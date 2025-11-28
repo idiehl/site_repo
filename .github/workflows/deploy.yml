@@ -17,5 +17,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/yourdomain.com
+            cd /var/www/atlasuniversalis.com
             git pull origin master
