@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Atlas: Apocalypse – {% block head_title %}{{ page.title if page is defined else "Home" }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&display=swap" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/javascript/script.js"></script>
+</head>
+<body>
+<div class="pagewrapper">
+
+    <!-- Header -->
+    <div class="headwrapper">
+        <div class="headbar">
+            <h1>Atlas: Apocalypse</h1>
+        </div>
+
+        <div class="titlebox">
+            <div class="pagetitle">
+                {% block page_title %}
+                    {% if page is defined %}
+                        <h1>{{ page.title }}</h1>
+                    {% else %}
+                        <h1>Welcome</h1>
+                    {% endif %}
+                {% endblock %}
+            </div>
+            <div class="pagetitlesub">
+                {% block page_subtitle %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main section -->
+    <div class="sectionwrapper">
+        <div class="section">
+
+            <!-- Simple nav (we can replace with SVG later if you want) -->
+            <div class="navbox">
+                <nav class="chapter-nav">
+                    <ul>
+                        {% for item in nav_items %}
+                            <li class="{% if item.slug == current_slug %}active{% endif %}">
+                                <a href="/pages/{{ item.slug }}">{{ item.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Where each page’s unique content goes -->
+            <div class="sectioncenter">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footwrapper">
+        <div class="footerbox">
+            <footer>
+                <p>Ian Diehl<br>
+                    Sarasota, Florida. 2024<br>
+                    Email: diehl4@usf.edu</p>
+            </footer>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
