@@ -17,5 +17,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/atlasuniversalis.com
-            git pull origin master
+              cd /var/www/atlasuniversalis.com
+              git pull origin master
+              .venv/bin/pip install -r requirements.txt
+              sudo systemctl restart atlasuniversalis
+
