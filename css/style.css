@@ -186,29 +186,25 @@ body {
     grid-area: rdeco;
 }
 
-/* Chapter nav (shared across pages) */
+/* Chapter list inside the navbox */
 .chapter-nav {
-    padding: 10px 15px;
-}
-
-.chapter-nav ul {
-    list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 8px 10px;
+    list-style: none;
 
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .chapter-nav-item a {
-    display: block;
-    padding: 6px 10px;
+    display: inline-block;
+    padding: 4px 10px;
     border: 1px solid #F2F2F2;
     border-radius: 999px;
 
     font-family: "Aldrich", sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     letter-spacing: 0.03em;
     text-decoration: none;
 
@@ -224,7 +220,6 @@ body {
     background-color: #F2F2F2;
     color: #333A40;
 }
-
 
 /* svg l/r bars LVL2 (section) */
 .sidebarleft {

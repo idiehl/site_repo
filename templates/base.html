@@ -20,17 +20,17 @@
 <body>
 <div class="pagewrapper">
 
-    <!-- Header / site title -->
+    <!-- Header -->
     <div class="headwrapper">
         <div class="headbar">
-            <h1 class="site-title">
-                <a href="{{ request.url_for('home') }}">Atlas: Apocalypse</a>
-            </h1>
+            <h1>Atlas: Apocalypse</h1>
         </div>
 
         <div class="titlebox">
             <div class="pagetitle">
-                {% block page_title %}{% endblock %}
+                {% block page_title %}
+                    <h1>{{ page.title if page is defined else "Welcome" }}</h1>
+                {% endblock %}
             </div>
             <div class="pagetitlesub">
                 {% block page_subtitle %}{% endblock %}
@@ -38,31 +38,38 @@
         </div>
     </div>
 
-    <!-- Main content area with nav + body -->
+    <!-- Main body (nav + content) -->
     <div class="sectionwrapper">
         <div class="section">
 
-            <!-- Global chapter nav -->
+            <!-- Optional decorative left/right containers are allowed to be empty -->
+            <div class="navbarleft"></div>
+
+            <!-- Chapter nav lives in the "nav" grid area -->
             <div class="navbox">
-                {% if nav_items is defined %}
-                    <nav class="chapter-nav">
-                        <ul>
-                            {% for item in nav_items %}
-                                <li class="chapter-nav-item{% if current_slug == item.slug %} is-active{% endif %}">
-                                    <a href="{{ request.url_for('render_page', slug=item.slug) }}">
-                                        {{ item.title }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
+                {% if nav_items %}
+                    <ul class="chapter-nav">
+                        {% for item in nav_items %}
+                            <li class="chapter-nav-item{% if current_slug == item.slug %} is-active{% endif %}">
+                                <a href="{{ request.url_for('render_page', slug=item.slug) }}">
+                                    {{ item.title }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             </div>
 
-            <!-- Page-specific content -->
+            <div class="navbarright"></div>
+
+            <div class="sidebarleft"></div>
+
+            <!-- Central bordered content box -->
             <div class="sectioncenter">
                 {% block content %}{% endblock %}
             </div>
+
+            <div class="sidebarright"></div>
         </div>
     </div>
 
