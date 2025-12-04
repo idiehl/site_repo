@@ -17,7 +17,11 @@
         <p>Select a chapter to begin:</p>
         <ul>
             {% for item in nav_items %}
-                <li><a href="/pages/{{ item.slug }}">{{ item.title }}</a></li>
+                <li>
+                    <a href="{{ request.url_for('render_page', slug=item.slug) }}">
+                        {{ item.title }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
     </div>
