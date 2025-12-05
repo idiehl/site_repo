@@ -46,19 +46,27 @@
             <div class="navbarleft"></div>
 
             <!-- Chapter nav lives in the "nav" grid area -->
-            <div class="navbox">
-                {% if nav_items %}
-                    <ul class="chapter-nav">
-                        {% for item in nav_items %}
-                            <li class="chapter-nav-item{% if current_slug == item.slug %} is-active{% endif %}">
-                                <a href="{{ request.url_for('render_page', slug=item.slug) }}">
-                                    {{ item.title }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
+            <div class="navbox"
+     		id="chapter-nav-root"
+     		data-current-slug="{{ current_slug or '' }}"
+     		data-nav-items='{{ nav_items_json | safe }}'>
+
+    		<!-- Fallback if JS is disabled -->
+    		<noscript>
+        	    {% if nav_items %}
+            	        <ul class="chapter-nav">
+                            {% for item in nav_items %}
+                                <li class="chapter-nav-item{% if current_slug == item.slug %} is-active{% endif %}">
+                                    <a href="{{ request.url_for('render_page', slug=item.slug) }}">
+                                        {{ item.title }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </noscript>
+             </div>
+
 
             <div class="navbarright"></div>
 
@@ -85,5 +93,7 @@
     </div>
 
 </div>
+
+<script type="module" src="/javascript/dist/assets/main.js"></script>
 </body>
 </html>

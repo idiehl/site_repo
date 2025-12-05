@@ -1,6 +1,8 @@
 import asyncio
 import os
 import re
+import json
+
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -136,14 +138,18 @@ async def _get_nav_items(session: AsyncSession) -> list[dict]:
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, session: AsyncSession = Depends(get_session)):
     nav_items = await _get_nav_items(session)
+    nav_items_json = json.dumps(nav_items)
+
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "nav_items": nav_items,
+            "nav_items_json": nav_items_json,
             "current_slug": None,
         },
     )
+
 
 
 @app.get("/pages/{slug}", response_class=HTMLResponse)
@@ -159,6 +165,7 @@ async def render_page(
 
     page = Page(**row._mapping)
     nav_items = await _get_nav_items(session)
+    nav_items_json = json.dumps(nav_items)
 
     return templates.TemplateResponse(
         "page.html",
@@ -166,9 +173,11 @@ async def render_page(
             "request": request,
             "page": page,
             "nav_items": nav_items,
+            "nav_items_json": nav_items_json,
             "current_slug": slug,
         },
     )
+
 
 
 # ---------- DB management helpers ----------
