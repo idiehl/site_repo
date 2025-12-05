@@ -119,26 +119,22 @@ body {
     grid-area: main;
 }
 
-/* main body container LVL2 (sectionwrapper) */
 .section {
     display: grid;
     margin-top: 25px;
     margin-bottom: 25px;
 
     grid-gap: 15px;
-
     grid-auto-flow: row dense;
 
     grid-template-areas:
-    "ldeco nav rdeco"
-    "lbar center rbar"
-;
+        "ldeco nav rdeco"
+        "lbar center rbar";
     grid-template-columns:
-    1fr 6fr 1fr;
+        1fr 6fr 1fr;
     grid-template-rows:
-    auto 1fr;
+        auto 1fr;
 }
-
 
 /* nav LVL3 (section) */
 .navbox {
@@ -176,7 +172,6 @@ body {
     box-sizing: border-box;
     margin-right: 15px;
     grid-area: ldeco;
-
 }
 
 .navbarright {
@@ -230,6 +225,8 @@ body {
     border-style: solid;
     border-color: #F2F2F2;
     border-width: 5px;
+
+    grid-area: lbar;
 }
 
 .sidebarright {
