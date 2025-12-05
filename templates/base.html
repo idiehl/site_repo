@@ -70,14 +70,53 @@
 
             <div class="navbarright"></div>
 
-            <div class="sidebarleft"></div>
+            <div class="sidebarleft">
+    <div class="constellation-column constellation-column-left">
+        <div class="constellation-track">
+            <!-- You can replace these names with SVGs later -->
+            <div class="constellation-item">Orion</div>
+            <div class="constellation-item">Cassiopeia</div>
+            <div class="constellation-item">Ursa Major</div>
+            <div class="constellation-item">Scorpius</div>
+            <div class="constellation-item">Cygnus</div>
+            <div class="constellation-item">Lyra</div>
 
-            <!-- Central bordered content box -->
-            <div class="sectioncenter">
-                {% block content %}{% endblock %}
-            </div>
+            <!-- duplicate list for seamless loop -->
+            <div class="constellation-item">Orion</div>
+            <div class="constellation-item">Cassiopeia</div>
+            <div class="constellation-item">Ursa Major</div>
+            <div class="constellation-item">Scorpius</div>
+            <div class="constellation-item">Cygnus</div>
+            <div class="constellation-item">Lyra</div>
+        </div>
+    </div>
+</div>
 
-            <div class="sidebarright"></div>
+<div class="sectioncenter">
+    {% block content %}{% endblock %}
+</div>
+
+<div class="sidebarright">
+    <div class="constellation-column constellation-column-right">
+        <div class="constellation-track">
+            <!-- same items; we’ll scroll them the opposite way -->
+            <div class="constellation-item">Orion</div>
+            <div class="constellation-item">Cassiopeia</div>
+            <div class="constellation-item">Ursa Major</div>
+            <div class="constellation-item">Scorpius</div>
+            <div class="constellation-item">Cygnus</div>
+            <div class="constellation-item">Lyra</div>
+
+            <div class="constellation-item">Orion</div>
+            <div class="constellation-item">Cassiopeia</div>
+            <div class="constellation-item">Ursa Major</div>
+            <div class="constellation-item">Scorpius</div>
+            <div class="constellation-item">Cygnus</div>
+            <div class="constellation-item">Lyra</div>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 

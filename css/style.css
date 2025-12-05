@@ -242,6 +242,90 @@ body {
     grid-area: rbar;
 }
 
+/* Sidebars sit in the left/right grid cells */
+.sidebarleft,
+.sidebarright {
+    position: relative;
+    /* Let the grid height be whatever, we’ll stick the column inside */
+}
+
+/* The visible “window” for constellations */
+.constellation-column {
+    position: sticky;
+    top: 140px; /* adjust so it sits just under your header/nav */
+    height: calc(100vh - 180px); /* viewport-based height */
+    margin-inline: auto;
+    width: 100%;
+    max-width: 120px;  /* how thick the columns are */
+    overflow: hidden;
+
+    border: 2px solid #F2F2F2;
+    border-radius: 999px;
+    background: #20242b;
+}
+
+/* The tall inner strip that slides behind the window */
+.constellation-track {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-block: 3rem;
+    align-items: center;
+    /* make it tall so the loop feels slow and smooth */
+    animation-duration: 60s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* Left column scrolls upward */
+.constellation-column-left .constellation-track {
+    animation-name: constellation-scroll-up;
+}
+
+/* Right column scrolls downward */
+.constellation-column-right .constellation-track {
+    animation-name: constellation-scroll-down;
+}
+
+/* Individual items */
+.constellation-item {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid #ff004d;
+    opacity: 0.7;
+}
+
+/* Optional hover glow */
+.constellation-item:hover {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(255, 0, 77, 0.7);
+}
+
+/* Keyframes for the vertical marquee */
+@keyframes constellation-scroll-up {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-50%); /* because we duplicated the list */
+    }
+}
+
+@keyframes constellation-scroll-down {
+    0% {
+        transform: translateY(-50%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+
 /* main text/content container LVL3 (section) */
 .sectioncenter {
     display: grid;
