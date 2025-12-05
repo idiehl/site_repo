@@ -150,6 +150,8 @@ body {
     border-width: 5px;
     box-sizing: border-box;
 
+    padding: 8px 10px;
+
     grid-area: nav;
 
     display: grid;
