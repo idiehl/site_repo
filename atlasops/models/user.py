@@ -68,12 +68,12 @@ class UserProfile(Base):
     headline: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
-    # Enhanced profile fields
+    # New fields for enhanced profile
     profile_picture_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     
-    # Social links stored as JSON
+    # Social links stored as JSON: {"linkedin": "...", "github": "...", "twitter": "...", "portfolio": "..."}
     social_links: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     
     # Resume storage
