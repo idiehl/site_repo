@@ -343,6 +343,8 @@ async def get_job_resumes(
     db: DbSession,
 ) -> List[dict]:
     """Get all generated resumes for a job posting."""
+    from atlasops.models.resume import GeneratedResume
+    
     # Verify job belongs to user
     result = await db.execute(
         select(JobPosting).where(
@@ -385,6 +387,8 @@ async def get_resume(
     db: DbSession,
 ) -> dict:
     """Get a specific generated resume with HTML content."""
+    from atlasops.models.resume import GeneratedResume
+    
     # Verify job belongs to user
     result = await db.execute(
         select(JobPosting).where(
