@@ -536,6 +536,14 @@ async function saveManualContent() {
             >
               {{ generatingInterviewPrep ? 'Generating...' : '🎤 Interview Prep' }}
             </button>
+            <button 
+              v-if="canGenerateFollowup"
+              @click="generateFollowup"
+              :disabled="generatingFollowup"
+              class="btn btn-secondary"
+            >
+              {{ generatingFollowup ? 'Generating...' : '✉️ Follow-up Message' }}
+            </button>
           </div>
           <p v-if="!job.company_name" class="text-sm text-night-500 mt-2">
             ℹ️ Add job details to enable these actions
@@ -579,18 +587,6 @@ async function saveManualContent() {
                 <h4 class="font-medium">Review Resume</h4>
               </div>
               <p class="text-sm text-night-400">Check your tailored resume for this role</p>
-            </div>
-            <div 
-              v-if="canGenerateFollowup"
-              @click="generateFollowup"
-              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
-              :class="{ 'opacity-50 cursor-wait': generatingFollowup }"
-            >
-              <div class="flex items-center gap-3 mb-2">
-                <span class="text-2xl">✉️</span>
-                <h4 class="font-medium">{{ generatingFollowup ? 'Generating...' : 'Follow-up Message' }}</h4>
-              </div>
-              <p class="text-sm text-night-400">Generate a professional check-in message for the recruiter</p>
             </div>
             <div class="p-4 bg-night-800/50 rounded-lg">
               <div class="flex items-center gap-3 mb-2">
