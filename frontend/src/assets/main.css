@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #5e6bf1;
+  --color-primary-hover: #4a4de5;
+  --color-background: #0d0d12;
+  --color-surface: #1a1a24;
+  --color-surface-hover: #242432;
+  --color-border: #343446;
+  --color-text: #ececf2;
+  --color-text-muted: #878aa9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Form elements */
+input, textarea, select {
+  @apply bg-night-900 border border-night-700 rounded-lg px-4 py-2.5 text-night-100 
+         placeholder-night-500 focus:outline-none focus:ring-2 focus:ring-atlas-500 
+         focus:border-transparent transition-all duration-200;
+}
+
+/* Buttons */
+.btn {
+  @apply px-4 py-2.5 rounded-lg font-medium transition-all duration-200 
+         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-night-950;
+}
+
+.btn-primary {
+  @apply bg-atlas-600 text-white hover:bg-atlas-500 focus:ring-atlas-500;
+}
+
+.btn-secondary {
+  @apply bg-night-800 text-night-100 hover:bg-night-700 focus:ring-night-600;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-night-300 hover:bg-night-800 hover:text-night-100;
+}
+
+/* Cards */
+.card {
+  @apply bg-night-900/50 border border-night-800 rounded-xl p-6 
+         backdrop-blur-sm transition-all duration-200;
+}
+
+.card-hover:hover {
+  @apply bg-night-900/80 border-night-700;
+}
+
+/* Status badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-pending {
+  @apply bg-yellow-500/20 text-yellow-400;
+}
+
+.badge-applied {
+  @apply bg-blue-500/20 text-blue-400;
+}
+
+.badge-interview {
+  @apply bg-purple-500/20 text-purple-400;
+}
+
+.badge-offer {
+  @apply bg-green-500/20 text-green-400;
+}
+
+.badge-rejected {
+  @apply bg-red-500/20 text-red-400;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}

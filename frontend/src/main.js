@@ -1,23 +1,12 @@
 import { createApp } from 'vue'
-import ChapterNav from './components/ChapterNav.vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import router from './router'
+import './assets/main.css'
 
-document.addEventListener('DOMContentLoaded', () => {
-  const navRoot = document.getElementById('chapter-nav-root')
-  if (navRoot) {
-    const itemsJson = navRoot.dataset.navItems || '[]'
-    const currentSlug = navRoot.dataset.currentSlug || ''
+const app = createApp(App)
 
-    let items
-    try {
-      items = JSON.parse(itemsJson)
-    } catch (err) {
-      console.error('Failed to parse nav items JSON', err)
-      items = []
-    }
+app.use(createPinia())
+app.use(router)
 
-    createApp(ChapterNav, {
-      items,
-      currentSlug,
-    }).mount(navRoot)
-  }
-})
+app.mount('#app')
