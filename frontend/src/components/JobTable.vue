@@ -22,16 +22,16 @@ const jobsStore = useJobsStore()
 const applicationsStore = useApplicationsStore()
 const deletingId = ref(null)
 
-// Application status display
+// Application status display (matching StatusBadge style)
 const appStatusLabels = {
-  pending: { label: '📋 Saved', color: 'bg-gray-500/20 text-gray-300' },
-  applied: { label: '✅ Applied', color: 'bg-blue-500/20 text-blue-300' },
-  followup_scheduled: { label: '📅 Follow-up', color: 'bg-yellow-500/20 text-yellow-300' },
-  interview_scheduled: { label: '🎤 Interview', color: 'bg-purple-500/20 text-purple-300' },
-  offer_received: { label: '🎉 Offer!', color: 'bg-green-500/20 text-green-300' },
-  rejected: { label: '❌ Rejected', color: 'bg-red-500/20 text-red-300' },
-  withdrawn: { label: '🚫 Withdrawn', color: 'bg-gray-500/20 text-gray-400' },
-  no_response_closed: { label: '⏰ No Response', color: 'bg-gray-500/20 text-gray-400' }
+  pending: { label: 'Saved', color: 'bg-gray-500/20 text-gray-300 border border-gray-500/30' },
+  applied: { label: 'Applied', color: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
+  followup_scheduled: { label: 'Follow-up', color: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' },
+  interview_scheduled: { label: 'Interview', color: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
+  offer_received: { label: 'Offer', color: 'bg-green-500/20 text-green-300 border border-green-500/30' },
+  rejected: { label: 'Rejected', color: 'bg-red-500/20 text-red-300 border border-red-500/30' },
+  withdrawn: { label: 'Withdrawn', color: 'bg-gray-500/20 text-gray-400 border border-gray-500/30' },
+  no_response_closed: { label: 'No Response', color: 'bg-gray-500/20 text-gray-400 border border-gray-500/30' }
 }
 
 function getApplicationForJob(jobId) {
