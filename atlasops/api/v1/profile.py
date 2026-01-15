@@ -1,7 +1,10 @@
 """User profile endpoints."""
 
 import logging
+import os
+import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
@@ -9,12 +12,18 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from atlasops.api.deps import CurrentUser, DbSession
+from atlasops.config import get_settings
 from atlasops.models.user import UserProfile
 from atlasops.schemas.user import UserProfileResponse, UserProfileUpdate
 from atlasops.services.resume_parser import ResumeParser
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+settings = get_settings()
+
+# Directory for uploaded files
+UPLOAD_DIR = Path(__file__).parent.parent.parent / "uploads" / "avatars"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class ResumeParseResponse(BaseModel):
@@ -260,3 +269,136 @@ async def get_profile_completeness(
         "missing_fields": missing,
         "is_complete": score >= 80,
     }
+
+
+class ProfilePictureResponse(BaseModel):
+    """Response for profile picture upload."""
+    
+    message: str
+    profile_picture_url: str
+
+
+@router.post("/upload-picture", response_model=ProfilePictureResponse)
+async def upload_profile_picture(
+    current_user: CurrentUser,
+    db: DbSession,
+    file: UploadFile = File(...),
+) -> dict:
+    """
+    Upload a profile picture.
+    
+    Supports JPEG, PNG, GIF, and WebP images.
+    Max file size: 5MB.
+    """
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported file type: {file.content_type}. Allowed: JPEG, PNG, GIF, WebP",
+        )
+    
+    # Read file content
+    content = await file.read()
+    
+    # Check file size (5MB max)
+    max_size = 5 * 1024 * 1024  # 5MB
+    if len(content) > max_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File too large. Maximum size is 5MB.",
+        )
+    
+    # Generate unique filename
+    ext = file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg"
+    filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}.{ext}"
+    filepath = UPLOAD_DIR / filename
+    
+    # Save file
+    try:
+        with open(filepath, "wb") as f:
+            f.write(content)
+    except Exception as e:
+        logger.error(f"Failed to save profile picture: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save image. Please try again.",
+        )
+    
+    # Generate URL for the uploaded file
+    picture_url = f"/uploads/avatars/{filename}"
+    
+    # Get user's profile
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.user_id == current_user.id)
+    )
+    profile = result.scalar_one_or_none()
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Profile not found",
+        )
+    
+    # Delete old profile picture if exists
+    if profile.profile_picture_url:
+        old_filename = profile.profile_picture_url.split("/")[-1]
+        old_path = UPLOAD_DIR / old_filename
+        if old_path.exists():
+            try:
+                old_path.unlink()
+            except Exception:
+                pass  # Don't fail if we can't delete old file
+    
+    # Update profile
+    profile.profile_picture_url = picture_url
+    profile.completeness_score = profile.calculate_completeness()
+    
+    await db.commit()
+    
+    return {
+        "message": "Profile picture uploaded successfully",
+        "profile_picture_url": picture_url,
+    }
+
+
+@router.delete("/picture")
+async def delete_profile_picture(
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Delete the current profile picture."""
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.user_id == current_user.id)
+    )
+    profile = result.scalar_one_or_none()
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Profile not found",
+        )
+    
+    if not profile.profile_picture_url:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No profile picture to delete",
+        )
+    
+    # Delete the file
+    filename = profile.profile_picture_url.split("/")[-1]
+    filepath = UPLOAD_DIR / filename
+    if filepath.exists():
+        try:
+            filepath.unlink()
+        except Exception as e:
+            logger.warning(f"Could not delete profile picture file: {e}")
+    
+    # Update profile
+    profile.profile_picture_url = None
+    profile.completeness_score = profile.calculate_completeness()
+    
+    await db.commit()
+    
+    return {"message": "Profile picture deleted successfully"}

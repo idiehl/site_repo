@@ -29,12 +29,14 @@ const profile = ref({
 const loading = ref(false)
 const saving = ref(false)
 const uploading = ref(false)
+const uploadingPicture = ref(false)
 const error = ref(null)
 const success = ref(null)
 const activeTab = ref('basic')
 
 const newSkill = ref('')
 const resumeFile = ref(null)
+const pictureFile = ref(null)
 
 // Completeness info
 const completenessInfo = ref({
@@ -154,6 +156,58 @@ function handleFileSelect(event) {
   }
 }
 
+function handlePictureSelect(event) {
+  const file = event.target.files[0]
+  if (file) {
+    pictureFile.value = file
+    uploadProfilePicture()
+  }
+}
+
+async function uploadProfilePicture() {
+  if (!pictureFile.value) return
+  
+  uploadingPicture.value = true
+  error.value = null
+  
+  const formData = new FormData()
+  formData.append('file', pictureFile.value)
+  
+  try {
+    const response = await api.post('/api/v1/profile/upload-picture', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    
+    profile.value.profile_picture_url = response.data.profile_picture_url
+    success.value = 'Profile picture uploaded!'
+    await fetchCompleteness()
+    
+    pictureFile.value = null
+    const fileInput = document.getElementById('picture-upload')
+    if (fileInput) fileInput.value = ''
+    
+    setTimeout(() => success.value = null, 3000)
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to upload picture'
+  } finally {
+    uploadingPicture.value = false
+  }
+}
+
+async function deleteProfilePicture() {
+  if (!profile.value.profile_picture_url) return
+  
+  try {
+    await api.delete('/api/v1/profile/picture')
+    profile.value.profile_picture_url = ''
+    success.value = 'Profile picture removed'
+    await fetchCompleteness()
+    setTimeout(() => success.value = null, 3000)
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to delete picture'
+  }
+}
+
 function addSkill() {
   if (newSkill.value.trim() && !profile.value.skills.includes(newSkill.value.trim())) {
     profile.value.skills.push(newSkill.value.trim())
@@ -259,14 +313,44 @@ const completenessColor = computed(() => {
         <div class="card">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-              <div class="w-16 h-16 rounded-full bg-night-700 flex items-center justify-center overflow-hidden">
-                <img 
-                  v-if="profile.profile_picture_url" 
-                  :src="profile.profile_picture_url" 
-                  class="w-full h-full object-cover"
-                  alt="Profile"
-                />
-                <span v-else class="text-2xl">👤</span>
+              <!-- Profile Picture with Upload -->
+              <div class="relative group">
+                <div class="w-20 h-20 rounded-full bg-night-700 flex items-center justify-center overflow-hidden ring-2 ring-night-600">
+                  <img 
+                    v-if="profile.profile_picture_url" 
+                    :src="profile.profile_picture_url" 
+                    class="w-full h-full object-cover"
+                    alt="Profile"
+                  />
+                  <span v-else class="text-3xl">👤</span>
+                </div>
+                <!-- Upload overlay -->
+                <div class="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <input
+                    id="picture-upload"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    @change="handlePictureSelect"
+                    class="hidden"
+                  />
+                  <label 
+                    v-if="!uploadingPicture"
+                    for="picture-upload"
+                    class="text-white text-xs font-medium cursor-pointer"
+                  >
+                    {{ profile.profile_picture_url ? '📷 Change' : '📷 Upload' }}
+                  </label>
+                  <span v-else class="text-white text-xs">Uploading...</span>
+                </div>
+                <!-- Delete button -->
+                <button 
+                  v-if="profile.profile_picture_url && !uploadingPicture"
+                  @click="deleteProfilePicture"
+                  class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove picture"
+                >
+                  ×
+                </button>
               </div>
               <div>
                 <h2 class="text-xl font-semibold">{{ profile.full_name || 'Your Name' }}</h2>

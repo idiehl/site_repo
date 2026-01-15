@@ -1,6 +1,7 @@
 """AtlasOps - FastAPI Application Entrypoint."""
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,11 @@ from atlasops.api.v1.router import router as api_router
 from atlasops.config import get_settings
 
 settings = get_settings()
+
+# Ensure uploads directory exists
+UPLOADS_DIR = Path(__file__).parent / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
+(UPLOADS_DIR / "avatars").mkdir(exist_ok=True)
 
 
 @asynccontextmanager
@@ -57,6 +63,9 @@ async def root():
         "health": "/health",
     }
 
+
+# Mount uploads directory for serving user-uploaded files
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 # Mount static files for frontend (after build)
 # Uncomment when frontend is built:
