@@ -92,25 +92,38 @@ function closeResumeModal() {
   selectedResume.value = null
 }
 
-function printResume() {
-  const printWindow = window.open('', '_blank')
-  if (printWindow && selectedResume.value?.rendered_html) {
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Resume - ${job.value?.job_title || 'Generated Resume'}</title>
-          <style>
-            body { font-family: 'Georgia', serif; max-width: 800px; margin: 0 auto; padding: 40px; }
-            @media print { body { padding: 0; } }
-          </style>
-        </head>
-        <body>${selectedResume.value.rendered_html}</body>
-      </html>
-    `)
-    printWindow.document.close()
-    printWindow.print()
-  }
+function downloadResume() {
+  if (!selectedResume.value?.rendered_html) return
+  
+  const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Resume - ${job.value?.job_title || 'Generated Resume'}</title>
+  <style>
+    body { font-family: 'Georgia', serif; max-width: 800px; margin: 0 auto; padding: 40px; line-height: 1.6; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+${selectedResume.value.rendered_html}
+</body>
+</html>`
+
+  const blob = new Blob([htmlContent], { type: 'text/html' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  
+  // Create filename from job title
+  const jobTitle = (job.value?.job_title || 'resume').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+  const company = (job.value?.company_name || '').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+  link.download = `resume_${company}_${jobTitle}.html`
+  
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 async function generateDeepDive() {
@@ -358,8 +371,8 @@ async function saveManualContent() {
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button @click="printResume" class="px-3 py-2 bg-atlas-600 text-white rounded-lg text-sm hover:bg-atlas-700 transition-colors">
-              🖨️ Print / Save PDF
+            <button @click="downloadResume" class="px-3 py-2 bg-atlas-600 text-white rounded-lg text-sm hover:bg-atlas-700 transition-colors">
+              ⬇️ Download Resume
             </button>
             <button @click="closeResumeModal" class="p-2 text-gray-500 hover:text-gray-700 text-xl">
               ✕
