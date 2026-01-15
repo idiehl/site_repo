@@ -37,6 +37,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/applications',
+    name: 'applications',
+    component: () => import('../views/ApplicationsView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/oauth/callback',
     name: 'oauth-callback',
     component: () => import('../views/OAuthCallbackView.vue'),

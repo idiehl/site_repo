@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
+import { useApplicationsStore } from '../stores/applications'
 import StatusBadge from '../components/StatusBadge.vue'
 import api from '../api/client'
 import html2pdf from 'html2pdf.js'
@@ -9,6 +10,7 @@ import html2pdf from 'html2pdf.js'
 const route = useRoute()
 const router = useRouter()
 const jobs = useJobsStore()
+const applicationsStore = useApplicationsStore()
 
 const job = computed(() => jobs.currentJob)
 const generating = ref(false)
@@ -29,6 +31,33 @@ const loadingResume = ref(false)
 const deepDive = ref(null)
 const showDeepDiveModal = ref(false)
 
+// Application state
+const application = ref(null)
+const creatingApplication = ref(false)
+const updatingStatus = ref(false)
+const showStatusModal = ref(false)
+const showInterviewPrepModal = ref(false)
+const interviewPrep = ref(null)
+const generatingInterviewPrep = ref(false)
+
+// Application statuses for dropdown
+const applicationStatuses = [
+  { value: 'pending', label: '📋 Pending', color: 'gray' },
+  { value: 'applied', label: '✅ Applied', color: 'blue' },
+  { value: 'followup_scheduled', label: '📅 Follow-up Scheduled', color: 'yellow' },
+  { value: 'interview_scheduled', label: '🎤 Interview Scheduled', color: 'purple' },
+  { value: 'offer_received', label: '🎉 Offer Received', color: 'green' },
+  { value: 'rejected', label: '❌ Rejected', color: 'red' },
+  { value: 'withdrawn', label: '🚫 Withdrawn', color: 'gray' },
+  { value: 'no_response_closed', label: '⏰ No Response', color: 'gray' }
+]
+
+const hasApplication = computed(() => !!application.value)
+const currentStatusLabel = computed(() => {
+  if (!application.value) return null
+  return applicationStatuses.find(s => s.value === application.value.status)?.label || application.value.status
+})
+
 // Check if job was blocked/failed to scrape
 const wasBlocked = computed(() => {
   if (!job.value) return false
@@ -40,8 +69,11 @@ const wasBlocked = computed(() => {
 
 onMounted(async () => {
   await jobs.fetchJob(route.params.id)
-  await fetchResumes()
-  await fetchDeepDive()
+  await Promise.all([
+    fetchResumes(),
+    fetchDeepDive(),
+    fetchApplication()
+  ])
 })
 
 async function fetchResumes() {
@@ -190,6 +222,75 @@ function closeDeepDiveModal() {
   showDeepDiveModal.value = false
 }
 
+// Application functions
+async function fetchApplication() {
+  if (!route.params.id) return
+  try {
+    // Fetch all applications and find one for this job
+    await applicationsStore.fetchApplications()
+    application.value = applicationsStore.getApplicationForJob(route.params.id)
+  } catch (err) {
+    console.error('Failed to fetch application:', err)
+  }
+}
+
+async function createApplication() {
+  if (!job.value?.id) return
+  
+  creatingApplication.value = true
+  error.value = ''
+  try {
+    const app = await applicationsStore.createApplication(job.value.id, `Applied to ${job.value.job_title} at ${job.value.company_name}`)
+    application.value = app
+    message.value = '🎉 Application created! Good luck!'
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to create application'
+  } finally {
+    creatingApplication.value = false
+  }
+}
+
+async function updateStatus(newStatus) {
+  if (!application.value) return
+  
+  updatingStatus.value = true
+  error.value = ''
+  try {
+    const updated = await applicationsStore.updateApplicationStatus(application.value.id, newStatus)
+    application.value = updated
+    message.value = `Status updated to ${applicationStatuses.find(s => s.value === newStatus)?.label || newStatus}`
+    showStatusModal.value = false
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to update status'
+  } finally {
+    updatingStatus.value = false
+  }
+}
+
+async function generateInterviewPrep() {
+  if (!application.value) return
+  
+  generatingInterviewPrep.value = true
+  error.value = ''
+  try {
+    const prep = await applicationsStore.generateInterviewPrep(application.value.id)
+    interviewPrep.value = prep
+    showInterviewPrepModal.value = true
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to generate interview prep'
+  } finally {
+    generatingInterviewPrep.value = false
+  }
+}
+
+function closeInterviewPrepModal() {
+  showInterviewPrepModal.value = false
+}
+
+function closeStatusModal() {
+  showStatusModal.value = false
+}
+
 async function saveManualContent() {
   if (!manualContent.value.trim()) return
   
@@ -333,6 +434,29 @@ async function saveManualContent() {
           <p class="text-red-400">✗ {{ error }}</p>
         </div>
 
+        <!-- Application Status Banner -->
+        <div v-if="hasApplication" class="card bg-gradient-to-r from-atlas-900/50 to-purple-900/50 border-atlas-600/50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="text-3xl">📝</div>
+              <div>
+                <h3 class="font-semibold text-white">Application Tracked</h3>
+                <p class="text-sm text-night-300">
+                  Status: <span class="font-medium text-atlas-300">{{ currentStatusLabel }}</span>
+                  <span class="text-night-500 ml-2">•</span>
+                  <span class="text-night-400 ml-2">Created {{ new Date(application.created_at).toLocaleDateString() }}</span>
+                </p>
+              </div>
+            </div>
+            <button 
+              @click="showStatusModal = true"
+              class="btn btn-secondary text-sm"
+            >
+              Update Status
+            </button>
+          </div>
+        </div>
+
         <!-- Actions -->
         <div class="card">
           <h3 class="text-lg font-semibold mb-4">Actions</h3>
@@ -351,13 +475,87 @@ async function saveManualContent() {
             >
               {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Deep Dive' : '🔍 Company Deep Dive') }}
             </button>
-            <button class="btn btn-secondary" disabled>
-              Create Application
+            <button 
+              v-if="!hasApplication"
+              @click="createApplication"
+              :disabled="creatingApplication || !job.company_name"
+              class="btn btn-secondary"
+            >
+              {{ creatingApplication ? 'Creating...' : '📝 Create Application' }}
+            </button>
+            <button 
+              v-if="hasApplication"
+              @click="generateInterviewPrep"
+              :disabled="generatingInterviewPrep"
+              class="btn btn-secondary"
+            >
+              {{ generatingInterviewPrep ? 'Generating...' : '🎤 Interview Prep' }}
             </button>
           </div>
           <p v-if="!job.company_name" class="text-sm text-night-500 mt-2">
             ℹ️ Add job details to enable these actions
           </p>
+        </div>
+
+        <!-- Interview Prep Hub (shown when application exists) -->
+        <div v-if="hasApplication" class="card bg-purple-900/20 border-purple-600/30">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span>🎯</span>
+            <span>Interview Preparation Hub</span>
+          </h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div 
+              @click="generateInterviewPrep"
+              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+            >
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">📚</span>
+                <h4 class="font-medium">Practice Questions</h4>
+              </div>
+              <p class="text-sm text-night-400">Get AI-generated interview questions with suggested answers</p>
+            </div>
+            <div 
+              @click="viewDeepDive"
+              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+            >
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">🔍</span>
+                <h4 class="font-medium">Company Research</h4>
+              </div>
+              <p class="text-sm text-night-400">Review company insights and talking points</p>
+            </div>
+            <div 
+              v-if="resumes.length > 0"
+              @click="viewResume(resumes[0].id)"
+              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+            >
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">📄</span>
+                <h4 class="font-medium">Review Resume</h4>
+              </div>
+              <p class="text-sm text-night-400">Check your tailored resume for this role</p>
+            </div>
+            <div class="p-4 bg-night-800/50 rounded-lg">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">✅</span>
+                <h4 class="font-medium">Prep Checklist</h4>
+              </div>
+              <ul class="text-sm text-night-400 space-y-1">
+                <li class="flex items-center gap-2">
+                  <span :class="resumes.length > 0 ? 'text-green-400' : 'text-night-600'">{{ resumes.length > 0 ? '✓' : '○' }}</span>
+                  Tailored resume ready
+                </li>
+                <li class="flex items-center gap-2">
+                  <span :class="deepDive ? 'text-green-400' : 'text-night-600'">{{ deepDive ? '✓' : '○' }}</span>
+                  Company research done
+                </li>
+                <li class="flex items-center gap-2">
+                  <span :class="interviewPrep ? 'text-green-400' : 'text-night-600'">{{ interviewPrep ? '✓' : '○' }}</span>
+                  Practice questions reviewed
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <!-- Generated Resumes -->
@@ -534,6 +732,65 @@ async function saveManualContent() {
         <div class="px-6 py-4 border-t border-night-700 bg-night-800 text-xs text-night-500">
           Generated {{ deepDive.generated_at ? new Date(deepDive.generated_at).toLocaleDateString() : 'recently' }} • 
           AI-generated insights based on public information
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div 
+      v-if="showStatusModal" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeStatusModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-md w-full shadow-2xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700">
+          <h3 class="text-lg font-semibold">Update Application Status</h3>
+          <button @click="closeStatusModal" class="p-2 text-night-400 hover:text-white text-xl">✕</button>
+        </div>
+        <div class="p-6 space-y-3">
+          <button 
+            v-for="status in applicationStatuses" 
+            :key="status.value"
+            @click="updateStatus(status.value)"
+            :disabled="updatingStatus || application?.status === status.value"
+            class="w-full p-3 text-left rounded-lg transition-colors flex items-center justify-between"
+            :class="application?.status === status.value 
+              ? 'bg-atlas-600/30 border border-atlas-500 text-atlas-300' 
+              : 'bg-night-800 hover:bg-night-700 text-night-200'"
+          >
+            <span>{{ status.label }}</span>
+            <span v-if="application?.status === status.value" class="text-atlas-400">Current</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview Prep Modal -->
+    <div 
+      v-if="showInterviewPrepModal && interviewPrep" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeInterviewPrepModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <div>
+            <h3 class="text-lg font-semibold text-white">🎤 Interview Preparation</h3>
+            <p class="text-sm text-night-400">{{ interviewPrep.job_title }} at {{ interviewPrep.company_name }}</p>
+          </div>
+          <button @click="closeInterviewPrepModal" class="p-2 text-night-400 hover:text-white text-xl">✕</button>
+        </div>
+        
+        <!-- Interview Prep Content -->
+        <div class="flex-1 overflow-auto p-6">
+          <div class="prose prose-invert prose-sm max-w-none">
+            <div class="whitespace-pre-wrap text-night-200 leading-relaxed">{{ interviewPrep.interview_prep }}</div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800 text-xs text-night-500">
+          AI-generated interview preparation • Review and personalize these suggestions
         </div>
       </div>
     </div>
