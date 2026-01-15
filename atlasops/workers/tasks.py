@@ -40,6 +40,30 @@ def run_async(coro):
         loop.close()
 
 
+def get_fresh_session():
+    """Create a fresh async session maker for Celery tasks.
+    
+    This avoids connection pool issues when Celery workers fork.
+    """
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+    
+    engine = create_async_engine(
+        settings.database_url,
+        echo=False,
+        future=True,
+        pool_pre_ping=True,
+        pool_recycle=300,
+    )
+    
+    session_maker = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+    
+    return session_maker, engine
+
+
 @celery_app.task(bind=True, max_retries=3)
 def scrape_job_posting(self, job_id: str):
     """
@@ -56,7 +80,6 @@ def scrape_job_posting(self, job_id: str):
     async def _scrape():
         from sqlalchemy import select
 
-        from atlasops.db import async_session_maker
         from atlasops.models.job import JobPosting
         from atlasops.services.llm_client import llm_client
         from atlasops.services.scraper import (
@@ -66,7 +89,10 @@ def scrape_job_posting(self, job_id: str):
             fetch_with_playwright,
         )
 
-        async with async_session_maker() as db:
+        # Create fresh connection for this task
+        session_maker, engine = get_fresh_session()
+        
+        async with session_maker() as db:
             # Get job posting
             result = await db.execute(
                 select(JobPosting).where(JobPosting.id == job_id)
@@ -127,6 +153,9 @@ def scrape_job_posting(self, job_id: str):
                 job.error_message = str(e)
                 await db.commit()
                 raise
+            finally:
+                # Clean up the engine to avoid connection pool issues
+                await engine.dispose()
 
     try:
         run_async(_scrape())
@@ -146,7 +175,6 @@ def check_stale_applications():
     async def _check():
         from sqlalchemy import select
 
-        from atlasops.db import async_session_maker
         from atlasops.models.application import (
             Application,
             ApplicationEvent,
@@ -155,7 +183,10 @@ def check_stale_applications():
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=30)
 
-        async with async_session_maker() as db:
+        # Create fresh connection for this task
+        session_maker, engine = get_fresh_session()
+        
+        async with session_maker() as db:
             result = await db.execute(
                 select(Application).where(
                     Application.status == ApplicationStatus.APPLIED,
@@ -181,6 +212,9 @@ def check_stale_applications():
 
             await db.commit()
             logger.info(f"Auto-closed {len(stale_apps)} stale applications")
+        
+        # Clean up engine
+        await engine.dispose()
 
     run_async(_check())
 
