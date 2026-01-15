@@ -44,7 +44,7 @@ class JobPostingResponse(BaseModel):
     salary_range: Optional[str] = None
     job_description: Optional[str] = None
     requirements: Optional[Dict[str, Any]] = None
-    benefits: Optional[Dict[str, Any]] = None
+    benefits: Optional[List[str]] = None  # Benefits are returned as a list from LLM
     extraction_confidence: Optional[float] = None
     error_message: Optional[str] = None
     created_at: datetime
