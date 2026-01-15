@@ -40,9 +40,6 @@ class Settings(BaseSettings):
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
 
-    # Scraping Services
-    scrapingbee_api_key: str = ""  # Sign up at https://www.scrapingbee.com/
-
     # Application
     debug: bool = False
     environment: str = "development"
