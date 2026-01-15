@@ -87,6 +87,8 @@ def scrape_job_posting(self, job_id: str):
             extract_text_from_html,
             fetch_url_content,
             fetch_with_playwright,
+            fetch_with_scrapingbee,
+            is_blocked_content,
         )
 
         # Create fresh connection for this task
@@ -111,13 +113,23 @@ def scrape_job_posting(self, job_id: str):
                 # Compute URL hash
                 job.url_hash = compute_url_hash(job.url)
 
-                # Fetch content
+                # Fetch content - try multiple methods
                 content, error = await fetch_url_content(job.url)
 
                 # Try Playwright if simple fetch fails or returns no content
                 if not content or len(content) < 500:
                     logger.info(f"Trying Playwright for {job.url}")
                     content, error = await fetch_with_playwright(job.url)
+
+                # Check if content is blocked (Cloudflare, CAPTCHA, etc.)
+                if content and is_blocked_content(content):
+                    logger.info(f"Content blocked, trying ScrapingBee for {job.url}")
+                    content, error = await fetch_with_scrapingbee(job.url)
+
+                # Final fallback to ScrapingBee if still no content
+                if not content or len(content) < 500:
+                    logger.info(f"Trying ScrapingBee as final fallback for {job.url}")
+                    content, error = await fetch_with_scrapingbee(job.url)
 
                 if not content:
                     job.status = "failed"
@@ -127,6 +139,15 @@ def scrape_job_posting(self, job_id: str):
 
                 # Extract text
                 raw_text = extract_text_from_html(content)
+                
+                # Check if extracted text is still blocked
+                if is_blocked_content(raw_text):
+                    job.status = "failed"
+                    job.error_message = "Site blocked scraping. Use manual entry."
+                    job.raw_text = raw_text[:1000]  # Store for debugging
+                    await db.commit()
+                    return
+                
                 job.raw_text = raw_text[:50000]  # Limit storage
 
                 # Use LLM to extract structured data

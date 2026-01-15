@@ -3,10 +3,11 @@
 import hashlib
 import logging
 from typing import Optional, Tuple
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 import httpx
 
+from atlasops.config import get_settings
 from atlasops.utils.url_validator import validate_url
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,74 @@ async def fetch_with_playwright(url: str) -> Tuple[Optional[str], Optional[str]]
     except Exception as e:
         logger.exception("Playwright error fetching URL")
         return None, f"Playwright error: {str(e)}"
+
+
+async def fetch_with_scrapingbee(url: str) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Fetch content using ScrapingBee API for anti-bot bypass.
+    
+    ScrapingBee handles Cloudflare, CAPTCHAs, and JS rendering.
+    Sign up at https://www.scrapingbee.com/ and set SCRAPINGBEE_API_KEY.
+
+    Returns:
+        Tuple of (content, error_message)
+    """
+    settings = get_settings()
+    api_key = settings.scrapingbee_api_key
+    
+    if not api_key:
+        return None, "ScrapingBee API key not configured"
+
+    try:
+        params = {
+            "api_key": api_key,
+            "url": url,
+            "render_js": "true",  # Enable JavaScript rendering
+            "premium_proxy": "true",  # Use residential proxies for Indeed
+            "country_code": "us",  # US-based proxy
+            "wait": "3000",  # Wait 3s for JS to load
+        }
+        
+        api_url = f"https://app.scrapingbee.com/api/v1/?{urlencode(params)}"
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(api_url)
+            
+            if response.status_code == 200:
+                return response.text, None
+            elif response.status_code == 500:
+                return None, "ScrapingBee: Target website error"
+            elif response.status_code == 401:
+                return None, "ScrapingBee: Invalid API key"
+            elif response.status_code == 429:
+                return None, "ScrapingBee: Rate limit exceeded"
+            else:
+                return None, f"ScrapingBee error: {response.status_code}"
+                
+    except httpx.TimeoutException:
+        return None, "ScrapingBee request timed out"
+    except Exception as e:
+        logger.exception("ScrapingBee error")
+        return None, f"ScrapingBee error: {str(e)}"
+
+
+def is_blocked_content(content: str) -> bool:
+    """Check if the scraped content indicates blocking."""
+    if not content or len(content) < 500:
+        return True
+    
+    blocked_indicators = [
+        "blocked",
+        "cloudflare",
+        "captcha",
+        "access denied",
+        "please verify you are a human",
+        "unusual traffic",
+        "robot check",
+    ]
+    
+    content_lower = content.lower()
+    return any(indicator in content_lower for indicator in blocked_indicators)
 
 
 def extract_text_from_html(html: str) -> str:
