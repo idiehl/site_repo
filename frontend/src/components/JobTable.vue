@@ -1,6 +1,7 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
+import { useJobsStore } from '../stores/jobs'
 import StatusBadge from './StatusBadge.vue'
 
 const props = defineProps({
@@ -16,9 +17,27 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh'])
 const router = useRouter()
+const jobs = useJobsStore()
+const deletingId = ref(null)
 
 function viewJob(job) {
   router.push(`/jobs/${job.id}`)
+}
+
+async function deleteJob(event, job) {
+  event.stopPropagation() // Prevent row click
+  
+  if (!confirm(`Delete this job posting?\n${job.company_name || job.url}`)) {
+    return
+  }
+  
+  deletingId.value = job.id
+  const success = await jobs.deleteJob(job.id)
+  deletingId.value = null
+  
+  if (success) {
+    emit('refresh')
+  }
 }
 
 function formatDate(dateStr) {
@@ -57,6 +76,7 @@ function formatDate(dateStr) {
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Location</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Status</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Added</th>
+            <th class="text-right py-3 px-4 text-sm font-medium text-night-400">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -80,6 +100,16 @@ function formatDate(dateStr) {
             </td>
             <td class="py-3 px-4">
               <span class="text-night-400 text-sm">{{ formatDate(job.created_at) }}</span>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button
+                @click="deleteJob($event, job)"
+                :disabled="deletingId === job.id"
+                class="text-red-400 hover:text-red-300 hover:bg-red-900/30 px-2 py-1 rounded text-sm transition-colors disabled:opacity-50"
+                title="Delete job"
+              >
+                {{ deletingId === job.id ? '...' : '🗑️' }}
+              </button>
             </td>
           </tr>
         </tbody>
