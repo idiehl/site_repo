@@ -22,24 +22,24 @@ Job posting text:
 Return a JSON object with these fields:
 
 ```json
-{
+{{
   "company_name": "string or null",
   "job_title": "string or null",
   "location": "string or null",
   "remote_policy": "remote | hybrid | onsite | unknown",
   "salary_range": "string or null (e.g., '$80,000 - $120,000')",
   "job_description": "string - brief summary of the role",
-  "requirements": {
+  "requirements": {{
     "hard_skills": ["list of technical skills"],
     "soft_skills": ["list of soft skills"],
     "experience_years": "string or null (e.g., '3-5 years')",
     "education": "string or null",
     "certifications": ["list of required certifications"]
-  },
+  }},
   "benefits": ["list of benefits if mentioned"],
   "application_deadline": "string or null",
   "extraction_confidence": 0.0 to 1.0
-}
+}}
 ```
 
 ## Output
