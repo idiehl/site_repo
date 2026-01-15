@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
 import StatusBadge from '../components/StatusBadge.vue'
 import api from '../api/client'
+import html2pdf from 'html2pdf.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -92,38 +93,45 @@ function closeResumeModal() {
   selectedResume.value = null
 }
 
-function downloadResume() {
+const downloadingPdf = ref(false)
+
+async function downloadResume() {
   if (!selectedResume.value?.rendered_html) return
   
-  const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Resume - ${job.value?.job_title || 'Generated Resume'}</title>
-  <style>
-    body { font-family: 'Georgia', serif; max-width: 800px; margin: 0 auto; padding: 40px; line-height: 1.6; }
-    @media print { body { padding: 20px; } }
-  </style>
-</head>
-<body>
-${selectedResume.value.rendered_html}
-</body>
-</html>`
-
-  const blob = new Blob([htmlContent], { type: 'text/html' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
+  downloadingPdf.value = true
   
-  // Create filename from job title
-  const jobTitle = (job.value?.job_title || 'resume').replace(/[^a-z0-9]/gi, '_').toLowerCase()
-  const company = (job.value?.company_name || '').replace(/[^a-z0-9]/gi, '_').toLowerCase()
-  link.download = `resume_${company}_${jobTitle}.html`
-  
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  try {
+    // Create a temporary container for the HTML content
+    const container = document.createElement('div')
+    container.innerHTML = selectedResume.value.rendered_html
+    container.style.padding = '20px'
+    container.style.fontFamily = 'Georgia, serif'
+    container.style.lineHeight = '1.6'
+    container.style.maxWidth = '800px'
+    container.style.margin = '0 auto'
+    
+    // Create filename from job title
+    const jobTitle = (job.value?.job_title || 'resume').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    const company = (job.value?.company_name || '').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    const filename = `resume_${company}_${jobTitle}.pdf`
+    
+    // PDF options
+    const options = {
+      margin: 0.5,
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    }
+    
+    // Generate and download PDF
+    await html2pdf().set(options).from(container).save()
+  } catch (err) {
+    console.error('PDF generation failed:', err)
+    error.value = 'Failed to generate PDF'
+  } finally {
+    downloadingPdf.value = false
+  }
 }
 
 async function generateDeepDive() {
@@ -371,8 +379,12 @@ async function saveManualContent() {
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button @click="downloadResume" class="px-3 py-2 bg-atlas-600 text-white rounded-lg text-sm hover:bg-atlas-700 transition-colors">
-              ⬇️ Download Resume
+            <button 
+              @click="downloadResume" 
+              :disabled="downloadingPdf"
+              class="px-3 py-2 bg-atlas-600 text-white rounded-lg text-sm hover:bg-atlas-700 transition-colors disabled:opacity-50"
+            >
+              {{ downloadingPdf ? '⏳ Generating PDF...' : '⬇️ Download PDF' }}
             </button>
             <button @click="closeResumeModal" class="p-2 text-gray-500 hover:text-gray-700 text-xl">
               ✕
