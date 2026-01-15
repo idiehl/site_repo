@@ -27,10 +27,6 @@ function viewJob(job) {
 async function deleteJob(event, job) {
   event.stopPropagation() // Prevent row click
   
-  if (!confirm(`Delete this job posting?\n${job.company_name || job.url}`)) {
-    return
-  }
-  
   deletingId.value = job.id
   const success = await jobsStore.deleteJob(job.id)
   deletingId.value = null
