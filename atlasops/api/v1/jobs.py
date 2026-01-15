@@ -107,6 +107,74 @@ async def delete_job(
     await db.commit()
 
 
+@router.post("/{job_id}/retry", response_model=JobPostingResponse)
+async def retry_job(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> JobPosting:
+    """Retry processing a failed job posting."""
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+    
+    if job.status not in ("failed", "pending"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot retry job with status '{job.status}'",
+        )
+    
+    # Reset job status and clear error
+    job.status = "pending"
+    job.error_message = None
+    await db.commit()
+    
+    # Queue for reprocessing
+    scrape_job_posting.delay(str(job.id))
+    
+    await db.refresh(job)
+    return job
+
+
+@router.post("/retry-all-failed")
+async def retry_all_failed_jobs(
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Retry all failed job postings for the current user."""
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.user_id == current_user.id,
+            JobPosting.status == "failed",
+        )
+    )
+    failed_jobs = list(result.scalars().all())
+    
+    if not failed_jobs:
+        return {"message": "No failed jobs to retry", "count": 0}
+    
+    for job in failed_jobs:
+        job.status = "pending"
+        job.error_message = None
+        scrape_job_posting.delay(str(job.id))
+    
+    await db.commit()
+    
+    return {
+        "message": f"Queued {len(failed_jobs)} job(s) for reprocessing",
+        "count": len(failed_jobs),
+    }
+
+
 @router.post("/{job_id}/resumes")
 async def generate_resume(
     job_id: UUID,

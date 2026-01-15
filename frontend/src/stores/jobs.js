@@ -16,6 +16,10 @@ export const useJobsStore = defineStore('jobs', () => {
     jobs.value.filter(j => j.status === 'completed')
   )
 
+  const failedJobs = computed(() => 
+    jobs.value.filter(j => j.status === 'failed')
+  )
+
   async function fetchJobs() {
     loading.value = true
     error.value = null
@@ -74,6 +78,33 @@ export const useJobsStore = defineStore('jobs', () => {
     }
   }
 
+  async function retryJob(id) {
+    try {
+      await api.post(`/api/v1/jobs/${id}/retry`)
+      await fetchJobs()
+      return true
+    } catch (err) {
+      error.value = err.response?.data?.detail || 'Failed to retry job'
+      return false
+    }
+  }
+
+  async function retryAllFailed() {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await api.post('/api/v1/jobs/retry-all-failed')
+      await fetchJobs()
+      return response.data
+    } catch (err) {
+      error.value = err.response?.data?.detail || 'Failed to retry jobs'
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     jobs,
     currentJob,
@@ -81,9 +112,12 @@ export const useJobsStore = defineStore('jobs', () => {
     error,
     pendingJobs,
     completedJobs,
+    failedJobs,
     fetchJobs,
     fetchJob,
     ingestJobs,
     deleteJob,
+    retryJob,
+    retryAllFailed,
   }
 })
