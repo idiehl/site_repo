@@ -1,7 +1,8 @@
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
+import { useApplicationsStore } from '../stores/applications'
 import StatusBadge from './StatusBadge.vue'
 
 const props = defineProps({
@@ -17,8 +18,35 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh'])
 const router = useRouter()
-const jobsStore = useJobsStore()  // Renamed to avoid conflict with props.jobs
+const jobsStore = useJobsStore()
+const applicationsStore = useApplicationsStore()
 const deletingId = ref(null)
+
+// Application status display
+const appStatusLabels = {
+  pending: { label: '📋 Saved', color: 'bg-gray-500/20 text-gray-300' },
+  applied: { label: '✅ Applied', color: 'bg-blue-500/20 text-blue-300' },
+  followup_scheduled: { label: '📅 Follow-up', color: 'bg-yellow-500/20 text-yellow-300' },
+  interview_scheduled: { label: '🎤 Interview', color: 'bg-purple-500/20 text-purple-300' },
+  offer_received: { label: '🎉 Offer!', color: 'bg-green-500/20 text-green-300' },
+  rejected: { label: '❌ Rejected', color: 'bg-red-500/20 text-red-300' },
+  withdrawn: { label: '🚫 Withdrawn', color: 'bg-gray-500/20 text-gray-400' },
+  no_response_closed: { label: '⏰ No Response', color: 'bg-gray-500/20 text-gray-400' }
+}
+
+function getApplicationForJob(jobId) {
+  return applicationsStore.getApplicationForJob(jobId)
+}
+
+function getAppStatusDisplay(jobId) {
+  const app = getApplicationForJob(jobId)
+  if (!app) return null
+  return appStatusLabels[app.status] || { label: app.status, color: 'bg-gray-500/20 text-gray-300' }
+}
+
+onMounted(() => {
+  applicationsStore.fetchApplications()
+})
 
 function viewJob(job) {
   router.push(`/jobs/${job.id}`)
@@ -70,7 +98,8 @@ function formatDate(dateStr) {
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Company</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Position</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Location</th>
-            <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Status</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Scrape</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Application</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Added</th>
             <th class="text-right py-3 px-4 text-sm font-medium text-night-400">Actions</th>
           </tr>
@@ -93,6 +122,16 @@ function formatDate(dateStr) {
             </td>
             <td class="py-3 px-4">
               <StatusBadge :status="job.status" />
+            </td>
+            <td class="py-3 px-4">
+              <span 
+                v-if="getAppStatusDisplay(job.id)"
+                class="px-2 py-1 rounded text-xs font-medium"
+                :class="getAppStatusDisplay(job.id).color"
+              >
+                {{ getAppStatusDisplay(job.id).label }}
+              </span>
+              <span v-else class="text-night-600 text-sm">—</span>
             </td>
             <td class="py-3 px-4">
               <span class="text-night-400 text-sm">{{ formatDate(job.created_at) }}</span>
