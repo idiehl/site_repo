@@ -25,6 +25,10 @@ const selectedResume = ref(null)
 const showResumeModal = ref(false)
 const loadingResume = ref(false)
 
+// Deep dive state
+const deepDive = ref(null)
+const showDeepDiveModal = ref(false)
+
 // Check if job was blocked/failed to scrape
 const wasBlocked = computed(() => {
   if (!job.value) return false
@@ -37,6 +41,7 @@ const wasBlocked = computed(() => {
 onMounted(async () => {
   await jobs.fetchJob(route.params.id)
   await fetchResumes()
+  await fetchDeepDive()
 })
 
 async function fetchResumes() {
@@ -46,6 +51,19 @@ async function fetchResumes() {
     resumes.value = response.data
   } catch (err) {
     console.error('Failed to fetch resumes:', err)
+  }
+}
+
+async function fetchDeepDive() {
+  if (!route.params.id) return
+  try {
+    const response = await api.get(`/api/v1/jobs/${route.params.id}/deep-dive`)
+    deepDive.value = response.data
+  } catch (err) {
+    // 404 is expected if no deep dive exists yet
+    if (err.response?.status !== 404) {
+      console.error('Failed to fetch deep dive:', err)
+    }
   }
 }
 
@@ -141,14 +159,35 @@ async function generateDeepDive() {
   }
   generatingDeepDive.value = true
   error.value = ''
+  message.value = ''
   try {
     const response = await api.post(`/api/v1/jobs/${job.value.id}/deep-dive`)
+    deepDive.value = response.data
     message.value = 'Deep dive generated!'
+    showDeepDiveModal.value = true
   } catch (err) {
-    error.value = err.response?.data?.detail || 'Failed to generate deep dive'
+    if (err.response?.data?.detail === 'Deep dive already exists for this job') {
+      // Just show the existing one
+      await fetchDeepDive()
+      showDeepDiveModal.value = true
+    } else {
+      error.value = err.response?.data?.detail || 'Failed to generate deep dive'
+    }
   } finally {
     generatingDeepDive.value = false
   }
+}
+
+function viewDeepDive() {
+  if (deepDive.value) {
+    showDeepDiveModal.value = true
+  } else {
+    generateDeepDive()
+  }
+}
+
+function closeDeepDiveModal() {
+  showDeepDiveModal.value = false
 }
 
 async function saveManualContent() {
@@ -306,11 +345,11 @@ async function saveManualContent() {
               {{ generating ? 'Generating...' : 'Generate Resume' }}
             </button>
             <button 
-              @click="generateDeepDive"
+              @click="viewDeepDive"
               :disabled="generatingDeepDive || !job.company_name"
               class="btn btn-secondary"
             >
-              {{ generatingDeepDive ? 'Researching...' : 'Company Deep Dive' }}
+              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Deep Dive' : '🔍 Company Deep Dive') }}
             </button>
             <button class="btn btn-secondary" disabled>
               Create Application
@@ -412,6 +451,89 @@ async function saveManualContent() {
               {{ gap }}
             </span>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deep Dive Modal -->
+    <div 
+      v-if="showDeepDiveModal && deepDive" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeDeepDiveModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <div>
+            <h3 class="text-lg font-semibold text-white">🔍 Company Deep Dive</h3>
+            <p class="text-sm text-night-400">{{ job?.company_name }}</p>
+          </div>
+          <button @click="closeDeepDiveModal" class="p-2 text-night-400 hover:text-white text-xl">
+            ✕
+          </button>
+        </div>
+        
+        <!-- Deep Dive Content -->
+        <div class="flex-1 overflow-auto p-6 space-y-6">
+          <!-- Company Overview -->
+          <div v-if="deepDive.company_overview" class="space-y-2">
+            <h4 class="text-sm font-semibold text-atlas-400 uppercase tracking-wide">🏢 Company Overview</h4>
+            <p class="text-night-200 leading-relaxed">{{ deepDive.company_overview }}</p>
+          </div>
+
+          <!-- Culture Insights -->
+          <div v-if="deepDive.culture_insights" class="space-y-2">
+            <h4 class="text-sm font-semibold text-purple-400 uppercase tracking-wide">🎭 Culture & Values</h4>
+            <p class="text-night-200 leading-relaxed">{{ deepDive.culture_insights }}</p>
+          </div>
+
+          <!-- Role Analysis -->
+          <div v-if="deepDive.role_analysis" class="space-y-2">
+            <h4 class="text-sm font-semibold text-green-400 uppercase tracking-wide">💼 Role Analysis</h4>
+            <p class="text-night-200 leading-relaxed">{{ deepDive.role_analysis }}</p>
+          </div>
+
+          <!-- Interview Tips -->
+          <div v-if="deepDive.interview_tips" class="space-y-2">
+            <h4 class="text-sm font-semibold text-yellow-400 uppercase tracking-wide">🎯 Interview Tips</h4>
+            <p class="text-night-200 leading-relaxed">{{ deepDive.interview_tips }}</p>
+          </div>
+
+          <!-- Key Talking Points -->
+          <div v-if="deepDive.summary_json?.key_talking_points?.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-cyan-400 uppercase tracking-wide">💬 Key Talking Points</h4>
+            <ul class="space-y-2">
+              <li 
+                v-for="(point, idx) in deepDive.summary_json.key_talking_points" 
+                :key="idx"
+                class="flex items-start gap-2 text-night-200"
+              >
+                <span class="text-cyan-500 mt-1">→</span>
+                <span>{{ point }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Potential Concerns -->
+          <div v-if="deepDive.summary_json?.potential_concerns?.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-orange-400 uppercase tracking-wide">⚠️ Things to Investigate</h4>
+            <ul class="space-y-2">
+              <li 
+                v-for="(concern, idx) in deepDive.summary_json.potential_concerns" 
+                :key="idx"
+                class="flex items-start gap-2 text-night-200"
+              >
+                <span class="text-orange-500 mt-1">!</span>
+                <span>{{ concern }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800 text-xs text-night-500">
+          Generated {{ deepDive.generated_at ? new Date(deepDive.generated_at).toLocaleDateString() : 'recently' }} • 
+          AI-generated insights based on public information
         </div>
       </div>
     </div>

@@ -428,6 +428,53 @@ async def get_resume(
     }
 
 
+@router.get("/{job_id}/deep-dive")
+async def get_deep_dive(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Get the company deep dive for a job posting."""
+    from atlasops.models.job import CompanyDeepDive
+
+    # Get job posting
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get deep dive
+    dd_result = await db.execute(
+        select(CompanyDeepDive).where(CompanyDeepDive.job_posting_id == job.id)
+    )
+    deep_dive = dd_result.scalar_one_or_none()
+    if not deep_dive:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No deep dive found for this job",
+        )
+
+    return {
+        "id": str(deep_dive.id),
+        "job_posting_id": str(deep_dive.job_posting_id),
+        "company_overview": deep_dive.company_overview,
+        "culture_insights": deep_dive.culture_insights,
+        "role_analysis": deep_dive.role_analysis,
+        "interview_tips": deep_dive.interview_tips,
+        "summary_json": deep_dive.summary_json,
+        "sources": deep_dive.sources,
+        "generated_at": deep_dive.generated_at.isoformat() if deep_dive.generated_at else None,
+    }
+
+
 @router.post("/{job_id}/deep-dive")
 async def generate_deep_dive(
     job_id: UUID,
@@ -435,6 +482,7 @@ async def generate_deep_dive(
     db: DbSession,
 ) -> dict:
     """Generate a company deep dive for a job posting."""
+    import json
     from atlasops.models.job import CompanyDeepDive
     from atlasops.services.llm_client import llm_client
 
@@ -472,15 +520,12 @@ async def generate_deep_dive(
     try:
         prompt_template = llm_client.load_prompt("deep_dive_v1")
     except FileNotFoundError:
-        prompt_template = """Research {company_name} for a {job_title} position.
+        prompt_template = """Research {{company_name}} for a {{job_title}} position.
 
-Job Description: {job_description}
+Job Description: {{job_description}}
 
-Provide:
-1. Company overview
-2. Culture insights
-3. Role analysis
-4. Interview tips"""
+Return a JSON object with:
+{{"company_overview": "Brief company description", "culture_insights": "Work culture and values", "role_analysis": "What this role entails", "interview_tips": "Preparation advice", "key_talking_points": ["Points to mention"], "potential_concerns": ["Things to ask about"]}}"""
 
     prompt = prompt_template.format(
         company_name=job.company_name,
@@ -491,21 +536,63 @@ Provide:
 
     response = await llm_client.complete(
         prompt,
-        system_prompt="You are a company research analyst helping job seekers prepare for applications and interviews.",
+        system_prompt="You are a company research analyst. Return ONLY a valid JSON object with company research insights. No markdown, no explanation - just JSON.",
         temperature=0.5,
     )
+
+    # Parse the JSON response
+    parsed = None
+    company_overview = response
+    culture_insights = None
+    role_analysis = None
+    interview_tips = None
+    
+    try:
+        # Try to extract JSON from the response
+        json_str = response.strip()
+        if json_str.startswith("```"):
+            # Remove markdown code blocks
+            lines = json_str.split("\n")
+            json_lines = []
+            in_block = False
+            for line in lines:
+                if line.startswith("```"):
+                    in_block = not in_block
+                    continue
+                if in_block or not line.startswith("```"):
+                    json_lines.append(line)
+            json_str = "\n".join(json_lines)
+        
+        parsed = json.loads(json_str)
+        company_overview = parsed.get("company_overview", response)
+        culture_insights = parsed.get("culture_insights")
+        role_analysis = parsed.get("role_analysis")
+        interview_tips = parsed.get("interview_tips")
+    except json.JSONDecodeError:
+        # If JSON parsing fails, store raw response as overview
+        parsed = {"raw_response": response}
 
     # Save deep dive
     deep_dive = CompanyDeepDive(
         job_posting_id=job.id,
-        company_overview=response,
+        company_overview=company_overview,
+        culture_insights=culture_insights,
+        role_analysis=role_analysis,
+        interview_tips=interview_tips,
+        summary_json=parsed,
         model_used="gpt-4o-mini",
         prompt_version="deep_dive_v1",
     )
     db.add(deep_dive)
     await db.commit()
+    await db.refresh(deep_dive)
 
     return {
+        "id": str(deep_dive.id),
         "message": "Deep dive generated successfully",
-        "company_overview": response[:500] + "..." if len(response) > 500 else response,
+        "company_overview": company_overview,
+        "culture_insights": culture_insights,
+        "role_analysis": role_analysis,
+        "interview_tips": interview_tips,
+        "summary_json": parsed,
     }
