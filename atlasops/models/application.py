@@ -45,7 +45,8 @@ class Application(Base):
     )
 
     status: Mapped[ApplicationStatus] = mapped_column(
-        Enum(ApplicationStatus), default=ApplicationStatus.PENDING
+        Enum(ApplicationStatus, values_callable=lambda x: [e.value for e in x]),
+        default=ApplicationStatus.PENDING
     )
     applied_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
@@ -87,9 +88,12 @@ class ApplicationEvent(Base):
     )
 
     from_status: Mapped[Optional[ApplicationStatus]] = mapped_column(
-        Enum(ApplicationStatus), nullable=True
+        Enum(ApplicationStatus, values_callable=lambda x: [e.value for e in x]),
+        nullable=True
     )
-    to_status: Mapped[ApplicationStatus] = mapped_column(Enum(ApplicationStatus))
+    to_status: Mapped[ApplicationStatus] = mapped_column(
+        Enum(ApplicationStatus, values_callable=lambda x: [e.value for e in x])
+    )
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
