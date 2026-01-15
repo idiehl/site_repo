@@ -226,6 +226,9 @@ async def linkedin_callback(
         linkedin_id = userinfo.get("sub")
         email = userinfo.get("email")
         name = userinfo.get("name")
+        picture_url = userinfo.get("picture")  # LinkedIn profile picture
+        given_name = userinfo.get("given_name")
+        family_name = userinfo.get("family_name")
         
         if not linkedin_id or not email:
             return RedirectResponse(
@@ -242,6 +245,7 @@ async def linkedin_callback(
             )
         )
         user = result.scalar_one_or_none()
+        is_new_user = False
         
         if not user:
             # Check if email already exists (user has password account)
@@ -255,6 +259,7 @@ async def linkedin_callback(
                 user = existing_user
             else:
                 # Create new user
+                is_new_user = True
                 user = User(
                     email=email,
                     hashed_password=None,
@@ -264,15 +269,42 @@ async def linkedin_callback(
                 db.add(user)
                 await db.flush()
                 
-                # Create empty profile with name from LinkedIn
+                # Create profile with data from LinkedIn
                 profile = UserProfile(
                     user_id=user.id,
-                    full_name=name,
+                    full_name=name or f"{given_name or ''} {family_name or ''}".strip(),
+                    profile_picture_url=picture_url,
+                    social_links={"linkedin": f"https://linkedin.com/in/{linkedin_id}"},
                 )
                 db.add(profile)
             
             await db.commit()
             await db.refresh(user)
+        
+        # Update profile with latest LinkedIn data for existing users
+        if not is_new_user:
+            result = await db.execute(
+                select(UserProfile).where(UserProfile.user_id == user.id)
+            )
+            profile = result.scalar_one_or_none()
+            
+            if profile:
+                # Update fields if they're empty or user wants to sync
+                if not profile.full_name and name:
+                    profile.full_name = name
+                
+                # Always update LinkedIn profile picture if available
+                if picture_url and (not profile.profile_picture_url or profile.profile_picture_url.startswith("http")):
+                    profile.profile_picture_url = picture_url
+                
+                # Add LinkedIn to social links if not present
+                if not profile.social_links:
+                    profile.social_links = {}
+                if "linkedin" not in profile.social_links:
+                    profile.social_links["linkedin"] = f"https://linkedin.com/in/{linkedin_id}"
+                
+                profile.completeness_score = profile.calculate_completeness()
+                await db.commit()
         
         # Generate tokens
         access_token = create_access_token(data={"sub": str(user.id)})
