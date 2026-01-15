@@ -40,6 +40,19 @@ const showInterviewPrepModal = ref(false)
 const interviewPrep = ref(null)
 const generatingInterviewPrep = ref(false)
 
+// Follow-up message state
+const showFollowupModal = ref(false)
+const followupMessage = ref(null)
+const generatingFollowup = ref(false)
+const copiedFollowup = ref(false)
+
+// Check if user can generate follow-up (must have applied)
+const canGenerateFollowup = computed(() => {
+  if (!application.value) return false
+  const appliedStatuses = ['applied', 'followup_scheduled', 'interview_scheduled']
+  return appliedStatuses.includes(application.value.status)
+})
+
 // Application statuses for dropdown
 const applicationStatuses = [
   { value: 'pending', label: '📋 Pending', color: 'gray' },
@@ -291,6 +304,38 @@ function closeStatusModal() {
   showStatusModal.value = false
 }
 
+async function generateFollowup() {
+  if (!application.value) return
+  
+  generatingFollowup.value = true
+  error.value = ''
+  try {
+    const result = await applicationsStore.generateFollowupMessage(application.value.id)
+    followupMessage.value = result
+    showFollowupModal.value = true
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to generate follow-up message'
+  } finally {
+    generatingFollowup.value = false
+  }
+}
+
+function closeFollowupModal() {
+  showFollowupModal.value = false
+  copiedFollowup.value = false
+}
+
+async function copyFollowupMessage() {
+  if (!followupMessage.value?.followup_message) return
+  try {
+    await navigator.clipboard.writeText(followupMessage.value.followup_message)
+    copiedFollowup.value = true
+    setTimeout(() => { copiedFollowup.value = false }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
+
 async function saveManualContent() {
   if (!manualContent.value.trim()) return
   
@@ -534,6 +579,18 @@ async function saveManualContent() {
                 <h4 class="font-medium">Review Resume</h4>
               </div>
               <p class="text-sm text-night-400">Check your tailored resume for this role</p>
+            </div>
+            <div 
+              v-if="canGenerateFollowup"
+              @click="generateFollowup"
+              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+              :class="{ 'opacity-50 cursor-wait': generatingFollowup }"
+            >
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">✉️</span>
+                <h4 class="font-medium">{{ generatingFollowup ? 'Generating...' : 'Follow-up Message' }}</h4>
+              </div>
+              <p class="text-sm text-night-400">Generate a professional check-in message for the recruiter</p>
             </div>
             <div class="p-4 bg-night-800/50 rounded-lg">
               <div class="flex items-center gap-3 mb-2">
@@ -791,6 +848,46 @@ async function saveManualContent() {
         <!-- Modal Footer -->
         <div class="px-6 py-4 border-t border-night-700 bg-night-800 text-xs text-night-500">
           AI-generated interview preparation • Review and personalize these suggestions
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow-up Message Modal -->
+    <div 
+      v-if="showFollowupModal && followupMessage" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeFollowupModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-2xl w-full shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <div>
+            <h3 class="text-lg font-semibold text-white">✉️ Follow-up Message</h3>
+            <p class="text-sm text-night-400">{{ followupMessage.company_name }} • {{ followupMessage.days_since_applied }} days since application</p>
+          </div>
+          <button @click="closeFollowupModal" class="p-2 text-night-400 hover:text-white text-xl">✕</button>
+        </div>
+        
+        <!-- Suggested Subject -->
+        <div class="px-6 py-3 border-b border-night-700/50 bg-night-800/50">
+          <p class="text-xs text-night-500 mb-1">Suggested Subject Line</p>
+          <p class="text-sm text-night-200 font-medium">{{ followupMessage.suggested_subject }}</p>
+        </div>
+        
+        <!-- Message Content -->
+        <div class="p-6">
+          <div class="bg-night-800 rounded-lg p-4 text-night-200 leading-relaxed whitespace-pre-wrap">{{ followupMessage.followup_message }}</div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800 flex items-center justify-between">
+          <p class="text-xs text-night-500">Copy and personalize before sending</p>
+          <button 
+            @click="copyFollowupMessage"
+            class="btn btn-primary text-sm"
+          >
+            {{ copiedFollowup ? '✓ Copied!' : '📋 Copy Message' }}
+          </button>
         </div>
       </div>
     </div>

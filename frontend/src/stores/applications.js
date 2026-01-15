@@ -106,6 +106,16 @@ export const useApplicationsStore = defineStore('applications', () => {
     }
   }
 
+  async function generateFollowupMessage(appId) {
+    try {
+      const response = await api.post(`/api/v1/applications/${appId}/followup-message`)
+      return response.data
+    } catch (err) {
+      error.value = err.response?.data?.detail || 'Failed to generate follow-up message'
+      throw err
+    }
+  }
+
   function getApplicationForJob(jobId) {
     return applications.value.find(app => app.job_posting_id === jobId)
   }
@@ -125,6 +135,7 @@ export const useApplicationsStore = defineStore('applications', () => {
     updateApplicationStatus,
     generateInterviewPrep,
     generateImprovementSuggestions,
+    generateFollowupMessage,
     getApplicationForJob,
     clearCurrent
   }

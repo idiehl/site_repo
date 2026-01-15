@@ -127,13 +127,18 @@ async def update_application(
     return application
 
 
-@router.post("/{app_id}/followup")
-async def schedule_followup(
+@router.post("/{app_id}/followup-message")
+async def generate_followup_message(
     app_id: UUID,
     current_user: CurrentUser,
     db: DbSession,
 ) -> dict:
-    """Schedule a follow-up for an application."""
+    """Generate a follow-up message for an application."""
+    from atlasops.models.job import JobPosting
+    from atlasops.models.user import UserProfile
+    from atlasops.services.llm_client import llm_client
+
+    # Get application
     result = await db.execute(
         select(Application).where(
             Application.id == app_id,
@@ -147,8 +152,58 @@ async def schedule_followup(
             detail="Application not found",
         )
 
-    # TODO: Implement follow-up scheduling with Celery
-    return {"message": "Follow-up scheduled"}
+    # Get job posting
+    job_result = await db.execute(
+        select(JobPosting).where(JobPosting.id == application.job_posting_id)
+    )
+    job = job_result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get user profile for name
+    profile_result = await db.execute(
+        select(UserProfile).where(UserProfile.user_id == current_user.id)
+    )
+    profile = profile_result.scalar_one_or_none()
+    
+    user_name = profile.full_name if profile and profile.full_name else current_user.email.split('@')[0].title()
+    
+    # Calculate days since application
+    days_since = (datetime.now(timezone.utc) - application.created_at).days
+    
+    prompt = f"""Write a professional follow-up email to check on the status of a job application.
+
+Details:
+- Position: {job.job_title or 'the position'}
+- Company: {job.company_name or 'your company'}
+- Applicant Name: {user_name}
+- Days since application: {days_since} days
+
+Guidelines:
+1. Keep it brief and professional (3-4 sentences max)
+2. Express continued interest in the role
+3. Politely ask about the status or next steps
+4. Don't be pushy or desperate
+5. Include a professional sign-off
+
+Return ONLY the email body text, ready to copy and paste. Do not include subject line or headers."""
+
+    response = await llm_client.complete(
+        prompt,
+        system_prompt="You are an expert at writing professional, concise follow-up emails that get responses. Write naturally and warmly, not robotically.",
+        temperature=0.7,
+    )
+
+    return {
+        "job_title": job.job_title,
+        "company_name": job.company_name,
+        "days_since_applied": days_since,
+        "followup_message": response.strip(),
+        "suggested_subject": f"Following Up - {job.job_title} Application"
+    }
 
 
 @router.post("/{app_id}/interview-prep")
