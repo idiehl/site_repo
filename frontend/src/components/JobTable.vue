@@ -17,7 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh'])
 const router = useRouter()
-const jobs = useJobsStore()
+const jobsStore = useJobsStore()  // Renamed to avoid conflict with props.jobs
 const deletingId = ref(null)
 
 function viewJob(job) {
@@ -32,7 +32,7 @@ async function deleteJob(event, job) {
   }
   
   deletingId.value = job.id
-  const success = await jobs.deleteJob(job.id)
+  const success = await jobsStore.deleteJob(job.id)
   deletingId.value = null
   
   if (success) {
@@ -54,13 +54,13 @@ function formatDate(dateStr) {
 <template>
   <div>
     <!-- Loading State -->
-    <div v-if="loading && !jobs.length" class="text-center py-12">
+    <div v-if="loading && !props.jobs.length" class="text-center py-12">
       <div class="inline-block animate-spin w-8 h-8 border-2 border-night-600 border-t-atlas-500 rounded-full"></div>
       <p class="text-night-400 mt-2">Loading jobs...</p>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="!jobs.length" class="text-center py-12">
+    <div v-else-if="!props.jobs.length" class="text-center py-12">
       <div class="text-4xl mb-4">📋</div>
       <h3 class="text-lg font-medium text-night-300 mb-2">No jobs yet</h3>
       <p class="text-night-500">Add job URLs to start building your pipeline</p>
@@ -81,7 +81,7 @@ function formatDate(dateStr) {
         </thead>
         <tbody>
           <tr 
-            v-for="job in jobs" 
+            v-for="job in props.jobs" 
             :key="job.id"
             class="border-b border-night-800/50 hover:bg-night-800/30 cursor-pointer transition-colors"
             @click="viewJob(job)"
