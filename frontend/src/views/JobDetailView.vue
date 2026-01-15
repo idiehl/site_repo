@@ -1,14 +1,31 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
 import StatusBadge from '../components/StatusBadge.vue'
+import api from '../api/client'
 
 const route = useRoute()
 const router = useRouter()
 const jobs = useJobsStore()
 
 const job = computed(() => jobs.currentJob)
+const generating = ref(false)
+const generatingDeepDive = ref(false)
+const showManualEntry = ref(false)
+const manualContent = ref('')
+const savingManual = ref(false)
+const message = ref('')
+const error = ref('')
+
+// Check if job was blocked/failed to scrape
+const wasBlocked = computed(() => {
+  if (!job.value) return false
+  const text = job.value.raw_text || job.value.job_description || ''
+  return text.toLowerCase().includes('blocked') || 
+         text.toLowerCase().includes('cloudflare') ||
+         (!job.value.company_name && !job.value.job_title && job.value.status === 'completed')
+})
 
 onMounted(async () => {
   await jobs.fetchJob(route.params.id)
@@ -16,6 +33,62 @@ onMounted(async () => {
 
 function goBack() {
   router.push('/dashboard')
+}
+
+async function generateResume() {
+  if (!job.value?.company_name) {
+    error.value = 'Please add job details first (company blocked scraping)'
+    return
+  }
+  generating.value = true
+  error.value = ''
+  try {
+    const response = await api.post(`/api/v1/jobs/${job.value.id}/resumes`)
+    message.value = `Resume generated! Match score: ${response.data.match_score}%`
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to generate resume'
+  } finally {
+    generating.value = false
+  }
+}
+
+async function generateDeepDive() {
+  if (!job.value?.company_name) {
+    error.value = 'Please add job details first'
+    return
+  }
+  generatingDeepDive.value = true
+  error.value = ''
+  try {
+    const response = await api.post(`/api/v1/jobs/${job.value.id}/deep-dive`)
+    message.value = 'Deep dive generated!'
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to generate deep dive'
+  } finally {
+    generatingDeepDive.value = false
+  }
+}
+
+async function saveManualContent() {
+  if (!manualContent.value.trim()) return
+  
+  savingManual.value = true
+  error.value = ''
+  try {
+    // Re-process with manual content
+    await api.post(`/api/v1/jobs/${job.value.id}/manual-content`, {
+      content: manualContent.value
+    })
+    message.value = 'Job content saved and processed!'
+    showManualEntry.value = false
+    manualContent.value = ''
+    // Refresh job data
+    await jobs.fetchJob(route.params.id)
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to save content'
+  } finally {
+    savingManual.value = false
+  }
 }
 </script>
 
@@ -93,20 +166,77 @@ function goBack() {
           </div>
         </div>
 
+        <!-- Blocked Warning -->
+        <div v-if="wasBlocked" class="card bg-yellow-900/20 border-yellow-600/50">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">⚠️</span>
+            <div class="flex-1">
+              <h3 class="font-semibold text-yellow-400 mb-1">Scraping Blocked</h3>
+              <p class="text-sm text-night-300 mb-3">
+                This site blocked our scraper. You can paste the job posting content manually.
+              </p>
+              <button 
+                @click="showManualEntry = !showManualEntry" 
+                class="btn btn-secondary text-sm"
+              >
+                {{ showManualEntry ? 'Cancel' : 'Enter Job Details Manually' }}
+              </button>
+            </div>
+          </div>
+          
+          <!-- Manual Entry Form -->
+          <div v-if="showManualEntry" class="mt-4 pt-4 border-t border-yellow-600/30">
+            <p class="text-sm text-night-400 mb-2">
+              Copy and paste the job posting content from the website:
+            </p>
+            <textarea
+              v-model="manualContent"
+              class="w-full h-48 bg-night-800 border border-night-700 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-atlas-500"
+              placeholder="Paste the job title, company name, description, requirements, etc..."
+            ></textarea>
+            <button 
+              @click="saveManualContent"
+              :disabled="savingManual || !manualContent.trim()"
+              class="btn btn-primary mt-3"
+            >
+              {{ savingManual ? 'Processing...' : 'Save & Process' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div v-if="message" class="card bg-green-900/20 border-green-600/50">
+          <p class="text-green-400">✓ {{ message }}</p>
+        </div>
+        <div v-if="error" class="card bg-red-900/20 border-red-600/50">
+          <p class="text-red-400">✗ {{ error }}</p>
+        </div>
+
         <!-- Actions -->
         <div class="card">
           <h3 class="text-lg font-semibold mb-4">Actions</h3>
           <div class="flex flex-wrap gap-3">
-            <button class="btn btn-primary" disabled>
-              Generate Resume
+            <button 
+              @click="generateResume"
+              :disabled="generating || !job.company_name"
+              class="btn btn-primary"
+            >
+              {{ generating ? 'Generating...' : 'Generate Resume' }}
             </button>
-            <button class="btn btn-secondary" disabled>
-              Company Deep Dive
+            <button 
+              @click="generateDeepDive"
+              :disabled="generatingDeepDive || !job.company_name"
+              class="btn btn-secondary"
+            >
+              {{ generatingDeepDive ? 'Researching...' : 'Company Deep Dive' }}
             </button>
             <button class="btn btn-secondary" disabled>
               Create Application
             </button>
           </div>
+          <p v-if="!job.company_name" class="text-sm text-night-500 mt-2">
+            ℹ️ Add job details to enable these actions
+          </p>
         </div>
 
         <!-- Source URL -->

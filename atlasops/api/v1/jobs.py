@@ -175,6 +175,75 @@ async def retry_all_failed_jobs(
     }
 
 
+@router.post("/{job_id}/manual-content")
+async def save_manual_content(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+    content: dict,
+) -> dict:
+    """Save manually entered job content and process with LLM."""
+    from atlasops.services.llm_client import llm_client
+    
+    # Get job posting
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+    
+    raw_text = content.get("content", "")
+    if not raw_text or len(raw_text) < 50:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please provide more job content (at least 50 characters)",
+        )
+    
+    # Store raw text
+    job.raw_text = raw_text[:50000]
+    
+    # Extract with LLM
+    try:
+        extracted = await llm_client.extract_job_posting(raw_text, job.url)
+        
+        # Update job with extracted data
+        job.company_name = extracted.get("company_name")
+        job.job_title = extracted.get("job_title")
+        job.location = extracted.get("location")
+        job.remote_policy = extracted.get("remote_policy")
+        job.salary_range = extracted.get("salary_range")
+        job.job_description = extracted.get("job_description")
+        job.requirements = extracted.get("requirements")
+        job.benefits = extracted.get("benefits")
+        job.structured_data = extracted
+        job.extraction_confidence = extracted.get("extraction_confidence", 0.8)
+        job.status = "completed"
+        job.error_message = None
+        
+        await db.commit()
+        
+        return {
+            "message": "Job content processed successfully",
+            "company_name": job.company_name,
+            "job_title": job.job_title,
+        }
+    except Exception as e:
+        job.status = "failed"
+        job.error_message = str(e)
+        await db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process content: {str(e)}",
+        )
+
+
 @router.post("/{job_id}/resumes")
 async def generate_resume(
     job_id: UUID,
