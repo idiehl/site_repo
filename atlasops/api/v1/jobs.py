@@ -13,6 +13,7 @@ from atlasops.schemas.job import (
     JobIngestResponse,
     JobPostingResponse,
 )
+from atlasops.workers.tasks import scrape_job_posting
 
 router = APIRouter()
 
@@ -36,8 +37,8 @@ async def ingest_jobs(
         await db.flush()
         job_ids.append(str(job.id))
 
-        # TODO: Queue background task for scraping
-        # celery_app.send_task("atlasops.workers.tasks.scrape_job", args=[str(job.id)])
+        # Queue background task for scraping
+        scrape_job_posting.delay(str(job.id))
 
     await db.commit()
 
