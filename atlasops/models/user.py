@@ -63,10 +63,27 @@ class UserProfile(Base):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True
     )
 
-    # Profile fields stored as JSON for flexibility
+    # Basic info
     full_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     headline: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Enhanced profile fields
+    profile_picture_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    
+    # Social links stored as JSON
+    social_links: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    
+    # Resume storage
+    resume_file_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    resume_parsed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    
+    # Profile completeness (0-100)
+    completeness_score: Mapped[int] = mapped_column(default=0)
+    
+    # Structured data stored as JSON for flexibility
     work_history: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     education: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     skills: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
@@ -85,3 +102,45 @@ class UserProfile(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="profile")
+    
+    def calculate_completeness(self) -> int:
+        """Calculate profile completeness score (0-100)."""
+        score = 0
+        weights = {
+            "full_name": 10,
+            "headline": 10,
+            "summary": 10,
+            "profile_picture_url": 5,
+            "location": 5,
+            "phone": 5,
+            "work_history": 20,
+            "education": 10,
+            "skills": 15,
+            "projects": 5,
+            "certifications": 5,
+        }
+        
+        if self.full_name:
+            score += weights["full_name"]
+        if self.headline:
+            score += weights["headline"]
+        if self.summary:
+            score += weights["summary"]
+        if self.profile_picture_url:
+            score += weights["profile_picture_url"]
+        if self.location:
+            score += weights["location"]
+        if self.phone:
+            score += weights["phone"]
+        if self.work_history and len(self.work_history) > 0:
+            score += weights["work_history"]
+        if self.education and len(self.education) > 0:
+            score += weights["education"]
+        if self.skills and len(self.skills) > 0:
+            score += weights["skills"]
+        if self.projects and len(self.projects) > 0:
+            score += weights["projects"]
+        if self.certifications and len(self.certifications) > 0:
+            score += weights["certifications"]
+            
+        return min(score, 100)
