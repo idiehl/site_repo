@@ -18,6 +18,12 @@ const savingManual = ref(false)
 const message = ref('')
 const error = ref('')
 
+// Resume state
+const resumes = ref([])
+const selectedResume = ref(null)
+const showResumeModal = ref(false)
+const loadingResume = ref(false)
+
 // Check if job was blocked/failed to scrape
 const wasBlocked = computed(() => {
   if (!job.value) return false
@@ -29,7 +35,18 @@ const wasBlocked = computed(() => {
 
 onMounted(async () => {
   await jobs.fetchJob(route.params.id)
+  await fetchResumes()
 })
+
+async function fetchResumes() {
+  if (!route.params.id) return
+  try {
+    const response = await api.get(`/api/v1/jobs/${route.params.id}/resumes`)
+    resumes.value = response.data
+  } catch (err) {
+    console.error('Failed to fetch resumes:', err)
+  }
+}
 
 function goBack() {
   router.push('/dashboard')
@@ -42,13 +59,57 @@ async function generateResume() {
   }
   generating.value = true
   error.value = ''
+  message.value = ''
   try {
     const response = await api.post(`/api/v1/jobs/${job.value.id}/resumes`)
-    message.value = `Resume generated! Match score: ${response.data.match_score}%`
+    message.value = `Resume generated! Match score: ${(response.data.match_score * 100).toFixed(0)}%`
+    // Refresh resumes list and show the new one
+    await fetchResumes()
+    await viewResume(response.data.id)
   } catch (err) {
     error.value = err.response?.data?.detail || 'Failed to generate resume'
   } finally {
     generating.value = false
+  }
+}
+
+async function viewResume(resumeId) {
+  if (!job.value) return
+  loadingResume.value = true
+  try {
+    const response = await api.get(`/api/v1/jobs/${job.value.id}/resumes/${resumeId}`)
+    selectedResume.value = response.data
+    showResumeModal.value = true
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to load resume'
+  } finally {
+    loadingResume.value = false
+  }
+}
+
+function closeResumeModal() {
+  showResumeModal.value = false
+  selectedResume.value = null
+}
+
+function printResume() {
+  const printWindow = window.open('', '_blank')
+  if (printWindow && selectedResume.value?.rendered_html) {
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Resume - ${job.value?.job_title || 'Generated Resume'}</title>
+          <style>
+            body { font-family: 'Georgia', serif; max-width: 800px; margin: 0 auto; padding: 40px; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>${selectedResume.value.rendered_html}</body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.print()
   }
 }
 
@@ -239,6 +300,30 @@ async function saveManualContent() {
           </p>
         </div>
 
+        <!-- Generated Resumes -->
+        <div v-if="resumes.length > 0" class="card">
+          <h3 class="text-lg font-semibold mb-4">Generated Resumes</h3>
+          <div class="space-y-3">
+            <div 
+              v-for="resume in resumes" 
+              :key="resume.id"
+              class="flex items-center justify-between p-3 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+              @click="viewResume(resume.id)"
+            >
+              <div>
+                <p class="font-medium">Resume</p>
+                <p class="text-sm text-night-400">
+                  Match Score: {{ (resume.match_score * 100).toFixed(1) }}% • 
+                  {{ new Date(resume.created_at).toLocaleDateString() }}
+                </p>
+              </div>
+              <button class="btn btn-ghost text-sm" :disabled="loadingResume">
+                {{ loadingResume ? '...' : 'View →' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Source URL -->
         <div class="card">
           <h3 class="text-sm font-medium text-night-400 mb-2">Source</h3>
@@ -256,5 +341,54 @@ async function saveManualContent() {
         <p class="text-night-400">Job not found</p>
       </div>
     </main>
+
+    <!-- Resume Modal -->
+    <div 
+      v-if="showResumeModal && selectedResume" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeResumeModal"
+    >
+      <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Generated Resume</h3>
+            <p class="text-sm text-gray-500">
+              Match Score: {{ (selectedResume.match_score * 100).toFixed(1) }}%
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button @click="printResume" class="px-3 py-2 bg-atlas-600 text-white rounded-lg text-sm hover:bg-atlas-700 transition-colors">
+              🖨️ Print / Save PDF
+            </button>
+            <button @click="closeResumeModal" class="p-2 text-gray-500 hover:text-gray-700 text-xl">
+              ✕
+            </button>
+          </div>
+        </div>
+        
+        <!-- Resume Content -->
+        <div class="flex-1 overflow-auto p-8 bg-white">
+          <div 
+            class="resume-content prose prose-sm max-w-none" 
+            v-html="selectedResume.rendered_html"
+          ></div>
+        </div>
+
+        <!-- Match Analysis -->
+        <div v-if="selectedResume.gaps?.missing?.length" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Skills Gap Analysis</h4>
+          <div class="flex flex-wrap gap-2">
+            <span 
+              v-for="gap in selectedResume.gaps.missing" 
+              :key="gap"
+              class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs"
+            >
+              {{ gap }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

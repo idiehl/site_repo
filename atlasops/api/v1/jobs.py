@@ -336,6 +336,94 @@ async def generate_resume(
     }
 
 
+@router.get("/{job_id}/resumes")
+async def get_job_resumes(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> List[dict]:
+    """Get all generated resumes for a job posting."""
+    # Verify job belongs to user
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get resumes for this job
+    resumes_result = await db.execute(
+        select(GeneratedResume)
+        .where(GeneratedResume.job_posting_id == job_id)
+        .order_by(GeneratedResume.created_at.desc())
+    )
+    resumes = resumes_result.scalars().all()
+
+    return [
+        {
+            "id": str(r.id),
+            "match_score": r.match_score,
+            "matched_keywords": r.matched_keywords,
+            "gaps": r.gaps,
+            "created_at": r.created_at.isoformat(),
+        }
+        for r in resumes
+    ]
+
+
+@router.get("/{job_id}/resumes/{resume_id}")
+async def get_resume(
+    job_id: UUID,
+    resume_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Get a specific generated resume with HTML content."""
+    # Verify job belongs to user
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get the resume
+    resume_result = await db.execute(
+        select(GeneratedResume).where(
+            GeneratedResume.id == resume_id,
+            GeneratedResume.job_posting_id == job_id,
+        )
+    )
+    resume = resume_result.scalar_one_or_none()
+    if not resume:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resume not found",
+        )
+
+    return {
+        "id": str(resume.id),
+        "match_score": resume.match_score,
+        "matched_keywords": resume.matched_keywords,
+        "gaps": resume.gaps,
+        "content_json": resume.content_json,
+        "rendered_html": resume.rendered_html,
+        "created_at": resume.created_at.isoformat(),
+    }
+
+
 @router.post("/{job_id}/deep-dive")
 async def generate_deep_dive(
     job_id: UUID,
