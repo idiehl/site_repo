@@ -65,17 +65,32 @@ class Project(BaseModel):
     url: Optional[str] = None
 
 
+class SocialLinks(BaseModel):
+    """Social media links."""
+    
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    twitter: Optional[str] = None
+    portfolio: Optional[str] = None
+    indeed: Optional[str] = None
+    other: Optional[List[str]] = None
+
+
 class UserProfileUpdate(BaseModel):
     """Schema for profile update."""
 
     full_name: Optional[str] = None
     headline: Optional[str] = None
     summary: Optional[str] = None
+    profile_picture_url: Optional[str] = None
+    location: Optional[str] = None
+    phone: Optional[str] = None
+    social_links: Optional[Dict[str, Any]] = None
     work_history: Optional[List[Dict[str, Any]]] = None
     education: Optional[List[Dict[str, Any]]] = None
     skills: Optional[List[str]] = None
     projects: Optional[List[Dict[str, Any]]] = None
-    certifications: Optional[List[str]] = None
+    certifications: Optional[List[Dict[str, Any]]] = None
     contact_info: Optional[Dict[str, str]] = None
 
 
@@ -87,11 +102,18 @@ class UserProfileResponse(BaseModel):
     full_name: Optional[str] = None
     headline: Optional[str] = None
     summary: Optional[str] = None
+    profile_picture_url: Optional[str] = None
+    location: Optional[str] = None
+    phone: Optional[str] = None
+    social_links: Optional[Dict[str, Any]] = None
+    resume_file_url: Optional[str] = None
+    resume_parsed_at: Optional[datetime] = None
+    completeness_score: int = 0
     work_history: Optional[List[Dict[str, Any]]] = None
     education: Optional[List[Dict[str, Any]]] = None
     skills: Optional[List[str]] = None
     projects: Optional[List[Dict[str, Any]]] = None
-    certifications: Optional[List[str]] = None
+    certifications: Optional[List[Dict[str, Any]]] = None
     contact_info: Optional[Dict[str, str]] = None
     created_at: datetime
     updated_at: datetime
