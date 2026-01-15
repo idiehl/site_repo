@@ -74,6 +74,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function loginWithLinkedIn() {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await api.get('/api/v1/auth/linkedin/authorize')
+      // Redirect to LinkedIn authorization page
+      window.location.href = response.data.url
+    } catch (err) {
+      error.value = err.response?.data?.detail || 'Failed to initiate LinkedIn login'
+      loading.value = false
+    }
+  }
+
+  function handleOAuthCallback(tokens) {
+    // Called by OAuth callback page with tokens from URL fragment
+    accessToken.value = tokens.access_token
+    refreshToken.value = tokens.refresh_token
+    
+    localStorage.setItem('access_token', accessToken.value)
+    localStorage.setItem('refresh_token', refreshToken.value)
+    
+    return fetchUser()
+  }
+
   function logout() {
     user.value = null
     accessToken.value = null
@@ -90,6 +115,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     login,
     register,
+    loginWithLinkedIn,
+    handleOAuthCallback,
     fetchUser,
     checkAuth,
     logout,

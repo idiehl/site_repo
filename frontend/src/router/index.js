@@ -36,6 +36,12 @@ const routes = [
     component: () => import('../views/ProfileView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/oauth/callback',
+    name: 'oauth-callback',
+    component: () => import('../views/OAuthCallbackView.vue'),
+    meta: { guest: true },
+  },
 ]
 
 const router = createRouter({

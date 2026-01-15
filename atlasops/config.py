@@ -35,9 +35,15 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o-mini"
     openai_extraction_model: str = "gpt-4o-mini"
 
+    # LinkedIn OAuth
+    linkedin_client_id: str = ""
+    linkedin_client_secret: str = ""
+    linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
+
     # Application
     debug: bool = False
     environment: str = "development"
+    frontend_url: str = "http://localhost:5173"
 
 
 @lru_cache

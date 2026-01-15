@@ -19,6 +19,7 @@ class UserResponse(BaseModel):
 
     id: UUID
     email: str
+    oauth_provider: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

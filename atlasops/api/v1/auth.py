@@ -1,13 +1,17 @@
 """Authentication endpoints."""
 
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
+from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from passlib.context import CryptContext
-from sqlalchemy import select
+from sqlalchemy import select, and_
 
 from atlasops.api.deps import CurrentUser, DbSession
 from atlasops.config import get_settings
@@ -115,3 +119,177 @@ async def get_current_user_info(current_user: CurrentUser) -> User:
 async def logout() -> dict:
     """Logout user (client should discard tokens)."""
     return {"message": "Successfully logged out"}
+
+
+# LinkedIn OAuth endpoints
+LINKEDIN_AUTH_URL = "https://www.linkedin.com/oauth/v2/authorization"
+LINKEDIN_TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
+LINKEDIN_USERINFO_URL = "https://api.linkedin.com/v2/userinfo"
+
+# In-memory state store (for production, use Redis or DB)
+oauth_states: dict[str, datetime] = {}
+
+
+@router.get("/linkedin/authorize")
+async def linkedin_authorize() -> dict:
+    """Get LinkedIn OAuth authorization URL."""
+    if not settings.linkedin_client_id:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="LinkedIn OAuth not configured",
+        )
+    
+    # Generate state for CSRF protection
+    state = secrets.token_urlsafe(32)
+    oauth_states[state] = datetime.now(timezone.utc)
+    
+    # Clean up old states (older than 10 minutes)
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)
+    expired_states = [s for s, t in oauth_states.items() if t < cutoff]
+    for s in expired_states:
+        oauth_states.pop(s, None)
+    
+    params = {
+        "response_type": "code",
+        "client_id": settings.linkedin_client_id,
+        "redirect_uri": settings.linkedin_redirect_uri,
+        "state": state,
+        "scope": "openid profile email",
+    }
+    
+    auth_url = f"{LINKEDIN_AUTH_URL}?{urlencode(params)}"
+    return {"url": auth_url, "state": state}
+
+
+@router.get("/linkedin/callback")
+async def linkedin_callback(
+    code: str = Query(...),
+    state: str = Query(...),
+    db: DbSession = None,
+) -> RedirectResponse:
+    """Handle LinkedIn OAuth callback."""
+    # Verify state
+    if state not in oauth_states:
+        return RedirectResponse(
+            url=f"{settings.frontend_url}/login?error=invalid_state"
+        )
+    
+    oauth_states.pop(state, None)
+    
+    if not settings.linkedin_client_id or not settings.linkedin_client_secret:
+        return RedirectResponse(
+            url=f"{settings.frontend_url}/login?error=oauth_not_configured"
+        )
+    
+    try:
+        # Exchange code for access token
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                LINKEDIN_TOKEN_URL,
+                data={
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": settings.linkedin_redirect_uri,
+                    "client_id": settings.linkedin_client_id,
+                    "client_secret": settings.linkedin_client_secret,
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+            
+            if token_response.status_code != 200:
+                return RedirectResponse(
+                    url=f"{settings.frontend_url}/login?error=token_exchange_failed"
+                )
+            
+            token_data = token_response.json()
+            access_token = token_data.get("access_token")
+            
+            if not access_token:
+                return RedirectResponse(
+                    url=f"{settings.frontend_url}/login?error=no_access_token"
+                )
+            
+            # Fetch user info using OpenID Connect userinfo endpoint
+            userinfo_response = await client.get(
+                LINKEDIN_USERINFO_URL,
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            
+            if userinfo_response.status_code != 200:
+                return RedirectResponse(
+                    url=f"{settings.frontend_url}/login?error=userinfo_failed"
+                )
+            
+            userinfo = userinfo_response.json()
+            
+        # Extract user data from OpenID Connect response
+        linkedin_id = userinfo.get("sub")
+        email = userinfo.get("email")
+        name = userinfo.get("name")
+        
+        if not linkedin_id or not email:
+            return RedirectResponse(
+                url=f"{settings.frontend_url}/login?error=missing_user_data"
+            )
+        
+        # Check if user exists by LinkedIn ID
+        result = await db.execute(
+            select(User).where(
+                and_(
+                    User.oauth_provider == "linkedin",
+                    User.oauth_provider_id == linkedin_id,
+                )
+            )
+        )
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            # Check if email already exists (user has password account)
+            result = await db.execute(select(User).where(User.email == email))
+            existing_user = result.scalar_one_or_none()
+            
+            if existing_user:
+                # Link LinkedIn to existing account
+                existing_user.oauth_provider = "linkedin"
+                existing_user.oauth_provider_id = linkedin_id
+                user = existing_user
+            else:
+                # Create new user
+                user = User(
+                    email=email,
+                    hashed_password=None,
+                    oauth_provider="linkedin",
+                    oauth_provider_id=linkedin_id,
+                )
+                db.add(user)
+                await db.flush()
+                
+                # Create empty profile with name from LinkedIn
+                profile = UserProfile(
+                    user_id=user.id,
+                    full_name=name,
+                )
+                db.add(profile)
+            
+            await db.commit()
+            await db.refresh(user)
+        
+        # Generate tokens
+        access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
+        
+        # Redirect to frontend with tokens in URL fragment
+        # The frontend will extract these and store them
+        redirect_url = (
+            f"{settings.frontend_url}/oauth/callback"
+            f"#access_token={access_token}"
+            f"&refresh_token={refresh_token}"
+            f"&token_type=bearer"
+        )
+        
+        return RedirectResponse(url=redirect_url)
+        
+    except httpx.RequestError:
+        return RedirectResponse(
+            url=f"{settings.frontend_url}/login?error=network_error"
+        )
