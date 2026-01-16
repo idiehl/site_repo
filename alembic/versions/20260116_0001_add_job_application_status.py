@@ -1,7 +1,7 @@
 """Add application status fields to job_postings.
 
-Revision ID: 20260116_0001
-Revises: 20260115_0012_add_subscription_fields
+Revision ID: 0013
+Revises: 0012
 Create Date: 2026-01-16
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "20260116_0001"
-down_revision = "20260115_0012_add_subscription_fields"
+revision = "0013"
+down_revision = "0012"
 branch_labels = None
 depends_on = None
 
