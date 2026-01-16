@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Raleway:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            font-size: 10pt;
+            line-height: 1.45;
+            color: #2d3436;
+            background: white;
+        }
+        
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+        
+        /* Header Banner */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 32px 44px;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 30pt;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        
+        .header .headline {
+            font-size: 13pt;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+        
+        .contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: 9pt;
+            opacity: 0.85;
+        }
+        
+        .contact-row a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .contact-row span::before {
+            content: "◆";
+            margin-right: 6px;
+            font-size: 5pt;
+            vertical-align: middle;
+        }
+        
+        /* Page 2 Header */
+        .page2-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 16px 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page2-header h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14pt;
+            font-weight: 500;
+        }
+        
+        .page2-header .page-num {
+            font-size: 9pt;
+            opacity: 0.8;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+        }
+        
+        .main-column {
+            padding: 24px 32px;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .side-column {
+            padding: 24px 20px;
+            background: #f8f9fa;
+        }
+        
+        /* Page 2 content */
+        .page2-content {
+            padding: 24px 44px;
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 18px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #1e3a5f;
+        }
+        
+        .side-column .section-title {
+            font-size: 10pt;
+            border-bottom-width: 1px;
+        }
+        
+        /* Profile Summary */
+        .profile-summary {
+            font-size: 10pt;
+            color: #3d3d3d;
+            line-height: 1.55;
+            text-align: justify;
+        }
+        
+        /* Skills */
+        .skill-group {
+            margin-bottom: 14px;
+        }
+        
+        .skill-group h4 {
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .skill-item {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 3px 8px;
+            font-size: 8pt;
+            border-radius: 3px;
+            color: #444;
+        }
+        
+        .skill-item.professional {
+            background: #1e3a5f;
+            color: white;
+            border-color: #1e3a5f;
+        }
+        
+        /* Experience */
+        .experience-item {
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 3px solid #1e3a5f;
+        }
+        
+        .job-title {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+        
+        .company {
+            font-weight: 600;
+            color: #2d5a87;
+        }
+        
+        .meta-line {
+            font-size: 9pt;
+            color: #777;
+            margin: 3px 0 6px;
+        }
+        
+        .highlights {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .highlights li {
+            position: relative;
+            padding-left: 14px;
+            margin-bottom: 4px;
+            font-size: 9.5pt;
+            color: #444;
+            line-height: 1.4;
+        }
+        
+        .highlights li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #2d5a87;
+            font-weight: 600;
+        }
+        
+        /* Projects */
+        .project-item {
+            margin-bottom: 14px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #1e3a5f;
+        }
+        
+        .project-name {
+            font-weight: 700;
+            color: #1e3a5f;
+            font-size: 10.5pt;
+        }
+        
+        .project-name a {
+            color: #2d5a87;
+            text-decoration: none;
+            margin-left: 8px;
+            font-weight: 400;
+            font-size: 9pt;
+        }
+        
+        .project-desc {
+            font-size: 9.5pt;
+            color: #444;
+            margin: 4px 0;
+        }
+        
+        .project-outcome {
+            font-size: 9pt;
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+        
+        .project-tech {
+            font-size: 8.5pt;
+            color: #777;
+            margin-top: 4px;
+        }
+        
+        /* Education */
+        .education-item {
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .education-item:last-child {
+            border-bottom: none;
+        }
+        
+        .degree {
+            font-weight: 700;
+            color: #1e3a5f;
+            font-size: 10.5pt;
+        }
+        
+        .institution {
+            font-size: 10pt;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .edu-date {
+            font-size: 9pt;
+            color: #888;
+        }
+        
+        .edu-details {
+            font-size: 9pt;
+            color: #555;
+            margin-top: 4px;
+        }
+        
+        .coursework {
+            font-size: 8.5pt;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* Extracurriculars */
+        .extra-item {
+            margin-bottom: 12px;
+        }
+        
+        .extra-org {
+            font-weight: 700;
+            color: #1e3a5f;
+            font-size: 10pt;
+        }
+        
+        .extra-role {
+            font-weight: 500;
+            color: #2d5a87;
+        }
+        
+        .extra-dates {
+            font-size: 8.5pt;
+            color: #888;
+        }
+        
+        .extra-desc {
+            font-size: 9pt;
+            color: #555;
+            margin-top: 3px;
+        }
+        
+        /* Certifications */
+        .cert-item {
+            margin-bottom: 8px;
+            padding: 8px 10px;
+            background: white;
+            border-radius: 4px;
+            border-left: 2px solid #1e3a5f;
+        }
+        
+        .cert-name {
+            font-weight: 600;
+            font-size: 9.5pt;
+            color: #1e3a5f;
+        }
+        
+        .cert-issuer {
+            font-size: 8.5pt;
+            color: #666;
+        }
+        
+        /* Print */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .page {
+                margin: 0;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .header, .page2-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .side-column {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <div class="page">
+        <header class="header">
+            <h1>{{name}}</h1>
+            <div class="headline">{{headline}}</div>
+            <div class="contact-row">
+                {{#if email}}<span>{{email}}</span>{{/if}}
+                {{#if phone}}<span>{{phone}}</span>{{/if}}
+                {{#if location}}<span>{{location}}</span>{{/if}}
+                {{#if linkedin}}<span><a href="{{linkedin}}">LinkedIn Profile</a></span>{{/if}}
+            </div>
+        </header>
+
+        <div class="two-column">
+            <div class="main-column">
+                <section class="section">
+                    <h2 class="section-title">Executive Profile</h2>
+                    <p class="profile-summary">{{profile_summary}}</p>
+                </section>
+
+                <section class="section">
+                    <h2 class="section-title">Professional Experience</h2>
+                    {{#each experience}}
+                    <div class="experience-item">
+                        <div class="job-title">{{title}}</div>
+                        <div class="company">{{company}}</div>
+                        <div class="meta-line">{{location}} · {{start_date}} – {{end_date}}</div>
+                        <ul class="highlights">
+                            {{#each highlights}}
+                            <li>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                    {{/each}}
+                </section>
+            </div>
+
+            <div class="side-column">
+                <section class="section">
+                    <h2 class="section-title">Core Skills</h2>
+                    
+                    {{#if skills.technical}}
+                    <div class="skill-group">
+                        <h4>Technical</h4>
+                        <div class="skill-list">
+                            {{#each skills.technical}}
+                            <span class="skill-item">{{this}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/if}}
+                    
+                    {{#if skills.tools}}
+                    <div class="skill-group">
+                        <h4>Tools</h4>
+                        <div class="skill-list">
+                            {{#each skills.tools}}
+                            <span class="skill-item">{{this}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/if}}
+                    
+                    {{#if skills.professional}}
+                    <div class="skill-group">
+                        <h4>Leadership</h4>
+                        <div class="skill-list">
+                            {{#each skills.professional}}
+                            <span class="skill-item professional">{{this}}</span>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/if}}
+                </section>
+
+                {{#if certifications}}
+                <section class="section">
+                    <h2 class="section-title">Certifications</h2>
+                    {{#each certifications}}
+                    <div class="cert-item">
+                        <div class="cert-name">{{name}}</div>
+                        <div class="cert-issuer">{{issuer}} · {{date}}</div>
+                    </div>
+                    {{/each}}
+                </section>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page page-break">
+        <div class="page2-header">
+            <h2>{{name}}</h2>
+            <span class="page-num">Page 2</span>
+        </div>
+
+        <div class="page2-content">
+            {{#if projects}}
+            <section class="section">
+                <h2 class="section-title">Key Projects & Initiatives</h2>
+                {{#each projects}}
+                <div class="project-item">
+                    <div class="project-name">
+                        {{name}}
+                        {{#if link}}<a href="{{link}}">View →</a>{{/if}}
+                    </div>
+                    <p class="project-desc">{{description}}</p>
+                    {{#if outcome}}<p class="project-outcome">Impact: {{outcome}}</p>{{/if}}
+                    {{#if technologies}}<div class="project-tech">Technologies: {{#each technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</div>{{/if}}
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+
+            {{#if education}}
+            <section class="section">
+                <h2 class="section-title">Education</h2>
+                {{#each education}}
+                <div class="education-item">
+                    <div class="degree">{{degree}}</div>
+                    <div class="institution">{{institution}}</div>
+                    <div class="edu-date">{{graduation_date}}{{#if gpa}} | GPA: {{gpa}}{{/if}}</div>
+                    {{#if honors}}<div class="edu-details">{{#each honors}}{{this}}{{#unless @last}} · {{/unless}}{{/each}}</div>{{/if}}
+                    {{#if relevant_coursework}}<div class="coursework">Focus: {{#each relevant_coursework}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</div>{{/if}}
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+
+            {{#if extracurriculars}}
+            <section class="section">
+                <h2 class="section-title">Leadership & Community Involvement</h2>
+                {{#each extracurriculars}}
+                <div class="extra-item">
+                    <div>
+                        <span class="extra-org">{{organization}}</span>
+                        <span class="extra-role"> · {{role}}</span>
+                    </div>
+                    <div class="extra-dates">{{dates}}</div>
+                    {{#if description}}<p class="extra-desc">{{description}}</p>{{/if}}
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>
