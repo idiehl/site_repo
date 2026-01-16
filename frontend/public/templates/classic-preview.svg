@@ -1,62 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" fill="none">
+<svg width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="300" height="400" fill="#ffffff" rx="4"/>
-  <rect x="1" y="1" width="298" height="398" fill="none" stroke="#e0e0e0" rx="4"/>
+  <rect width="120" height="160" fill="white"/>
+  <rect x="1" y="1" width="118" height="158" stroke="#e5e7eb" stroke-width="1" fill="none"/>
   
-  <!-- Header - centered, elegant -->
-  <rect x="60" y="25" width="180" height="20" rx="2" fill="#222"/>
-  <!-- Decorative line under name -->
-  <rect x="100" y="50" width="100" height="2" fill="#4361ee"/>
+  <!-- Elegant header with border -->
+  <rect x="10" y="12" width="100" height="24" fill="white" stroke="#4361ee" stroke-width="1"/>
+  <rect x="25" y="17" width="70" height="7" rx="1" fill="#1f2937"/>
+  <rect x="35" y="27" width="50" height="3" rx="1" fill="#4361ee"/>
   
-  <!-- Contact info centered -->
-  <rect x="70" y="60" width="160" height="8" rx="2" fill="#444"/>
+  <!-- Contact line -->
+  <rect x="20" y="42" width="80" height="2" rx="0.5" fill="#6b7280"/>
   
-  <!-- Section: Professional Summary -->
-  <rect x="20" y="85" width="260" height="1" fill="#ccc"/>
-  <rect x="95" y="78" width="110" height="10" rx="2" fill="#222"/>
-  <rect x="20" y="95" width="260" height="6" rx="2" fill="#666"/>
-  <rect x="20" y="105" width="250" height="6" rx="2" fill="#666"/>
-  <rect x="20" y="115" width="220" height="6" rx="2" fill="#666"/>
+  <!-- Section with underline -->
+  <rect x="10" y="52" width="50" height="4" rx="1" fill="#1f2937"/>
+  <rect x="10" y="57" width="100" height="0.5" fill="#e5e7eb"/>
+  <rect x="10" y="62" width="100" height="2" rx="0.5" fill="#d1d5db"/>
+  <rect x="10" y="66" width="95" height="2" rx="0.5" fill="#d1d5db"/>
+  <rect x="10" y="70" width="88" height="2" rx="0.5" fill="#d1d5db"/>
   
-  <!-- Section: Experience -->
-  <rect x="20" y="140" width="260" height="1" fill="#ccc"/>
-  <rect x="105" y="133" width="90" height="10" rx="2" fill="#222"/>
+  <!-- Experience with elegant styling -->
+  <rect x="10" y="80" width="60" height="4" rx="1" fill="#1f2937"/>
+  <rect x="10" y="85" width="100" height="0.5" fill="#e5e7eb"/>
+  <rect x="10" y="90" width="55" height="3" rx="0.5" fill="#374151"/>
+  <rect x="80" y="90" width="30" height="2" rx="0.5" fill="#9ca3af"/>
+  <rect x="10" y="95" width="40" height="2" rx="0.5" fill="#4361ee"/>
+  <rect x="15" y="100" width="85" height="2" rx="0.5" fill="#d1d5db"/>
+  <rect x="15" y="104" width="80" height="2" rx="0.5" fill="#d1d5db"/>
   
-  <!-- Experience item 1 -->
-  <rect x="20" y="155" width="150" height="10" rx="2" fill="#333"/>
-  <rect x="200" y="155" width="80" height="8" rx="2" fill="#888"/>
-  <rect x="20" y="168" width="100" height="8" rx="2" fill="#666"/>
-  <rect x="30" y="180" width="240" height="6" rx="2" fill="#888"/>
-  <rect x="30" y="190" width="230" height="6" rx="2" fill="#888"/>
+  <rect x="10" y="112" width="50" height="3" rx="0.5" fill="#374151"/>
+  <rect x="80" y="112" width="28" height="2" rx="0.5" fill="#9ca3af"/>
+  <rect x="10" y="117" width="35" height="2" rx="0.5" fill="#4361ee"/>
+  <rect x="15" y="122" width="82" height="2" rx="0.5" fill="#d1d5db"/>
+  <rect x="15" y="126" width="78" height="2" rx="0.5" fill="#d1d5db"/>
   
-  <!-- Experience item 2 -->
-  <rect x="20" y="210" width="140" height="10" rx="2" fill="#333"/>
-  <rect x="200" y="210" width="80" height="8" rx="2" fill="#888"/>
-  <rect x="20" y="223" width="90" height="8" rx="2" fill="#666"/>
-  <rect x="30" y="235" width="250" height="6" rx="2" fill="#888"/>
-  <rect x="30" y="245" width="220" height="6" rx="2" fill="#888"/>
+  <!-- Education -->
+  <rect x="10" y="136" width="45" height="4" rx="1" fill="#1f2937"/>
+  <rect x="10" y="141" width="100" height="0.5" fill="#e5e7eb"/>
+  <rect x="10" y="146" width="60" height="3" rx="0.5" fill="#374151"/>
   
-  <!-- Section: Education -->
-  <rect x="20" y="270" width="260" height="1" fill="#ccc"/>
-  <rect x="115" y="263" width="70" height="10" rx="2" fill="#222"/>
-  
-  <!-- Education item -->
-  <rect x="20" y="285" width="180" height="10" rx="2" fill="#333"/>
-  <rect x="20" y="298" width="120" height="8" rx="2" fill="#666"/>
-  <rect x="200" y="285" width="80" height="8" rx="2" fill="#888"/>
-  
-  <!-- Section: Skills -->
-  <rect x="20" y="325" width="260" height="1" fill="#ccc"/>
-  <rect x="125" y="318" width="50" height="10" rx="2" fill="#222"/>
-  
-  <!-- Skills list -->
-  <rect x="20" y="340" width="260" height="6" rx="2" fill="#888"/>
-  <rect x="20" y="350" width="240" height="6" rx="2" fill="#888"/>
-  
-  <!-- Page number -->
-  <text x="150" y="385" fill="#888" font-family="Georgia, serif" font-size="10" text-anchor="middle">1</text>
-  
-  <!-- PRO badge -->
-  <rect x="225" y="10" width="65" height="22" rx="11" fill="#8b5cf6"/>
-  <text x="257" y="25" fill="white" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle">PRO</text>
+  <!-- PRO Badge -->
+  <rect x="85" y="5" width="30" height="12" rx="6" fill="#8b5cf6"/>
+  <text x="100" y="13" font-family="Arial" font-size="6" font-weight="bold" fill="white" text-anchor="middle">PRO</text>
 </svg>

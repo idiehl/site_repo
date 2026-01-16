@@ -1,0 +1,64 @@
+<svg width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="160" fill="white"/>
+  <rect x="1" y="1" width="118" height="158" stroke="#e5e7eb" stroke-width="1" fill="none"/>
+  
+  <!-- Terminal-style header -->
+  <rect x="8" y="8" width="104" height="32" rx="4" fill="#1a1b26"/>
+  
+  <!-- Terminal dots -->
+  <circle cx="16" cy="16" r="3" fill="#f7768e"/>
+  <circle cx="24" cy="16" r="3" fill="#e0af68"/>
+  <circle cx="32" cy="16" r="3" fill="#9ece6a"/>
+  
+  <!-- Header content -->
+  <rect x="16" y="24" width="50" height="6" rx="1" fill="#7c3aed"/>
+  <rect x="16" y="32" width="35" height="2" rx="0.5" fill="#565f89"/>
+  <rect x="70" y="26" width="35" height="2" rx="0.5" fill="#10b981"/>
+  <rect x="70" y="30" width="30" height="2" rx="0.5" fill="#c0caf5"/>
+  
+  <!-- Code-style summary -->
+  <rect x="8" y="48" width="104" height="14" rx="2" fill="#f8fafc"/>
+  <rect x="8" y="48" width="2" height="14" fill="#7c3aed"/>
+  <rect x="14" y="52" width="12" height="2" rx="0.5" fill="#565f89"/>
+  <rect x="28" y="52" width="75" height="2" rx="0.5" fill="#64748b"/>
+  <rect x="14" y="56" width="85" height="2" rx="0.5" fill="#64748b"/>
+  
+  <!-- Skills as code -->
+  <rect x="8" y="68" width="10" height="3" rx="0.5" fill="#565f89"/>
+  <rect x="20" y="68" width="25" height="3" rx="0.5" fill="#7c3aed"/>
+  <rect x="12" y="74" width="20" height="5" rx="2" fill="url(#skillGrad)"/>
+  <rect x="35" y="74" width="25" height="5" rx="2" fill="url(#skillGrad)"/>
+  <rect x="63" y="74" width="22" height="5" rx="2" fill="url(#skillGrad)"/>
+  <rect x="12" y="81" width="18" height="5" rx="2" fill="url(#skillGrad)"/>
+  <rect x="33" y="81" width="28" height="5" rx="2" fill="url(#skillGrad)"/>
+  
+  <defs>
+    <linearGradient id="skillGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#10b981"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Experience -->
+  <rect x="8" y="92" width="10" height="3" rx="0.5" fill="#565f89"/>
+  <rect x="20" y="92" width="35" height="3" rx="0.5" fill="#7c3aed"/>
+  <rect x="8" y="98" width="2" height="20" fill="#7c3aed"/>
+  <rect x="14" y="98" width="45" height="3" rx="0.5" fill="#1f2937"/>
+  <rect x="62" y="98" width="3" height="3" rx="0.5" fill="#10b981"/>
+  <rect x="68" y="98" width="30" height="3" rx="0.5" fill="#10b981"/>
+  <rect x="14" y="103" width="30" height="2" rx="0.5" fill="#6b7280"/>
+  <rect x="18" y="108" width="80" height="2" rx="0.5" fill="#d1d5db"/>
+  <rect x="18" y="112" width="75" height="2" rx="0.5" fill="#d1d5db"/>
+  
+  <!-- Project card -->
+  <rect x="8" y="124" width="30" height="3" rx="0.5" fill="#7c3aed"/>
+  <rect x="8" y="130" width="104" height="18" rx="3" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <rect x="14" y="134" width="35" height="3" rx="0.5" fill="#7c3aed"/>
+  <rect x="14" y="139" width="90" height="2" rx="0.5" fill="#64748b"/>
+  <rect x="14" y="143" width="40" height="2" rx="0.5" fill="#10b981"/>
+  
+  <!-- PRO Badge -->
+  <rect x="85" y="42" width="30" height="12" rx="6" fill="#8b5cf6"/>
+  <text x="100" y="50" font-family="Arial" font-size="6" font-weight="bold" fill="white" text-anchor="middle">PRO</text>
+</svg>

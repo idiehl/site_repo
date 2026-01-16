@@ -588,7 +588,7 @@ async def generate_resume(
     job_id: UUID,
     current_user: CurrentUser,
     db: DbSession,
-    template: str = "modern",
+    template: str = "basic",
     color_scheme: str | None = None,
 ) -> dict:
     """Generate a tailored resume for a job posting.

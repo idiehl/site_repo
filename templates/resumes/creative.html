@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --accent-primary: {{accent_primary}};
+            --accent-secondary: {{accent_secondary}};
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #2d2d2d;
+            background: white;
+        }
+        
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            padding: 0;
+            background: white;
+            display: grid;
+            grid-template-columns: 2.2in 1fr;
+        }
+        
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            padding: 0.5in 0.3in;
+            color: white;
+        }
+        
+        .sidebar h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .sidebar .headline {
+            font-size: 9pt;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 18px;
+        }
+        
+        .sidebar-title {
+            font-size: 8pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        
+        .contact-item {
+            font-size: 8.5pt;
+            margin-bottom: 4px;
+            font-weight: 300;
+        }
+        
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .skill-bar {
+            margin-bottom: 8px;
+        }
+        
+        .skill-name {
+            font-size: 8.5pt;
+            font-weight: 400;
+            margin-bottom: 2px;
+        }
+        
+        .skill-level {
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+        
+        .skill-fill {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 85%;
+        }
+        
+        .skill-tag-sidebar {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 7.5pt;
+            margin: 2px 2px 2px 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 0.5in 0.5in 0.5in 0.4in;
+        }
+        
+        .section {
+            margin-bottom: 18px;
+        }
+        
+        .section-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--accent-primary);
+            display: inline-block;
+        }
+        
+        /* Profile Summary */
+        .profile-summary {
+            font-size: 9.5pt;
+            color: #444;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        
+        /* Experience */
+        .experience-item {
+            margin-bottom: 14px;
+            position: relative;
+            padding-left: 14px;
+        }
+        
+        .experience-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+        }
+        
+        .exp-title {
+            font-size: 10pt;
+            font-weight: 600;
+            color: #2d2d2d;
+        }
+        
+        .exp-company {
+            font-size: 9pt;
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+        
+        .exp-meta {
+            font-size: 8pt;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .highlights {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .highlights li {
+            font-size: 9pt;
+            color: #555;
+            margin-bottom: 2px;
+            padding-left: 12px;
+            position: relative;
+            font-weight: 300;
+        }
+        
+        .highlights li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-secondary);
+            font-size: 8pt;
+        }
+        
+        /* Projects */
+        .project-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(var(--accent-primary), 0.03) 0%, transparent 100%);
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .project-name {
+            font-weight: 600;
+            font-size: 10pt;
+            color: #2d2d2d;
+        }
+        
+        .project-desc {
+            font-size: 9pt;
+            color: #555;
+            font-weight: 300;
+            margin-top: 2px;
+        }
+        
+        .project-tech {
+            font-size: 8pt;
+            color: var(--accent-primary);
+            margin-top: 4px;
+        }
+        
+        /* Education */
+        .education-item {
+            margin-bottom: 10px;
+        }
+        
+        .edu-degree {
+            font-weight: 600;
+            font-size: 10pt;
+            color: #2d2d2d;
+        }
+        
+        .edu-school {
+            font-size: 9pt;
+            color: var(--accent-primary);
+        }
+        
+        .edu-date {
+            font-size: 8pt;
+            color: #888;
+        }
+        
+        /* Certifications */
+        .cert-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .cert-item {
+            background: var(--accent-primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 8pt;
+            font-weight: 500;
+        }
+        
+        /* Page 2 */
+        .page2-header {
+            grid-column: span 2;
+            padding: 0.3in 0.5in;
+            border-bottom: 2px solid var(--accent-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page2-header h2 {
+            font-size: 14pt;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .page2-header .page-num {
+            font-size: 9pt;
+            color: #888;
+        }
+        
+        .page2-content {
+            grid-column: span 2;
+            padding: 0.3in 0.5in;
+        }
+        
+        /* Activities */
+        .activity-item {
+            margin-bottom: 10px;
+            padding-left: 14px;
+            position: relative;
+        }
+        
+        .activity-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+        }
+        
+        .activity-role {
+            font-weight: 600;
+            font-size: 10pt;
+        }
+        
+        .activity-org {
+            color: var(--accent-primary);
+            font-size: 9pt;
+        }
+        
+        .activity-dates {
+            font-size: 8pt;
+            color: #888;
+        }
+        
+        .activity-desc {
+            font-size: 9pt;
+            color: #555;
+            font-weight: 300;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .page {
+                margin: 0;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <div class="page">
+        <aside class="sidebar">
+            <h1>{{name}}</h1>
+            {{#if headline}}<div class="headline">{{headline}}</div>{{/if}}
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Contact</div>
+                {{#if email}}<div class="contact-item">{{email}}</div>{{/if}}
+                {{#if phone}}<div class="contact-item">{{phone}}</div>{{/if}}
+                {{#if location}}<div class="contact-item">{{location}}</div>{{/if}}
+                {{#if linkedin}}<div class="contact-item"><a href="{{linkedin}}">LinkedIn</a></div>{{/if}}
+            </div>
+            
+            {{#if skills.technical}}
+            <div class="sidebar-section">
+                <div class="sidebar-title">Skills</div>
+                {{#each skills.technical}}
+                <span class="skill-tag-sidebar">{{this}}</span>
+                {{/each}}
+            </div>
+            {{/if}}
+            
+            {{#if skills.tools}}
+            <div class="sidebar-section">
+                <div class="sidebar-title">Tools</div>
+                {{#each skills.tools}}
+                <span class="skill-tag-sidebar">{{this}}</span>
+                {{/each}}
+            </div>
+            {{/if}}
+        </aside>
+        
+        <main class="main-content">
+            {{#if profile_summary}}
+            <section class="section">
+                <h2 class="section-title">About Me</h2>
+                <p class="profile-summary">{{profile_summary}}</p>
+            </section>
+            {{/if}}
+            
+            <section class="section">
+                <h2 class="section-title">Experience</h2>
+                {{#each experience}}
+                <div class="experience-item">
+                    <div class="exp-title">{{title}}</div>
+                    <div class="exp-company">{{company}}</div>
+                    <div class="exp-meta">{{start_date}} - {{end_date}} • {{location}}</div>
+                    <ul class="highlights">
+                        {{#each highlights}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/each}}
+            </section>
+        </main>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page page-break">
+        <div class="page2-header">
+            <h2>{{name}}</h2>
+            <span class="page-num">Page 2</span>
+        </div>
+        
+        <div class="page2-content">
+            {{#if projects}}
+            <section class="section">
+                <h2 class="section-title">Projects</h2>
+                {{#each projects}}
+                <div class="project-item">
+                    <div class="project-name">{{name}}</div>
+                    <p class="project-desc">{{description}}</p>
+                    {{#if technologies}}<div class="project-tech">{{#each technologies}}{{this}}{{#unless @last}} · {{/unless}}{{/each}}</div>{{/if}}
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+            
+            {{#if education}}
+            <section class="section">
+                <h2 class="section-title">Education</h2>
+                {{#each education}}
+                <div class="education-item">
+                    <div class="edu-degree">{{degree}}</div>
+                    <div class="edu-school">{{institution}}</div>
+                    <div class="edu-date">{{graduation_date}}</div>
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+            
+            {{#if certifications}}
+            <section class="section">
+                <h2 class="section-title">Certifications</h2>
+                <div class="cert-grid">
+                    {{#each certifications}}
+                    <div class="cert-item">{{name}}</div>
+                    {{/each}}
+                </div>
+            </section>
+            {{/if}}
+            
+            {{#if extracurriculars}}
+            <section class="section">
+                <h2 class="section-title">Leadership & Activities</h2>
+                {{#each extracurriculars}}
+                <div class="activity-item">
+                    <div class="activity-role">{{role}}</div>
+                    <div class="activity-org">{{organization}}</div>
+                    <div class="activity-dates">{{dates}}</div>
+                    {{#if description}}<p class="activity-desc">{{description}}</p>{{/if}}
+                </div>
+                {{/each}}
+            </section>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>

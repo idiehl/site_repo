@@ -15,32 +15,70 @@ PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 # Available templates with metadata
 TEMPLATE_INFO = {
+    # FREE TEMPLATES - No color customization, simple styling
+    "basic": {
+        "name": "Basic",
+        "description": "Simple black and white resume with traditional formatting",
+        "best_for": ["General use", "Traditional industries", "ATS-friendly"],
+        "tier": "free",
+        "color_schemes": None,
+        "thumbnail": "/templates/basic-preview.svg",
+        "default_colors": None,  # No colors
+    },
+    "simple": {
+        "name": "Simple",
+        "description": "Clean, minimal design with modern sans-serif typography",
+        "best_for": ["General use", "Entry-level", "All industries"],
+        "tier": "free",
+        "color_schemes": None,
+        "thumbnail": "/templates/simple-preview.svg",
+        "default_colors": None,  # No colors
+    },
+    # PAID TEMPLATES - With color customization and styling
     "modern": {
         "name": "Modern",
-        "description": "Clean, contemporary 2-page design with accent colors and skill tags",
+        "description": "Contemporary design with accent colors and skill tags",
         "best_for": ["Tech", "Startups", "Creative roles"],
-        "tier": "free",
-        "color_schemes": None,  # No customization for free template
+        "tier": "paid",
+        "color_schemes": ["blue", "green", "purple", "teal", "red", "orange"],
         "thumbnail": "/templates/modern-preview.svg",
         "default_colors": {"primary": "#4361ee", "secondary": "#06b6d4"},
     },
     "classic": {
         "name": "Classic",
-        "description": "Traditional professional 2-page format, elegant typography",
+        "description": "Traditional professional format with elegant typography",
         "best_for": ["Corporate", "Finance", "Legal", "Academia"],
         "tier": "paid",
-        "color_schemes": ["blue", "green", "purple", "teal", "red"],
+        "color_schemes": ["blue", "green", "purple", "teal", "red", "navy"],
         "thumbnail": "/templates/classic-preview.svg",
         "default_colors": {"primary": "#4361ee", "secondary": "#06b6d4"},
     },
     "executive": {
         "name": "Executive",
-        "description": "Bold two-column layout with header banner",
+        "description": "Bold two-column layout with professional header",
         "best_for": ["Senior roles", "Management", "C-Suite", "Consulting"],
         "tier": "paid",
-        "color_schemes": ["blue", "green", "purple", "teal", "red"],
+        "color_schemes": ["blue", "green", "purple", "teal", "navy"],
         "thumbnail": "/templates/executive-preview.svg",
-        "default_colors": {"primary": "#1e3a5f", "secondary": "#2d5a87"},  # Navy blue default
+        "default_colors": {"primary": "#1e3a5f", "secondary": "#2d5a87"},
+    },
+    "creative": {
+        "name": "Creative",
+        "description": "Visual sidebar layout with gradient accents",
+        "best_for": ["Design", "Marketing", "Creative industries", "Media"],
+        "tier": "paid",
+        "color_schemes": ["blue", "green", "purple", "teal", "red", "orange"],
+        "thumbnail": "/templates/creative-preview.svg",
+        "default_colors": {"primary": "#8b5cf6", "secondary": "#a78bfa"},
+    },
+    "technical": {
+        "name": "Technical",
+        "description": "Developer-inspired with terminal styling and code aesthetics",
+        "best_for": ["Software", "Engineering", "Data Science", "DevOps"],
+        "tier": "paid",
+        "color_schemes": ["blue", "green", "purple", "teal", "orange"],
+        "thumbnail": "/templates/technical-preview.svg",
+        "default_colors": {"primary": "#7c3aed", "secondary": "#10b981"},
     },
 }
 
@@ -51,7 +89,8 @@ COLOR_SCHEMES = {
     "purple": {"primary": "#8b5cf6", "secondary": "#a78bfa"},
     "teal": {"primary": "#14b8a6", "secondary": "#2dd4bf"},
     "red": {"primary": "#ef4444", "secondary": "#f87171"},
-    "navy": {"primary": "#1e3a5f", "secondary": "#2d5a87"},  # Executive default
+    "orange": {"primary": "#f97316", "secondary": "#fb923c"},
+    "navy": {"primary": "#1e3a5f", "secondary": "#2d5a87"},
 }
 
 

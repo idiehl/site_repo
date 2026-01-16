@@ -38,7 +38,7 @@ const tabs = [
 
 // Template state
 const templates = ref([])
-const selectedTemplate = ref('modern')
+const selectedTemplate = ref('basic')  // Default to free template
 const selectedColorScheme = ref(null)
 const colorSchemes = ref([])
 const loading = ref(false)
@@ -50,7 +50,9 @@ const colorSchemeInfo = {
   green: { name: 'Green', primary: '#10b981', secondary: '#34d399' },
   purple: { name: 'Purple', primary: '#8b5cf6', secondary: '#a78bfa' },
   teal: { name: 'Teal', primary: '#14b8a6', secondary: '#2dd4bf' },
-  red: { name: 'Red', primary: '#ef4444', secondary: '#f87171' }
+  red: { name: 'Red', primary: '#ef4444', secondary: '#f87171' },
+  orange: { name: 'Orange', primary: '#f97316', secondary: '#fb923c' },
+  navy: { name: 'Navy', primary: '#1e3a5f', secondary: '#2d5a87' }
 }
 
 // Computed
@@ -96,7 +98,8 @@ async function fetchTemplates() {
     console.error('Failed to fetch templates:', err)
     // Fallback templates
     templates.value = [
-      { id: 'modern', name: 'Modern', tier: 'free', thumbnail: '/templates/modern-preview.svg', accessible: true }
+      { id: 'basic', name: 'Basic', tier: 'free', thumbnail: '/templates/basic-preview.svg', accessible: true, description: 'Simple black and white resume' },
+      { id: 'simple', name: 'Simple', tier: 'free', thumbnail: '/templates/simple-preview.svg', accessible: true, description: 'Clean, minimal design' }
     ]
   } finally {
     loadingTemplates.value = false

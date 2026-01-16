@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+        
+        :root {
+            --accent-primary: {{accent_primary}};
+            --accent-secondary: {{accent_secondary}};
+            --bg-dark: #1a1b26;
+            --bg-code: #24283b;
+            --text-main: #c0caf5;
+            --text-dim: #565f89;
+            --comment: #565f89;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #1f2937;
+            background: white;
+        }
+        
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            padding: 0.5in 0.6in;
+            background: white;
+        }
+        
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+        
+        /* Terminal-style Header */
+        .header {
+            background: var(--bg-dark);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .terminal-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .terminal-dot.red { background: #f7768e; }
+        .terminal-dot.yellow { background: #e0af68; }
+        .terminal-dot.green { background: #9ece6a; }
+        
+        .header-content {
+            color: var(--text-main);
+        }
+        
+        .header h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+        
+        .header .headline {
+            font-size: 10pt;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+        
+        .contact-line {
+            margin-top: 10px;
+            font-size: 9pt;
+            color: var(--text-main);
+        }
+        
+        .contact-line span {
+            margin-right: 16px;
+        }
+        
+        .contact-line .label {
+            color: var(--accent-secondary);
+        }
+        
+        /* Page 2 Header */
+        .page2-header {
+            background: var(--bg-dark);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page2-header h2 {
+            font-size: 12pt;
+            color: var(--accent-primary);
+        }
+        
+        .page2-header .page-num {
+            font-size: 9pt;
+            color: var(--text-dim);
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 18px;
+        }
+        
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10pt;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: "//";
+            color: var(--comment);
+            font-weight: 400;
+        }
+        
+        /* Profile Summary as code comment */
+        .profile-summary {
+            background: #f8fafc;
+            border-left: 3px solid var(--accent-primary);
+            padding: 12px 16px;
+            font-size: 10pt;
+            color: #374151;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .profile-summary::before {
+            content: "/* ";
+            color: var(--comment);
+        }
+        
+        .profile-summary::after {
+            content: " */";
+            color: var(--comment);
+        }
+        
+        /* Skills as code tags */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .skill-group {
+            margin-bottom: 10px;
+        }
+        
+        .skill-group-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: var(--accent-secondary);
+            margin-bottom: 6px;
+            text-transform: lowercase;
+        }
+        
+        .skill-group-title::before {
+            content: "const ";
+            color: #7c3aed;
+        }
+        
+        .skill-group-title::after {
+            content: " = [";
+            color: #374151;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-left: 16px;
+        }
+        
+        .skill-tag {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: 500;
+        }
+        
+        .skill-tag::before {
+            content: '"';
+            opacity: 0.7;
+        }
+        
+        .skill-tag::after {
+            content: '"';
+            opacity: 0.7;
+        }
+        
+        .skill-close {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9pt;
+            color: #374151;
+            padding-left: 0;
+        }
+        
+        /* Experience as function blocks */
+        .experience-item {
+            margin-bottom: 16px;
+            border-left: 2px solid var(--accent-primary);
+            padding-left: 14px;
+        }
+        
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        
+        .exp-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10pt;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .exp-company {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+        
+        .exp-meta {
+            font-size: 8pt;
+            color: #6b7280;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .highlights {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 6px;
+        }
+        
+        .highlights li {
+            font-size: 9pt;
+            color: #374151;
+            margin-bottom: 3px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .highlights li::before {
+            content: ">";
+            position: absolute;
+            left: 4px;
+            color: var(--accent-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+        
+        /* Projects */
+        .project-item {
+            margin-bottom: 14px;
+            background: #f1f5f9;
+            padding: 12px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .project-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 10pt;
+            color: var(--accent-primary);
+        }
+        
+        .project-desc {
+            font-size: 9pt;
+            color: #475569;
+            margin-top: 4px;
+        }
+        
+        .project-tech {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: var(--accent-secondary);
+            margin-top: 6px;
+        }
+        
+        .project-tech::before {
+            content: "stack: ";
+            color: #6b7280;
+        }
+        
+        /* Education */
+        .education-item {
+            margin-bottom: 10px;
+            padding-left: 14px;
+            border-left: 2px solid var(--accent-secondary);
+        }
+        
+        .edu-degree {
+            font-weight: 600;
+            font-size: 10pt;
+            color: #1f2937;
+        }
+        
+        .edu-school {
+            font-size: 9pt;
+            color: var(--accent-primary);
+        }
+        
+        .edu-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: #6b7280;
+        }
+        
+        .edu-details {
+            font-size: 8.5pt;
+            color: #6b7280;
+        }
+        
+        /* Certifications */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .cert-item {
+            background: var(--bg-dark);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .cert-name {
+            font-size: 9pt;
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+        
+        .cert-issuer {
+            font-size: 8pt;
+            color: var(--text-dim);
+        }
+        
+        /* Activities */
+        .activity-item {
+            margin-bottom: 10px;
+        }
+        
+        .activity-role {
+            font-weight: 600;
+            font-size: 10pt;
+            color: #1f2937;
+        }
+        
+        .activity-org {
+            color: var(--accent-primary);
+        }
+        
+        .activity-dates {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: #6b7280;
+        }
+        
+        .activity-desc {
+            font-size: 9pt;
+            color: #475569;
+            margin-top: 2px;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .page {
+                padding: 0.4in 0.5in;
+                margin: 0;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <div class="page">
+        <header class="header">
+            <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+            </div>
+            <div class="header-content">
+                <h1>{{name}}</h1>
+                {{#if headline}}<div class="headline">{{headline}}</div>{{/if}}
+                <div class="contact-line">
+                    {{#if email}}<span><span class="label">email:</span> {{email}}</span>{{/if}}
+                    {{#if phone}}<span><span class="label">phone:</span> {{phone}}</span>{{/if}}
+                    {{#if location}}<span><span class="label">location:</span> {{location}}</span>{{/if}}
+                </div>
+            </div>
+        </header>
+
+        {{#if profile_summary}}
+        <section class="section">
+            <h2 class="section-title">About</h2>
+            <p class="profile-summary">{{profile_summary}}</p>
+        </section>
+        {{/if}}
+
+        <section class="section">
+            <h2 class="section-title">Skills</h2>
+            {{#if skills.technical}}
+            <div class="skill-group">
+                <div class="skill-group-title">technical</div>
+                <div class="skill-tags">
+                    {{#each skills.technical}}<span class="skill-tag">{{this}}</span>{{/each}}
+                </div>
+                <div class="skill-close">];</div>
+            </div>
+            {{/if}}
+            {{#if skills.tools}}
+            <div class="skill-group">
+                <div class="skill-group-title">tools</div>
+                <div class="skill-tags">
+                    {{#each skills.tools}}<span class="skill-tag">{{this}}</span>{{/each}}
+                </div>
+                <div class="skill-close">];</div>
+            </div>
+            {{/if}}
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Experience</h2>
+            {{#each experience}}
+            <div class="experience-item">
+                <div class="exp-header">
+                    <div>
+                        <span class="exp-title">{{title}}</span>
+                        <span class="exp-company"> @ {{company}}</span>
+                    </div>
+                    <div class="exp-meta">{{start_date}} → {{end_date}}</div>
+                </div>
+                <ul class="highlights">
+                    {{#each highlights}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/each}}
+        </section>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page page-break">
+        <div class="page2-header">
+            <h2>{{name}}</h2>
+            <span class="page-num">// page 2</span>
+        </div>
+
+        {{#if projects}}
+        <section class="section">
+            <h2 class="section-title">Projects</h2>
+            {{#each projects}}
+            <div class="project-item">
+                <div class="project-name">{{name}}</div>
+                <p class="project-desc">{{description}}</p>
+                {{#if technologies}}<div class="project-tech">{{#each technologies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</div>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if education}}
+        <section class="section">
+            <h2 class="section-title">Education</h2>
+            {{#each education}}
+            <div class="education-item">
+                <div class="edu-degree">{{degree}}</div>
+                <div class="edu-school">{{institution}}</div>
+                <div class="edu-date">{{graduation_date}}</div>
+                {{#if gpa}}<div class="edu-details">GPA: {{gpa}}</div>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if certifications}}
+        <section class="section">
+            <h2 class="section-title">Certifications</h2>
+            <div class="cert-grid">
+                {{#each certifications}}
+                <div class="cert-item">
+                    <div class="cert-name">{{name}}</div>
+                    <div class="cert-issuer">{{issuer}}</div>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+        {{/if}}
+
+        {{#if extracurriculars}}
+        <section class="section">
+            <h2 class="section-title">Activities</h2>
+            {{#each extracurriculars}}
+            <div class="activity-item">
+                <div>
+                    <span class="activity-role">{{role}}</span>
+                    <span class="activity-org"> @ {{organization}}</span>
+                </div>
+                <div class="activity-dates">{{dates}}</div>
+                {{#if description}}<p class="activity-desc">{{description}}</p>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+    </div>
+</body>
+</html>
