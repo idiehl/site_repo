@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
 
+    # Google OAuth
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
+
     # Billing (Stripe)
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""

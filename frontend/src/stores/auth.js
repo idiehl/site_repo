@@ -95,6 +95,20 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function loginWithGoogle() {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await api.get('/api/v1/auth/google/authorize')
+      // Redirect to Google authorization page
+      window.location.href = response.data.url
+    } catch (err) {
+      error.value = err.response?.data?.detail || 'Failed to initiate Google login'
+      loading.value = false
+    }
+  }
+
   function handleOAuthCallback(tokens) {
     // Called by OAuth callback page with tokens from URL fragment
     accessToken.value = tokens.access_token
@@ -130,6 +144,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     loginWithLinkedIn,
+    loginWithGoogle,
     handleOAuthCallback,
     fetchUser,
     checkAuth,
