@@ -66,6 +66,11 @@ const routes = [
     component: () => import('../views/AdminSecurityView.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  {
+    path: '/extension',
+    name: 'extension',
+    component: () => import('../views/ExtensionView.vue'),
+  },
 ]
 
 const router = createRouter({
