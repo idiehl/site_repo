@@ -125,9 +125,10 @@ def scrape_job_posting(self, job_id: str):
                     await db.commit()
                     return
 
-                # Extract text
-                raw_text = extract_text_from_html(content)
+                # Extract text (pass URL for site-specific extraction)
+                raw_text = extract_text_from_html(content, job.url)
                 job.raw_text = raw_text[:50000]  # Limit storage
+                logger.info(f"Extracted {len(raw_text)} chars from scraped content")
 
                 # Use LLM to extract structured data
                 extracted = await llm_client.extract_job_posting(raw_text, job.url)
@@ -213,9 +214,10 @@ def extract_job_from_html(self, job_id: str, html_content: str):
                 return
 
             try:
-                # Extract text from HTML
-                raw_text = extract_text_from_html(html_content)
+                # Extract text from HTML (pass URL for site-specific extraction)
+                raw_text = extract_text_from_html(html_content, job.url)
                 job.raw_text = raw_text[:50000]  # Limit storage
+                logger.info(f"Extracted {len(raw_text)} chars of text from HTML")
 
                 # Use LLM to extract structured data
                 extracted = await llm_client.extract_job_posting(raw_text, job.url)

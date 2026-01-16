@@ -121,7 +121,8 @@ Job posting URL: {url}
 Job posting text:
 {raw_text}"""
 
-        prompt = prompt_template.format(url=url, raw_text=raw_text[:8000])
+        # Use more text since site-specific extraction is cleaner
+        prompt = prompt_template.format(url=url, raw_text=raw_text[:15000])
 
         response = await self.complete(
             prompt,
