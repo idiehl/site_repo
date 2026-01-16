@@ -221,6 +221,7 @@ saveBtn.addEventListener('click', async () => {
     }
     
     // Send to API
+    console.log('Sending to API with token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
     const response = await fetch(`${API_BASE}/api/v1/jobs/ingest-html`, {
       method: 'POST',
       headers: {
@@ -233,6 +234,7 @@ saveBtn.addEventListener('click', async () => {
         page_title: currentTabInfo.title,
       }),
     });
+    console.log('Response status:', response.status, 'Content-Type:', response.headers.get('content-type'));
     
     if (!response.ok) {
       if (response.status === 401) {
@@ -240,8 +242,14 @@ saveBtn.addEventListener('click', async () => {
         showLoginView();
         throw new Error('Session expired. Please log in again.');
       }
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to save job');
+      // Try to parse as JSON, but handle HTML responses
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to save job');
+      } else {
+        throw new Error(`Server error (${response.status}). Please try again.`);
+      }
     }
     
     const data = await response.json();
