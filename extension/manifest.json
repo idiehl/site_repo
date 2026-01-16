@@ -5,7 +5,8 @@
   "description": "Save job postings to QuickPRO with one click. Works on LinkedIn, Indeed, and any job site.",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "scripting"
   ],
   "host_permissions": [
     "https://atlasuniversalis.com/*",
