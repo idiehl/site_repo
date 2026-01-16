@@ -464,7 +464,23 @@ async def generate_cover_letter(
     )
     profile = profile_result.scalar_one_or_none()
     
-    if not profile or not profile.parsed_resume:
+    # Build profile data from available fields
+    profile_data = {}
+    if profile:
+        profile_data = {
+            "name": profile.full_name or current_user.email.split('@')[0].title(),
+            "headline": profile.headline,
+            "summary": profile.summary,
+            "work_history": profile.work_history,
+            "education": profile.education,
+            "skills": profile.skills,
+            "projects": profile.projects,
+            "certifications": profile.certifications,
+        }
+    
+    # Check if we have at least some profile data
+    has_profile_data = profile and (profile.work_history or profile.skills or profile.summary)
+    if not has_profile_data:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Please complete your profile or upload a resume first",
@@ -493,7 +509,7 @@ Culture: {deep_dive.culture_insights or 'N/A'}
         company_name=job.company_name or "the company",
         job_description=job.job_description or job.raw_text or "Not available",
         requirements=json.dumps(job.requirements or {}, indent=2),
-        profile=json.dumps(profile.parsed_resume, indent=2),
+        profile=json.dumps(profile_data, indent=2),
         company_insights=company_insights or "Not available",
     )
 
