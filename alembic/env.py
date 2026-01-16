@@ -22,6 +22,9 @@ from atlasops.models import (  # noqa: F401
     Application,
     ApplicationEvent,
     GeneratedResume,
+    SiteVisit,
+    ApiUsage,
+    SecurityEvent,
 )
 
 # Alembic Config object

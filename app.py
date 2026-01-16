@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 
 from atlasops.api.v1.router import router as api_router
 from atlasops.config import get_settings
+from atlasops.middleware.analytics import AnalyticsMiddleware
 
 settings = get_settings()
 
@@ -41,6 +42,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Analytics middleware (track site visits and API usage)
+app.add_middleware(AnalyticsMiddleware)
 
 # Include API router
 app.include_router(api_router)

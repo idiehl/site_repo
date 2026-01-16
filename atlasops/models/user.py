@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,6 +29,32 @@ class User(Base):
     # OAuth fields
     oauth_provider: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     oauth_provider_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    
+    # Admin flag
+    is_admin: Mapped[bool] = mapped_column(default=False, nullable=False)
+
+    # Subscription/billing fields
+    subscription_tier: Mapped[str] = mapped_column(
+        String(50), default="free", nullable=False
+    )
+    subscription_status: Mapped[str] = mapped_column(
+        String(50), default="free", nullable=False
+    )
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    current_period_end: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    # Usage tracking
+    resume_generations_used: Mapped[int] = mapped_column(default=0, nullable=False)
+    resume_generation_reset_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

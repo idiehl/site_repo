@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref(null)
 
   const isAuthenticated = computed(() => !!accessToken.value && !!user.value)
+  const isAdmin = computed(() => user.value?.is_admin === true)
 
   async function login(email, password) {
     loading.value = true
@@ -113,6 +114,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     isAuthenticated,
+    isAdmin,
     login,
     register,
     loginWithLinkedIn,

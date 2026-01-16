@@ -20,6 +20,11 @@ class UserResponse(BaseModel):
     id: UUID
     email: str
     oauth_provider: Optional[str] = None
+    is_admin: bool = False
+    subscription_tier: Optional[str] = None
+    subscription_status: Optional[str] = None
+    resume_generations_used: int = 0
+    resume_generation_reset_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 
@@ -32,6 +37,13 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class CurrentUserResponse(UserResponse):
+    """Extended user response with entitlements."""
+
+    resume_generation_limit: int
+    can_access_premium_features: bool
 
 
 class WorkExperience(BaseModel):

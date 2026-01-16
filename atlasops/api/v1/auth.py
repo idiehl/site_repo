@@ -17,9 +17,14 @@ from atlasops.api.deps import CurrentUser, DbSession
 from atlasops.config import get_settings
 from atlasops.models.user import User, UserProfile
 from atlasops.schemas.user import (
+    CurrentUserResponse,
     TokenResponse,
     UserCreate,
     UserResponse,
+)
+from atlasops.services.entitlements import (
+    can_access_premium_features,
+    get_resume_generation_limit,
 )
 
 router = APIRouter()
@@ -109,10 +114,15 @@ async def login(
     }
 
 
-@router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: CurrentUser) -> User:
+@router.get("/me", response_model=CurrentUserResponse)
+async def get_current_user_info(current_user: CurrentUser) -> dict:
     """Get current authenticated user."""
-    return current_user
+    base = UserResponse.model_validate(current_user).model_dump()
+    return {
+        **base,
+        "resume_generation_limit": get_resume_generation_limit(current_user),
+        "can_access_premium_features": can_access_premium_features(current_user),
+    }
 
 
 @router.post("/logout")

@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
-from atlasops.api.deps import CurrentUser, DbSession
+from atlasops.api.deps import CurrentUser, DbSession, PaidUser
 from atlasops.models.job import JobPosting
 from atlasops.schemas.job import (
     JobIngestRequest,
@@ -15,6 +15,7 @@ from atlasops.schemas.job import (
     JobUpdateRequest,
 )
 from atlasops.workers.tasks import scrape_job_posting
+from atlasops.services.entitlements import enforce_resume_quota, reset_resume_quota_if_needed
 
 router = APIRouter()
 

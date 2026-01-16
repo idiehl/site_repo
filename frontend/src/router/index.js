@@ -48,6 +48,24 @@ const routes = [
     component: () => import('../views/OAuthCallbackView.vue'),
     meta: { guest: true },
   },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('../views/AdminDashboardView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/analytics',
+    name: 'admin-analytics',
+    component: () => import('../views/AdminAnalyticsView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/security',
+    name: 'admin-security',
+    component: () => import('../views/AdminSecurityView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
 ]
 
 const router = createRouter({
@@ -56,11 +74,19 @@ const router = createRouter({
 })
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
+
+  // Ensure user data is loaded
+  if (auth.isAuthenticated && !auth.user) {
+    await auth.fetchUser()
+  }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresAdmin && (!auth.user || !auth.user.is_admin)) {
+    // Redirect non-admin users trying to access admin routes
+    next({ name: 'dashboard' })
   } else if (to.meta.guest && auth.isAuthenticated) {
     next({ name: 'dashboard' })
   } else {

@@ -40,6 +40,17 @@ class Settings(BaseSettings):
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
 
+    # Billing (Stripe)
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_id: str = ""
+    stripe_success_url: str = "http://localhost:5173/profile?billing=success"
+    stripe_cancel_url: str = "http://localhost:5173/profile?billing=cancel"
+
+    # Subscription limits
+    free_resume_generation_limit: int = 3
+    paid_resume_generation_limit: int = 9999
+
     # Application
     debug: bool = False
     environment: str = "development"
