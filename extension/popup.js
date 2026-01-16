@@ -189,15 +189,36 @@ saveBtn.addEventListener('click', async () => {
   saveBtn.disabled = true;
   
   try {
-    // Get page HTML from content script
+    // Get page HTML - try multiple methods
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let html = '';
     
-    const htmlContent = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => document.documentElement.outerHTML,
-    });
+    // Method 1: Try chrome.scripting if available
+    if (chrome.scripting && chrome.scripting.executeScript) {
+      try {
+        const htmlContent = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => document.documentElement.outerHTML,
+        });
+        html = htmlContent[0].result;
+      } catch (scriptErr) {
+        console.log('scripting.executeScript failed, trying tabs.sendMessage');
+      }
+    }
     
-    const html = htmlContent[0].result;
+    // Method 2: Try sending message to content script
+    if (!html) {
+      try {
+        html = await chrome.tabs.sendMessage(tab.id, { type: 'GET_HTML' });
+      } catch (msgErr) {
+        console.log('tabs.sendMessage failed');
+      }
+    }
+    
+    // Method 3: If all else fails, just send the URL and let backend scrape
+    if (!html) {
+      html = `<html><head><title>${currentTabInfo.title}</title></head><body>Page content could not be captured. URL: ${currentTabInfo.url}</body></html>`;
+    }
     
     // Send to API
     const response = await fetch(`${API_BASE}/api/v1/jobs/ingest-html`, {

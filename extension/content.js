@@ -6,6 +6,14 @@
   if (window.quickproInjected) return;
   window.quickproInjected = true;
 
+  // Listen for messages from popup
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'GET_HTML') {
+      sendResponse(document.documentElement.outerHTML);
+      return true;
+    }
+  });
+
   // Create floating save button
   function createFloatingButton() {
     const button = document.createElement('div');
