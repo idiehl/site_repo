@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useJobsStore } from '../stores/jobs'
 import JobTable from '../components/JobTable.vue'
@@ -10,9 +10,58 @@ const jobs = useJobsStore()
 
 const showIngestModal = ref(false)
 const retrying = ref(false)
+const isPolling = ref(false)
+let pollInterval = null
 
-onMounted(() => {
-  jobs.fetchJobs()
+// Check if there are any jobs still processing
+const hasProcessingJobs = computed(() => {
+  return jobs.jobs.some(job => 
+    job.status === 'pending' || job.status === 'processing'
+  )
+})
+
+// Start polling when there are processing jobs
+function startPolling() {
+  if (pollInterval) return // Already polling
+  
+  isPolling.value = true
+  pollInterval = setInterval(async () => {
+    await jobs.fetchJobs()
+    
+    // Stop polling if no more processing jobs
+    if (!hasProcessingJobs.value) {
+      stopPolling()
+    }
+  }, 5000) // Poll every 5 seconds
+}
+
+function stopPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+  isPolling.value = false
+}
+
+// Watch for processing jobs and start/stop polling
+watch(hasProcessingJobs, (hasProcessing) => {
+  if (hasProcessing) {
+    startPolling()
+  } else {
+    stopPolling()
+  }
+})
+
+onMounted(async () => {
+  await jobs.fetchJobs()
+  // Start polling if there are already processing jobs
+  if (hasProcessingJobs.value) {
+    startPolling()
+  }
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 
 function handleLogout() {
@@ -108,7 +157,16 @@ async function handleRetryFailed() {
       <!-- Jobs Section -->
       <div class="card">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-semibold">Job Pipeline</h2>
+          <div class="flex items-center gap-3">
+            <h2 class="text-lg font-semibold">Job Pipeline</h2>
+            <span 
+              v-if="isPolling" 
+              class="flex items-center gap-2 text-xs text-night-400 bg-night-800 px-2 py-1 rounded-full"
+            >
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Auto-refreshing
+            </span>
+          </div>
           <button @click="showIngestModal = true" class="btn btn-primary">
             + Add Jobs
           </button>
