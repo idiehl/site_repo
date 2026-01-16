@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
 import { useAuthStore } from '../stores/auth'
@@ -22,6 +22,30 @@ const manualContent = ref('')
 const savingManual = ref(false)
 const message = ref('')
 const error = ref('')
+
+// Auto-dismiss notifications after 3 seconds
+let messageTimeout = null
+let errorTimeout = null
+
+watch(message, (newVal) => {
+  if (newVal) {
+    if (messageTimeout) clearTimeout(messageTimeout)
+    messageTimeout = setTimeout(() => {
+      message.value = ''
+      // Refresh job data to show updated state
+      jobs.fetchJob(route.params.id)
+    }, 3000)
+  }
+})
+
+watch(error, (newVal) => {
+  if (newVal) {
+    if (errorTimeout) clearTimeout(errorTimeout)
+    errorTimeout = setTimeout(() => {
+      error.value = ''
+    }, 3000)
+  }
+})
 
 // Resume state
 const resumes = ref([])
@@ -630,9 +654,9 @@ async function saveManualContent() {
               @click="extractRequirements"
               :disabled="extractingRequirements"
               class="btn btn-ghost text-sm"
-              title="Re-analyze job description for requirements"
+              title="Refresh job requirements"
             >
-              {{ extractingRequirements ? '🔄 Analyzing...' : '🔄 Re-analyze' }}
+              {{ extractingRequirements ? '🔄 Refreshing...' : '🔄 Refresh' }}
             </button>
           </div>
           
@@ -836,7 +860,7 @@ async function saveManualContent() {
               class="btn btn-secondary"
               :title="!canAccessPremium ? 'Upgrade to unlock company insights' : ''"
             >
-              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Company Insights' : '🔍 Company Insights') }}
+              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 Company Spotlight' : '🔍 Company Spotlight') }}
             </button>
             <button 
               v-if="!hasApplication"
@@ -966,7 +990,8 @@ async function saveManualContent() {
           <a 
             :href="job.url" 
             target="_blank" 
-            class="text-atlas-400 hover:text-atlas-300 break-all"
+            class="text-atlas-400 hover:text-atlas-300 block truncate"
+            :title="job.url"
           >
             {{ job.url }}
           </a>
@@ -1113,7 +1138,7 @@ async function saveManualContent() {
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
           <div>
-            <h3 class="text-lg font-semibold text-white">🔍 Company Insights</h3>
+            <h3 class="text-lg font-semibold text-white">🔍 Company Spotlight</h3>
             <p class="text-sm text-night-400">{{ job?.company_name }}</p>
           </div>
           <button @click="closeDeepDiveModal" class="p-2 text-night-400 hover:text-white text-xl">
