@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
+import { useAuthStore } from '../stores/auth'
 import { useApplicationsStore } from '../stores/applications'
 import StatusBadge from '../components/StatusBadge.vue'
 import api from '../api/client'
@@ -11,6 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const jobs = useJobsStore()
 const applicationsStore = useApplicationsStore()
+const auth = useAuthStore()
 
 const job = computed(() => jobs.currentJob)
 const generating = ref(false)
@@ -79,6 +81,17 @@ const extractingRequirements = ref(false)
 // Check if job needs review
 const needsReview = computed(() => job.value?.status === 'needs_review')
 
+const canAccessPremium = computed(() => auth.canAccessPremium)
+const resumeLimitReached = computed(() => {
+  if (canAccessPremium.value) return false
+  if (!auth.resumeGenerationLimit) return false
+  return auth.resumeGenerationsUsed >= auth.resumeGenerationLimit
+})
+const resumeUsageText = computed(() => {
+  if (!auth.resumeGenerationLimit) return ''
+  return `${auth.resumeGenerationsUsed} of ${auth.resumeGenerationLimit} resumes used`
+})
+
 // Check if user can generate follow-up (must have applied)
 const canGenerateFollowup = computed(() => {
   if (!application.value) return false
@@ -134,6 +147,7 @@ async function fetchResumes() {
 }
 
 async function fetchDeepDive() {
+  if (!canAccessPremium.value) return
   if (!route.params.id) return
   try {
     const response = await api.get(`/api/v1/jobs/${route.params.id}/deep-dive`)
@@ -159,6 +173,10 @@ function openTemplateSelector() {
 }
 
 async function generateResume() {
+  if (resumeLimitReached.value) {
+    error.value = 'Free plan resume limit reached. Upgrade to generate more.'
+    return
+  }
   if (!job.value?.company_name) {
     error.value = 'Please add job details first (company blocked scraping)'
     return
@@ -178,6 +196,19 @@ async function generateResume() {
     error.value = err.response?.data?.detail || 'Failed to generate resume'
   } finally {
     generating.value = false
+  }
+}
+
+async function startUpgrade() {
+  try {
+    const response = await api.post('/api/v1/billing/checkout')
+    if (response.data?.url) {
+      window.location.href = response.data.url
+    } else {
+      error.value = 'Billing session unavailable'
+    }
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to start checkout'
   }
 }
 
@@ -242,6 +273,10 @@ async function downloadResume() {
 }
 
 async function generateDeepDive() {
+  if (!canAccessPremium.value) {
+    error.value = 'Upgrade to a paid plan to access company insights.'
+    return
+  }
   if (!job.value?.company_name) {
     error.value = 'Please add job details first'
     return
@@ -325,6 +360,10 @@ async function updateStatus(newStatus) {
 }
 
 async function generateInterviewPrep() {
+  if (!canAccessPremium.value) {
+    error.value = 'Upgrade to a paid plan to access interview prep.'
+    return
+  }
   if (!application.value) return
   
   generatingInterviewPrep.value = true
@@ -349,6 +388,10 @@ function closeStatusModal() {
 }
 
 async function generateFollowup() {
+  if (!canAccessPremium.value) {
+    error.value = 'Upgrade to a paid plan to access follow-up messages.'
+    return
+  }
   if (!application.value) return
   
   generatingFollowup.value = true
@@ -382,6 +425,7 @@ async function copyFollowupMessage() {
 
 // Cover letter functions
 async function fetchCoverLetters() {
+  if (!canAccessPremium.value) return
   if (!job.value?.id) return
   try {
     const response = await api.get(`/api/v1/jobs/${job.value.id}/cover-letters`)
@@ -392,6 +436,10 @@ async function fetchCoverLetters() {
 }
 
 async function generateCoverLetter() {
+  if (!canAccessPremium.value) {
+    error.value = 'Upgrade to a paid plan to generate cover letters.'
+    return
+  }
   if (!job.value?.id) return
   
   generatingCoverLetter.value = true
@@ -753,25 +801,40 @@ async function saveManualContent() {
         <!-- Actions -->
         <div class="card">
           <h3 class="text-lg font-semibold mb-4">Actions</h3>
+          <div v-if="!canAccessPremium" class="mb-4 p-3 bg-night-800/60 rounded-lg text-sm text-night-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <p class="text-atlas-300 font-medium">Free plan limits apply</p>
+                <p class="text-night-400">{{ resumeUsageText }}</p>
+                <p class="text-night-500 mt-1">Upgrade to unlock cover letters, company insights, interview prep, and follow-ups.</p>
+              </div>
+              <button class="btn btn-primary" @click="startUpgrade">
+                Upgrade to Paid
+              </button>
+            </div>
+          </div>
           <div class="flex flex-wrap gap-3">
             <button 
               @click="openTemplateSelector"
-              :disabled="generating || !job.company_name"
+              :disabled="generating || !job.company_name || resumeLimitReached"
               class="btn btn-primary"
+              :title="resumeLimitReached ? 'Upgrade to generate more resumes' : ''"
             >
-              {{ generating ? 'Generating...' : '📄 Generate Resume' }}
+              {{ generating ? 'Generating...' : (resumeLimitReached ? '📄 Upgrade to Generate' : '📄 Generate Resume') }}
             </button>
             <button 
               @click="generateCoverLetter"
-              :disabled="generatingCoverLetter || !job.company_name"
+              :disabled="generatingCoverLetter || !job.company_name || !canAccessPremium"
               class="btn btn-primary"
+              :title="!canAccessPremium ? 'Upgrade to unlock cover letters' : ''"
             >
               {{ generatingCoverLetter ? 'Generating...' : '✉️ Generate Cover Letter' }}
             </button>
             <button 
               @click="viewDeepDive"
-              :disabled="generatingDeepDive || !job.company_name"
+              :disabled="generatingDeepDive || !job.company_name || !canAccessPremium"
               class="btn btn-secondary"
+              :title="!canAccessPremium ? 'Upgrade to unlock company insights' : ''"
             >
               {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Deep Dive' : '🔍 Company Deep Dive') }}
             </button>
@@ -786,22 +849,27 @@ async function saveManualContent() {
             <button 
               v-if="hasApplication"
               @click="generateInterviewPrep"
-              :disabled="generatingInterviewPrep"
+              :disabled="generatingInterviewPrep || !canAccessPremium"
               class="btn btn-secondary"
+              :title="!canAccessPremium ? 'Upgrade to unlock interview prep' : ''"
             >
               {{ generatingInterviewPrep ? 'Generating...' : '🎤 Interview Prep' }}
             </button>
             <button 
               v-if="canGenerateFollowup"
               @click="generateFollowup"
-              :disabled="generatingFollowup"
+              :disabled="generatingFollowup || !canAccessPremium"
               class="btn btn-secondary"
+              :title="!canAccessPremium ? 'Upgrade to unlock follow-ups' : ''"
             >
               {{ generatingFollowup ? 'Generating...' : '✉️ Follow-up Message' }}
             </button>
           </div>
           <p v-if="!job.company_name" class="text-sm text-night-500 mt-2">
             ℹ️ Add job details to enable these actions
+          </p>
+          <p v-else-if="resumeLimitReached" class="text-sm text-night-500 mt-2">
+            ℹ️ Free plan resume limit reached. Upgrade to generate more.
           </p>
         </div>
 
@@ -813,8 +881,9 @@ async function saveManualContent() {
           </h3>
           <div class="grid md:grid-cols-2 gap-4">
             <div 
-              @click="generateInterviewPrep"
-              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+              @click="canAccessPremium ? generateInterviewPrep() : null"
+              class="p-4 bg-night-800/50 rounded-lg transition-colors"
+              :class="canAccessPremium ? 'hover:bg-night-800 cursor-pointer' : 'opacity-50 cursor-not-allowed'"
             >
               <div class="flex items-center gap-3 mb-2">
                 <span class="text-2xl">📚</span>
@@ -823,8 +892,9 @@ async function saveManualContent() {
               <p class="text-sm text-night-400">Get AI-generated interview questions with suggested answers</p>
             </div>
             <div 
-              @click="viewDeepDive"
-              class="p-4 bg-night-800/50 rounded-lg hover:bg-night-800 transition-colors cursor-pointer"
+              @click="canAccessPremium ? viewDeepDive() : null"
+              class="p-4 bg-night-800/50 rounded-lg transition-colors"
+              :class="canAccessPremium ? 'hover:bg-night-800 cursor-pointer' : 'opacity-50 cursor-not-allowed'"
             >
               <div class="flex items-center gap-3 mb-2">
                 <span class="text-2xl">🔍</span>

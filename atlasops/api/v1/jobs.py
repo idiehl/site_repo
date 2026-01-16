@@ -412,6 +412,11 @@ async def generate_resume(
         render_resume_html,
     )
 
+    # Check and reset quota if needed, then enforce limits
+    if reset_resume_quota_if_needed(current_user):
+        await db.commit()
+    enforce_resume_quota(current_user)
+
     # Get job posting
     result = await db.execute(
         select(JobPosting).where(
@@ -476,6 +481,7 @@ async def generate_resume(
         matched_keywords={"keywords": matched},
         gaps={"missing": gaps},
     )
+    current_user.resume_generations_used += 1
     db.add(resume)
     await db.commit()
     await db.refresh(resume)
@@ -585,7 +591,7 @@ async def get_resume(
 @router.post("/{job_id}/cover-letters")
 async def generate_cover_letter(
     job_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Generate a tailored cover letter for a job posting."""
@@ -721,7 +727,7 @@ Culture: {deep_dive.culture_insights or 'N/A'}
 @router.get("/{job_id}/cover-letters")
 async def get_job_cover_letters(
     job_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> List[dict]:
     """Get all generated cover letters for a job posting."""
@@ -762,7 +768,7 @@ async def get_job_cover_letters(
 async def get_cover_letter(
     job_id: UUID,
     cover_letter_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Get a specific generated cover letter."""
@@ -807,7 +813,7 @@ async def get_cover_letter(
 @router.get("/{job_id}/deep-dive")
 async def get_deep_dive(
     job_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Get the company deep dive for a job posting."""
@@ -854,7 +860,7 @@ async def get_deep_dive(
 @router.post("/{job_id}/deep-dive")
 async def generate_deep_dive(
     job_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Generate a company deep dive for a job posting."""

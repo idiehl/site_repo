@@ -11,6 +11,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!accessToken.value && !!user.value)
   const isAdmin = computed(() => user.value?.is_admin === true)
+  const canAccessPremium = computed(() => user.value?.can_access_premium_features === true || isAdmin.value)
+  const subscriptionTier = computed(() => user.value?.subscription_tier || 'free')
+  const subscriptionStatus = computed(() => user.value?.subscription_status || 'free')
+  const resumeGenerationsUsed = computed(() => user.value?.resume_generations_used ?? 0)
+  const resumeGenerationLimit = computed(() => user.value?.resume_generation_limit ?? 0)
+  const resumeGenerationResetAt = computed(() => user.value?.resume_generation_reset_at || null)
 
   async function login(email, password) {
     loading.value = true
@@ -115,6 +121,12 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     isAuthenticated,
     isAdmin,
+    canAccessPremium,
+    subscriptionTier,
+    subscriptionStatus,
+    resumeGenerationsUsed,
+    resumeGenerationLimit,
+    resumeGenerationResetAt,
     login,
     register,
     loginWithLinkedIn,

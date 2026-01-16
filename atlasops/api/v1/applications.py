@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
-from atlasops.api.deps import CurrentUser, DbSession
+from atlasops.api.deps import CurrentUser, DbSession, PaidUser
 from atlasops.models.application import Application, ApplicationEvent, ApplicationStatus
 from atlasops.schemas.application import (
     ApplicationCreate,
@@ -130,7 +130,7 @@ async def update_application(
 @router.post("/{app_id}/followup-message")
 async def generate_followup_message(
     app_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Generate a follow-up message for an application."""
@@ -209,7 +209,7 @@ Return ONLY the email body text, ready to copy and paste. Do not include subject
 @router.post("/{app_id}/interview-prep")
 async def generate_interview_prep(
     app_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Generate interview preparation materials."""
@@ -272,7 +272,7 @@ Please provide:
 @router.post("/{app_id}/improvement")
 async def generate_improvement_suggestions(
     app_id: UUID,
-    current_user: CurrentUser,
+    current_user: PaidUser,
     db: DbSession,
 ) -> dict:
     """Generate improvement suggestions after rejection or no response."""

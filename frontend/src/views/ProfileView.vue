@@ -33,6 +33,8 @@ const uploadingPicture = ref(false)
 const error = ref(null)
 const success = ref(null)
 const activeTab = ref('basic')
+const billingLoading = ref(false)
+const billingError = ref(null)
 
 const newSkill = ref('')
 const resumeFile = ref(null)
@@ -53,6 +55,34 @@ const tabs = [
   { id: 'projects', label: 'Projects', icon: '📁' },
   { id: 'social', label: 'Links', icon: '🔗' },
 ]
+
+const planLabel = computed(() => {
+  if (auth.canAccessPremium) return 'Paid'
+  return 'Free'
+})
+
+const resumeUsageText = computed(() => {
+  if (auth.canAccessPremium) return 'Unlimited resume generations'
+  if (!auth.resumeGenerationLimit) return ''
+  return `${auth.resumeGenerationsUsed} of ${auth.resumeGenerationLimit} resumes used`
+})
+
+async function startUpgrade() {
+  billingLoading.value = true
+  billingError.value = null
+  try {
+    const response = await api.post('/api/v1/billing/checkout')
+    if (response.data?.url) {
+      window.location.href = response.data.url
+    } else {
+      billingError.value = 'Billing session unavailable'
+    }
+  } catch (err) {
+    billingError.value = err.response?.data?.detail || 'Failed to start checkout'
+  } finally {
+    billingLoading.value = false
+  }
+}
 
 onMounted(async () => {
   await fetchProfile()
@@ -382,6 +412,37 @@ const completenessColor = computed(() => {
               {{ completenessInfo.missing_fields.length > 3 ? ` and ${completenessInfo.missing_fields.length - 3} more` : '' }}
               to improve your profile.
             </p>
+          </div>
+        </div>
+
+        <!-- Plan & Billing -->
+        <div class="card">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-semibold">Plan</h3>
+              <p class="text-night-300 text-sm mt-1">
+                {{ planLabel }} plan
+                <span class="text-night-500 ml-2">•</span>
+                <span class="text-night-400 ml-2">{{ auth.subscriptionStatus }}</span>
+              </p>
+              <p v-if="resumeUsageText" class="text-sm text-night-400 mt-2">
+                {{ resumeUsageText }}
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                v-if="!auth.canAccessPremium"
+                @click="startUpgrade"
+                :disabled="billingLoading"
+                class="btn btn-primary"
+              >
+                {{ billingLoading ? 'Redirecting...' : 'Upgrade to Paid' }}
+              </button>
+              <span v-else class="text-sm text-green-400">Premium features unlocked</span>
+            </div>
+          </div>
+          <div v-if="billingError" class="mt-3 text-sm text-red-400">
+            {{ billingError }}
           </div>
         </div>
 
