@@ -143,7 +143,7 @@ function handleKeydown(e) {
         <!-- URL Mode -->
         <div v-if="mode === 'url'">
           <p class="text-night-400 text-sm mb-4">
-            Paste job posting URLs to add them to your pipeline.
+            Paste job posting URLs to save them to your list.
           </p>
 
           <!-- URL Input -->
@@ -186,7 +186,7 @@ function handleKeydown(e) {
         <!-- Paste Mode -->
         <div v-else>
           <p class="text-night-400 text-sm mb-4">
-            Copy and paste the job description directly. Great for sites that block scraping.
+            Copy and paste the job description directly. Great for sites we can't auto-import from.
           </p>
 
           <!-- Source URL (optional) -->

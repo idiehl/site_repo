@@ -166,7 +166,7 @@ function goBack() {
 
 function openTemplateSelector() {
   if (!job.value?.company_name) {
-    error.value = 'Please add job details first (company blocked scraping)'
+    error.value = 'Please add job details first'
     return
   }
   showTemplateSelector.value = true
@@ -178,7 +178,7 @@ async function generateResume() {
     return
   }
   if (!job.value?.company_name) {
-    error.value = 'Please add job details first (company blocked scraping)'
+    error.value = 'Please add job details first'
     return
   }
   showTemplateSelector.value = false
@@ -287,7 +287,7 @@ async function generateDeepDive() {
   try {
     const response = await api.post(`/api/v1/jobs/${job.value.id}/deep-dive`)
     deepDive.value = response.data
-    message.value = 'Deep dive generated!'
+    message.value = 'Company insights generated!'
     showDeepDiveModal.value = true
   } catch (err) {
     if (err.response?.data?.detail === 'Deep dive already exists for this job') {
@@ -632,7 +632,7 @@ async function saveManualContent() {
               class="btn btn-ghost text-sm"
               title="Re-analyze job description for requirements"
             >
-              {{ extractingRequirements ? '🔄 Analyzing...' : '🔄 Re-extract' }}
+              {{ extractingRequirements ? '🔄 Analyzing...' : '🔄 Re-analyze' }}
             </button>
           </div>
           
@@ -704,7 +704,7 @@ async function saveManualContent() {
               :disabled="extractingRequirements"
               class="btn btn-secondary text-sm"
             >
-              {{ extractingRequirements ? 'Analyzing...' : '🔍 Extract Requirements from Description' }}
+              {{ extractingRequirements ? 'Analyzing...' : '🔍 Analyze Job Requirements' }}
             </button>
             <p v-else class="text-sm">Add a job description first to extract requirements</p>
           </div>
@@ -734,9 +734,9 @@ async function saveManualContent() {
           <div class="flex items-start gap-3">
             <span class="text-2xl">⚠️</span>
             <div class="flex-1">
-              <h3 class="font-semibold text-yellow-400 mb-1">Scraping Blocked</h3>
+              <h3 class="font-semibold text-yellow-400 mb-1">Could Not Load Job</h3>
               <p class="text-sm text-night-300 mb-3">
-                This site blocked our scraper. You can paste the job posting content manually.
+                We couldn't automatically import this job posting. You can paste the content manually.
               </p>
               <button 
                 @click="showManualEntry = !showManualEntry" 
@@ -836,7 +836,7 @@ async function saveManualContent() {
               class="btn btn-secondary"
               :title="!canAccessPremium ? 'Upgrade to unlock company insights' : ''"
             >
-              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Deep Dive' : '🔍 Company Deep Dive') }}
+              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 View Company Insights' : '🔍 Company Insights') }}
             </button>
             <button 
               v-if="!hasApplication"
@@ -1113,7 +1113,7 @@ async function saveManualContent() {
         <!-- Modal Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
           <div>
-            <h3 class="text-lg font-semibold text-white">🔍 Company Deep Dive</h3>
+            <h3 class="text-lg font-semibold text-white">🔍 Company Insights</h3>
             <p class="text-sm text-night-400">{{ job?.company_name }}</p>
           </div>
           <button @click="closeDeepDiveModal" class="p-2 text-night-400 hover:text-white text-xl">

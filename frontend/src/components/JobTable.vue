@@ -98,7 +98,7 @@ function formatDate(dateStr) {
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Company</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Position</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Location</th>
-            <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Scrape</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Status</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Application</th>
             <th class="text-left py-3 px-4 text-sm font-medium text-night-400">Added</th>
             <th class="text-right py-3 px-4 text-sm font-medium text-night-400">Actions</th>

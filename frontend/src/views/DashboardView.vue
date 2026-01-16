@@ -128,7 +128,7 @@ async function handleRetryFailed() {
       <!-- Stats Cards -->
       <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
         <div class="card">
-          <p class="text-sm text-night-400 mb-1">Total Jobs</p>
+          <p class="text-sm text-night-400 mb-1">Saved Jobs</p>
           <p class="text-2xl font-bold">{{ jobs.jobs.length }}</p>
         </div>
         <div class="card">
@@ -167,7 +167,7 @@ async function handleRetryFailed() {
       <div class="card">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <h2 class="text-lg font-semibold">Job Pipeline</h2>
+            <h2 class="text-lg font-semibold">My Jobs</h2>
             <span 
               v-if="isPolling" 
               class="flex items-center gap-2 text-xs text-night-400 bg-night-800 px-2 py-1 rounded-full"
