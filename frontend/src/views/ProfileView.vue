@@ -320,10 +320,22 @@ const completenessColor = computed(() => {
                 Dashboard
               </router-link>
               <router-link 
+                to="/applications" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-400 hover:text-night-100 hover:bg-night-800/50"
+              >
+                Applications
+              </router-link>
+              <router-link 
                 to="/profile" 
                 class="px-3 py-2 rounded-lg text-sm font-medium text-night-100 bg-night-800"
               >
                 Profile
+              </router-link>
+              <router-link 
+                to="/extension" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-400 hover:text-night-100 hover:bg-night-800/50"
+              >
+                Extension
               </router-link>
             </nav>
           </div>
