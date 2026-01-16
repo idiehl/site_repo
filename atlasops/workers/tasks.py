@@ -182,6 +182,93 @@ def scrape_job_posting(self, job_id: str):
         self.retry(countdown=60 * (self.request.retries + 1))
 
 
+@celery_app.task(bind=True, max_retries=3)
+def extract_job_from_html(self, job_id: str, html_content: str):
+    """
+    Extract job data from raw HTML content (browser extension).
+    
+    This task skips scraping since we already have the HTML from the extension.
+    """
+    logger.info(f"Extracting job data from HTML for job {job_id}")
+
+    async def _extract():
+        from sqlalchemy import select
+
+        from atlasops.models.job import JobPosting
+        from atlasops.services.llm_client import llm_client
+        from atlasops.services.scraper import extract_text_from_html
+
+        # Create fresh connection for this task
+        session_maker, engine = get_fresh_session()
+        
+        async with session_maker() as db:
+            # Get job posting
+            result = await db.execute(
+                select(JobPosting).where(JobPosting.id == job_id)
+            )
+            job = result.scalar_one_or_none()
+
+            if not job:
+                logger.error(f"Job {job_id} not found")
+                return
+
+            try:
+                # Extract text from HTML
+                raw_text = extract_text_from_html(html_content)
+                job.raw_text = raw_text[:50000]  # Limit storage
+
+                # Use LLM to extract structured data
+                extracted = await llm_client.extract_job_posting(raw_text, job.url)
+
+                # Update job with extracted data
+                job.company_name = extracted.get("company_name")
+                job.job_title = extracted.get("job_title")
+                job.location = extracted.get("location")
+                job.remote_policy = extracted.get("remote_policy")
+                job.salary_range = extracted.get("salary_range")
+                job.job_description = extracted.get("job_description")
+                job.requirements = extracted.get("requirements")
+                job.benefits = extracted.get("benefits")
+                job.structured_data = extracted
+
+                # Validate minimum required fields
+                has_company = bool(job.company_name and job.company_name.strip())
+                has_title = bool(job.job_title and job.job_title.strip())
+                has_description = bool(job.job_description and len(job.job_description.strip()) > 50)
+
+                if has_company and has_title and has_description:
+                    job.status = "completed"
+                    logger.info(f"Successfully extracted job {job_id} from extension HTML")
+                else:
+                    job.status = "needs_review"
+                    missing = []
+                    if not has_company:
+                        missing.append("company name")
+                    if not has_title:
+                        missing.append("job title")
+                    if not has_description:
+                        missing.append("job description")
+                    job.error_message = f"Missing required fields: {', '.join(missing)}. Use manual entry to add details."
+                    logger.warning(f"Job {job_id} needs review - missing: {missing}")
+
+                await db.commit()
+
+            except Exception as e:
+                logger.exception(f"Error extracting job {job_id}")
+                job.status = "failed"
+                job.error_message = str(e)
+                await db.commit()
+                raise
+            finally:
+                await engine.dispose()
+
+    try:
+        run_async(_extract())
+    except Exception as e:
+        logger.exception(f"Extraction task failed for job {job_id}")
+        self.retry(countdown=60 * (self.request.retries + 1))
+
+
 @celery_app.task
 def check_stale_applications():
     """

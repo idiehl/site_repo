@@ -9,6 +9,7 @@ from sqlalchemy import select
 from atlasops.api.deps import CurrentUser, DbSession, PaidUser
 from atlasops.models.job import JobPosting
 from atlasops.schemas.job import (
+    JobIngestHtmlRequest,
     JobIngestRequest,
     JobIngestResponse,
     JobPostingResponse,
@@ -47,6 +48,41 @@ async def ingest_jobs(
     return {
         "message": f"Queued {len(job_ids)} job(s) for processing",
         "job_ids": job_ids,
+    }
+
+
+@router.post("/ingest-html", response_model=JobIngestResponse)
+async def ingest_job_html(
+    request: JobIngestHtmlRequest,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """
+    Ingest a job posting from raw HTML content (browser extension).
+    
+    This endpoint accepts HTML captured by the browser extension,
+    bypassing the need for server-side scraping.
+    """
+    from atlasops.workers.tasks import extract_job_from_html
+    
+    # Create job posting record
+    job = JobPosting(
+        user_id=current_user.id,
+        url=request.url,
+        status="processing",
+        raw_text=request.html_content[:50000],  # Limit size
+    )
+    db.add(job)
+    await db.flush()
+    
+    # Queue background task for extraction (no scraping needed)
+    extract_job_from_html.delay(str(job.id), request.html_content)
+    
+    await db.commit()
+    
+    return {
+        "message": "Job captured and queued for processing",
+        "job_ids": [str(job.id)],
     }
 
 

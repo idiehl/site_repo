@@ -13,6 +13,14 @@ class JobIngestRequest(BaseModel):
     urls: List[HttpUrl]
 
 
+class JobIngestHtmlRequest(BaseModel):
+    """Schema for ingesting a job from raw HTML (browser extension)."""
+
+    url: str
+    html_content: str
+    page_title: Optional[str] = None
+
+
 class JobIngestResponse(BaseModel):
     """Schema for job ingestion response."""
 
