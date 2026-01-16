@@ -30,10 +30,11 @@ Return a JSON object with these fields:
   "salary_range": "string or null (e.g., '$80,000 - $120,000')",
   "job_description": "string - brief summary of the role",
   "requirements": {{
-    "hard_skills": ["list of technical skills"],
-    "soft_skills": ["list of soft skills"],
+    "hard_skills": ["list of technical skills required"],
+    "soft_skills": ["list of soft skills required"],
     "experience_years": "string or null (e.g., '3-5 years')",
-    "education": "string or null",
+    "education": "string or null (e.g., 'Bachelor's in Computer Science')",
+    "work_schedule": "string or null (e.g., 'Full-time', 'Part-time', '9-5 EST', 'Flexible')",
     "certifications": ["list of required certifications"]
   }},
   "benefits": ["list of benefits if mentioned"],

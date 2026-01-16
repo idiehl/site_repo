@@ -66,6 +66,9 @@ const editForm = ref({
   job_description: ''
 })
 
+// Requirements extraction state
+const extractingRequirements = ref(false)
+
 // Check if job needs review
 const needsReview = computed(() => job.value?.status === 'needs_review')
 
@@ -460,6 +463,24 @@ async function saveJobEdit() {
   }
 }
 
+async function extractRequirements() {
+  if (!job.value?.id) return
+  
+  extractingRequirements.value = true
+  error.value = ''
+  message.value = ''
+  
+  try {
+    await api.post(`/api/v1/jobs/${job.value.id}/extract-requirements`)
+    await jobs.fetchJob(job.value.id)
+    message.value = 'Requirements extracted successfully!'
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to extract requirements'
+  } finally {
+    extractingRequirements.value = false
+  }
+}
+
 async function saveManualContent() {
   if (!manualContent.value.trim()) return
   
@@ -536,33 +557,91 @@ async function saveManualContent() {
         </div>
 
         <!-- Requirements -->
-        <div v-if="job.requirements" class="card">
-          <h3 class="text-lg font-semibold mb-4">Requirements</h3>
-          <div class="grid md:grid-cols-2 gap-6">
-            <div v-if="job.requirements.hard_skills?.length">
-              <h4 class="text-sm font-medium text-night-400 mb-2">Technical Skills</h4>
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Requirements</h3>
+            <button 
+              v-if="job.job_description"
+              @click="extractRequirements"
+              :disabled="extractingRequirements"
+              class="btn btn-ghost text-sm"
+              title="Re-analyze job description for requirements"
+            >
+              {{ extractingRequirements ? '🔄 Analyzing...' : '🔄 Re-extract' }}
+            </button>
+          </div>
+          
+          <div v-if="job.requirements && Object.keys(job.requirements).length > 0" class="space-y-4">
+            <!-- Experience & Education Row -->
+            <div class="grid md:grid-cols-3 gap-4">
+              <div v-if="job.requirements.experience_years" class="bg-night-800/50 rounded-lg p-3">
+                <p class="text-xs text-night-500 uppercase tracking-wide mb-1">Experience</p>
+                <p class="text-night-200 font-medium">{{ job.requirements.experience_years }}</p>
+              </div>
+              <div v-if="job.requirements.education" class="bg-night-800/50 rounded-lg p-3">
+                <p class="text-xs text-night-500 uppercase tracking-wide mb-1">Education</p>
+                <p class="text-night-200 font-medium">{{ job.requirements.education }}</p>
+              </div>
+              <div v-if="job.requirements.work_schedule" class="bg-night-800/50 rounded-lg p-3">
+                <p class="text-xs text-night-500 uppercase tracking-wide mb-1">Work Schedule</p>
+                <p class="text-night-200 font-medium">{{ job.requirements.work_schedule }}</p>
+              </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="grid md:grid-cols-2 gap-6">
+              <div v-if="job.requirements.hard_skills?.length">
+                <h4 class="text-sm font-medium text-night-400 mb-2">Technical Skills</h4>
+                <div class="flex flex-wrap gap-2">
+                  <span 
+                    v-for="skill in job.requirements.hard_skills" 
+                    :key="skill"
+                    class="px-2 py-1 bg-atlas-500/20 text-atlas-300 rounded text-sm"
+                  >
+                    {{ skill }}
+                  </span>
+                </div>
+              </div>
+              <div v-if="job.requirements.soft_skills?.length">
+                <h4 class="text-sm font-medium text-night-400 mb-2">Soft Skills</h4>
+                <div class="flex flex-wrap gap-2">
+                  <span 
+                    v-for="skill in job.requirements.soft_skills" 
+                    :key="skill"
+                    class="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-sm"
+                  >
+                    {{ skill }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Certifications -->
+            <div v-if="job.requirements.certifications?.length">
+              <h4 class="text-sm font-medium text-night-400 mb-2">Certifications</h4>
               <div class="flex flex-wrap gap-2">
                 <span 
-                  v-for="skill in job.requirements.hard_skills" 
-                  :key="skill"
-                  class="px-2 py-1 bg-atlas-500/20 text-atlas-300 rounded text-sm"
+                  v-for="cert in job.requirements.certifications" 
+                  :key="cert"
+                  class="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm"
                 >
-                  {{ skill }}
+                  {{ cert }}
                 </span>
               </div>
             </div>
-            <div v-if="job.requirements.soft_skills?.length">
-              <h4 class="text-sm font-medium text-night-400 mb-2">Soft Skills</h4>
-              <div class="flex flex-wrap gap-2">
-                <span 
-                  v-for="skill in job.requirements.soft_skills" 
-                  :key="skill"
-                  class="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-sm"
-                >
-                  {{ skill }}
-                </span>
-              </div>
-            </div>
+          </div>
+          
+          <div v-else class="text-center py-6 text-night-500">
+            <p class="mb-2">No requirements extracted yet</p>
+            <button 
+              v-if="job.job_description"
+              @click="extractRequirements"
+              :disabled="extractingRequirements"
+              class="btn btn-secondary text-sm"
+            >
+              {{ extractingRequirements ? 'Analyzing...' : '🔍 Extract Requirements from Description' }}
+            </button>
+            <p v-else class="text-sm">Add a job description first to extract requirements</p>
           </div>
         </div>
 

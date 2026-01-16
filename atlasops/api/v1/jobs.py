@@ -159,6 +159,106 @@ async def update_job(
     return job
 
 
+@router.post("/{job_id}/extract-requirements", response_model=JobPostingResponse)
+async def extract_requirements(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> JobPosting:
+    """Extract requirements from job description using LLM."""
+    import json
+    import re
+    
+    from atlasops.services.llm_client import llm_client
+    
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+    
+    # Need job description to extract requirements
+    description_text = job.job_description or job.raw_text
+    if not description_text or len(description_text) < 30:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Job needs a description to extract requirements from",
+        )
+    
+    # Build extraction prompt
+    prompt = f"""Analyze this job description and extract the requirements.
+
+Job Title: {job.job_title or 'Unknown'}
+Company: {job.company_name or 'Unknown'}
+
+Job Description:
+{description_text}
+
+Extract and return a JSON object with these fields:
+{{
+  "hard_skills": ["list of technical/hard skills required"],
+  "soft_skills": ["list of soft skills required"],
+  "experience_years": "string describing experience requirement (e.g., '3-5 years', '5+ years', 'Entry level') or null if not specified",
+  "education": "string describing education requirement (e.g., 'Bachelor's in Computer Science', 'High school diploma') or null if not specified",
+  "work_schedule": "string describing work schedule (e.g., 'Full-time', 'Part-time', 'Flexible hours', '9-5 EST', 'Shift work') or null if not specified",
+  "certifications": ["list of required certifications or licenses"]
+}}
+
+Be thorough - look for:
+- Technical skills, programming languages, tools, frameworks
+- Soft skills like communication, teamwork, leadership
+- Years of experience or experience level
+- Education requirements (degrees, fields of study)
+- Work schedule, hours, availability requirements
+- Certifications, licenses, clearances
+
+Return ONLY the JSON object, no additional text."""
+
+    try:
+        response = await llm_client.complete(
+            prompt,
+            system_prompt="You are a job requirements analyst. Extract requirements from job descriptions and return structured JSON.",
+            temperature=0.3,
+        )
+        
+        # Parse the JSON response
+        json_match = re.search(r"\{[\s\S]*\}", response)
+        if json_match:
+            requirements = json.loads(json_match.group())
+        else:
+            raise ValueError("No valid JSON found in response")
+        
+        # Clean up empty arrays/nulls
+        for key in ["hard_skills", "soft_skills", "certifications"]:
+            if key in requirements and not requirements[key]:
+                requirements[key] = []
+        
+        # Update job requirements
+        job.requirements = requirements
+        await db.commit()
+        await db.refresh(job)
+        
+        return job
+        
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to parse requirements: {str(e)}",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to extract requirements: {str(e)}",
+        )
+
+
 @router.post("/{job_id}/retry", response_model=JobPostingResponse)
 async def retry_job(
     job_id: UUID,
