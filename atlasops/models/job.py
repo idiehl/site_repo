@@ -12,7 +12,7 @@ from atlasops.db import Base
 
 if TYPE_CHECKING:
     from atlasops.models.application import Application
-    from atlasops.models.resume import GeneratedResume
+    from atlasops.models.resume import GeneratedCoverLetter, GeneratedResume
     from atlasops.models.user import User
 
 
@@ -67,6 +67,9 @@ class JobPosting(Base):
     )
     resumes: Mapped[List["GeneratedResume"]] = relationship(
         "GeneratedResume", back_populates="job_posting"
+    )
+    cover_letters: Mapped[List["GeneratedCoverLetter"]] = relationship(
+        "GeneratedCoverLetter", back_populates="job_posting"
     )
     deep_dive: Mapped[Optional["CompanyDeepDive"]] = relationship(
         "CompanyDeepDive", back_populates="job_posting", uselist=False

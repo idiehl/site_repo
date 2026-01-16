@@ -46,6 +46,14 @@ const followupMessage = ref(null)
 const generatingFollowup = ref(false)
 const copiedFollowup = ref(false)
 
+// Cover letter state
+const coverLetters = ref([])
+const selectedCoverLetter = ref(null)
+const showCoverLetterModal = ref(false)
+const generatingCoverLetter = ref(false)
+const loadingCoverLetter = ref(false)
+const copiedCoverLetter = ref(false)
+
 // Check if user can generate follow-up (must have applied)
 const canGenerateFollowup = computed(() => {
   if (!application.value) return false
@@ -84,6 +92,7 @@ onMounted(async () => {
   await jobs.fetchJob(route.params.id)
   await Promise.all([
     fetchResumes(),
+    fetchCoverLetters(),
     fetchDeepDive(),
     fetchApplication()
   ])
@@ -336,6 +345,69 @@ async function copyFollowupMessage() {
   }
 }
 
+// Cover letter functions
+async function fetchCoverLetters() {
+  if (!job.value?.id) return
+  try {
+    const response = await api.get(`/api/v1/jobs/${job.value.id}/cover-letters`)
+    coverLetters.value = response.data
+  } catch (err) {
+    console.error('Failed to fetch cover letters:', err)
+  }
+}
+
+async function generateCoverLetter() {
+  if (!job.value?.id) return
+  
+  generatingCoverLetter.value = true
+  error.value = ''
+  message.value = ''
+  try {
+    const response = await api.post(`/api/v1/jobs/${job.value.id}/cover-letters`)
+    selectedCoverLetter.value = response.data
+    showCoverLetterModal.value = true
+    await fetchCoverLetters()
+    message.value = 'Cover letter generated successfully!'
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to generate cover letter'
+  } finally {
+    generatingCoverLetter.value = false
+  }
+}
+
+async function viewCoverLetter(coverLetterId) {
+  if (!job.value?.id || !coverLetterId) return
+  
+  loadingCoverLetter.value = true
+  error.value = ''
+  try {
+    const response = await api.get(`/api/v1/jobs/${job.value.id}/cover-letters/${coverLetterId}`)
+    selectedCoverLetter.value = response.data
+    showCoverLetterModal.value = true
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to load cover letter'
+  } finally {
+    loadingCoverLetter.value = false
+  }
+}
+
+function closeCoverLetterModal() {
+  showCoverLetterModal.value = false
+  selectedCoverLetter.value = null
+  copiedCoverLetter.value = false
+}
+
+async function copyCoverLetter() {
+  if (!selectedCoverLetter.value?.full_text) return
+  try {
+    await navigator.clipboard.writeText(selectedCoverLetter.value.full_text)
+    copiedCoverLetter.value = true
+    setTimeout(() => { copiedCoverLetter.value = false }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
+
 async function saveManualContent() {
   if (!manualContent.value.trim()) return
   
@@ -511,7 +583,14 @@ async function saveManualContent() {
               :disabled="generating || !job.company_name"
               class="btn btn-primary"
             >
-              {{ generating ? 'Generating...' : 'Generate Resume' }}
+              {{ generating ? 'Generating...' : '📄 Generate Resume' }}
+            </button>
+            <button 
+              @click="generateCoverLetter"
+              :disabled="generatingCoverLetter || !job.company_name"
+              class="btn btn-primary"
+            >
+              {{ generatingCoverLetter ? 'Generating...' : '✉️ Generate Cover Letter' }}
             </button>
             <button 
               @click="viewDeepDive"
@@ -884,6 +963,49 @@ async function saveManualContent() {
           >
             {{ copiedFollowup ? '✓ Copied!' : '📋 Copy Message' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cover Letter Modal -->
+    <div 
+      v-if="showCoverLetterModal && selectedCoverLetter" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeCoverLetterModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <div>
+            <h3 class="text-lg font-semibold text-white">✉️ Cover Letter</h3>
+            <p class="text-sm text-night-400">{{ job?.company_name }} • {{ job?.job_title }}</p>
+          </div>
+          <button @click="closeCoverLetterModal" class="p-2 text-night-400 hover:text-white text-xl">✕</button>
+        </div>
+        
+        <!-- Cover Letter Content -->
+        <div class="flex-1 overflow-auto p-6">
+          <div class="bg-white text-gray-900 rounded-lg p-8 shadow-inner font-serif leading-relaxed whitespace-pre-wrap">{{ selectedCoverLetter.full_text }}</div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800 flex items-center justify-between">
+          <p class="text-xs text-night-500">Review and personalize before sending</p>
+          <div class="flex gap-2">
+            <button 
+              @click="copyCoverLetter"
+              class="btn btn-secondary text-sm"
+            >
+              {{ copiedCoverLetter ? '✓ Copied!' : '📋 Copy' }}
+            </button>
+            <button 
+              v-if="coverLetters.length > 0"
+              @click="viewCoverLetter(coverLetters[0].id)"
+              class="btn btn-ghost text-sm"
+            >
+              View Previous
+            </button>
+          </div>
         </div>
       </div>
     </div>

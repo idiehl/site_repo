@@ -428,6 +428,213 @@ async def get_resume(
     }
 
 
+# Cover Letter endpoints
+@router.post("/{job_id}/cover-letters")
+async def generate_cover_letter(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Generate a tailored cover letter for a job posting."""
+    import json
+    import re
+    from pathlib import Path
+    
+    from atlasops.models.resume import GeneratedCoverLetter
+    from atlasops.models.user import UserProfile
+    from atlasops.services.llm_client import llm_client
+
+    # Get job posting
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get user profile
+    profile_result = await db.execute(
+        select(UserProfile).where(UserProfile.user_id == current_user.id)
+    )
+    profile = profile_result.scalar_one_or_none()
+    
+    if not profile or not profile.parsed_resume:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please complete your profile or upload a resume first",
+        )
+
+    # Check for existing deep dive for company insights
+    from atlasops.models.job import CompanyDeepDive
+    dd_result = await db.execute(
+        select(CompanyDeepDive).where(CompanyDeepDive.job_posting_id == job.id)
+    )
+    deep_dive = dd_result.scalar_one_or_none()
+    company_insights = ""
+    if deep_dive:
+        company_insights = f"""
+Company Overview: {deep_dive.company_overview or 'N/A'}
+Culture: {deep_dive.culture_insights or 'N/A'}
+"""
+
+    # Load prompt template
+    prompt_path = Path(__file__).parent.parent.parent / "prompts" / "cover_letter_v1.md"
+    prompt_template = prompt_path.read_text(encoding="utf-8")
+    
+    # Build the prompt
+    prompt = prompt_template.format(
+        job_title=job.job_title or "the position",
+        company_name=job.company_name or "the company",
+        job_description=job.job_description or job.raw_text or "Not available",
+        requirements=json.dumps(job.requirements or {}, indent=2),
+        profile=json.dumps(profile.parsed_resume, indent=2),
+        company_insights=company_insights or "Not available",
+    )
+
+    response = await llm_client.complete(
+        prompt,
+        system_prompt="You are an expert career coach and professional writer. Create compelling, personalized cover letters.",
+        temperature=0.7,
+    )
+
+    # Parse the response
+    try:
+        json_match = re.search(r"\{[\s\S]*\}", response)
+        if json_match:
+            content = json.loads(json_match.group())
+        else:
+            content = {"full_text": response}
+    except json.JSONDecodeError:
+        content = {"full_text": response}
+
+    full_text = content.get("full_text", "")
+    if not full_text and content.get("greeting"):
+        # Reconstruct from parts
+        full_text = f"""{content.get('greeting', 'Dear Hiring Manager,')}
+
+{content.get('opening_paragraph', '')}
+
+{content.get('body_paragraph_1', '')}
+
+{content.get('body_paragraph_2', '')}
+
+{content.get('closing_paragraph', '')}
+
+{content.get('signature', 'Sincerely,')}
+{profile.full_name or current_user.email.split('@')[0].title()}"""
+
+    # Save the cover letter
+    cover_letter = GeneratedCoverLetter(
+        job_posting_id=job.id,
+        content_json=content,
+        full_text=full_text,
+        model_used="gpt-4o-mini",
+        prompt_version="cover_letter_v1",
+    )
+    db.add(cover_letter)
+    await db.commit()
+    await db.refresh(cover_letter)
+
+    return {
+        "id": str(cover_letter.id),
+        "content_json": cover_letter.content_json,
+        "full_text": cover_letter.full_text,
+        "created_at": cover_letter.created_at.isoformat(),
+    }
+
+
+@router.get("/{job_id}/cover-letters")
+async def get_job_cover_letters(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> List[dict]:
+    """Get all generated cover letters for a job posting."""
+    from atlasops.models.resume import GeneratedCoverLetter
+    
+    # Verify job belongs to user
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get cover letters for this job
+    cl_result = await db.execute(
+        select(GeneratedCoverLetter)
+        .where(GeneratedCoverLetter.job_posting_id == job_id)
+        .order_by(GeneratedCoverLetter.created_at.desc())
+    )
+    cover_letters = cl_result.scalars().all()
+
+    return [
+        {
+            "id": str(cl.id),
+            "created_at": cl.created_at.isoformat(),
+        }
+        for cl in cover_letters
+    ]
+
+
+@router.get("/{job_id}/cover-letters/{cover_letter_id}")
+async def get_cover_letter(
+    job_id: UUID,
+    cover_letter_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> dict:
+    """Get a specific generated cover letter."""
+    from atlasops.models.resume import GeneratedCoverLetter
+    
+    # Verify job belongs to user
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Get the cover letter
+    cl_result = await db.execute(
+        select(GeneratedCoverLetter).where(
+            GeneratedCoverLetter.id == cover_letter_id,
+            GeneratedCoverLetter.job_posting_id == job_id,
+        )
+    )
+    cover_letter = cl_result.scalar_one_or_none()
+    if not cover_letter:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cover letter not found",
+        )
+
+    return {
+        "id": str(cover_letter.id),
+        "content_json": cover_letter.content_json,
+        "full_text": cover_letter.full_text,
+        "created_at": cover_letter.created_at.isoformat(),
+    }
+
+
 @router.get("/{job_id}/deep-dive")
 async def get_deep_dive(
     job_id: UUID,
