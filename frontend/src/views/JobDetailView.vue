@@ -808,7 +808,7 @@ async function saveManualContent() {
                 <p class="text-night-400">{{ resumeUsageText }}</p>
                 <p class="text-night-500 mt-1">Upgrade to unlock cover letters, company insights, interview prep, and follow-ups.</p>
               </div>
-              <button class="btn btn-primary" @click="startUpgrade">
+              <button class="btn btn-accent" @click="startUpgrade">
                 Upgrade to Paid
               </button>
             </div>
@@ -817,7 +817,7 @@ async function saveManualContent() {
             <button 
               @click="openTemplateSelector"
               :disabled="generating || !job.company_name || resumeLimitReached"
-              class="btn btn-primary"
+              class="btn btn-accent"
               :title="resumeLimitReached ? 'Upgrade to generate more resumes' : ''"
             >
               {{ generating ? 'Generating...' : (resumeLimitReached ? '📄 Upgrade to Generate' : '📄 Generate Resume') }}
@@ -825,7 +825,7 @@ async function saveManualContent() {
             <button 
               @click="generateCoverLetter"
               :disabled="generatingCoverLetter || !job.company_name || !canAccessPremium"
-              class="btn btn-primary"
+              class="btn btn-accent"
               :title="!canAccessPremium ? 'Upgrade to unlock cover letters' : ''"
             >
               {{ generatingCoverLetter ? 'Generating...' : '✉️ Generate Cover Letter' }}

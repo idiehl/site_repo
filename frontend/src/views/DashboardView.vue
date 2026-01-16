@@ -90,7 +90,10 @@ async function handleRetryFailed() {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold text-atlas-400">QuickPro</h1>
+            <div class="flex items-center gap-2">
+              <img src="/quickpro-icon.svg" alt="QuickPRO" class="w-7 h-7" />
+              <h1 class="text-xl font-bold text-atlas-400">QuickPRO</h1>
+            </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 
                 to="/dashboard" 
@@ -176,7 +179,7 @@ async function handleRetryFailed() {
               Auto-refreshing
             </span>
           </div>
-          <button @click="showIngestModal = true" class="btn btn-primary">
+          <button @click="showIngestModal = true" class="btn btn-accent">
             + Add Jobs
           </button>
         </div>

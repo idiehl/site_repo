@@ -61,6 +61,10 @@ input, textarea, select {
   @apply bg-atlas-600 text-white hover:bg-atlas-500 focus:ring-atlas-500;
 }
 
+.btn-accent {
+  @apply bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500;
+}
+
 .btn-secondary {
   @apply bg-night-800 text-night-100 hover:bg-night-700 focus:ring-night-600;
 }

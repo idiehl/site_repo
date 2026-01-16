@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Outer ring -->
+  <circle cx="32" cy="32" r="28" stroke="#5e6bf1" stroke-width="3" fill="none"/>
+  
+  <!-- Inner ring accent -->
+  <circle cx="32" cy="32" r="22" stroke="#06b6d4" stroke-width="1.5" fill="none" opacity="0.5"/>
+  
+  <!-- Compass needle pointing bottom-right (toward Q tail) -->
+  <path 
+    d="M32 32 L46 46" 
+    stroke="#06b6d4" 
+    stroke-width="4" 
+    stroke-linecap="round"
+  />
+  
+  <!-- Needle arrow head -->
+  <path 
+    d="M42 50 L46 46 L50 42" 
+    stroke="#06b6d4" 
+    stroke-width="3" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+    fill="none"
+  />
+  
+  <!-- Center dot -->
+  <circle cx="32" cy="32" r="4" fill="#5e6bf1"/>
+  
+  <!-- Opposite direction indicator (subtle) -->
+  <path 
+    d="M32 32 L22 22" 
+    stroke="#878aa9" 
+    stroke-width="2" 
+    stroke-linecap="round"
+    opacity="0.4"
+  />
+</svg>
