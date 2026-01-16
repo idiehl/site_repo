@@ -51,6 +51,18 @@ class JobPosting(Base):
     extraction_confidence: Mapped[Optional[float]] = mapped_column(nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Application tracking (built-in status without separate Application entity)
+    application_status: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True
+    )  # null, applied, interview_scheduled, followup_sent, second_interview
+    interview_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    interview_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    applied_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

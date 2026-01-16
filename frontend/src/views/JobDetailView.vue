@@ -68,11 +68,21 @@ const descriptionExpanded = ref(false)
 // Deep dive state
 const deepDive = ref(null)
 const showDeepDiveModal = ref(false)
+const spotlightExpanded = ref(true)  // Company Spotlight section expanded by default
 
-// Application state
+// Application status state (built-in to job, not separate entity)
+const updatingStatus = ref(false)
+const applicationStatuses = [
+  { value: null, label: 'Not Applied', icon: '📋' },
+  { value: 'applied', label: 'Applied', icon: '✅' },
+  { value: 'interview_scheduled', label: 'Interview Scheduled', icon: '📅' },
+  { value: 'followup_sent', label: 'Follow-up Sent', icon: '📧' },
+  { value: 'second_interview', label: 'Second Interview', icon: '🎯' },
+]
+
+// Legacy application state (for backwards compatibility)
 const application = ref(null)
 const creatingApplication = ref(false)
-const updatingStatus = ref(false)
 const showStatusModal = ref(false)
 const showInterviewPrepModal = ref(false)
 const interviewPrep = ref(null)
@@ -128,8 +138,8 @@ const canGenerateFollowup = computed(() => {
   return appliedStatuses.includes(application.value.status)
 })
 
-// Application statuses for dropdown
-const applicationStatuses = [
+// Legacy application statuses (for backwards compatibility with Application entity)
+const legacyApplicationStatuses = [
   { value: 'pending', label: '📋 Pending', color: 'gray' },
   { value: 'applied', label: '✅ Applied', color: 'blue' },
   { value: 'followup_scheduled', label: '📅 Follow-up Scheduled', color: 'yellow' },
@@ -143,7 +153,13 @@ const applicationStatuses = [
 const hasApplication = computed(() => !!application.value)
 const currentStatusLabel = computed(() => {
   if (!application.value) return null
-  return applicationStatuses.find(s => s.value === application.value.status)?.label || application.value.status
+  return legacyApplicationStatuses.find(s => s.value === application.value.status)?.label || application.value.status
+})
+
+// New job-level application status (built into JobPosting)
+const jobApplicationStatus = computed(() => job.value?.application_status || null)
+const jobApplicationStatusInfo = computed(() => {
+  return applicationStatuses.find(s => s.value === jobApplicationStatus.value) || applicationStatuses[0]
 })
 
 // Check if job was blocked/failed to scrape
@@ -191,6 +207,77 @@ async function fetchDeepDive() {
 
 function goBack() {
   router.push('/dashboard')
+}
+
+async function updateApplicationStatus(newStatus) {
+  if (!job.value) return
+  
+  updatingStatus.value = true
+  error.value = ''
+  
+  try {
+    const response = await api.patch(`/api/v1/jobs/${job.value.id}/application-status`, null, {
+      params: {
+        application_status: newStatus || '',
+        interview_date: job.value.interview_date || '',
+        interview_notes: job.value.interview_notes || '',
+      }
+    })
+    
+    // Update local job data
+    job.value.application_status = response.data.application_status
+    job.value.applied_at = response.data.applied_at
+    
+    // If deep dive was generated, update it
+    if (response.data.deep_dive_generated && response.data.deep_dive) {
+      deepDive.value = response.data.deep_dive
+      message.value = 'Status updated and Company Spotlight generated!'
+    } else {
+      message.value = 'Application status updated!'
+    }
+    
+    // Refresh job data
+    await jobs.fetchJob(route.params.id)
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to update status'
+  } finally {
+    updatingStatus.value = false
+  }
+}
+
+async function updateInterviewDate(dateString) {
+  if (!job.value) return
+  
+  updatingStatus.value = true
+  try {
+    await api.patch(`/api/v1/jobs/${job.value.id}/application-status`, null, {
+      params: {
+        interview_date: dateString || '',
+      }
+    })
+    job.value.interview_date = dateString
+    message.value = 'Interview date updated!'
+    await jobs.fetchJob(route.params.id)
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to update interview date'
+  } finally {
+    updatingStatus.value = false
+  }
+}
+
+async function updateInterviewNotes(notes) {
+  if (!job.value) return
+  
+  try {
+    await api.patch(`/api/v1/jobs/${job.value.id}/application-status`, null, {
+      params: {
+        interview_notes: notes || '',
+      }
+    })
+    job.value.interview_notes = notes
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to save notes'
+  }
 }
 
 function openTemplateSelector() {
@@ -629,6 +716,82 @@ async function saveManualContent() {
       </div>
 
       <div v-else-if="job" class="space-y-6">
+        <!-- Application Status Section -->
+        <div class="card bg-gradient-to-r from-night-900 to-night-800 border-night-700">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="text-3xl">{{ jobApplicationStatusInfo.icon }}</div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Application Status</h3>
+                <p class="text-sm text-night-400">
+                  <span v-if="job.applied_at">Applied {{ new Date(job.applied_at).toLocaleDateString() }}</span>
+                  <span v-else>Track your application progress</span>
+                </p>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <select
+                :value="job.application_status || ''"
+                @change="updateApplicationStatus($event.target.value || null)"
+                :disabled="updatingStatus"
+                class="bg-night-800 border border-night-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-atlas-500 min-w-[200px]"
+              >
+                <option 
+                  v-for="status in applicationStatuses" 
+                  :key="status.value" 
+                  :value="status.value || ''"
+                >
+                  {{ status.icon }} {{ status.label }}
+                </option>
+              </select>
+              <span v-if="updatingStatus" class="text-night-400 animate-pulse">Saving...</span>
+            </div>
+          </div>
+          
+          <!-- Interview Date Picker (shown when interview_scheduled or second_interview) -->
+          <div 
+            v-if="job.application_status === 'interview_scheduled' || job.application_status === 'second_interview'"
+            class="mt-4 pt-4 border-t border-night-700"
+          >
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">📅</span>
+                <label class="text-sm font-medium text-night-300">
+                  {{ job.application_status === 'second_interview' ? 'Second Interview Date & Time' : 'Interview Date & Time' }}
+                </label>
+              </div>
+              <input
+                type="datetime-local"
+                :value="job.interview_date ? job.interview_date.slice(0, 16) : ''"
+                @change="updateInterviewDate($event.target.value)"
+                class="bg-night-800 border border-night-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-atlas-500"
+              />
+              <span v-if="job.interview_date" class="text-sm text-night-400">
+                {{ new Date(job.interview_date).toLocaleString() }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Interview Notes (shown when second_interview) -->
+          <div 
+            v-if="job.application_status === 'second_interview'"
+            class="mt-4 pt-4 border-t border-night-700"
+          >
+            <div class="flex items-center gap-3 mb-2">
+              <span class="text-xl">📝</span>
+              <label class="text-sm font-medium text-night-300">First Interview Notes</label>
+            </div>
+            <textarea
+              :value="job.interview_notes || ''"
+              @blur="updateInterviewNotes($event.target.value)"
+              rows="4"
+              class="w-full bg-night-800 border border-night-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-atlas-500 resize-none"
+              placeholder="Record key points, questions asked, your answers, and things to follow up on..."
+            ></textarea>
+          </div>
+        </div>
+
         <!-- Job Header -->
         <div class="card">
           <div class="flex items-start justify-between">
@@ -651,6 +814,106 @@ async function saveManualContent() {
               </button>
               <StatusBadge :status="job.status" />
             </div>
+          </div>
+        </div>
+
+        <!-- Company Spotlight Section (shown when applied and deep_dive exists) -->
+        <div 
+          v-if="job.application_status && deepDive" 
+          class="card border-purple-600/30 bg-gradient-to-r from-purple-900/20 to-night-900"
+        >
+          <div 
+            class="flex items-center justify-between cursor-pointer"
+            @click="spotlightExpanded = !spotlightExpanded"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🔍</span>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Company Spotlight</h3>
+                <p class="text-sm text-night-400">AI-generated insights about {{ job.company_name }}</p>
+              </div>
+            </div>
+            <button class="text-sm text-atlas-400 hover:text-atlas-300 transition-colors">
+              {{ spotlightExpanded ? '▲ Collapse' : '▼ Expand' }}
+            </button>
+          </div>
+          
+          <div 
+            v-if="spotlightExpanded"
+            class="mt-4 pt-4 border-t border-night-700 space-y-6"
+          >
+            <!-- Company Overview -->
+            <div v-if="deepDive.company_overview">
+              <h4 class="font-medium text-atlas-300 mb-2 flex items-center gap-2">
+                <span>🏢</span> Company Overview
+              </h4>
+              <p class="text-night-300 whitespace-pre-wrap">{{ deepDive.company_overview }}</p>
+            </div>
+            
+            <!-- Culture Insights -->
+            <div v-if="deepDive.culture_insights">
+              <h4 class="font-medium text-atlas-300 mb-2 flex items-center gap-2">
+                <span>💡</span> Culture Insights
+              </h4>
+              <p class="text-night-300 whitespace-pre-wrap">{{ deepDive.culture_insights }}</p>
+            </div>
+            
+            <!-- Role Analysis -->
+            <div v-if="deepDive.role_analysis">
+              <h4 class="font-medium text-atlas-300 mb-2 flex items-center gap-2">
+                <span>📊</span> Role Analysis
+              </h4>
+              <p class="text-night-300 whitespace-pre-wrap">{{ deepDive.role_analysis }}</p>
+            </div>
+            
+            <!-- Interview Tips -->
+            <div v-if="deepDive.interview_tips">
+              <h4 class="font-medium text-atlas-300 mb-2 flex items-center gap-2">
+                <span>🎯</span> Interview Tips
+              </h4>
+              <p class="text-night-300 whitespace-pre-wrap">{{ deepDive.interview_tips }}</p>
+            </div>
+            
+            <p class="text-xs text-night-500">
+              Generated {{ deepDive.generated_at ? new Date(deepDive.generated_at).toLocaleDateString() : 'recently' }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Generating Spotlight Loading State -->
+        <div 
+          v-else-if="job.application_status && generatingDeepDive" 
+          class="card border-purple-600/30 bg-gradient-to-r from-purple-900/20 to-night-900"
+        >
+          <div class="flex items-center gap-3">
+            <span class="text-2xl animate-pulse">🔍</span>
+            <div>
+              <h3 class="text-lg font-semibold text-white">Generating Company Spotlight...</h3>
+              <p class="text-sm text-night-400">Researching {{ job.company_name }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Prompt to Generate Spotlight (shown when applied but no deep_dive) -->
+        <div 
+          v-else-if="job.application_status && !deepDive && canAccessPremium" 
+          class="card border-dashed border-night-600"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl opacity-50">🔍</span>
+              <div>
+                <h3 class="text-lg font-semibold text-night-400">Company Spotlight</h3>
+                <p class="text-sm text-night-500">Generate AI-powered insights about {{ job.company_name }}</p>
+              </div>
+            </div>
+            <button 
+              @click="generateDeepDive"
+              :disabled="generatingDeepDive"
+              class="btn btn-secondary"
+            >
+              {{ generatingDeepDive ? 'Generating...' : 'Generate Spotlight' }}
+            </button>
           </div>
         </div>
 
@@ -830,28 +1093,6 @@ async function saveManualContent() {
         </div>
 
         <!-- Application Status Banner -->
-        <div v-if="hasApplication" class="card bg-gradient-to-r from-atlas-900/50 to-purple-900/50 border-atlas-600/50">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div class="text-3xl">📝</div>
-              <div>
-                <h3 class="font-semibold text-white">Application Tracked</h3>
-                <p class="text-sm text-night-300">
-                  Status: <span class="font-medium text-atlas-300">{{ currentStatusLabel }}</span>
-                  <span class="text-night-500 ml-2">•</span>
-                  <span class="text-night-400 ml-2">Created {{ new Date(application.created_at).toLocaleDateString() }}</span>
-                </p>
-              </div>
-            </div>
-            <button 
-              @click="showStatusModal = true"
-              class="btn btn-secondary text-sm"
-            >
-              Update Status
-            </button>
-          </div>
-        </div>
-
         <!-- Generate Section -->
         <GenerateSection
           ref="generateSectionRef"
@@ -865,34 +1106,26 @@ async function saveManualContent() {
           @upgrade="startUpgrade"
         />
         
-        <!-- Quick Actions -->
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div class="flex flex-wrap gap-3">
+        <!-- Interview Prep (shown when interview scheduled) -->
+        <div 
+          v-if="job.application_status === 'interview_scheduled' || job.application_status === 'second_interview'"
+          class="card"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎤</span>
+              <div>
+                <h3 class="text-lg font-semibold">Interview Preparation</h3>
+                <p class="text-sm text-night-400">Get ready for your upcoming interview</p>
+              </div>
+            </div>
             <button 
-              @click="viewDeepDive"
-              :disabled="generatingDeepDive || !job.company_name || !canAccessPremium"
-              class="btn btn-secondary"
-              :title="!canAccessPremium ? 'Upgrade to unlock company insights' : ''"
-            >
-              {{ generatingDeepDive ? 'Researching...' : '🔍 Company Spotlight' }}
-            </button>
-            <button 
-              v-if="!hasApplication"
-              @click="createApplication"
-              :disabled="creatingApplication || !job.company_name"
-              class="btn btn-secondary"
-            >
-              {{ creatingApplication ? 'Creating...' : '📝 Create Application' }}
-            </button>
-            <button 
-              v-if="hasApplication"
               @click="generateInterviewPrep"
               :disabled="generatingInterviewPrep || !canAccessPremium"
-              class="btn btn-secondary"
+              class="btn btn-accent"
               :title="!canAccessPremium ? 'Upgrade to unlock interview prep' : ''"
             >
-              {{ generatingInterviewPrep ? 'Generating...' : '🎤 Interview Prep' }}
+              {{ generatingInterviewPrep ? 'Generating...' : 'Generate Prep Guide' }}
             </button>
           </div>
         </div>

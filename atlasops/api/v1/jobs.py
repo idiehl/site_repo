@@ -222,6 +222,130 @@ async def update_job(
     return job
 
 
+# Valid application status values
+VALID_APPLICATION_STATUSES = [None, "applied", "interview_scheduled", "followup_sent", "second_interview"]
+
+
+@router.patch("/{job_id}/application-status")
+async def update_application_status(
+    job_id: UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+    application_status: str | None = None,
+    interview_date: str | None = None,
+    interview_notes: str | None = None,
+) -> dict:
+    """Update the application status for a job posting.
+    
+    When changing from null to 'applied', automatically generates a Company Spotlight.
+    """
+    from datetime import datetime as dt, timezone
+    from atlasops.models.job import CompanyDeepDive
+    from atlasops.services.llm_client import llm_client
+    
+    # Validate status
+    if application_status is not None and application_status not in VALID_APPLICATION_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid status. Must be one of: {VALID_APPLICATION_STATUSES}",
+        )
+    
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+    
+    old_status = job.application_status
+    trigger_deep_dive = False
+    
+    # Update application status
+    if application_status is not None:
+        job.application_status = application_status if application_status else None
+        
+        # Set applied_at timestamp when first applying
+        if application_status == "applied" and old_status is None:
+            job.applied_at = dt.now(timezone.utc)
+            trigger_deep_dive = True  # Generate Company Spotlight
+    
+    # Update interview date
+    if interview_date is not None:
+        if interview_date:
+            try:
+                job.interview_date = dt.fromisoformat(interview_date.replace('Z', '+00:00'))
+            except ValueError:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid interview_date format. Use ISO 8601.",
+                )
+        else:
+            job.interview_date = None
+    
+    # Update interview notes
+    if interview_notes is not None:
+        job.interview_notes = interview_notes if interview_notes else None
+    
+    await db.commit()
+    await db.refresh(job)
+    
+    # Generate Company Spotlight if transitioning to "applied"
+    deep_dive_data = None
+    if trigger_deep_dive and job.company_name and can_access_premium_features(current_user):
+        # Check if deep dive already exists
+        existing = await db.execute(
+            select(CompanyDeepDive).where(CompanyDeepDive.job_posting_id == job.id)
+        )
+        if not existing.scalar_one_or_none():
+            try:
+                # Generate deep dive
+                research = await llm_client.generate_deep_dive(
+                    company_name=job.company_name,
+                    job_title=job.job_title or "Unknown Role",
+                    job_description=job.job_description or "",
+                )
+                
+                deep_dive = CompanyDeepDive(
+                    job_posting_id=job.id,
+                    company_overview=research.get("company_overview"),
+                    culture_insights=research.get("culture_insights"),
+                    role_analysis=research.get("role_analysis"),
+                    interview_tips=research.get("interview_tips"),
+                    sources=research.get("sources"),
+                )
+                db.add(deep_dive)
+                await db.commit()
+                await db.refresh(deep_dive)
+                deep_dive_data = {
+                    "id": str(deep_dive.id),
+                    "company_overview": deep_dive.company_overview,
+                    "culture_insights": deep_dive.culture_insights,
+                    "role_analysis": deep_dive.role_analysis,
+                    "interview_tips": deep_dive.interview_tips,
+                    "generated_at": deep_dive.generated_at.isoformat(),
+                }
+            except Exception as e:
+                # Don't fail the status update if deep dive fails
+                import logging
+                logging.getLogger(__name__).error(f"Failed to generate deep dive: {e}")
+    
+    return {
+        "id": str(job.id),
+        "application_status": job.application_status,
+        "interview_date": job.interview_date.isoformat() if job.interview_date else None,
+        "interview_notes": job.interview_notes,
+        "applied_at": job.applied_at.isoformat() if job.applied_at else None,
+        "deep_dive_generated": deep_dive_data is not None,
+        "deep_dive": deep_dive_data,
+    }
+
+
 @router.post("/{job_id}/extract-requirements", response_model=JobPostingResponse)
 async def extract_requirements(
     job_id: UUID,

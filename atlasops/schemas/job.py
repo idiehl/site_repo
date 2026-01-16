@@ -49,6 +49,10 @@ class JobUpdateRequest(BaseModel):
     job_description: Optional[str] = None
     requirements: Optional[Dict[str, Any]] = None
     benefits: Optional[List[str]] = None
+    # Application tracking fields
+    application_status: Optional[str] = None
+    interview_date: Optional[datetime] = None
+    interview_notes: Optional[str] = None
 
 
 class JobPostingResponse(BaseModel):
@@ -68,6 +72,11 @@ class JobPostingResponse(BaseModel):
     benefits: Optional[List[str]] = None  # Benefits are returned as a list from LLM
     extraction_confidence: Optional[float] = None
     error_message: Optional[str] = None
+    # Application tracking fields
+    application_status: Optional[str] = None
+    interview_date: Optional[datetime] = None
+    interview_notes: Optional[str] = None
+    applied_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 
