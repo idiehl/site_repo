@@ -149,10 +149,8 @@
 <script setup>
 import { computed } from 'vue'
 
-// For now, link to GitHub releases or a hosted zip
-// In production, this would be a proper download URL
+// Direct download from our server
 const downloadUrl = computed(() => {
-  // This could be a GitHub release asset or a hosted file
-  return 'https://github.com/idiehl/site_repo/archive/refs/heads/master.zip'
+  return '/quickpro-extension.zip'
 })
 </script>
