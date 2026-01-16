@@ -20,6 +20,11 @@ const hasProcessingJobs = computed(() => {
   )
 })
 
+// Count of jobs needing review
+const needsReviewCount = computed(() => {
+  return jobs.jobs.filter(job => job.status === 'needs_review').length
+})
+
 // Start polling when there are processing jobs
 function startPolling() {
   if (pollInterval) return // Already polling
@@ -121,7 +126,7 @@ async function handleRetryFailed() {
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
         <div class="card">
           <p class="text-sm text-night-400 mb-1">Total Jobs</p>
           <p class="text-2xl font-bold">{{ jobs.jobs.length }}</p>
@@ -133,6 +138,10 @@ async function handleRetryFailed() {
         <div class="card">
           <p class="text-sm text-night-400 mb-1">Ready</p>
           <p class="text-2xl font-bold text-green-400">{{ jobs.completedJobs.length }}</p>
+        </div>
+        <div class="card">
+          <p class="text-sm text-night-400 mb-1">Needs Review</p>
+          <p class="text-2xl font-bold text-orange-400">{{ needsReviewCount }}</p>
         </div>
         <div class="card">
           <p class="text-sm text-night-400 mb-1">Failed</p>

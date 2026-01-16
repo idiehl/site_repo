@@ -142,10 +142,28 @@ def scrape_job_posting(self, job_id: str):
                 job.requirements = extracted.get("requirements")
                 job.benefits = extracted.get("benefits")
                 job.structured_data = extracted
-                job.status = "completed"
+
+                # Validate minimum required fields
+                has_company = bool(job.company_name and job.company_name.strip())
+                has_title = bool(job.job_title and job.job_title.strip())
+                has_description = bool(job.job_description and len(job.job_description.strip()) > 50)
+
+                if has_company and has_title and has_description:
+                    job.status = "completed"
+                    logger.info(f"Successfully processed job {job_id}")
+                else:
+                    job.status = "needs_review"
+                    missing = []
+                    if not has_company:
+                        missing.append("company name")
+                    if not has_title:
+                        missing.append("job title")
+                    if not has_description:
+                        missing.append("job description")
+                    job.error_message = f"Missing required fields: {', '.join(missing)}. Use manual entry to add details."
+                    logger.warning(f"Job {job_id} needs review - missing: {missing}")
 
                 await db.commit()
-                logger.info(f"Successfully processed job {job_id}")
 
             except Exception as e:
                 logger.exception(f"Error processing job {job_id}")

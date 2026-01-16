@@ -29,19 +29,14 @@ Company Insights (if available):
 
 ## Required Output
 
-Return a JSON object:
-
-```json
-{
-  "greeting": "Dear Hiring Manager," or personalized if name available,
-  "opening_paragraph": "Hook + why you're excited about this role",
-  "body_paragraph_1": "Your most relevant experience and how it applies",
-  "body_paragraph_2": "Additional skills/achievements that make you stand out",
-  "closing_paragraph": "Call to action + enthusiasm for next steps",
-  "signature": "Sincerely,\n[Name]",
-  "full_text": "The complete cover letter as a single string"
-}
-```
+Return a JSON object with these fields:
+- greeting: "Dear Hiring Manager," or personalized if name available
+- opening_paragraph: Hook + why you're excited about this role
+- body_paragraph_1: Your most relevant experience and how it applies
+- body_paragraph_2: Additional skills/achievements that make you stand out
+- closing_paragraph: Call to action + enthusiasm for next steps
+- signature: Sincerely followed by candidate name
+- full_text: The complete cover letter as a single string
 
 ## Guidelines
 

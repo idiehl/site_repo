@@ -12,6 +12,7 @@ const statusConfig = {
   pending: { label: 'Pending', class: 'badge-pending' },
   processing: { label: 'Processing', class: 'badge-pending' },
   completed: { label: 'Ready', class: 'bg-green-500/20 text-green-400' },
+  needs_review: { label: '⚠️ Needs Info', class: 'bg-orange-500/20 text-orange-400' },
   failed: { label: 'Failed', class: 'badge-rejected' },
   applied: { label: 'Applied', class: 'badge-applied' },
   followup_scheduled: { label: 'Follow-up', class: 'badge-applied' },
