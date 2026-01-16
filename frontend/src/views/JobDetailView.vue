@@ -62,6 +62,9 @@ const availableTemplates = ref([
   { id: 'executive', name: 'Executive', description: 'Bold two-column layout with header banner', best_for: ['Senior roles', 'Management', 'C-Suite'] },
 ])
 
+// Description collapse state
+const descriptionExpanded = ref(false)
+
 // Deep dive state
 const deepDive = ref(null)
 const showDeepDiveModal = ref(false)
@@ -653,8 +656,23 @@ async function saveManualContent() {
 
         <!-- Description -->
         <div v-if="job.job_description" class="card">
-          <h3 class="text-lg font-semibold mb-4">Description</h3>
-          <p class="text-night-300 whitespace-pre-wrap">{{ job.job_description }}</p>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Description</h3>
+            <button 
+              @click="descriptionExpanded = !descriptionExpanded"
+              class="text-sm text-atlas-400 hover:text-atlas-300 transition-colors"
+            >
+              {{ descriptionExpanded ? 'Show less' : 'Show more' }}
+            </button>
+          </div>
+          <div 
+            :class="[
+              'text-night-300 whitespace-pre-wrap transition-all duration-300 overflow-hidden',
+              descriptionExpanded ? '' : 'max-h-[12rem] description-fade'
+            ]"
+          >
+            {{ job.job_description }}
+          </div>
         </div>
 
         <!-- Requirements -->
@@ -1434,3 +1452,10 @@ async function saveManualContent() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.description-fade {
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+</style>
