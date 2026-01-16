@@ -24,7 +24,7 @@ async function handleSubmit() {
     <div class="w-full max-w-md">
       <!-- Logo/Brand -->
       <div class="text-center mb-8 animate-fade-in">
-        <h1 class="text-4xl font-bold text-atlas-400 mb-2">AtlasOps</h1>
+        <h1 class="text-4xl font-bold text-atlas-400 mb-2">QuickPro</h1>
         <p class="text-night-400">AI-Powered Job Application Manager</p>
       </div>
 

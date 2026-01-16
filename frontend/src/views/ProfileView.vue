@@ -308,7 +308,7 @@ const completenessColor = computed(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold text-atlas-400">AtlasOps</h1>
+            <h1 class="text-xl font-bold text-atlas-400">QuickPro</h1>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 
                 to="/dashboard" 
