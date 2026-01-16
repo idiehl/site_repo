@@ -654,7 +654,7 @@ async function saveManualContent() {
               @click="extractRequirements"
               :disabled="extractingRequirements"
               class="btn btn-ghost text-sm"
-              title="Refresh job requirements"
+              title="Refresh job details and requirements"
             >
               {{ extractingRequirements ? '🔄 Refreshing...' : '🔄 Refresh' }}
             </button>
@@ -860,7 +860,7 @@ async function saveManualContent() {
               class="btn btn-secondary"
               :title="!canAccessPremium ? 'Upgrade to unlock company insights' : ''"
             >
-              {{ generatingDeepDive ? 'Researching...' : (deepDive ? '🔍 Company Spotlight' : '🔍 Company Spotlight') }}
+              {{ generatingDeepDive ? 'Researching...' : '🔍 Company Spotlight' }}
             </button>
             <button 
               v-if="!hasApplication"
