@@ -26,6 +26,13 @@ const resumes = ref([])
 const selectedResume = ref(null)
 const showResumeModal = ref(false)
 const loadingResume = ref(false)
+const showTemplateSelector = ref(false)
+const selectedTemplate = ref('modern')
+const availableTemplates = ref([
+  { id: 'modern', name: 'Modern', description: 'Clean, contemporary 2-page design with accent colors', best_for: ['Tech', 'Startups', 'Creative'] },
+  { id: 'classic', name: 'Classic', description: 'Traditional professional 2-page format', best_for: ['Corporate', 'Finance', 'Legal'] },
+  { id: 'executive', name: 'Executive', description: 'Bold two-column layout with header banner', best_for: ['Senior roles', 'Management', 'C-Suite'] },
+])
 
 // Deep dive state
 const deepDive = ref(null)
@@ -143,17 +150,27 @@ function goBack() {
   router.push('/dashboard')
 }
 
+function openTemplateSelector() {
+  if (!job.value?.company_name) {
+    error.value = 'Please add job details first (company blocked scraping)'
+    return
+  }
+  showTemplateSelector.value = true
+}
+
 async function generateResume() {
   if (!job.value?.company_name) {
     error.value = 'Please add job details first (company blocked scraping)'
     return
   }
+  showTemplateSelector.value = false
   generating.value = true
   error.value = ''
   message.value = ''
   try {
-    const response = await api.post(`/api/v1/jobs/${job.value.id}/resumes`)
-    message.value = `Resume generated! Match score: ${(response.data.match_score * 100).toFixed(0)}%`
+    const response = await api.post(`/api/v1/jobs/${job.value.id}/resumes?template=${selectedTemplate.value}`)
+    const keywordsCount = response.data.keywords_used?.length || 0
+    message.value = `2-page resume generated with ${selectedTemplate.value} template! Match score: ${(response.data.match_score * 100).toFixed(0)}% | ${keywordsCount} keywords matched`
     // Refresh resumes list and show the new one
     await fetchResumes()
     await viewResume(response.data.id)
@@ -738,7 +755,7 @@ async function saveManualContent() {
           <h3 class="text-lg font-semibold mb-4">Actions</h3>
           <div class="flex flex-wrap gap-3">
             <button 
-              @click="generateResume"
+              @click="openTemplateSelector"
               :disabled="generating || !job.company_name"
               class="btn btn-primary"
             >
@@ -890,6 +907,78 @@ async function saveManualContent() {
         <p class="text-night-400">Job not found</p>
       </div>
     </main>
+
+    <!-- Template Selector Modal -->
+    <div 
+      v-if="showTemplateSelector" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="showTemplateSelector = false"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <div>
+            <h3 class="text-lg font-semibold text-white">Choose Resume Template</h3>
+            <p class="text-sm text-night-400 mt-1">Select a 2-page style that matches your target role</p>
+          </div>
+          <button @click="showTemplateSelector = false" class="p-2 text-night-400 hover:text-white">
+            ✕
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div 
+            v-for="template in availableTemplates" 
+            :key="template.id"
+            @click="selectedTemplate = template.id"
+            :class="[
+              'p-4 rounded-lg border-2 cursor-pointer transition-all duration-200',
+              selectedTemplate === template.id 
+                ? 'border-atlas-500 bg-atlas-500/10' 
+                : 'border-night-700 hover:border-night-500 bg-night-800/50'
+            ]"
+          >
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="font-semibold text-white flex items-center gap-2">
+                  {{ template.name }}
+                  <span v-if="selectedTemplate === template.id" class="text-atlas-400 text-sm">✓ Selected</span>
+                </h4>
+                <p class="text-sm text-night-400 mt-1">{{ template.description }}</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span 
+                    v-for="use in template.best_for" 
+                    :key="use"
+                    class="text-xs px-2 py-0.5 rounded bg-night-700 text-night-300"
+                  >
+                    {{ use }}
+                  </span>
+                </div>
+              </div>
+              <div 
+                :class="[
+                  'w-5 h-5 rounded-full border-2 flex items-center justify-center',
+                  selectedTemplate === template.id 
+                    ? 'border-atlas-500 bg-atlas-500' 
+                    : 'border-night-600'
+                ]"
+              >
+                <span v-if="selectedTemplate === template.id" class="text-white text-xs">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800">
+          <p class="text-xs text-night-500 mb-3">📄 Generates a 2-page resume: Page 1 has Profile, Skills, Experience | Page 2 has Projects, Education, Activities</p>
+          <div class="flex justify-end gap-3">
+            <button @click="showTemplateSelector = false" class="btn btn-ghost">
+              Cancel
+            </button>
+            <button @click="generateResume" class="btn btn-primary">
+              🚀 Generate with {{ availableTemplates.find(t => t.id === selectedTemplate)?.name }} Template
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Resume Modal -->
     <div 
