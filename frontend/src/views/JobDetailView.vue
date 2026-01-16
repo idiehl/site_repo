@@ -68,7 +68,7 @@ const descriptionExpanded = ref(false)
 // Deep dive state
 const deepDive = ref(null)
 const showDeepDiveModal = ref(false)
-const spotlightExpanded = ref(true)  // Company Spotlight section expanded by default
+const spotlightExpanded = ref(false)  // Company Spotlight section collapsed by default
 
 // Application status state (built-in to job, not separate entity)
 const updatingStatus = ref(false)
