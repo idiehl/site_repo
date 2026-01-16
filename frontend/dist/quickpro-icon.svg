@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background -->
+  <circle cx="32" cy="32" r="32" fill="#0d0d12"/>
+  
+  <!-- Q circle (the O part of Q) -->
+  <circle cx="32" cy="30" r="20" stroke="#5e6bf1" stroke-width="4" fill="none"/>
+  
+  <!-- Q tail (compass needle pointing bottom-right) -->
+  <path 
+    d="M42 40 L56 54" 
+    stroke="#06b6d4" 
+    stroke-width="5" 
+    stroke-linecap="round"
+  />
+  
+  <!-- Small compass center dot -->
+  <circle cx="32" cy="30" r="4" fill="#06b6d4"/>
+</svg>

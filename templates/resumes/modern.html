@@ -7,6 +7,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
+        :root {
+            --accent-primary: {{accent_primary}};
+            --accent-secondary: {{accent_secondary}};
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -41,7 +46,7 @@
             align-items: flex-start;
             margin-bottom: 20px;
             padding-bottom: 14px;
-            border-bottom: 3px solid #4361ee;
+            border-bottom: 3px solid var(--accent-primary);
         }
         
         .header-left h1 {
@@ -54,7 +59,7 @@
         
         .header-left .headline {
             font-size: 11pt;
-            color: #4361ee;
+            color: var(--accent-primary);
             font-weight: 500;
         }
         
@@ -65,7 +70,7 @@
         }
         
         .header-right a {
-            color: #4361ee;
+            color: var(--accent-primary);
             text-decoration: none;
         }
         
@@ -102,7 +107,7 @@
         .section-title {
             font-size: 10pt;
             font-weight: 600;
-            color: #4361ee;
+            color: var(--accent-primary);
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 10px;
@@ -118,7 +123,7 @@
             text-align: justify;
             background: #f8faff;
             padding: 12px 14px;
-            border-left: 3px solid #4361ee;
+            border-left: 3px solid var(--accent-primary);
             border-radius: 0 4px 4px 0;
         }
         
@@ -146,7 +151,7 @@
         
         .skill-tag {
             background: #eef2ff;
-            color: #4361ee;
+            color: var(--accent-primary);
             padding: 3px 9px;
             border-radius: 10px;
             font-size: 8.5pt;
@@ -183,7 +188,7 @@
         
         .company {
             font-weight: 500;
-            color: #4361ee;
+            color: var(--accent-primary);
         }
         
         .date-location {
@@ -212,7 +217,7 @@
             content: "▸";
             position: absolute;
             left: 0;
-            color: #4361ee;
+            color: var(--accent-primary);
             font-size: 8pt;
         }
         
@@ -220,7 +225,7 @@
         .project-item {
             margin-bottom: 12px;
             padding-left: 12px;
-            border-left: 2px solid #4361ee;
+            border-left: 2px solid var(--accent-primary);
         }
         
         .project-name {
@@ -230,7 +235,7 @@
         }
         
         .project-name a {
-            color: #4361ee;
+            color: var(--accent-primary);
             text-decoration: none;
             margin-left: 6px;
             font-weight: 400;
@@ -245,7 +250,7 @@
         
         .project-outcome {
             font-size: 9pt;
-            color: #4361ee;
+            color: var(--accent-primary);
             font-weight: 500;
         }
         
@@ -273,7 +278,7 @@
         }
         
         .institution {
-            color: #4361ee;
+            color: var(--accent-primary);
             font-weight: 500;
         }
         
@@ -312,7 +317,7 @@
         }
         
         .extra-role {
-            color: #4361ee;
+            color: var(--accent-primary);
             font-weight: 500;
         }
         
@@ -338,7 +343,7 @@
             background: #f8faff;
             padding: 8px 10px;
             border-radius: 4px;
-            border-left: 2px solid #4361ee;
+            border-left: 2px solid var(--accent-primary);
         }
         
         .cert-name {

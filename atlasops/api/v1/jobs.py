@@ -16,9 +16,35 @@ from atlasops.schemas.job import (
     JobUpdateRequest,
 )
 from atlasops.workers.tasks import scrape_job_posting
-from atlasops.services.entitlements import enforce_resume_quota, reset_resume_quota_if_needed
+from atlasops.services.entitlements import (
+    can_access_premium_features,
+    enforce_resume_quota,
+    reset_resume_quota_if_needed,
+)
 
 router = APIRouter()
+
+
+@router.get("/templates")
+async def get_resume_templates(
+    current_user: CurrentUser,
+) -> List[dict]:
+    """Get available resume templates with tier and customization info."""
+    from atlasops.services.resume_generator import get_available_templates, COLOR_SCHEMES
+    
+    templates = get_available_templates()
+    is_premium = can_access_premium_features(current_user)
+    
+    # Add access info to each template
+    for template in templates:
+        template["accessible"] = template["tier"] == "free" or is_premium
+        template["locked"] = not template["accessible"]
+    
+    return {
+        "templates": templates,
+        "color_schemes": list(COLOR_SCHEMES.keys()) if is_premium else [],
+        "is_premium": is_premium,
+    }
 
 
 @router.post("/ingest", response_model=JobIngestResponse)
@@ -438,15 +464,60 @@ async def generate_resume(
     job_id: UUID,
     current_user: CurrentUser,
     db: DbSession,
+    template: str = "modern",
+    color_scheme: str | None = None,
 ) -> dict:
-    """Generate a tailored resume for a job posting."""
+    """Generate a tailored resume for a job posting.
+    
+    Args:
+        job_id: The job posting ID
+        template: Resume template to use (modern=free, classic/executive=paid)
+        color_scheme: Color scheme for paid templates (blue, green, purple, teal, red)
+    """
     from atlasops.models.resume import GeneratedResume
     from atlasops.models.user import UserProfile
     from atlasops.services.resume_generator import (
         calculate_match_score,
         generate_resume_content,
         render_resume_html,
+        validate_template_access,
+        TEMPLATE_INFO,
+        COLOR_SCHEMES,
     )
+
+    # Validate template exists
+    if template not in TEMPLATE_INFO:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid template: {template}. Available: {list(TEMPLATE_INFO.keys())}",
+        )
+    
+    # Check template tier access
+    is_premium = can_access_premium_features(current_user)
+    if not validate_template_access(template, is_premium):
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail=f"Template '{template}' requires a paid subscription. Upgrade to access premium templates.",
+        )
+    
+    # Validate color scheme if provided
+    template_info = TEMPLATE_INFO[template]
+    if color_scheme:
+        if not is_premium:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="Color customization requires a paid subscription.",
+            )
+        if template_info.get("color_schemes") is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Template '{template}' does not support color customization.",
+            )
+        if color_scheme not in COLOR_SCHEMES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid color scheme: {color_scheme}. Available: {list(COLOR_SCHEMES.keys())}",
+            )
 
     # Check and reset quota if needed, then enforce limits
     if reset_resume_quota_if_needed(current_user):
@@ -505,8 +576,8 @@ async def generate_resume(
     # Generate content
     content = await generate_resume_content(profile_data, job_data)
 
-    # Render HTML
-    html = render_resume_html(content)
+    # Render HTML with template and color scheme
+    html = render_resume_html(content, template_id=template, color_scheme=color_scheme)
 
     # Save resume
     resume = GeneratedResume(
@@ -527,6 +598,8 @@ async def generate_resume(
         "match_score": score,
         "matched_keywords": matched,
         "gaps": gaps,
+        "template": template,
+        "color_scheme": color_scheme,
         "message": "Resume generated successfully",
     }
 

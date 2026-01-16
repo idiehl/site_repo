@@ -19,17 +19,39 @@ TEMPLATE_INFO = {
         "name": "Modern",
         "description": "Clean, contemporary 2-page design with accent colors and skill tags",
         "best_for": ["Tech", "Startups", "Creative roles"],
+        "tier": "free",
+        "color_schemes": None,  # No customization for free template
+        "thumbnail": "/templates/modern-preview.svg",
+        "default_colors": {"primary": "#4361ee", "secondary": "#06b6d4"},
     },
     "classic": {
         "name": "Classic",
         "description": "Traditional professional 2-page format, elegant typography",
         "best_for": ["Corporate", "Finance", "Legal", "Academia"],
+        "tier": "paid",
+        "color_schemes": ["blue", "green", "purple", "teal", "red"],
+        "thumbnail": "/templates/classic-preview.svg",
+        "default_colors": {"primary": "#4361ee", "secondary": "#06b6d4"},
     },
     "executive": {
         "name": "Executive",
         "description": "Bold two-column layout with header banner",
         "best_for": ["Senior roles", "Management", "C-Suite", "Consulting"],
+        "tier": "paid",
+        "color_schemes": ["blue", "green", "purple", "teal", "red"],
+        "thumbnail": "/templates/executive-preview.svg",
+        "default_colors": {"primary": "#1e3a5f", "secondary": "#2d5a87"},  # Navy blue default
     },
+}
+
+# Color scheme definitions with primary and secondary accent colors
+COLOR_SCHEMES = {
+    "blue": {"primary": "#4361ee", "secondary": "#06b6d4"},
+    "green": {"primary": "#10b981", "secondary": "#34d399"},
+    "purple": {"primary": "#8b5cf6", "secondary": "#a78bfa"},
+    "teal": {"primary": "#14b8a6", "secondary": "#2dd4bf"},
+    "red": {"primary": "#ef4444", "secondary": "#f87171"},
+    "navy": {"primary": "#1e3a5f", "secondary": "#2d5a87"},  # Executive default
 }
 
 
@@ -44,6 +66,9 @@ def get_available_templates() -> List[Dict[str, Any]]:
                 "name": info["name"],
                 "description": info["description"],
                 "best_for": info["best_for"],
+                "tier": info.get("tier", "free"),
+                "color_schemes": info.get("color_schemes"),
+                "thumbnail": info.get("thumbnail"),
             })
     
     if not templates:
@@ -52,9 +77,29 @@ def get_available_templates() -> List[Dict[str, Any]]:
             "name": "Default",
             "description": "Basic professional 2-page layout",
             "best_for": ["General use"],
+            "tier": "free",
+            "color_schemes": None,
+            "thumbnail": None,
         })
     
     return templates
+
+
+def get_color_scheme(scheme_name: str) -> Optional[Dict[str, str]]:
+    """Get color scheme by name. Returns None if not found."""
+    return COLOR_SCHEMES.get(scheme_name)
+
+
+def validate_template_access(template_id: str, is_premium: bool) -> bool:
+    """Check if user can access the template based on their tier."""
+    template_info = TEMPLATE_INFO.get(template_id)
+    if not template_info:
+        return False
+    
+    if template_info.get("tier") == "paid" and not is_premium:
+        return False
+    
+    return True
 
 
 def calculate_match_score(
@@ -275,8 +320,15 @@ Return JSON with this structure:
 def render_resume_html(
     content: Dict[str, Any],
     template_id: str = "modern",
+    color_scheme: Optional[str] = None,
 ) -> str:
-    """Render resume content to HTML using a template."""
+    """Render resume content to HTML using a template.
+    
+    Args:
+        content: Resume content dictionary
+        template_id: Template to use (modern, classic, executive)
+        color_scheme: Optional color scheme for paid templates (blue, green, purple, teal, red)
+    """
     template_path = TEMPLATES_DIR / f"{template_id}.html"
 
     if not template_path.exists():
@@ -284,12 +336,34 @@ def render_resume_html(
         return _render_builtin_html(content, template_id)
 
     template = template_path.read_text(encoding="utf-8")
-    return _render_template(template, content)
+    
+    # Get color scheme colors if specified, otherwise use template defaults
+    if color_scheme:
+        colors = get_color_scheme(color_scheme)
+    else:
+        # Use template-specific default colors
+        template_info = TEMPLATE_INFO.get(template_id, {})
+        colors = template_info.get("default_colors")
+    
+    return _render_template(template, content, colors)
 
 
-def _render_template(template: str, content: Dict[str, Any]) -> str:
+def _render_template(
+    template: str, 
+    content: Dict[str, Any],
+    colors: Optional[Dict[str, str]] = None,
+) -> str:
     """Render a Handlebars-like template with content."""
     html = template
+    
+    # Color scheme replacements (CSS variables)
+    if colors:
+        html = html.replace("{{accent_primary}}", colors.get("primary", "#4361ee"))
+        html = html.replace("{{accent_secondary}}", colors.get("secondary", "#06b6d4"))
+    else:
+        # Default colors
+        html = html.replace("{{accent_primary}}", "#4361ee")
+        html = html.replace("{{accent_secondary}}", "#06b6d4")
     
     # Simple variable replacements
     replacements = {

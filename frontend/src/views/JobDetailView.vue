@@ -5,6 +5,7 @@ import { useJobsStore } from '../stores/jobs'
 import { useAuthStore } from '../stores/auth'
 import { useApplicationsStore } from '../stores/applications'
 import StatusBadge from '../components/StatusBadge.vue'
+import GenerateSection from '../components/GenerateSection.vue'
 import api from '../api/client'
 import html2pdf from 'html2pdf.js'
 
@@ -54,6 +55,7 @@ const showResumeModal = ref(false)
 const loadingResume = ref(false)
 const showTemplateSelector = ref(false)
 const selectedTemplate = ref('modern')
+const generateSectionRef = ref(null)
 const availableTemplates = ref([
   { id: 'modern', name: 'Modern', description: 'Clean, contemporary 2-page design with accent colors', best_for: ['Tech', 'Startups', 'Creative'] },
   { id: 'classic', name: 'Classic', description: 'Traditional professional 2-page format', best_for: ['Corporate', 'Finance', 'Legal'] },
@@ -196,13 +198,18 @@ function openTemplateSelector() {
   showTemplateSelector.value = true
 }
 
-async function generateResume() {
-  if (resumeLimitReached.value) {
+async function generateResume(options = {}) {
+  const template = options.template || selectedTemplate.value || 'modern'
+  const colorScheme = options.colorScheme || null
+  
+  if (resumeLimitReached.value && !canAccessPremium.value) {
     error.value = 'Free plan resume limit reached. Upgrade to generate more.'
+    generateSectionRef.value?.resetLoading()
     return
   }
   if (!job.value?.company_name) {
     error.value = 'Please add job details first'
+    generateSectionRef.value?.resetLoading()
     return
   }
   showTemplateSelector.value = false
@@ -210,9 +217,13 @@ async function generateResume() {
   error.value = ''
   message.value = ''
   try {
-    const response = await api.post(`/api/v1/jobs/${job.value.id}/resumes?template=${selectedTemplate.value}`)
+    let url = `/api/v1/jobs/${job.value.id}/resumes?template=${template}`
+    if (colorScheme) {
+      url += `&color_scheme=${colorScheme}`
+    }
+    const response = await api.post(url)
     const keywordsCount = response.data.keywords_used?.length || 0
-    message.value = `2-page resume generated with ${selectedTemplate.value} template! Match score: ${(response.data.match_score * 100).toFixed(0)}% | ${keywordsCount} keywords matched`
+    message.value = `Resume generated with ${template} template! Match score: ${(response.data.match_score * 100).toFixed(0)}% | ${keywordsCount} keywords matched`
     // Refresh resumes list and show the new one
     await fetchResumes()
     await viewResume(response.data.id)
@@ -220,6 +231,7 @@ async function generateResume() {
     error.value = err.response?.data?.detail || 'Failed to generate resume'
   } finally {
     generating.value = false
+    generateSectionRef.value?.resetLoading()
   }
 }
 
@@ -822,38 +834,23 @@ async function saveManualContent() {
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- Generate Section -->
+        <GenerateSection
+          ref="generateSectionRef"
+          :job="job"
+          :is-premium="canAccessPremium"
+          :resume-limit-reached="resumeLimitReached"
+          :resume-usage-text="resumeUsageText"
+          @generate-resume="generateResume"
+          @generate-cover-letter="generateCoverLetter"
+          @generate-followup="generateFollowup"
+          @upgrade="startUpgrade"
+        />
+        
+        <!-- Quick Actions -->
         <div class="card">
-          <h3 class="text-lg font-semibold mb-4">Actions</h3>
-          <div v-if="!canAccessPremium" class="mb-4 p-3 bg-night-800/60 rounded-lg text-sm text-night-300">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div>
-                <p class="text-atlas-300 font-medium">Free plan limits apply</p>
-                <p class="text-night-400">{{ resumeUsageText }}</p>
-                <p class="text-night-500 mt-1">Upgrade to unlock cover letters, company insights, interview prep, and follow-ups.</p>
-              </div>
-              <button class="btn btn-accent" @click="startUpgrade">
-                Upgrade to Paid
-              </button>
-            </div>
-          </div>
+          <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
           <div class="flex flex-wrap gap-3">
-            <button 
-              @click="openTemplateSelector"
-              :disabled="generating || !job.company_name || resumeLimitReached"
-              class="btn btn-accent"
-              :title="resumeLimitReached ? 'Upgrade to generate more resumes' : ''"
-            >
-              {{ generating ? 'Generating...' : (resumeLimitReached ? '📄 Upgrade to Generate' : '📄 Generate Resume') }}
-            </button>
-            <button 
-              @click="generateCoverLetter"
-              :disabled="generatingCoverLetter || !job.company_name || !canAccessPremium"
-              class="btn btn-accent"
-              :title="!canAccessPremium ? 'Upgrade to unlock cover letters' : ''"
-            >
-              {{ generatingCoverLetter ? 'Generating...' : '✉️ Generate Cover Letter' }}
-            </button>
             <button 
               @click="viewDeepDive"
               :disabled="generatingDeepDive || !job.company_name || !canAccessPremium"
@@ -879,22 +876,7 @@ async function saveManualContent() {
             >
               {{ generatingInterviewPrep ? 'Generating...' : '🎤 Interview Prep' }}
             </button>
-            <button 
-              v-if="canGenerateFollowup"
-              @click="generateFollowup"
-              :disabled="generatingFollowup || !canAccessPremium"
-              class="btn btn-secondary"
-              :title="!canAccessPremium ? 'Upgrade to unlock follow-ups' : ''"
-            >
-              {{ generatingFollowup ? 'Generating...' : '✉️ Follow-up Message' }}
-            </button>
           </div>
-          <p v-if="!job.company_name" class="text-sm text-night-500 mt-2">
-            ℹ️ Add job details to enable these actions
-          </p>
-          <p v-else-if="resumeLimitReached" class="text-sm text-night-500 mt-2">
-            ℹ️ Free plan resume limit reached. Upgrade to generate more.
-          </p>
         </div>
 
         <!-- Interview Prep Hub (shown when application exists) -->
