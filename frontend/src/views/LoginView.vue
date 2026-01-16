@@ -24,9 +24,9 @@ async function handleSubmit() {
     <div class="w-full max-w-md">
       <!-- Logo/Brand -->
       <div class="text-center mb-8 animate-fade-in">
-        <div class="flex items-center justify-center gap-3 mb-2">
-          <img src="/quickpro-icon.svg" alt="QuickPRO" class="w-12 h-12" />
-          <h1 class="text-4xl font-bold text-atlas-400">QuickPRO</h1>
+        <div class="flex items-center justify-center mb-2">
+          <img src="/quickpro-icon.svg" alt="Q" class="w-12 h-12 -mr-1" />
+          <h1 class="text-4xl font-bold text-atlas-400">uickPRO</h1>
         </div>
         <p class="text-night-400">The tools you need to build the future you want</p>
       </div>
