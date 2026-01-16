@@ -2,9 +2,11 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApplicationsStore } from '../stores/applications'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const applicationsStore = useApplicationsStore()
+const auth = useAuthStore()
 
 const filterStatus = ref('all')
 
@@ -74,9 +76,46 @@ function goBack() {
     <!-- Header -->
     <header class="bg-night-900/50 border-b border-night-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center h-16">
-          <button @click="goBack" class="btn btn-ghost mr-4">← Back</button>
-          <h1 class="text-xl font-bold">My Applications</h1>
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center">
+              <img src="/quickpro-icon.svg" alt="Q" class="w-8 h-8 -mr-0.5" />
+              <h1 class="text-xl font-bold text-atlas-400">uickPRO</h1>
+            </div>
+            <nav class="hidden md:flex items-center gap-1">
+              <router-link 
+                to="/dashboard" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-400 hover:text-night-100 hover:bg-night-800/50"
+              >
+                Dashboard
+              </router-link>
+              <router-link 
+                to="/applications" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-100 bg-night-800"
+              >
+                Applications
+              </router-link>
+              <router-link 
+                to="/profile" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-400 hover:text-night-100 hover:bg-night-800/50"
+              >
+                Profile
+              </router-link>
+              <router-link 
+                to="/extension" 
+                class="px-3 py-2 rounded-lg text-sm font-medium text-night-400 hover:text-night-100 hover:bg-night-800/50"
+              >
+                Extension
+              </router-link>
+            </nav>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-night-400">{{ auth.user?.email }}</span>
+            <button @click="auth.logout" class="btn btn-ghost text-sm">
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </header>
