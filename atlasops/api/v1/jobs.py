@@ -12,6 +12,7 @@ from atlasops.schemas.job import (
     JobIngestRequest,
     JobIngestResponse,
     JobPostingResponse,
+    JobUpdateRequest,
 )
 from atlasops.workers.tasks import scrape_job_posting
 
@@ -105,6 +106,57 @@ async def delete_job(
         )
     await db.delete(job)
     await db.commit()
+
+
+@router.patch("/{job_id}", response_model=JobPostingResponse)
+async def update_job(
+    job_id: UUID,
+    request: JobUpdateRequest,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> JobPosting:
+    """Update a job posting with new details."""
+    result = await db.execute(
+        select(JobPosting).where(
+            JobPosting.id == job_id,
+            JobPosting.user_id == current_user.id,
+        )
+    )
+    job = result.scalar_one_or_none()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job posting not found",
+        )
+
+    # Update fields if provided
+    update_data = request.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        if value is not None:
+            setattr(job, field, value)
+
+    # Re-validate minimum requirements and update status
+    has_company = bool(job.company_name and job.company_name.strip())
+    has_title = bool(job.job_title and job.job_title.strip())
+    has_description = bool(job.job_description and len(job.job_description.strip()) > 50)
+
+    if has_company and has_title and has_description:
+        job.status = "completed"
+        job.error_message = None
+    else:
+        job.status = "needs_review"
+        missing = []
+        if not has_company:
+            missing.append("company name")
+        if not has_title:
+            missing.append("job title")
+        if not has_description:
+            missing.append("job description")
+        job.error_message = f"Missing required fields: {', '.join(missing)}"
+
+    await db.commit()
+    await db.refresh(job)
+    return job
 
 
 @router.post("/{job_id}/retry", response_model=JobPostingResponse)

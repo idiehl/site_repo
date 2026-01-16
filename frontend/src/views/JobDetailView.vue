@@ -54,6 +54,21 @@ const generatingCoverLetter = ref(false)
 const loadingCoverLetter = ref(false)
 const copiedCoverLetter = ref(false)
 
+// Edit job state
+const showEditModal = ref(false)
+const editingJob = ref(false)
+const editForm = ref({
+  company_name: '',
+  job_title: '',
+  location: '',
+  remote_policy: '',
+  salary_range: '',
+  job_description: ''
+})
+
+// Check if job needs review
+const needsReview = computed(() => job.value?.status === 'needs_review')
+
 // Check if user can generate follow-up (must have applied)
 const canGenerateFollowup = computed(() => {
   if (!application.value) return false
@@ -408,6 +423,43 @@ async function copyCoverLetter() {
   }
 }
 
+// Edit job functions
+function openEditModal() {
+  if (!job.value) return
+  editForm.value = {
+    company_name: job.value.company_name || '',
+    job_title: job.value.job_title || '',
+    location: job.value.location || '',
+    remote_policy: job.value.remote_policy || '',
+    salary_range: job.value.salary_range || '',
+    job_description: job.value.job_description || ''
+  }
+  showEditModal.value = true
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+}
+
+async function saveJobEdit() {
+  if (!job.value?.id) return
+  
+  editingJob.value = true
+  error.value = ''
+  message.value = ''
+  
+  try {
+    await api.patch(`/api/v1/jobs/${job.value.id}`, editForm.value)
+    await jobs.fetchJob(job.value.id)
+    showEditModal.value = false
+    message.value = 'Job details updated successfully!'
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Failed to update job'
+  } finally {
+    editingJob.value = false
+  }
+}
+
 async function saveManualContent() {
   if (!manualContent.value.trim()) return
   
@@ -464,7 +516,16 @@ async function saveManualContent() {
                 <span v-if="job.salary_range">💰 {{ job.salary_range }}</span>
               </div>
             </div>
-            <StatusBadge :status="job.status" />
+            <div class="flex items-center gap-3">
+              <button 
+                @click="openEditModal" 
+                class="p-2 text-night-400 hover:text-white hover:bg-night-800 rounded-lg transition-colors"
+                title="Edit job details"
+              >
+                ✏️
+              </button>
+              <StatusBadge :status="job.status" />
+            </div>
           </div>
         </div>
 
@@ -505,8 +566,27 @@ async function saveManualContent() {
           </div>
         </div>
 
+        <!-- Needs Review Warning -->
+        <div v-if="needsReview" class="card bg-orange-900/20 border-orange-600/50">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">⚠️</span>
+            <div class="flex-1">
+              <h3 class="font-semibold text-orange-400 mb-1">Missing Required Information</h3>
+              <p class="text-sm text-night-300 mb-3">
+                {{ job.error_message || 'This job is missing some required details. Add them to enable all features.' }}
+              </p>
+              <button 
+                @click="openEditModal" 
+                class="btn btn-primary text-sm"
+              >
+                ✏️ Edit Job Details
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Blocked Warning -->
-        <div v-if="wasBlocked" class="card bg-yellow-900/20 border-yellow-600/50">
+        <div v-if="wasBlocked && !needsReview" class="card bg-yellow-900/20 border-yellow-600/50">
           <div class="flex items-start gap-3">
             <span class="text-2xl">⚠️</span>
             <div class="flex-1">
@@ -1004,6 +1084,104 @@ async function saveManualContent() {
               class="btn btn-ghost text-sm"
             >
               View Previous
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Job Modal -->
+    <div 
+      v-if="showEditModal" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click.self="closeEditModal"
+    >
+      <div class="bg-night-900 border border-night-700 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-night-700 bg-night-800">
+          <h3 class="text-lg font-semibold text-white">✏️ Edit Job Details</h3>
+          <button @click="closeEditModal" class="p-2 text-night-400 hover:text-white text-xl">✕</button>
+        </div>
+        
+        <!-- Edit Form -->
+        <div class="flex-1 overflow-auto p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-night-300 mb-1">Company Name *</label>
+            <input 
+              v-model="editForm.company_name" 
+              type="text" 
+              class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500"
+              placeholder="e.g., Microsoft"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-night-300 mb-1">Job Title *</label>
+            <input 
+              v-model="editForm.job_title" 
+              type="text" 
+              class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500"
+              placeholder="e.g., Software Engineer"
+            />
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-night-300 mb-1">Location</label>
+              <input 
+                v-model="editForm.location" 
+                type="text" 
+                class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500"
+                placeholder="e.g., San Francisco, CA"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-night-300 mb-1">Remote Policy</label>
+              <select 
+                v-model="editForm.remote_policy"
+                class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500"
+              >
+                <option value="">Select...</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="On-site">On-site</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-night-300 mb-1">Salary Range</label>
+            <input 
+              v-model="editForm.salary_range" 
+              type="text" 
+              class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500"
+              placeholder="e.g., $120,000 - $160,000"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-night-300 mb-1">Job Description *</label>
+            <textarea 
+              v-model="editForm.job_description" 
+              rows="8"
+              class="w-full bg-night-800 border border-night-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-atlas-500 resize-none"
+              placeholder="Paste the job description here..."
+            ></textarea>
+            <p class="text-xs text-night-500 mt-1">Minimum 50 characters required</p>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-night-700 bg-night-800 flex items-center justify-between">
+          <p class="text-xs text-night-500">* Required fields</p>
+          <div class="flex gap-2">
+            <button @click="closeEditModal" class="btn btn-ghost text-sm">Cancel</button>
+            <button 
+              @click="saveJobEdit"
+              :disabled="editingJob || !editForm.company_name || !editForm.job_title || editForm.job_description.length < 50"
+              class="btn btn-primary text-sm"
+            >
+              {{ editingJob ? 'Saving...' : 'Save Changes' }}
             </button>
           </div>
         </div>

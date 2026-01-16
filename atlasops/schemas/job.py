@@ -30,6 +30,19 @@ class JobRequirements(BaseModel):
     certifications: Optional[List[str]] = None
 
 
+class JobUpdateRequest(BaseModel):
+    """Schema for updating a job posting."""
+
+    company_name: Optional[str] = None
+    job_title: Optional[str] = None
+    location: Optional[str] = None
+    remote_policy: Optional[str] = None
+    salary_range: Optional[str] = None
+    job_description: Optional[str] = None
+    requirements: Optional[Dict[str, Any]] = None
+    benefits: Optional[List[str]] = None
+
+
 class JobPostingResponse(BaseModel):
     """Schema for job posting response."""
 
