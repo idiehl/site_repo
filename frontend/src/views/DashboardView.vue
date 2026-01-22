@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useJobsStore } from '../stores/jobs'
 import JobTable from '../components/JobTable.vue'
 import IngestModal from '../components/IngestModal.vue'
 
+const router = useRouter()
 const auth = useAuthStore()
 const jobs = useJobsStore()
 
@@ -71,6 +73,7 @@ onUnmounted(() => {
 
 function handleLogout() {
   auth.logout()
+  router.push({ name: 'login' })
 }
 
 async function handleRetryFailed() {

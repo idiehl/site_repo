@@ -8,6 +8,11 @@ const router = useRouter()
 const applicationsStore = useApplicationsStore()
 const auth = useAuthStore()
 
+function handleLogout() {
+  auth.logout()
+  router.push({ name: 'login' })
+}
+
 const filterStatus = ref('all')
 
 const statusOptions = [
@@ -112,7 +117,7 @@ function goBack() {
           
           <div class="flex items-center gap-4">
             <span class="text-sm text-night-400">{{ auth.user?.email }}</span>
-            <button @click="auth.logout" class="btn btn-ghost text-sm">
+            <button @click="handleLogout" class="btn btn-ghost text-sm">
               Logout
             </button>
           </div>

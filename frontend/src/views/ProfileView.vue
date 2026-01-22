@@ -1,9 +1,16 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../api/client'
 
+const router = useRouter()
 const auth = useAuthStore()
+
+function handleLogout() {
+  auth.logout()
+  router.push({ name: 'login' })
+}
 
 const profile = ref({
   full_name: '',
@@ -339,7 +346,7 @@ const completenessColor = computed(() => {
               </router-link>
             </nav>
           </div>
-          <button @click="auth.logout" class="text-sm text-night-400 hover:text-night-200">
+          <button @click="handleLogout" class="text-sm text-night-400 hover:text-night-200">
             Logout
           </button>
         </div>

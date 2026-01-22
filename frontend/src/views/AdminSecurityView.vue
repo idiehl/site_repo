@@ -1,9 +1,16 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../api/client'
 
+const router = useRouter()
 const auth = useAuthStore()
+
+function handleLogout() {
+  auth.logout()
+  router.push({ name: 'login' })
+}
 
 const loading = ref(true)
 const events = ref([])
@@ -89,7 +96,7 @@ onMounted(() => {
           
           <div class="flex items-center gap-4">
             <span class="text-sm text-night-400">{{ auth.user?.email }}</span>
-            <button @click="auth.logout" class="btn btn-ghost text-sm">
+            <button @click="handleLogout" class="btn btn-ghost text-sm">
               Logout
             </button>
           </div>

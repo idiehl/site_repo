@@ -1,8 +1,15 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
+const router = useRouter()
 const auth = useAuthStore()
+
+function handleLogout() {
+  auth.logout()
+  router.push({ name: 'login' })
+}
 
 // Direct download from our server
 const downloadUrl = computed(() => {
@@ -51,7 +58,7 @@ const downloadUrl = computed(() => {
           
           <div class="flex items-center gap-4">
             <span class="text-sm text-night-400">{{ auth.user?.email }}</span>
-            <button @click="auth.logout" class="btn btn-ghost text-sm">
+            <button @click="handleLogout" class="btn btn-ghost text-sm">
               Logout
             </button>
           </div>
