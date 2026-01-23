@@ -1,6 +1,6 @@
 // QuickPRO Browser Extension - Popup Script
 
-const API_BASE = 'https://atlasuniversalis.com';
+const API_BASE = 'https://quickpro.atlasuniversalis.com';
 
 // DOM Elements
 const loginView = document.getElementById('login-view');

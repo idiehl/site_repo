@@ -29,7 +29,13 @@ jobs:
             # Run database migrations
             .venv/bin/alembic upgrade head
             
-            # Build frontend
+            # Build main portfolio site (atlasuniversalis.com)
+            cd frontend-main
+            npm ci
+            npm run build
+            cd ..
+            
+            # Build QuickPRO app (quickpro.atlasuniversalis.com)
             cd frontend
             npm ci
             npm run build
