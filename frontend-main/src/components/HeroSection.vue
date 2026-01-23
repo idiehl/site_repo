@@ -17,9 +17,9 @@
       <!-- Logo -->
       <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
         <img 
-          src="/atlas-icon.svg" 
+          src="/atlas-logo.png" 
           alt="Atlas Universalis" 
-          class="w-20 h-28 mx-auto animate-float"
+          class="h-32 w-auto mx-auto animate-float"
         />
       </div>
       
