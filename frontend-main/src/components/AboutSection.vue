@@ -100,23 +100,23 @@ const socialLinks = [
             
             <div class="flex-1">
               <h3 class="text-2xl font-bold text-white mb-2">Jacob Diehl</h3>
-              <p class="text-atlas-400 font-medium mb-4">Artist, Musician & Software Developer</p>
+              <p class="text-atlas-400 font-medium mb-4">Software Developer & Data Analyst</p>
               
               <div class="space-y-3 text-night-300">
                 <p>
-                  First and foremost, I am a musician and artist. I began my education pursuing a 
-                  degree in Psychology with the intention of becoming a licensed mental health 
-                  counselor. Along the way, I discovered a passion for drawing and painting - 
-                  becoming fascinated with light, color, form, and perspective.
+                  I'm a software developer with a diverse background that shapes how I approach 
+                  problem-solving. My journey started in Psychology, then took a creative turn 
+                  through visual art - where I became fascinated with light, color, and perspective. 
+                  This led me to explore the tools and platforms that could expand those creative efforts.
                 </p>
                 <p>
-                  This creative journey led me to explore different tools and platforms that could 
-                  expand my artistic vision. Just before graduating, I pivoted to Interdisciplinary 
-                  Social Studies with a focus on Mass Communication and Information Systems - 
-                  merging my love of creativity with technology.
+                  I graduated with a degree in Interdisciplinary Social Studies, focusing on Mass 
+                  Communication and Information Systems. Today I build full-stack applications, 
+                  data pipelines, and desktop tools - bringing a unique perspective that bridges 
+                  analytical thinking with creative problem-solving.
                 </p>
                 <p>
-                  Today, my focus is developing tools for artists, musicians, students, and 
+                  My current focus is developing tools for artists, musicians, students, and 
                   researchers. Atlas Universalis is my platform for building software that empowers 
                   creative and analytical minds alike.
                 </p>
