@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Option 3: Dynamic Arcs - A with sweeping motion arcs -->
+  
+  <!-- Dynamic sweeping arcs suggesting motion/progress -->
+  <g stroke="#5e6bf1" fill="none" stroke-linecap="round">
+    <!-- Primary arc -->
+    <path d="M 25 140 Q 25 25 100 25 Q 175 25 175 140" stroke-width="4"/>
+    <!-- Secondary arc (offset) -->
+    <path d="M 35 155 Q 35 45 100 45 Q 165 45 165 155" stroke-width="2" opacity="0.4"/>
+  </g>
+  
+  <!-- Bold filled A -->
+  <g fill="#5e6bf1">
+    <!-- Main A shape -->
+    <path d="M 100 55 L 60 165 L 78 165 L 88 135 L 112 135 L 122 165 L 140 165 L 100 55 Z M 93 118 L 100 95 L 107 118 Z"/>
+  </g>
+  
+  <!-- Rising star/compass at apex -->
+  <g fill="#f59e0b">
+    <polygon points="100,20 105,40 100,50 95,40"/>
+    <polygon points="85,35 95,38 100,35 95,32"/>
+    <polygon points="115,35 105,32 100,35 105,38"/>
+  </g>
+  
+  <!-- Ground line with glow effect -->
+  <line x1="45" y1="175" x2="155" y2="175" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="60" y1="175" x2="140" y2="175" stroke="#f59e0b" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+</svg>

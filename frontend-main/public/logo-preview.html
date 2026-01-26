@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Logo Options</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #0a0a0f, #12121a);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #fff;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .option {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .option:hover {
+      transform: translateY(-4px);
+      border-color: #5e6bf1;
+    }
+    .option img {
+      width: 180px;
+      height: 180px;
+      margin-bottom: 20px;
+    }
+    .option h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      color: #5e6bf1;
+    }
+    .option p {
+      font-size: 0.9rem;
+      color: #888;
+      line-height: 1.5;
+    }
+    .current {
+      margin-top: 50px;
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .current h2 { margin-bottom: 20px; color: #f59e0b; }
+    .current img { width: 150px; height: 150px; }
+  </style>
+</head>
+<body>
+  <h1>Atlas Universalis Logo Options</h1>
+  
+  <div class="grid">
+    <div class="option">
+      <img src="/logo-option-1.svg" alt="Option 1">
+      <h2>Option 1: Minimalist Clean</h2>
+      <p>Simple, bold A with single orbit ring. Clean and modern, works great at small sizes.</p>
+    </div>
+    
+    <div class="option">
+      <img src="/logo-option-2.svg" alt="Option 2">
+      <h2>Option 2: Hexagonal Tech</h2>
+      <p>A inside hexagon container with tech-forward details. Professional and distinctive.</p>
+    </div>
+    
+    <div class="option">
+      <img src="/logo-option-3.svg" alt="Option 3">
+      <h2>Option 3: Dynamic Arcs</h2>
+      <p>Sweeping motion arcs suggest progress and momentum. Filled A with rising star.</p>
+    </div>
+    
+    <div class="option">
+      <img src="/logo-option-4.svg" alt="Option 4">
+      <h2>Option 4: Globe Integration</h2>
+      <p>A formed by globe meridian lines. The geography/exploration theme is front and center.</p>
+    </div>
+    
+    <div class="option">
+      <img src="/logo-option-5.svg" alt="Option 5">
+      <h2>Option 5: Shield Badge</h2>
+      <p>A in a shield shape. Conveys trust, security, and professionalism.</p>
+    </div>
+  </div>
+  
+  <div class="current">
+    <h2>Currently Deployed</h2>
+    <img src="/atlas-icon.svg" alt="Current">
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Option 2: Hexagonal Tech - A inside hexagon with circuit-like details -->
+  
+  <!-- Hexagon container -->
+  <polygon 
+    points="100,8 178,50 178,150 100,192 22,150 22,50" 
+    stroke="#5e6bf1" 
+    stroke-width="4" 
+    fill="none"
+  />
+  
+  <!-- Inner hexagon accent -->
+  <polygon 
+    points="100,25 160,58 160,142 100,175 40,142 40,58" 
+    stroke="#5e6bf1" 
+    stroke-width="1.5" 
+    fill="none"
+    opacity="0.3"
+  />
+  
+  <!-- Stylized A with sharp angles -->
+  <g fill="none" stroke="#5e6bf1" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M 55 155 L 100 45 L 145 155"/>
+    <path d="M 70 120 L 130 120"/>
+  </g>
+  
+  <!-- Tech accent nodes -->
+  <g fill="#f59e0b">
+    <circle cx="100" cy="45" r="6"/>
+    <circle cx="55" cy="155" r="4"/>
+    <circle cx="145" cy="155" r="4"/>
+  </g>
+  
+  <!-- Corner accents -->
+  <g fill="#f59e0b" opacity="0.7">
+    <circle cx="100" cy="8" r="3"/>
+    <circle cx="178" cy="50" r="3"/>
+    <circle cx="178" cy="150" r="3"/>
+    <circle cx="100" cy="192" r="3"/>
+    <circle cx="22" cy="150" r="3"/>
+    <circle cx="22" cy="50" r="3"/>
+  </g>
+</svg>

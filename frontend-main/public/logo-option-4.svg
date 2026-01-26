@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Option 4: Globe Integration - A merges with globe meridian lines -->
+  
+  <!-- Globe circle -->
+  <circle cx="100" cy="100" r="85" stroke="#5e6bf1" stroke-width="3" fill="none"/>
+  
+  <!-- Meridian lines that form the A structure -->
+  <g stroke="#5e6bf1" stroke-width="3" fill="none">
+    <!-- Central meridian (becomes spine of A) -->
+    <ellipse cx="100" cy="100" rx="0" ry="85"/>
+    <!-- Left meridian (becomes left leg of A) -->
+    <path d="M 100 15 Q 45 60 45 100 Q 45 140 58 175"/>
+    <!-- Right meridian (becomes right leg of A) -->
+    <path d="M 100 15 Q 155 60 155 100 Q 155 140 142 175"/>
+  </g>
+  
+  <!-- Latitude lines -->
+  <g stroke="#5e6bf1" stroke-width="2" fill="none" opacity="0.5">
+    <ellipse cx="100" cy="70" rx="75" ry="18"/>
+    <ellipse cx="100" cy="130" rx="75" ry="18"/>
+  </g>
+  
+  <!-- A crossbar integrated as equator -->
+  <ellipse cx="100" cy="100" rx="65" ry="16" stroke="#5e6bf1" stroke-width="4" fill="none"/>
+  
+  <!-- Compass rose at north pole -->
+  <g fill="#f59e0b">
+    <polygon points="100,5 104,12 100,15 96,12"/>
+    <circle cx="100" cy="15" r="4"/>
+  </g>
+  
+  <!-- South pole accent -->
+  <circle cx="100" cy="185" r="4" fill="#f59e0b"/>
+  
+  <!-- Orbital ring suggesting satellite/reach -->
+  <ellipse cx="100" cy="100" rx="95" ry="35" stroke="#f59e0b" stroke-width="2" fill="none" transform="rotate(-20 100 100)" opacity="0.6"/>
+</svg>

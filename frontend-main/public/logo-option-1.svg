@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Option 1: Minimalist Clean - Simple A with single orbit -->
+  
+  <!-- Single clean orbit ring -->
+  <circle cx="100" cy="100" r="88" stroke="#5e6bf1" stroke-width="3" fill="none"/>
+  
+  <!-- Bold, clean A letterform -->
+  <g fill="#5e6bf1">
+    <!-- Left leg -->
+    <polygon points="50,170 70,170 100,45 95,45"/>
+    <!-- Right leg -->
+    <polygon points="150,170 130,170 100,45 105,45"/>
+    <!-- Crossbar -->
+    <rect x="65" y="115" width="70" height="12" rx="2"/>
+  </g>
+  
+  <!-- Simple compass point at top -->
+  <polygon fill="#f59e0b" points="100,12 106,28 100,36 94,28"/>
+  
+  <!-- Subtle accent dot at bottom -->
+  <circle cx="100" cy="188" r="5" fill="#f59e0b"/>
+</svg>
