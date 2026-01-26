@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas Logo Options</title>
+  <title>Atlas Logo Options - Hexagon Variations</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -15,21 +15,26 @@
     }
     h1 {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 10px;
       font-size: 2rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      max-width: 1200px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     .option {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
-      padding: 30px;
+      padding: 25px;
       text-align: center;
       transition: transform 0.2s, border-color 0.2s;
     }
@@ -37,69 +42,118 @@
       transform: translateY(-4px);
       border-color: #5e6bf1;
     }
+    .logo-container {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
     .option img {
-      width: 180px;
-      height: 180px;
-      margin-bottom: 20px;
+      width: 160px;
+      height: 160px;
     }
     .option h2 {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       margin-bottom: 8px;
       color: #5e6bf1;
     }
     .option p {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #888;
       line-height: 1.5;
     }
-    .current {
-      margin-top: 50px;
-      text-align: center;
-      padding-top: 40px;
+    .size-demo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+      padding-top: 15px;
       border-top: 1px solid rgba(255,255,255,0.1);
     }
-    .current h2 { margin-bottom: 20px; color: #f59e0b; }
-    .current img { width: 150px; height: 150px; }
+    .size-demo img {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 5px;
+    }
+    .size-demo .s64 { width: 64px; height: 64px; }
+    .size-demo .s32 { width: 32px; height: 32px; }
+    .size-demo .s16 { width: 16px; height: 16px; }
+    .size-label {
+      font-size: 0.7rem;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <h1>Atlas Universalis Logo Options</h1>
+  <h1>Hexagon Logo Variations</h1>
+  <p class="subtitle">5 creative variations of the hexagonal tech design</p>
   
   <div class="grid">
     <div class="option">
-      <img src="/logo-option-1.svg" alt="Option 1">
-      <h2>Option 1: Minimalist Clean</h2>
-      <p>Simple, bold A with single orbit ring. Clean and modern, works great at small sizes.</p>
+      <div class="logo-container">
+        <img src="/logo-hex-1.svg" alt="Hex 1">
+      </div>
+      <h2>Hex 1: Layered Depth</h2>
+      <p>Multiple hexagon layers creating a 3D shadow effect. Bold filled A with highlight accents.</p>
+      <div class="size-demo">
+        <div><img src="/logo-hex-1.svg" class="s64"><div class="size-label">64px</div></div>
+        <div><img src="/logo-hex-1.svg" class="s32"><div class="size-label">32px</div></div>
+        <div><img src="/logo-hex-1.svg" class="s16"><div class="size-label">16px</div></div>
+      </div>
     </div>
     
     <div class="option">
-      <img src="/logo-option-2.svg" alt="Option 2">
-      <h2>Option 2: Hexagonal Tech</h2>
-      <p>A inside hexagon container with tech-forward details. Professional and distinctive.</p>
+      <div class="logo-container">
+        <img src="/logo-hex-2.svg" alt="Hex 2">
+      </div>
+      <h2>Hex 2: Circuit Network</h2>
+      <p>Connected nodes with data flow lines. The A is formed by circuit paths with powered nodes.</p>
+      <div class="size-demo">
+        <div><img src="/logo-hex-2.svg" class="s64"><div class="size-label">64px</div></div>
+        <div><img src="/logo-hex-2.svg" class="s32"><div class="size-label">32px</div></div>
+        <div><img src="/logo-hex-2.svg" class="s16"><div class="size-label">16px</div></div>
+      </div>
     </div>
     
     <div class="option">
-      <img src="/logo-option-3.svg" alt="Option 3">
-      <h2>Option 3: Dynamic Arcs</h2>
-      <p>Sweeping motion arcs suggest progress and momentum. Filled A with rising star.</p>
+      <div class="logo-container">
+        <img src="/logo-hex-3.svg" alt="Hex 3">
+      </div>
+      <h2>Hex 3: Segmented Modern</h2>
+      <p>Broken hexagon with gaps for a dynamic, modern feel. Sharp A with diamond accents.</p>
+      <div class="size-demo">
+        <div><img src="/logo-hex-3.svg" class="s64"><div class="size-label">64px</div></div>
+        <div><img src="/logo-hex-3.svg" class="s32"><div class="size-label">32px</div></div>
+        <div><img src="/logo-hex-3.svg" class="s16"><div class="size-label">16px</div></div>
+      </div>
     </div>
     
     <div class="option">
-      <img src="/logo-option-4.svg" alt="Option 4">
-      <h2>Option 4: Globe Integration</h2>
-      <p>A formed by globe meridian lines. The geography/exploration theme is front and center.</p>
+      <div class="logo-container">
+        <img src="/logo-hex-4.svg" alt="Hex 4">
+      </div>
+      <h2>Hex 4: Crystalline Gem</h2>
+      <p>Faceted gemstone appearance with internal light reflections. Premium and elegant.</p>
+      <div class="size-demo">
+        <div><img src="/logo-hex-4.svg" class="s64"><div class="size-label">64px</div></div>
+        <div><img src="/logo-hex-4.svg" class="s32"><div class="size-label">32px</div></div>
+        <div><img src="/logo-hex-4.svg" class="s16"><div class="size-label">16px</div></div>
+      </div>
     </div>
     
     <div class="option">
-      <img src="/logo-option-5.svg" alt="Option 5">
-      <h2>Option 5: Shield Badge</h2>
-      <p>A in a shield shape. Conveys trust, security, and professionalism.</p>
+      <div class="logo-container">
+        <img src="/logo-hex-5.svg" alt="Hex 5">
+      </div>
+      <h2>Hex 5: Orbital System</h2>
+      <p>Hexagon with orbiting satellites and crossing orbital paths. Suggests global reach and motion.</p>
+      <div class="size-demo">
+        <div><img src="/logo-hex-5.svg" class="s64"><div class="size-label">64px</div></div>
+        <div><img src="/logo-hex-5.svg" class="s32"><div class="size-label">32px</div></div>
+        <div><img src="/logo-hex-5.svg" class="s16"><div class="size-label">16px</div></div>
+      </div>
     </div>
-  </div>
-  
-  <div class="current">
-    <h2>Currently Deployed</h2>
-    <img src="/atlas-icon.svg" alt="Current">
   </div>
 </body>
 </html>

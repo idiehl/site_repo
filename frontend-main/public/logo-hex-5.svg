@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Hex Variation 5: Orbital Hex - Hexagon with orbiting elements -->
+  
+  <!-- Main hexagon with thick stroke -->
+  <polygon 
+    points="100,15 170,48 170,152 100,185 30,152 30,48" 
+    fill="none"
+    stroke="#5e6bf1"
+    stroke-width="5"
+  />
+  
+  <!-- Orbital ring around hexagon -->
+  <ellipse 
+    cx="100" cy="100" 
+    rx="95" ry="40" 
+    stroke="#5e6bf1" 
+    stroke-width="2" 
+    fill="none"
+    transform="rotate(-30 100 100)"
+    opacity="0.5"
+  />
+  
+  <!-- Second orbital ring -->
+  <ellipse 
+    cx="100" cy="100" 
+    rx="95" ry="40" 
+    stroke="#5e6bf1" 
+    stroke-width="2" 
+    fill="none"
+    transform="rotate(30 100 100)"
+    opacity="0.5"
+  />
+  
+  <!-- Solid filled A -->
+  <path 
+    d="M 100 45 L 58 155 L 78 155 L 87 130 L 113 130 L 122 155 L 142 155 L 100 45 Z M 92 115 L 100 88 L 108 115 Z"
+    fill="#5e6bf1"
+  />
+  
+  <!-- Orbiting satellites/nodes -->
+  <g fill="#f59e0b">
+    <!-- On first orbital -->
+    <circle cx="45" cy="50" r="6"/>
+    <circle cx="155" cy="150" r="6"/>
+    <!-- On second orbital -->
+    <circle cx="155" cy="50" r="5"/>
+    <circle cx="45" cy="150" r="5"/>
+  </g>
+  
+  <!-- Orbital trails -->
+  <g fill="#f59e0b" opacity="0.4">
+    <circle cx="55" cy="55" r="3"/>
+    <circle cx="65" cy="62" r="2"/>
+    <circle cx="145" cy="145" r="3"/>
+    <circle cx="135" cy="138" r="2"/>
+  </g>
+  
+  <!-- Top apex star -->
+  <g fill="#f59e0b">
+    <polygon points="100,18 105,30 100,38 95,30"/>
+    <polygon points="88,28 95,32 95,26"/>
+    <polygon points="112,28 105,26 105,32"/>
+  </g>
+  
+  <!-- Vertex accents -->
+  <g fill="#f59e0b" opacity="0.7">
+    <circle cx="100" cy="15" r="3"/>
+    <circle cx="100" cy="185" r="3"/>
+  </g>
+</svg>

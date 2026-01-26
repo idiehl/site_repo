@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Hex Variation 3: Segmented/Broken - Modern with gaps for dynamic feel -->
+  
+  <!-- Segmented hexagon outline (with gaps) -->
+  <g stroke="#5e6bf1" stroke-width="4" stroke-linecap="round" fill="none">
+    <!-- Top segment -->
+    <line x1="65" y1="20" x2="135" y2="20"/>
+    <!-- Top-right segment -->
+    <line x1="150" y1="30" x2="175" y2="70"/>
+    <!-- Bottom-right segment -->  
+    <line x1="175" y1="95" x2="175" y2="145"/>
+    <!-- Bottom segment -->
+    <line x1="160" y1="175" x2="100" y2="192"/>
+    <line x1="100" y1="192" x2="40" y2="175"/>
+    <!-- Bottom-left segment -->
+    <line x1="25" y1="145" x2="25" y2="95"/>
+    <!-- Top-left segment -->
+    <line x1="25" y1="70" x2="50" y2="30"/>
+  </g>
+  
+  <!-- Inner accent segments -->
+  <g stroke="#5e6bf1" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.3">
+    <line x1="80" y1="40" x2="120" y2="40"/>
+    <line x1="155" y1="75" x2="155" y2="125"/>
+    <line x1="45" y1="75" x2="45" y2="125"/>
+  </g>
+  
+  <!-- Stylized A with sharp modern lines -->
+  <g fill="none" stroke="#5e6bf1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 60 160 L 100 48 L 140 160"/>
+  </g>
+  <line x1="75" y1="120" x2="125" y2="120" stroke="#5e6bf1" stroke-width="5" stroke-linecap="round"/>
+  
+  <!-- Apex highlight -->
+  <g fill="#f59e0b">
+    <!-- Diamond at top -->
+    <polygon points="100,35 108,48 100,61 92,48"/>
+  </g>
+  
+  <!-- Corner accent diamonds -->
+  <g fill="#f59e0b">
+    <polygon points="100,8 106,16 100,24 94,16"/>
+    <polygon points="180,100 172,106 164,100 172,94"/>
+    <polygon points="100,192 94,184 100,176 106,184"/>
+    <polygon points="20,100 28,94 36,100 28,106"/>
+  </g>
+  
+  <!-- Small floating accents -->
+  <g fill="#5e6bf1" opacity="0.5">
+    <circle cx="175" cy="55" r="3"/>
+    <circle cx="25" cy="55" r="3"/>
+    <circle cx="175" cy="160" r="3"/>
+    <circle cx="25" cy="160" r="3"/>
+  </g>
+</svg>

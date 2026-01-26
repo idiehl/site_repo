@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Hex Variation 1: Layered Depth - Multiple hexagon layers with 3D effect -->
+  
+  <!-- Back layer (offset shadow) -->
+  <polygon 
+    points="100,12 172,48 172,152 100,188 28,152 28,48" 
+    fill="#1a1a2e"
+    stroke="#3d3d5c"
+    stroke-width="1"
+    transform="translate(4, 4)"
+  />
+  
+  <!-- Middle layer -->
+  <polygon 
+    points="100,12 172,48 172,152 100,188 28,152 28,48" 
+    fill="#12121a"
+    stroke="#5e6bf1"
+    stroke-width="2"
+    opacity="0.5"
+    transform="translate(2, 2)"
+  />
+  
+  <!-- Main hexagon -->
+  <polygon 
+    points="100,12 172,48 172,152 100,188 28,152 28,48" 
+    fill="none"
+    stroke="#5e6bf1"
+    stroke-width="4"
+  />
+  
+  <!-- Inner hexagon frame -->
+  <polygon 
+    points="100,35 150,60 150,140 100,165 50,140 50,60" 
+    fill="none"
+    stroke="#5e6bf1"
+    stroke-width="1.5"
+    opacity="0.4"
+  />
+  
+  <!-- Bold A with gradient effect simulated by layers -->
+  <g fill="#5e6bf1">
+    <path d="M 100 50 L 62 150 L 80 150 L 88 128 L 112 128 L 120 150 L 138 150 L 100 50 Z M 94 112 L 100 92 L 106 112 Z"/>
+  </g>
+  
+  <!-- Highlight on A -->
+  <path d="M 100 50 L 85 95" stroke="#8b95f7" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  
+  <!-- Accent nodes at vertices -->
+  <g fill="#f59e0b">
+    <circle cx="100" cy="12" r="5"/>
+    <circle cx="172" cy="48" r="4"/>
+    <circle cx="172" cy="152" r="4"/>
+    <circle cx="100" cy="188" r="5"/>
+    <circle cx="28" cy="152" r="4"/>
+    <circle cx="28" cy="48" r="4"/>
+  </g>
+  
+  <!-- Top crown accent -->
+  <polygon fill="#f59e0b" points="100,25 106,40 100,48 94,40"/>
+</svg>
