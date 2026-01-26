@@ -35,9 +35,9 @@ onUnmounted(() => {
         <!-- Logo -->
         <a href="/" class="flex items-center gap-3 group">
           <img 
-            src="/atlas-logo.png" 
+            src="/atlas-icon.svg" 
             alt="Atlas Universalis" 
-            class="h-10 w-auto transition-transform group-hover:scale-105"
+            class="h-8 w-auto transition-transform group-hover:scale-105"
           />
           <span class="text-xl font-bold">
             <span class="text-white">Atlas</span>
