@@ -14,12 +14,12 @@
     <div class="absolute inset-0 bg-[linear-gradient(rgba(94,107,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(94,107,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
     
     <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <!-- Logo -->
+      <!-- Logo - SVG icon with transparent background -->
       <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
         <img 
-          src="/atlas-logo.png" 
+          src="/atlas-icon.svg" 
           alt="Atlas Universalis" 
-          class="h-32 w-auto mx-auto animate-float"
+          class="h-40 w-auto mx-auto animate-float"
         />
       </div>
       
@@ -50,12 +50,13 @@
         </a>
       </div>
       
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg class="w-6 h-6 text-night-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
-      </div>
+    </div>
+    
+    <!-- Scroll indicator - positioned relative to section, not content container -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce z-10">
+      <svg class="w-6 h-6 text-night-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
     </div>
   </section>
 </template>
