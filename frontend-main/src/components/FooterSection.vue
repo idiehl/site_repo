@@ -59,10 +59,10 @@ const footerLinks = [
           <ul class="space-y-2">
             <li>
               <a 
-                href="mailto:idiehl@atlasuniversalis.onmicrosoft.com" 
+                href="mailto:contact@atlasuniversalis.com" 
                 class="text-night-400 hover:text-white transition-colors text-sm"
               >
-                idiehl@atlasuniversalis.onmicrosoft.com
+                contact@atlasuniversalis.com
               </a>
             </li>
           </ul>
