@@ -13,3 +13,13 @@ venv/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Node.js
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+npm-debug.log*
