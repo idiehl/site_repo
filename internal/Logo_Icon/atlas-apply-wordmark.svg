@@ -1,12 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 512" role="img" aria-label="Atlas Apply wordmark">
-  <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#0b1220"/>
-      <stop offset="1" stop-color="#0f1a2e"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="2000" height="512" fill="url(#bg)"/>
+  <rect width="2000" height="512" fill="#0b1220"/>
   <rect width="512" height="512" fill="#0b1220"/>
   <circle cx="256" cy="256" r="150" fill="none" stroke="#e2e8f0" stroke-width="10"/>
   <ellipse cx="256" cy="256" rx="120" ry="150" fill="none" stroke="#e2e8f0" stroke-width="8"/>

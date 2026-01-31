@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { previewComponent } from '../../lib/canvas-store';
 import { getLibrary, getComponent } from '../../lib/registry';
@@ -29,6 +29,28 @@ const customComponents: Record<string, any> = {
 };
 
 const preview = useStore(previewComponent);
+
+// Dispatch event to React when preview changes (for cross-framework communication)
+function notifyReact() {
+  if (typeof window !== 'undefined') {
+    const detail = {
+      libraryId: preview.value.libraryId,
+      componentId: preview.value.componentId,
+      props: preview.value.props,
+    };
+    // Store in window for initial load
+    (window as any).__forgePreview = detail;
+    // Dispatch event for updates
+    window.dispatchEvent(new CustomEvent('forge:preview-change', { detail }));
+    console.log('Vue dispatched preview event:', detail);
+  }
+}
+
+// Watch for changes and notify React
+watch(preview, notifyReact, { deep: true, immediate: true });
+
+// Also notify on mount
+onMounted(notifyReact);
 
 const currentLibrary = computed(() => {
   if (!preview.value.libraryId) return null;

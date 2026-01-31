@@ -1,6 +1,12 @@
-import { useStore } from '@nanostores/react';
-import { previewComponent } from '../../lib/canvas-store';
+import { useState, useEffect } from 'react';
 import * as HeroiconsReact from '@heroicons/react/24/outline';
+
+// Preview state type
+interface PreviewState {
+  libraryId: string | null;
+  componentId: string | null;
+  props: Record<string, any>;
+}
 
 // Custom React components
 function CustomCard({ className = '', hover = false }: { className?: string; hover?: boolean }) {
@@ -130,7 +136,30 @@ const registry: Record<string, Record<string, any>> = {
 };
 
 export default function ReactPreviewWrapper() {
-  const preview = useStore(previewComponent);
+  const [preview, setPreview] = useState<PreviewState>({
+    libraryId: null,
+    componentId: null,
+    props: {},
+  });
+  
+  // Listen for preview changes from Vue via custom events
+  useEffect(() => {
+    const handlePreviewChange = (event: CustomEvent<PreviewState>) => {
+      console.log('React received preview event:', event.detail);
+      setPreview(event.detail);
+    };
+    
+    window.addEventListener('forge:preview-change', handlePreviewChange as EventListener);
+    
+    // Also check for initial state from window
+    if ((window as any).__forgePreview) {
+      setPreview((window as any).__forgePreview);
+    }
+    
+    return () => {
+      window.removeEventListener('forge:preview-change', handlePreviewChange as EventListener);
+    };
+  }, []);
   
   // Debug logging
   console.log('ReactPreviewWrapper render:', preview);
@@ -142,7 +171,7 @@ export default function ReactPreviewWrapper() {
     return null;
   }
   
-  const libraryComponents = registry[preview.libraryId!];
+  const libraryComponents = registry[preview.libraryId];
   if (!libraryComponents) {
     return (
       <div className="p-12 bg-[#343446] rounded-xl border border-[#444560]">
@@ -151,7 +180,7 @@ export default function ReactPreviewWrapper() {
     );
   }
   
-  const Component = libraryComponents[preview.componentId!];
+  const Component = libraryComponents[preview.componentId];
   if (!Component) {
     return (
       <div className="p-12 bg-[#343446] rounded-xl border border-[#444560]">
