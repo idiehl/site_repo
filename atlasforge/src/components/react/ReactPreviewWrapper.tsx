@@ -132,10 +132,13 @@ const registry: Record<string, Record<string, any>> = {
 export default function ReactPreviewWrapper() {
   const preview = useStore(previewComponent);
   
+  // Debug logging
+  console.log('ReactPreviewWrapper render:', preview);
+  
   // Only render for React frameworks
   const isReact = preview.libraryId?.includes('react');
   
-  if (!isReact) {
+  if (!isReact || !preview.libraryId || !preview.componentId) {
     return null;
   }
   

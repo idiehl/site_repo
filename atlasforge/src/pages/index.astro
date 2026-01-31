@@ -6,22 +6,27 @@ import ReactPreviewWrapper from '../components/react/ReactPreviewWrapper';
 
 <PlaygroundLayout title="Atlas Forge - UI Design Laboratory">
   <PlaygroundApp client:load />
-  <!-- React preview overlay - positions itself in the preview area when React component is selected -->
-  <div id="react-preview-overlay" class="fixed inset-0 pointer-events-none z-40">
-    <div class="absolute top-14 left-72 right-80 bottom-0 flex items-center justify-center pointer-events-auto">
-      <ReactPreviewWrapper client:only="react" />
-    </div>
+  <!-- React preview overlay - absolutely positioned in the center area -->
+  <div id="react-preview-overlay">
+    <ReactPreviewWrapper client:only="react" />
   </div>
 </PlaygroundLayout>
 
 <style>
-  /* Hide React overlay when left/right panels might be closed */
   #react-preview-overlay {
-    display: none;
+    position: fixed;
+    top: 56px; /* Height of top bar (h-14 = 3.5rem = 56px) */
+    left: 288px; /* Width of left sidebar (w-72 = 18rem = 288px) */
+    right: 320px; /* Width of right sidebar (w-80 = 20rem = 320px) */
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    pointer-events: none;
   }
   
-  /* Show only when there's content (controlled by the component returning null or content) */
-  #react-preview-overlay:has(> div > div) {
-    display: block;
+  #react-preview-overlay > div {
+    pointer-events: auto;
   }
 </style>

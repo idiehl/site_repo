@@ -116,20 +116,12 @@ const vueComponent = computed(() => {
         </div>
       </div>
       
-      <!-- React Component Preview - rendered by ReactPreviewWrapper overlay -->
+      <!-- React Component Preview - transparent area, actual component rendered by ReactPreviewWrapper overlay -->
       <div 
         v-else-if="currentLibrary?.framework === 'react'"
-        class="flex items-center justify-center text-night-500 text-sm"
+        class="flex items-center justify-center"
       >
-        <!-- React component renders in overlay -->
-        <div class="text-center">
-          <div class="w-8 h-8 mx-auto mb-3 rounded-full bg-sky-500/20 flex items-center justify-center">
-            <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <span class="text-sky-400">React component loading...</span>
-        </div>
+        <!-- This is intentionally empty - React overlay renders on top -->
       </div>
     </div>
     
