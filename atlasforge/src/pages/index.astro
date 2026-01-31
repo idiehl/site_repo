@@ -1,8 +1,27 @@
 ---
 import PlaygroundLayout from '../layouts/PlaygroundLayout.astro';
 import PlaygroundApp from '../components/core/PlaygroundApp.vue';
+import ReactPreviewWrapper from '../components/react/ReactPreviewWrapper';
 ---
 
 <PlaygroundLayout title="Atlas Forge - UI Design Laboratory">
   <PlaygroundApp client:load />
+  <!-- React preview overlay - positions itself in the preview area when React component is selected -->
+  <div id="react-preview-overlay" class="fixed inset-0 pointer-events-none z-40">
+    <div class="absolute top-14 left-72 right-80 bottom-0 flex items-center justify-center pointer-events-auto">
+      <ReactPreviewWrapper client:only="react" />
+    </div>
+  </div>
 </PlaygroundLayout>
+
+<style>
+  /* Hide React overlay when left/right panels might be closed */
+  #react-preview-overlay {
+    display: none;
+  }
+  
+  /* Show only when there's content (controlled by the component returning null or content) */
+  #react-preview-overlay:has(> div > div) {
+    display: block;
+  }
+</style>

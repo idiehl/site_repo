@@ -116,19 +116,19 @@ const vueComponent = computed(() => {
         </div>
       </div>
       
-      <!-- React Component Preview (placeholder for now) -->
+      <!-- React Component Preview - rendered by ReactPreviewWrapper overlay -->
       <div 
         v-else-if="currentLibrary?.framework === 'react'"
-        class="p-12 bg-night-900 rounded-xl border border-night-800 min-w-[200px]"
+        class="flex items-center justify-center text-night-500 text-sm"
       >
+        <!-- React component renders in overlay -->
         <div class="text-center">
-          <div class="text-sky-400 font-medium mb-2">React Component</div>
-          <div class="text-night-400 text-sm">{{ currentComponent?.name }}</div>
-          <div class="mt-4 p-4 bg-night-800 rounded-lg">
-            <code class="text-xs text-night-300">
-              &lt;{{ preview.componentId }} {{ Object.entries(preview.props).map(([k, v]) => `${k}="${v}"`).join(' ') }} /&gt;
-            </code>
+          <div class="w-8 h-8 mx-auto mb-3 rounded-full bg-sky-500/20 flex items-center justify-center">
+            <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
           </div>
+          <span class="text-sky-400">React component loading...</span>
         </div>
       </div>
     </div>
