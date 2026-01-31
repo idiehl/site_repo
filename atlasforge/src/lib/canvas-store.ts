@@ -185,6 +185,13 @@ export function setPreviewComponent(libraryId: string, componentId: string, prop
   previewComponent.setKey('libraryId', libraryId);
   previewComponent.setKey('componentId', componentId);
   previewComponent.setKey('props', props);
+  
+  // Also emit a custom event for reliable cross-component notification
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('forge:preview-update', { 
+      detail: { libraryId, componentId, props } 
+    }));
+  }
 }
 
 export function updatePreviewProps(props: Record<string, any>): void {

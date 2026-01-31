@@ -3,7 +3,7 @@
  * PreviewPanel - Renders live component previews with library loading
  * Supports all Vue libraries with dynamic loading and provider injection
  */
-import { computed, watch, onMounted, ref, shallowRef, markRaw } from 'vue';
+import { computed, watch, onMounted, onUnmounted, ref, shallowRef, markRaw } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { previewComponent } from '../../lib/canvas-store';
 import { getLibrary, getComponent } from '../../lib/registry';
@@ -38,6 +38,17 @@ const customComponents: Record<string, any> = {
 
 const preview = useStore(previewComponent);
 
+// Local reactive state that's updated both from store and events
+const localPreview = ref<{
+  libraryId: string | null;
+  componentId: string | null;
+  props: Record<string, any>;
+}>({
+  libraryId: null,
+  componentId: null,
+  props: {},
+});
+
 // Loading state
 const isLoading = ref(false);
 const loadError = ref<string | null>(null);
@@ -64,18 +75,30 @@ function getLoaderLibraryId(registryId: string): LibraryId | null {
 }
 
 const currentLibrary = computed(() => {
-  if (!preview.value.libraryId) return null;
-  return getLibrary(preview.value.libraryId);
+  if (!localPreview.value.libraryId) return null;
+  return getLibrary(localPreview.value.libraryId);
 });
 
 const currentComponent = computed(() => {
-  if (!preview.value.libraryId || !preview.value.componentId) return null;
-  return getComponent(preview.value.libraryId, preview.value.componentId);
+  if (!localPreview.value.libraryId || !localPreview.value.componentId) return null;
+  return getComponent(localPreview.value.libraryId, localPreview.value.componentId);
 });
+
+// Sync store changes to local state
+watch(
+  preview,
+  (newValue) => {
+    if (newValue.libraryId !== localPreview.value.libraryId || 
+        newValue.componentId !== localPreview.value.componentId) {
+      localPreview.value = { ...newValue };
+    }
+  },
+  { deep: true, immediate: true }
+);
 
 // Load and resolve component when preview changes
 watch(
-  [() => preview.value.libraryId, () => preview.value.componentId],
+  [() => localPreview.value.libraryId, () => localPreview.value.componentId],
   async ([libraryId, componentId]) => {
     loadedComponent.value = null;
     loadError.value = null;
@@ -130,6 +153,20 @@ const isVueLibrary = computed(() => {
 const useMockPreview = computed(() => {
   return loadError.value !== null && currentComponent.value !== null;
 });
+
+// Event listener for fallback reactivity
+function handlePreviewUpdate(event: CustomEvent) {
+  const { libraryId, componentId, props } = event.detail;
+  localPreview.value = { libraryId, componentId, props };
+}
+
+onMounted(() => {
+  window.addEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
+});
 </script>
 
 <template>
@@ -171,7 +208,7 @@ const useMockPreview = computed(() => {
     <div class="flex-1 flex items-center justify-center p-8 bg-night-950">
       <!-- Empty state -->
       <div 
-        v-if="!preview.libraryId"
+        v-if="!localPreview.libraryId"
         class="text-center text-night-500"
       >
         <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-night-800 flex items-center justify-center">
@@ -199,15 +236,15 @@ const useMockPreview = computed(() => {
       <div 
         v-else-if="isVueLibrary && loadedComponent && !useMockPreview"
         class="p-12 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
-        :data-library="preview.libraryId"
+        :data-library="localPreview.libraryId"
       >
         <component 
           :is="loadedComponent" 
-          v-bind="preview.props"
+          v-bind="localPreview.props"
         >
           <!-- Default slot content for components that need it -->
           <template v-if="currentComponent?.category === 'buttons'">
-            {{ preview.props.text || preview.props.label || currentComponent?.name || 'Button' }}
+            {{ localPreview.props.text || localPreview.props.label || currentComponent?.name || 'Button' }}
           </template>
         </component>
       </div>
@@ -219,7 +256,7 @@ const useMockPreview = computed(() => {
       >
         <MockPreview 
           :component="currentComponent"
-          :component-props="preview.props"
+          :component-props="localPreview.props"
           :library-name="currentLibrary?.name || 'Unknown'"
         />
       </div>
@@ -246,7 +283,7 @@ const useMockPreview = computed(() => {
         <div v-if="currentComponent" class="mt-4">
           <MockPreview 
             :component="currentComponent"
-            :component-props="preview.props"
+            :component-props="localPreview.props"
             :library-name="currentLibrary?.name || 'Unknown'"
           />
         </div>
@@ -257,7 +294,7 @@ const useMockPreview = computed(() => {
     <div v-if="currentComponent" class="px-4 py-2 border-t border-night-800 bg-night-900/50">
       <div class="flex items-center gap-4 text-xs text-night-500">
         <span>Category: <span class="text-night-300">{{ currentComponent.category }}</span></span>
-        <span>Props: <span class="text-night-300">{{ Object.keys(preview.props).length }}</span></span>
+        <span>Props: <span class="text-night-300">{{ Object.keys(localPreview.props).length }}</span></span>
         <span v-if="loadedComponent" class="text-green-400">Live component</span>
         <span v-else-if="useMockPreview" class="text-amber-400">Mock preview</span>
       </div>
