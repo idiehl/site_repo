@@ -12,25 +12,19 @@ const props = defineProps<{
 // Search
 const searchQuery = ref('');
 
-// Expanded state for each level: frameworks, libraries, and library types
+// Expanded state for frameworks and libraries
 const expandedFrameworks = ref<Set<string>>(new Set()); // 'vue', 'react' - collapsed by default
-const expandedLibraryTypes = ref<Set<string>>(new Set()); // 'vue:heroicons', 'react:headless', etc.
-const expandedLibraries = ref<Set<string>>(new Set()); // Full library IDs
+const expandedLibraries = ref<Set<string>>(new Set()); // Library IDs - collapsed by default
 
 // Current preview
 const currentPreview = useStore(previewComponent);
 
-// Library type mapping (extract type from library ID)
-function getLibraryType(libraryId: string): string {
-  // heroicons-vue -> heroicons, headless-vue -> headless, custom-vue -> custom
-  return libraryId.replace(/-vue$/, '').replace(/-react$/, '');
-}
-
-// Group libraries by framework and then by type
+// Group libraries by framework - each library is its own group now
 interface LibraryGroup {
-  type: string;
-  typeName: string;
-  libraries: LibraryMeta[];
+  id: string;
+  name: string;
+  library: LibraryMeta;
+  componentCount: number;
 }
 
 interface FrameworkGroup {
@@ -41,7 +35,7 @@ interface FrameworkGroup {
 }
 
 const frameworkGroups = computed((): FrameworkGroup[] => {
-  let libs = libraries;
+  let libs = [...libraries];
   
   // Apply framework filter
   if (props.frameworkFilter !== 'all') {
@@ -70,7 +64,12 @@ const frameworkGroups = computed((): FrameworkGroup[] => {
     result.push({
       framework: 'vue',
       frameworkName: 'Vue',
-      libraryGroups: groupByType(vueLibs),
+      libraryGroups: vueLibs.map(lib => ({
+        id: lib.id,
+        name: lib.name,
+        library: lib,
+        componentCount: lib.components.length,
+      })),
       totalComponents: vueLibs.reduce((sum, l) => sum + l.components.length, 0),
     });
   }
@@ -79,37 +78,18 @@ const frameworkGroups = computed((): FrameworkGroup[] => {
     result.push({
       framework: 'react',
       frameworkName: 'React',
-      libraryGroups: groupByType(reactLibs),
+      libraryGroups: reactLibs.map(lib => ({
+        id: lib.id,
+        name: lib.name,
+        library: lib,
+        componentCount: lib.components.length,
+      })),
       totalComponents: reactLibs.reduce((sum, l) => sum + l.components.length, 0),
     });
   }
   
   return result;
 });
-
-function groupByType(libs: LibraryMeta[]): LibraryGroup[] {
-  const typeMap = new Map<string, LibraryMeta[]>();
-  
-  for (const lib of libs) {
-    const type = getLibraryType(lib.id);
-    if (!typeMap.has(type)) {
-      typeMap.set(type, []);
-    }
-    typeMap.get(type)!.push(lib);
-  }
-  
-  const typeNames: Record<string, string> = {
-    heroicons: 'Heroicons',
-    headless: 'Headless UI',
-    custom: 'Custom Components',
-  };
-  
-  return Array.from(typeMap.entries()).map(([type, libraries]) => ({
-    type,
-    typeName: typeNames[type] || type,
-    libraries,
-  }));
-}
 
 function toggleFramework(framework: string) {
   if (expandedFrameworks.value.has(framework)) {
@@ -120,18 +100,17 @@ function toggleFramework(framework: string) {
   expandedFrameworks.value = new Set(expandedFrameworks.value);
 }
 
-function toggleLibraryType(framework: string, type: string) {
-  const key = `${framework}:${type}`;
-  if (expandedLibraryTypes.value.has(key)) {
-    expandedLibraryTypes.value.delete(key);
+function toggleLibrary(libraryId: string) {
+  if (expandedLibraries.value.has(libraryId)) {
+    expandedLibraries.value.delete(libraryId);
   } else {
-    expandedLibraryTypes.value.add(key);
+    expandedLibraries.value.add(libraryId);
   }
-  expandedLibraryTypes.value = new Set(expandedLibraryTypes.value);
+  expandedLibraries.value = new Set(expandedLibraries.value);
 }
 
-function isLibraryTypeExpanded(framework: string, type: string): boolean {
-  return expandedLibraryTypes.value.has(`${framework}:${type}`);
+function isLibraryExpanded(libraryId: string): boolean {
+  return expandedLibraries.value.has(libraryId);
 }
 
 function selectComponent(library: LibraryMeta, component: ComponentMeta) {
@@ -208,56 +187,54 @@ function getFrameworkColor(framework: 'vue' | 'react') {
           </span>
         </button>
         
-        <!-- Library Type Level (Heroicons, Headless UI, Custom) -->
+        <!-- Library Level (Vuetify, PrimeVue, Chakra UI, etc.) -->
         <div v-show="expandedFrameworks.has(fwGroup.framework)" class="ml-3 mt-1 space-y-1">
-          <div v-for="libGroup in fwGroup.libraryGroups" :key="libGroup.type">
+          <div v-for="libGroup in fwGroup.libraryGroups" :key="libGroup.id">
             <button
-              @click="toggleLibraryType(fwGroup.framework, libGroup.type)"
+              @click="toggleLibrary(libGroup.id)"
               class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-night-800 transition-colors text-left"
             >
               <component 
-                :is="isLibraryTypeExpanded(fwGroup.framework, libGroup.type) ? ChevronDownIcon : ChevronRightIcon" 
+                :is="isLibraryExpanded(libGroup.id) ? ChevronDownIcon : ChevronRightIcon" 
                 class="w-4 h-4 text-night-500"
               />
-              <span class="flex-1 text-sm font-medium text-white">{{ libGroup.typeName }}</span>
+              <span class="flex-1 text-sm font-medium text-white">{{ libGroup.name }}</span>
               <span class="text-xs text-night-500">
-                {{ libGroup.libraries.reduce((sum, l) => sum + l.components.length, 0) }}
+                {{ libGroup.componentCount }}
               </span>
             </button>
             
             <!-- Component Level -->
             <div 
-              v-show="isLibraryTypeExpanded(fwGroup.framework, libGroup.type)" 
-              class="ml-4 mt-1 space-y-0.5"
+              v-show="isLibraryExpanded(libGroup.id)" 
+              class="ml-4 mt-1 space-y-0.5 max-h-64 overflow-y-auto"
             >
-              <template v-for="library in libGroup.libraries" :key="library.id">
-                <div
-                  v-for="component in library.components"
-                  :key="component.id"
-                  @click="selectComponent(library, component)"
-                  @dblclick="addToCanvas(library, component)"
-                  class="group flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
-                  :class="isSelected(library.id, component.id) 
-                    ? 'bg-atlas-600/20 border border-atlas-500/50' 
-                    : 'hover:bg-night-800 border border-transparent'"
+              <div
+                v-for="component in libGroup.library.components"
+                :key="component.id"
+                @click="selectComponent(libGroup.library, component)"
+                @dblclick="addToCanvas(libGroup.library, component)"
+                class="group flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
+                :class="isSelected(libGroup.library.id, component.id) 
+                  ? 'bg-atlas-600/20 border border-atlas-500/50' 
+                  : 'hover:bg-night-800 border border-transparent'"
+              >
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm text-white truncate">{{ component.name }}</div>
+                  <div class="text-xs text-night-500 truncate">{{ component.description }}</div>
+                </div>
+                
+                <!-- Add button -->
+                <button
+                  @click.stop="addToCanvas(libGroup.library, component)"
+                  class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-atlas-600 text-night-400 hover:text-white transition-all"
+                  title="Add to canvas"
                 >
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm text-white truncate">{{ component.name }}</div>
-                    <div class="text-xs text-night-500 truncate">{{ component.description }}</div>
-                  </div>
-                  
-                  <!-- Add button -->
-                  <button
-                    @click.stop="addToCanvas(library, component)"
-                    class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-atlas-600 text-night-400 hover:text-white transition-all"
-                    title="Add to canvas"
-                  >
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
                 </div>
-              </template>
             </div>
           </div>
         </div>

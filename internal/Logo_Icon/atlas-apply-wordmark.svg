@@ -8,6 +8,6 @@
   <rect x="230" y="296" width="52" height="24" fill="#0b1220"/>
   <path d="M196 240h120" stroke="#0b1220" stroke-width="8" stroke-linecap="round"/>
 
-  <text x="392" y="256" font-family="DejaVu Sans, Arial, sans-serif" font-size="156" font-weight="600" fill="#e2e8f0" dominant-baseline="middle" letter-spacing="6">TLAS APPLY</text>
-  <line x1="392" y1="360" x2="1760" y2="360" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
+  <text x="389" y="256" font-family="DejaVu Sans, Arial, sans-serif" font-size="156" font-weight="600" fill="#e2e8f0" dominant-baseline="middle" letter-spacing="6">TLAS APPLY</text>
+  <line x1="389" y1="360" x2="1760" y2="360" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
 </svg>
