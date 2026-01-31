@@ -3,10 +3,8 @@
  * Supports all React libraries with provider injection
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@nanostores/react';
 import * as HeroiconsReact from '@heroicons/react/24/outline';
 import { loadLibrary, isLibraryLoaded, getLoadedLibrary, type LibraryId } from '../../lib/library-loader';
-import { previewComponent } from '../../lib/canvas-store';
 import { getComponent, getLibrary } from '../../lib/registry';
 
 // Custom React components (always available)
@@ -312,17 +310,53 @@ interface PreviewState {
 }
 
 export default function ReactPreviewWrapper() {
-  const previewStore = useStore(previewComponent);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [LoadedComponent, setLoadedComponent] = useState<React.ComponentType<any> | null>(null);
   const [mode, setMode] = useState<'preview' | 'canvas'>('preview');
+  
+  // Local preview state - updated via custom event for reliable reactivity
+  const [localPreview, setLocalPreview] = useState<{
+    libraryId: string | null;
+    componentId: string | null;
+    props: Record<string, any>;
+  }>({
+    libraryId: null,
+    componentId: null,
+    props: {},
+  });
+
+  // Listen for preview updates from Vue
+  useEffect(() => {
+    const handlePreviewUpdate = (event: CustomEvent) => {
+      const { libraryId, componentId, props } = event.detail;
+      setLocalPreview({ libraryId, componentId, props });
+    };
+    
+    window.addEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
+    
+    // Check for initial state from window
+    if ((window as any).__forgePreview) {
+      const initial = (window as any).__forgePreview;
+      setLocalPreview({
+        libraryId: initial.libraryId || null,
+        componentId: initial.componentId || null,
+        props: initial.props || {},
+      });
+    }
+    
+    return () => {
+      window.removeEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
+    };
+  }, []);
 
   // Map preview state to a more convenient object
   const preview = {
-    ...previewStore,
-    category: getComponent(previewStore.libraryId || '', previewStore.componentId || '')?.category,
-    libraryName: getLibrary(previewStore.libraryId || '')?.name,
+    libraryId: localPreview.libraryId || '',
+    componentId: localPreview.componentId || '',
+    props: localPreview.props || {},
+    category: getComponent(localPreview.libraryId || '', localPreview.componentId || '')?.category,
+    libraryName: getLibrary(localPreview.libraryId || '')?.name,
   };
   
   // Map registry IDs to loader IDs
