@@ -69,6 +69,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     frontend_url: str = "http://localhost:5173"
 
+    # Developer access
+    dev_token: str = "CHANGE-ME-dev-token-2026"
+
 
 @lru_cache
 def get_settings() -> Settings:

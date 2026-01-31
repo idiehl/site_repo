@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickPRO</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <img src="icons/icon.svg" alt="Q" class="logo-icon">
+        <span class="logo-text">uickPRO</span>
+      </div>
+    </div>
+
+    <!-- Login View -->
+    <div id="login-view" class="view">
+      <p class="subtitle">Sign in to save jobs</p>
+      <form id="login-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit" class="btn btn-primary" id="login-btn">
+          Sign In
+        </button>
+      </form>
+      <p class="error" id="login-error"></p>
+      <p class="footer-text">
+        Don't have an account? 
+        <a href="https://atlasuniversalis.com/register" target="_blank">Sign up</a>
+      </p>
+    </div>
+
+    <!-- Logged In View -->
+    <div id="main-view" class="view hidden">
+      <div class="user-info">
+        <span id="user-email"></span>
+        <button id="logout-btn" class="btn-link">Logout</button>
+      </div>
+      
+      <div id="page-status" class="status-box">
+        <p id="status-message">Checking page...</p>
+      </div>
+
+      <button id="save-btn" class="btn btn-accent" disabled>
+        <span id="save-btn-text">Save This Job</span>
+      </button>
+
+      <div id="result" class="result hidden">
+        <p id="result-message"></p>
+      </div>
+
+      <a href="https://atlasuniversalis.com/dashboard" target="_blank" class="btn btn-secondary">
+        Open Dashboard
+      </a>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Saving job...</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

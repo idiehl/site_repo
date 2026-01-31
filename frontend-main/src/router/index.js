@@ -6,6 +6,27 @@ const routes = [
     name: 'home',
     component: () => import('../views/HomeView.vue'),
   },
+  // Developer portal routes
+  {
+    path: '/dev',
+    name: 'dev-login',
+    component: () => import('../views/DevLoginView.vue'),
+  },
+  {
+    path: '/dev/dashboard',
+    name: 'dev-dashboard',
+    component: () => import('../views/DevDashboardView.vue'),
+  },
+  {
+    path: '/dev/log',
+    name: 'dev-log',
+    component: () => import('../views/DevLogView.vue'),
+  },
+  {
+    path: '/dev/overview',
+    name: 'dev-overview',
+    component: () => import('../views/DevOverviewView.vue'),
+  },
 ]
 
 const router = createRouter({

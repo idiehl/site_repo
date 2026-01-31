@@ -30,6 +30,77 @@ Build an end-to-end workflow:
 
 ---
 
+## 0.0) Documentation + Master Log (PDF version log)
+**Non‑negotiable:** every meaningful code/config change must produce a **log entry** that doubles as a running version history.
+
+### 0.1 Master log artifacts (canonical + rendered)
+Maintain a master log as **Markdown source** and a consistently-rendered **PDF**:
+- `docs/master_log/Master_Log.md` (source of truth)
+- `docs/master_log/Master_Log.pdf` (rendered “sheet” for easy reading/sharing)
+
+If a repo already has a docs convention, follow it, but keep the names consistent.
+
+### 0.2 When to create an entry
+Create a new entry whenever work changes due to:
+- incremental building (new feature/capability)
+- bug fix / error correction
+- refactor / cleanup that changes structure or behavior
+- creative direction shifts
+- choosing one option over another (decision/tradeoff)
+
+### 0.3 Rudimentary indexing standard (quick references)
+Every entry gets a stable **Log ID**:
+
+`<PROJ>-<CYCLE>-<YYYYMMDD>-<NNN>`
+
+- `PROJ`: short project slug (examples: `AO`, `SV`, `NG`, `TB`)
+- `CYCLE`: development cycle label (default: `C01`; bump when you start a new cycle)
+- `YYYYMMDD`: local date (America/Kentucky/Louisville)
+- `NNN`: 3-digit sequence for that day (001, 002, …)
+
+**Rules:**
+- The log ID must appear in:
+  - the entry header
+  - commit message (when applicable)
+  - any PR/issue title (when applicable)
+- Use optional **concept anchors** inside entries for “things you’ll reference later”:
+  - `@concept:<slug>` (e.g., `@concept:market-data-cache`, `@concept:auth-flow`)
+
+### 0.4 Entry format (consistent + readable)
+- Keep entries **chronological** (append to the end).
+- Each entry begins with a level-2 heading containing the Log ID.
+- Include a one-line **Title**, then structured fields.
+
+**Entry template:**
+```markdown
+## SV-C01-20260103-001 — Title (short + specific)
+
+**Type:** Feature | Fix | Refactor | Decision | Docs | Ops  
+**Context:** why this work happened / trigger  
+**Change summary:** what changed (plain English)  
+**Rationale / tradeoffs:** why this approach, what alternatives were rejected  
+**Files touched:** list key files/dirs  
+**Commands run:** build/test/run commands  
+**Verification:** what you checked + results  
+**Notes:** edge cases, follow-ups, TODOs  
+**Concepts:** @concept:... @concept:...
+```
+
+### 0.5 PDF output expectation
+- After updating `Master_Log.md`, regenerate/update `Master_Log.pdf` using a **repeatable command** checked into the repo.
+- Prefer a single, cross-platform render path that produces consistent formatting:
+  - Generate via Markdown → HTML → PDF using a repo-local stylesheet at `docs/master_log/pdf.css`
+  - Provide one of these build entrypoints (pick the simplest per repo):
+    - `scripts/build_master_log.ps1` (Windows) and `scripts/build_master_log.sh` (Ubuntu), **or**
+    - an npm script: `npm run log:pdf`, **or**
+    - a Python entrypoint: `python -m scripts.build_master_log`
+- If tooling isn’t available in the environment, still update the Markdown and include the exact command(s) I should run to rebuild the PDF.
+### 0.6 Architectural decisions (lightweight ADR behavior)
+- When choosing between options, record the decision as **Type: Decision** and include:
+  - alternatives considered
+  - why they were rejected
+  - impact on deployment/maintenance
+
 ## 1) Non-Negotiable Guardrails
 
 ### Preserve the existing website

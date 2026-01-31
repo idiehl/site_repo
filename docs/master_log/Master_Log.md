@@ -289,3 +289,44 @@ git commit -m "AU-C01-20260130-011: Add Master Log and project documentation"
 **Verification:** Documentation complete and committed  
 **Notes:** PDF generation requires markdown-pdf or similar tool  
 **Concepts:** @concept:documentation @concept:master-log
+
+---
+
+## AU-C01-20260130-012 — Add Developer Portal with Protected Documentation Pages
+
+**Type:** Feature  
+**Context:** User requested developer-only pages to view Master Log and Project Overview in real-time  
+**Change summary:** 
+- Added token-based dev authentication via `DEV_TOKEN` environment variable
+- Created `/api/v1/dev/*` API endpoints to serve markdown documentation
+- Created Vue pages: DevLoginView, DevDashboardView, DevLogView, DevOverviewView
+- Dev pages render markdown to styled HTML with toggle for raw markdown view
+- Content is read from disk on each request for real-time updates
+
+**Rationale / tradeoffs:** 
+- Simple token auth chosen over full user auth for developer convenience
+- Token stored in localStorage for session persistence
+- Markdown converted to HTML server-side for consistent rendering
+- Real-time updates achieved by reading files on each request (no caching)
+
+**Files touched:**
+- `atlasops/config.py` - Added `dev_token` setting
+- `atlasops/api/v1/dev.py` - New dev API router
+- `atlasops/api/v1/router.py` - Included dev router
+- `frontend-main/src/views/DevLoginView.vue` - Token login page
+- `frontend-main/src/views/DevDashboardView.vue` - Dev portal dashboard
+- `frontend-main/src/views/DevLogView.vue` - Master Log viewer
+- `frontend-main/src/views/DevOverviewView.vue` - Project Overview viewer
+- `frontend-main/src/router/index.js` - Added dev routes
+- `requirements.txt` - Added markdown package
+- `.env.example` - Added DEV_TOKEN example
+
+**Commands run:**
+```bash
+git add -A
+git commit -m "AU-C01-20260130-012: Add Developer Portal with protected documentation pages"
+```
+
+**Verification:** Pages accessible at /dev on main site with valid token  
+**Notes:** Set `DEV_TOKEN` in production .env file  
+**Concepts:** @concept:dev-portal @concept:documentation @concept:authentication

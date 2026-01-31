@@ -1,0 +1,14 @@
+# AtlasOps Dashboard MCP Server Dependencies
+
+# MCP SDK
+mcp>=1.0.0
+
+# Database (sync driver for MCP server - simpler than async)
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.25
+
+# Environment
+python-dotenv>=1.0.0
+
+# Utilities
+pydantic>=2.5.0

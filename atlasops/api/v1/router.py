@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from atlasops.api.v1 import admin, auth, billing, jobs, profile, applications
+from atlasops.api.v1 import admin, auth, billing, dev, jobs, profile, applications
 
 router = APIRouter(prefix="/api/v1")
 
@@ -12,3 +12,4 @@ router.include_router(profile.router, prefix="/profile", tags=["profile"])
 router.include_router(applications.router, prefix="/applications", tags=["applications"])
 router.include_router(billing.router, prefix="/billing", tags=["billing"])
 router.include_router(admin.router, prefix="/admin", tags=["admin"])
+router.include_router(dev.router)
