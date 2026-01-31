@@ -7,6 +7,27 @@ import { getLibrary, getComponent } from '../../lib/registry';
 // Vue component imports
 import * as HeroiconsVue from '@heroicons/vue/24/outline';
 
+// Custom Vue components
+import CustomCard from '../vue/CustomCard.vue';
+import CustomBadge from '../vue/CustomBadge.vue';
+import CustomAlert from '../vue/CustomAlert.vue';
+import CustomButton from '../vue/CustomButton.vue';
+import CustomInput from '../vue/CustomInput.vue';
+import CustomAvatar from '../vue/CustomAvatar.vue';
+import CustomProgress from '../vue/CustomProgress.vue';
+import CustomTabs from '../vue/CustomTabs.vue';
+
+const customComponents: Record<string, any> = {
+  Card: CustomCard,
+  Badge: CustomBadge,
+  Alert: CustomAlert,
+  Button: CustomButton,
+  Input: CustomInput,
+  Avatar: CustomAvatar,
+  Progress: CustomProgress,
+  Tabs: CustomTabs,
+};
+
 const preview = useStore(previewComponent);
 
 const currentLibrary = computed(() => {
@@ -27,6 +48,11 @@ const vueComponent = computed(() => {
   // Handle Heroicons Vue
   if (preview.value.libraryId === 'heroicons-vue') {
     return (HeroiconsVue as any)[preview.value.componentId] || null;
+  }
+  
+  // Handle custom Vue components
+  if (preview.value.libraryId === 'custom-vue') {
+    return customComponents[preview.value.componentId] || null;
   }
   
   return null;

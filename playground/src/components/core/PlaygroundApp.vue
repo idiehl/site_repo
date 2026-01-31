@@ -5,6 +5,8 @@ import PropsEditor from './PropsEditor.vue';
 import CanvasBuilder from './CanvasBuilder.vue';
 import PreviewPanel from './PreviewPanel.vue';
 import TopBar from './TopBar.vue';
+import CodeExporter from './CodeExporter.vue';
+import SaveDesignModal from './SaveDesignModal.vue';
 
 // Panel visibility
 const leftPanelOpen = ref(true);
@@ -15,6 +17,10 @@ const mode = ref<'preview' | 'canvas'>('preview');
 
 // Framework filter
 const frameworkFilter = ref<'all' | 'vue' | 'react'>('all');
+
+// Modal visibility
+const exportModalOpen = ref(false);
+const saveModalOpen = ref(false);
 </script>
 
 <template>
@@ -25,6 +31,8 @@ const frameworkFilter = ref<'all' | 'vue' | 'react'>('all');
       v-model:frameworkFilter="frameworkFilter"
       v-model:leftPanelOpen="leftPanelOpen"
       v-model:rightPanelOpen="rightPanelOpen"
+      @export="exportModalOpen = true"
+      @save="saveModalOpen = true"
     />
     
     <!-- Main Content -->
@@ -51,5 +59,9 @@ const frameworkFilter = ref<'all' | 'vue' | 'react'>('all');
         <PropsEditor />
       </aside>
     </div>
+    
+    <!-- Modals -->
+    <CodeExporter :open="exportModalOpen" @close="exportModalOpen = false" />
+    <SaveDesignModal :open="saveModalOpen" @close="saveModalOpen = false" />
   </div>
 </template>

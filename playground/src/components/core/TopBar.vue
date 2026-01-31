@@ -6,7 +6,7 @@ import {
   EyeIcon,
   Square2StackIcon,
   CodeBracketIcon,
-  ArrowDownTrayIcon
+  FolderIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps<{
@@ -21,6 +21,8 @@ const emit = defineEmits<{
   'update:frameworkFilter': [value: 'all' | 'vue' | 'react'];
   'update:leftPanelOpen': [value: boolean];
   'update:rightPanelOpen': [value: boolean];
+  'export': [];
+  'save': [];
 }>();
 
 const modes = [
@@ -87,8 +89,18 @@ const frameworks = [
     <!-- Spacer -->
     <div class="flex-1" />
     
+    <!-- Save Button -->
+    <button
+      @click="emit('save')"
+      class="flex items-center gap-2 px-3 py-1.5 bg-night-800 hover:bg-night-700 text-white rounded-lg text-sm font-medium transition-colors"
+    >
+      <FolderIcon class="w-4 h-4" />
+      <span class="hidden sm:inline">Designs</span>
+    </button>
+    
     <!-- Export Button -->
     <button
+      @click="emit('export')"
       class="flex items-center gap-2 px-3 py-1.5 bg-atlas-600 hover:bg-atlas-500 text-white rounded-lg text-sm font-medium transition-colors"
     >
       <CodeBracketIcon class="w-4 h-4" />

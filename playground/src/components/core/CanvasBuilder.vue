@@ -27,6 +27,27 @@ import {
 // Vue component imports for rendering
 import * as HeroiconsVue from '@heroicons/vue/24/outline';
 
+// Custom Vue components
+import CustomCard from '../vue/CustomCard.vue';
+import CustomBadge from '../vue/CustomBadge.vue';
+import CustomAlert from '../vue/CustomAlert.vue';
+import CustomButton from '../vue/CustomButton.vue';
+import CustomInput from '../vue/CustomInput.vue';
+import CustomAvatar from '../vue/CustomAvatar.vue';
+import CustomProgress from '../vue/CustomProgress.vue';
+import CustomTabs from '../vue/CustomTabs.vue';
+
+const customComponents: Record<string, any> = {
+  Card: CustomCard,
+  Badge: CustomBadge,
+  Alert: CustomAlert,
+  Button: CustomButton,
+  Input: CustomInput,
+  Avatar: CustomAvatar,
+  Progress: CustomProgress,
+  Tabs: CustomTabs,
+};
+
 const elements = useStore(canvasElements);
 const selectedId = useStore(selectedElementId);
 const layout = useStore(canvasLayout);
@@ -43,6 +64,9 @@ const dragOffset = ref({ x: 0, y: 0 });
 function getVueComponent(libraryId: string, componentId: string) {
   if (libraryId === 'heroicons-vue') {
     return (HeroiconsVue as any)[componentId] || null;
+  }
+  if (libraryId === 'custom-vue') {
+    return customComponents[componentId] || null;
   }
   return null;
 }
