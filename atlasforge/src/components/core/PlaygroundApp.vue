@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import ComponentBrowser from './ComponentBrowser.vue';
 import PropsEditor from './PropsEditor.vue';
 import CanvasBuilder from './CanvasBuilder.vue';
@@ -21,6 +21,19 @@ const frameworkFilter = ref<'all' | 'vue' | 'react'>('all');
 // Modal visibility
 const exportModalOpen = ref(false);
 const saveModalOpen = ref(false);
+
+// Emit mode changes to React for hiding preview overlay
+function emitModeChange() {
+  if (typeof window !== 'undefined') {
+    (window as any).__forgeMode = mode.value;
+    window.dispatchEvent(new CustomEvent('forge:mode-change', { 
+      detail: { mode: mode.value } 
+    }));
+  }
+}
+
+watch(mode, emitModeChange, { immediate: true });
+onMounted(emitModeChange);
 </script>
 
 <template>

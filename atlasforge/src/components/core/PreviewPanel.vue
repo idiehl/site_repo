@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue';
+/**
+ * PreviewPanel - Renders live component previews with library loading
+ * Supports all Vue libraries with dynamic loading and provider injection
+ */
+import { computed, watch, onMounted, ref, shallowRef, markRaw } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { previewComponent } from '../../lib/canvas-store';
 import { getLibrary, getComponent } from '../../lib/registry';
+import { loadLibrary, isLibraryLoaded, getLoadedLibrary, type LibraryId } from '../../lib/library-loader';
 
-// Vue component imports
+// Vue component imports (always available)
 import * as HeroiconsVue from '@heroicons/vue/24/outline';
 
 // Custom Vue components
@@ -17,7 +22,7 @@ import CustomAvatar from '../vue/CustomAvatar.vue';
 import CustomProgress from '../vue/CustomProgress.vue';
 import CustomTabs from '../vue/CustomTabs.vue';
 
-// Mock preview for libraries without implementations
+// Mock preview for libraries that fail to load
 import MockPreview from './MockPreview.vue';
 
 const customComponents: Record<string, any> = {
@@ -31,34 +36,32 @@ const customComponents: Record<string, any> = {
   Tabs: CustomTabs,
 };
 
-// Libraries with actual implementations
-const implementedLibraries = ['heroicons-vue', 'custom-vue'];
-
 const preview = useStore(previewComponent);
 
-// Dispatch event to React when preview changes (for cross-framework communication)
-function notifyReact() {
-  if (typeof window !== 'undefined') {
-    const detail = {
-      libraryId: preview.value.libraryId,
-      componentId: preview.value.componentId,
-      props: preview.value.props,
-      category: currentComponent.value?.category,
-      libraryName: currentLibrary.value?.name,
-    };
-    // Store in window for initial load
-    (window as any).__forgePreview = detail;
-    // Dispatch event for updates
-    window.dispatchEvent(new CustomEvent('forge:preview-change', { detail }));
-    console.log('Vue dispatched preview event:', detail);
-  }
+// Loading state
+const isLoading = ref(false);
+const loadError = ref<string | null>(null);
+const loadedComponent = shallowRef<any>(null);
+
+// Map registry IDs to loader IDs
+function getLoaderLibraryId(registryId: string): LibraryId | null {
+  const mapping: Record<string, LibraryId> = {
+    'heroicons-vue': 'heroicons-vue',
+    'heroicons-react': 'heroicons-react',
+    'headless-vue': 'headless-vue',
+    'headless-react': 'headless-react',
+    'custom-vue': 'custom-vue',
+    'custom-react': 'custom-react',
+    'vuetify': 'vuetify',
+    'primevue': 'primevue',
+    'naiveui': 'naiveui',
+    'chakraui': 'chakraui',
+    'mantine': 'mantine',
+    'radixui': 'radixui',
+    'shadcnui': 'shadcnui',
+  };
+  return mapping[registryId] || null;
 }
-
-// Watch for changes and notify React
-watch(preview, notifyReact, { deep: true, immediate: true });
-
-// Also notify on mount
-onMounted(notifyReact);
 
 const currentLibrary = computed(() => {
   if (!preview.value.libraryId) return null;
@@ -70,28 +73,80 @@ const currentComponent = computed(() => {
   return getComponent(preview.value.libraryId, preview.value.componentId);
 });
 
-// Check if this library has actual implementations
-const hasImplementation = computed(() => {
-  if (!preview.value.libraryId) return false;
-  return implementedLibraries.includes(preview.value.libraryId);
+// Load and resolve component when preview changes
+watch(
+  () => [preview.value.libraryId, preview.value.componentId],
+  async ([libraryId, componentId]) => {
+    loadedComponent.value = null;
+    loadError.value = null;
+    
+    if (!libraryId || !componentId) return;
+    
+    // Handle always-available libraries first
+    if (libraryId === 'heroicons-vue') {
+      loadedComponent.value = markRaw((HeroiconsVue as any)[componentId] || null);
+      return;
+    }
+    
+    if (libraryId === 'custom-vue') {
+      loadedComponent.value = markRaw(customComponents[componentId] || null);
+      return;
+    }
+    
+    // For other libraries, load dynamically
+    const loaderLibraryId = getLoaderLibraryId(libraryId);
+    if (!loaderLibraryId) {
+      loadError.value = `Unknown library: ${libraryId}`;
+      return;
+    }
+    
+    isLoading.value = true;
+    
+    try {
+      const library = await loadLibrary(loaderLibraryId);
+      const component = library.components[componentId];
+      
+      if (component) {
+        loadedComponent.value = markRaw(component);
+      } else {
+        loadError.value = `Component ${componentId} not found in ${libraryId}`;
+      }
+    } catch (err: any) {
+      console.error('Failed to load library:', err);
+      loadError.value = err.message || 'Failed to load library';
+    } finally {
+      isLoading.value = false;
+    }
+  },
+  { immediate: true }
+);
+
+// Notify React about preview changes for cross-framework communication
+function notifyReact() {
+  if (typeof window !== 'undefined') {
+    const detail = {
+      libraryId: preview.value.libraryId,
+      componentId: preview.value.componentId,
+      props: preview.value.props,
+      category: currentComponent.value?.category,
+      libraryName: currentLibrary.value?.name,
+    };
+    (window as any).__forgePreview = detail;
+    window.dispatchEvent(new CustomEvent('forge:preview-change', { detail }));
+  }
+}
+
+watch(preview, notifyReact, { deep: true, immediate: true });
+onMounted(notifyReact);
+
+// Check if current library is Vue-based
+const isVueLibrary = computed(() => {
+  return currentLibrary.value?.framework === 'vue';
 });
 
-// Get the actual Vue component to render (only for implemented libraries)
-const vueComponent = computed(() => {
-  if (!currentLibrary.value || currentLibrary.value.framework !== 'vue') return null;
-  if (!preview.value.componentId) return null;
-  
-  // Handle Heroicons Vue
-  if (preview.value.libraryId === 'heroicons-vue') {
-    return (HeroiconsVue as any)[preview.value.componentId] || null;
-  }
-  
-  // Handle custom Vue components
-  if (preview.value.libraryId === 'custom-vue') {
-    return customComponents[preview.value.componentId] || null;
-  }
-  
-  return null;
+// Check if we should use mock preview (fallback)
+const useMockPreview = computed(() => {
+  return loadError.value !== null && currentComponent.value !== null;
 });
 </script>
 
@@ -108,8 +163,18 @@ const vueComponent = computed(() => {
         </p>
       </div>
       
-      <div v-if="currentLibrary" class="flex items-center gap-2">
+      <div class="flex items-center gap-2">
+        <!-- Loading indicator -->
+        <div v-if="isLoading" class="flex items-center gap-2">
+          <svg class="animate-spin h-4 w-4 text-atlas-400" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span class="text-xs text-night-400">Loading...</span>
+        </div>
+        
         <span 
+          v-if="currentLibrary"
           class="text-xs px-2 py-1 rounded"
           :class="currentLibrary.framework === 'vue' 
             ? 'bg-emerald-500/20 text-emerald-400' 
@@ -122,6 +187,7 @@ const vueComponent = computed(() => {
     
     <!-- Preview Area -->
     <div class="flex-1 flex items-center justify-center p-8 bg-night-950">
+      <!-- Empty state -->
       <div 
         v-if="!preview.libraryId"
         class="text-center text-night-500"
@@ -137,35 +203,71 @@ const vueComponent = computed(() => {
         <p class="text-xs mt-1">Click to preview, double-click to add to canvas</p>
       </div>
       
-      <!-- Vue Component Preview - Actual implementation -->
-      <div 
-        v-else-if="currentLibrary?.framework === 'vue' && hasImplementation && vueComponent"
-        class="p-12 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
-      >
-        <component 
-          :is="vueComponent" 
-          v-bind="preview.props"
-        />
+      <!-- Loading state -->
+      <div v-else-if="isLoading" class="text-center text-night-500">
+        <svg class="animate-spin h-12 w-12 mx-auto mb-4 text-atlas-400" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <p class="text-sm">Loading {{ currentLibrary?.name }}...</p>
+        <p class="text-xs mt-1 text-night-600">First load may take a moment</p>
       </div>
       
-      <!-- Vue Component Preview - Mock preview for libraries without implementations -->
+      <!-- Vue Component Preview - Loaded Successfully -->
       <div 
-        v-else-if="currentLibrary?.framework === 'vue' && currentComponent"
+        v-else-if="isVueLibrary && loadedComponent && !useMockPreview"
+        class="p-12 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
+        :data-library="preview.libraryId"
+      >
+        <component 
+          :is="loadedComponent" 
+          v-bind="preview.props"
+        >
+          <!-- Default slot content for components that need it -->
+          <template v-if="currentComponent?.category === 'buttons'">
+            {{ preview.props.text || preview.props.label || currentComponent?.name || 'Button' }}
+          </template>
+        </component>
+      </div>
+      
+      <!-- Vue Mock Preview - Fallback when library fails to load -->
+      <div 
+        v-else-if="isVueLibrary && useMockPreview && currentComponent"
         class="p-8 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
       >
         <MockPreview 
           :component="currentComponent"
           :component-props="preview.props"
-          :library-name="currentLibrary.name"
+          :library-name="currentLibrary?.name || 'Unknown'"
         />
       </div>
       
-      <!-- React Component Preview - transparent area, actual component rendered by ReactPreviewWrapper overlay -->
+      <!-- React Component Preview - handled by ReactPreviewWrapper overlay -->
       <div 
         v-else-if="currentLibrary?.framework === 'react'"
         class="flex items-center justify-center"
       >
-        <!-- This is intentionally empty - React overlay renders on top -->
+        <!-- React preview renders in the overlay -->
+      </div>
+      
+      <!-- Error state -->
+      <div v-else-if="loadError" class="text-center">
+        <div class="text-red-400 mb-4">
+          <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <p class="text-sm text-red-400">{{ loadError }}</p>
+        <p class="text-xs text-night-500 mt-2">Using mock preview instead</p>
+        
+        <!-- Show mock preview on error -->
+        <div v-if="currentComponent" class="mt-4">
+          <MockPreview 
+            :component="currentComponent"
+            :component-props="preview.props"
+            :library-name="currentLibrary?.name || 'Unknown'"
+          />
+        </div>
       </div>
     </div>
     
@@ -174,6 +276,8 @@ const vueComponent = computed(() => {
       <div class="flex items-center gap-4 text-xs text-night-500">
         <span>Category: <span class="text-night-300">{{ currentComponent.category }}</span></span>
         <span>Props: <span class="text-night-300">{{ Object.keys(preview.props).length }}</span></span>
+        <span v-if="loadedComponent" class="text-green-400">Live component</span>
+        <span v-else-if="useMockPreview" class="text-amber-400">Mock preview</span>
       </div>
     </div>
   </div>

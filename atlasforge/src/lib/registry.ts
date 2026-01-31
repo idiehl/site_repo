@@ -915,6 +915,257 @@ const mantine: LibraryMeta = {
     { id: 'Code', name: 'Code', description: 'Inline code', category: 'typography', props: [
       { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet', 'orange'] },
     ], defaultProps: { color: 'blue' } },
+    
+    // Additional Layout Components
+    { id: 'Container', name: 'Container', description: 'Centered container', category: 'layout', props: [
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'fluid', type: 'boolean', default: false },
+    ], defaultProps: { size: 'md', fluid: false } },
+    { id: 'Grid', name: 'Grid', description: 'Grid layout', category: 'layout', props: [
+      { name: 'columns', type: 'number', default: 12 },
+      { name: 'gutter', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { columns: 12, gutter: 'md' } },
+    { id: 'SimpleGrid', name: 'Simple Grid', description: 'Responsive grid', category: 'layout', props: [
+      { name: 'cols', type: 'number', default: 3 },
+      { name: 'spacing', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { cols: 3, spacing: 'md' } },
+    { id: 'Flex', name: 'Flex', description: 'Flexbox container', category: 'layout', props: [
+      { name: 'direction', type: 'select', default: 'row', options: ['row', 'column', 'row-reverse', 'column-reverse'] },
+      { name: 'align', type: 'select', default: 'stretch', options: ['stretch', 'center', 'flex-start', 'flex-end'] },
+      { name: 'justify', type: 'select', default: 'flex-start', options: ['flex-start', 'center', 'flex-end', 'space-between', 'space-around'] },
+      { name: 'gap', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { direction: 'row', align: 'stretch', justify: 'flex-start', gap: 'md' } },
+    { id: 'Stack', name: 'Stack', description: 'Vertical stack', category: 'layout', props: [
+      { name: 'gap', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'align', type: 'select', default: 'stretch', options: ['stretch', 'center', 'flex-start', 'flex-end'] },
+    ], defaultProps: { gap: 'md', align: 'stretch' } },
+    { id: 'Group', name: 'Group', description: 'Horizontal group', category: 'layout', props: [
+      { name: 'gap', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'justify', type: 'select', default: 'flex-start', options: ['flex-start', 'center', 'flex-end', 'space-between'] },
+    ], defaultProps: { gap: 'md', justify: 'flex-start' } },
+    { id: 'Center', name: 'Center', description: 'Center content', category: 'layout', props: [
+      { name: 'inline', type: 'boolean', default: false },
+    ], defaultProps: { inline: false } },
+    { id: 'AspectRatio', name: 'Aspect Ratio', description: 'Aspect ratio container', category: 'layout', props: [
+      { name: 'ratio', type: 'number', default: 1.778 },
+    ], defaultProps: { ratio: 1.778 } },
+    { id: 'Space', name: 'Space', description: 'Spacer element', category: 'layout', props: [
+      { name: 'h', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'w', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { h: 'md', w: 'md' } },
+    { id: 'Divider', name: 'Divider', description: 'Horizontal divider', category: 'layout', props: [
+      { name: 'variant', type: 'select', default: 'solid', options: ['solid', 'dashed', 'dotted'] },
+      { name: 'color', type: 'select', default: 'gray', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+      { name: 'size', type: 'select', default: 'xs', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { variant: 'solid', color: 'gray', size: 'xs' } },
+    
+    // Additional Input Components
+    { id: 'Autocomplete', name: 'Autocomplete', description: 'Autocomplete input', category: 'inputs', props: [
+      { name: 'label', type: 'string', default: 'Autocomplete' },
+      { name: 'placeholder', type: 'string', default: 'Start typing...' },
+    ], defaultProps: { label: 'Autocomplete', placeholder: 'Start typing...' } },
+    { id: 'TagsInput', name: 'Tags Input', description: 'Tags input field', category: 'inputs', props: [
+      { name: 'label', type: 'string', default: 'Tags' },
+      { name: 'placeholder', type: 'string', default: 'Enter tag' },
+      { name: 'clearable', type: 'boolean', default: true },
+    ], defaultProps: { label: 'Tags', placeholder: 'Enter tag', clearable: true } },
+    { id: 'JsonInput', name: 'JSON Input', description: 'JSON editor', category: 'inputs', props: [
+      { name: 'label', type: 'string', default: 'JSON' },
+      { name: 'formatOnBlur', type: 'boolean', default: true },
+      { name: 'validationError', type: 'string', default: 'Invalid JSON' },
+    ], defaultProps: { label: 'JSON', formatOnBlur: true, validationError: 'Invalid JSON' } },
+    { id: 'PinInput', name: 'PIN Input', description: 'PIN code input', category: 'inputs', props: [
+      { name: 'length', type: 'number', default: 4 },
+      { name: 'type', type: 'select', default: 'number', options: ['number', 'alphanumeric'] },
+      { name: 'mask', type: 'boolean', default: false },
+    ], defaultProps: { length: 4, type: 'number', mask: false } },
+    { id: 'SegmentedControl', name: 'Segmented Control', description: 'Segmented button group', category: 'inputs', props: [
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+      { name: 'size', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'fullWidth', type: 'boolean', default: false },
+    ], defaultProps: { color: 'blue', size: 'sm', radius: 'sm', fullWidth: false } },
+    { id: 'Chip', name: 'Chip', description: 'Chip component', category: 'inputs', props: [
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet', 'orange'] },
+      { name: 'variant', type: 'select', default: 'outline', options: ['outline', 'filled', 'light'] },
+      { name: 'size', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'checked', type: 'boolean', default: false },
+    ], defaultProps: { color: 'blue', variant: 'outline', size: 'sm', checked: false } },
+    { id: 'FileInput', name: 'File Input', description: 'File upload input', category: 'inputs', props: [
+      { name: 'label', type: 'string', default: 'Upload file' },
+      { name: 'placeholder', type: 'string', default: 'Pick file' },
+      { name: 'accept', type: 'string', default: '' },
+      { name: 'multiple', type: 'boolean', default: false },
+      { name: 'clearable', type: 'boolean', default: true },
+    ], defaultProps: { label: 'Upload file', placeholder: 'Pick file', accept: '', multiple: false, clearable: true } },
+    { id: 'NativeSelect', name: 'Native Select', description: 'Native HTML select', category: 'inputs', props: [
+      { name: 'label', type: 'string', default: 'Select' },
+      { name: 'size', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { label: 'Select', size: 'sm' } },
+    { id: 'ColorPicker', name: 'Color Picker', description: 'Color picker', category: 'inputs', props: [
+      { name: 'format', type: 'select', default: 'hex', options: ['hex', 'rgb', 'rgba', 'hsl', 'hsla'] },
+      { name: 'swatches', type: 'boolean', default: false },
+    ], defaultProps: { format: 'hex', swatches: false } },
+    { id: 'RangeSlider', name: 'Range Slider', description: 'Range slider', category: 'inputs', props: [
+      { name: 'min', type: 'number', default: 0 },
+      { name: 'max', type: 'number', default: 100 },
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+    ], defaultProps: { min: 0, max: 100, color: 'blue' } },
+    
+    // Navigation Components
+    { id: 'Anchor', name: 'Anchor', description: 'Link/anchor element', category: 'navigation', props: [
+      { name: 'href', type: 'string', default: '#' },
+      { name: 'underline', type: 'select', default: 'always', options: ['always', 'hover', 'never'] },
+    ], defaultProps: { href: '#', underline: 'always' } },
+    { id: 'Burger', name: 'Burger', description: 'Burger menu icon', category: 'navigation', props: [
+      { name: 'opened', type: 'boolean', default: false },
+      { name: 'color', type: 'string', default: '' },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { opened: false, color: '', size: 'md' } },
+    
+    // Data Display Components
+    { id: 'ThemeIcon', name: 'Theme Icon', description: 'Icon container with theme', category: 'data', props: [
+      { name: 'variant', type: 'select', default: 'filled', options: ['filled', 'light', 'outline', 'gradient'] },
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet', 'orange'] },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { variant: 'filled', color: 'blue', size: 'md', radius: 'sm' } },
+    { id: 'ColorSwatch', name: 'Color Swatch', description: 'Color swatch', category: 'data', props: [
+      { name: 'color', type: 'color', default: '#228be6' },
+      { name: 'size', type: 'number', default: 25 },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { color: '#228be6', size: 25, radius: 'sm' } },
+    { id: 'Timeline', name: 'Timeline', description: 'Timeline component', category: 'data', props: [
+      { name: 'active', type: 'number', default: 1 },
+      { name: 'bulletSize', type: 'number', default: 20 },
+      { name: 'lineWidth', type: 'number', default: 2 },
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+    ], defaultProps: { active: 1, bulletSize: 20, lineWidth: 2, color: 'blue' } },
+    { id: 'Spoiler', name: 'Spoiler', description: 'Expandable content', category: 'data', props: [
+      { name: 'maxHeight', type: 'number', default: 100 },
+      { name: 'showLabel', type: 'string', default: 'Show more' },
+      { name: 'hideLabel', type: 'string', default: 'Hide' },
+    ], defaultProps: { maxHeight: 100, showLabel: 'Show more', hideLabel: 'Hide' } },
+    { id: 'Kbd', name: 'Keyboard Key', description: 'Keyboard key display', category: 'data', props: [
+      { name: 'children', type: 'string', default: 'Ctrl' },
+      { name: 'size', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { children: 'Ctrl', size: 'sm' } },
+    { id: 'Image', name: 'Image', description: 'Image component', category: 'data', props: [
+      { name: 'src', type: 'string', default: '' },
+      { name: 'alt', type: 'string', default: 'Image' },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'fit', type: 'select', default: 'cover', options: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
+    ], defaultProps: { src: '', alt: 'Image', radius: 'sm', fit: 'cover' } },
+    { id: 'BackgroundImage', name: 'Background Image', description: 'Background image container', category: 'data', props: [
+      { name: 'src', type: 'string', default: '' },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { src: '', radius: 'sm' } },
+    
+    // Feedback Components
+    { id: 'Loader', name: 'Loader', description: 'Loading spinner', category: 'feedback', props: [
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet', 'orange'] },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'type', type: 'select', default: 'oval', options: ['oval', 'bars', 'dots'] },
+    ], defaultProps: { color: 'blue', size: 'md', type: 'oval' } },
+    { id: 'Notification', name: 'Notification', description: 'Notification message', category: 'feedback', props: [
+      { name: 'title', type: 'string', default: 'Notification' },
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet', 'orange'] },
+      { name: 'loading', type: 'boolean', default: false },
+      { name: 'withCloseButton', type: 'boolean', default: true },
+    ], defaultProps: { title: 'Notification', color: 'blue', loading: false, withCloseButton: true } },
+    { id: 'RingProgress', name: 'Ring Progress', description: 'Circular progress', category: 'feedback', props: [
+      { name: 'value', type: 'number', default: 65 },
+      { name: 'size', type: 'number', default: 120 },
+      { name: 'thickness', type: 'number', default: 12 },
+      { name: 'roundCaps', type: 'boolean', default: true },
+    ], defaultProps: { value: 65, size: 120, thickness: 12, roundCaps: true } },
+    
+    // Overlay Components
+    { id: 'Modal', name: 'Modal', description: 'Modal dialog', category: 'overlays', props: [
+      { name: 'title', type: 'string', default: 'Modal title' },
+      { name: 'centered', type: 'boolean', default: false },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl', 'full'] },
+      { name: 'radius', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { title: 'Modal title', centered: false, size: 'md', radius: 'sm' } },
+    { id: 'Drawer', name: 'Drawer', description: 'Side drawer', category: 'overlays', props: [
+      { name: 'title', type: 'string', default: 'Drawer' },
+      { name: 'position', type: 'select', default: 'left', options: ['left', 'right', 'top', 'bottom'] },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl', 'full'] },
+    ], defaultProps: { title: 'Drawer', position: 'left', size: 'md' } },
+    { id: 'Dialog', name: 'Dialog', description: 'Dialog box', category: 'overlays', props: [
+      { name: 'withCloseButton', type: 'boolean', default: true },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { withCloseButton: true, size: 'md' } },
+    { id: 'Tooltip', name: 'Tooltip', description: 'Tooltip popup', category: 'overlays', props: [
+      { name: 'label', type: 'string', default: 'Tooltip' },
+      { name: 'position', type: 'select', default: 'top', options: ['top', 'right', 'bottom', 'left'] },
+      { name: 'color', type: 'select', default: 'gray', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+      { name: 'withArrow', type: 'boolean', default: true },
+    ], defaultProps: { label: 'Tooltip', position: 'top', color: 'gray', withArrow: true } },
+    { id: 'Popover', name: 'Popover', description: 'Popover container', category: 'overlays', props: [
+      { name: 'position', type: 'select', default: 'bottom', options: ['top', 'right', 'bottom', 'left'] },
+      { name: 'withArrow', type: 'boolean', default: true },
+      { name: 'shadow', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { position: 'bottom', withArrow: true, shadow: 'md' } },
+    { id: 'HoverCard', name: 'Hover Card', description: 'Hover activated card', category: 'overlays', props: [
+      { name: 'position', type: 'select', default: 'bottom', options: ['top', 'right', 'bottom', 'left'] },
+      { name: 'shadow', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'openDelay', type: 'number', default: 0 },
+      { name: 'closeDelay', type: 'number', default: 150 },
+    ], defaultProps: { position: 'bottom', shadow: 'md', openDelay: 0, closeDelay: 150 } },
+    { id: 'Menu', name: 'Menu', description: 'Dropdown menu', category: 'overlays', props: [
+      { name: 'trigger', type: 'select', default: 'click', options: ['click', 'hover'] },
+      { name: 'position', type: 'select', default: 'bottom', options: ['top', 'right', 'bottom', 'left'] },
+      { name: 'shadow', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'withArrow', type: 'boolean', default: false },
+    ], defaultProps: { trigger: 'click', position: 'bottom', shadow: 'md', withArrow: false } },
+    { id: 'LoadingOverlay', name: 'Loading Overlay', description: 'Overlay with loader', category: 'overlays', props: [
+      { name: 'visible', type: 'boolean', default: true },
+      { name: 'overlayBlur', type: 'number', default: 2 },
+    ], defaultProps: { visible: true, overlayBlur: 2 } },
+    { id: 'Affix', name: 'Affix', description: 'Fixed position element', category: 'overlays', props: [
+      { name: 'position', type: 'select', default: 'bottom-right', options: ['top-left', 'top-right', 'bottom-left', 'bottom-right'] },
+    ], defaultProps: { position: 'bottom-right' } },
+    
+    // Typography Components
+    { id: 'Blockquote', name: 'Blockquote', description: 'Blockquote text', category: 'typography', props: [
+      { name: 'cite', type: 'string', default: '' },
+      { name: 'color', type: 'select', default: 'blue', options: ['gray', 'red', 'green', 'blue', 'violet'] },
+    ], defaultProps: { cite: '', color: 'blue' } },
+    { id: 'Mark', name: 'Mark', description: 'Marked/highlighted text', category: 'typography', props: [
+      { name: 'color', type: 'select', default: 'yellow', options: ['gray', 'red', 'green', 'blue', 'yellow'] },
+    ], defaultProps: { color: 'yellow' } },
+    { id: 'List', name: 'List', description: 'List component', category: 'typography', props: [
+      { name: 'type', type: 'select', default: 'unordered', options: ['ordered', 'unordered'] },
+      { name: 'spacing', type: 'select', default: 'sm', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+    ], defaultProps: { type: 'unordered', spacing: 'sm', size: 'md' } },
+    
+    // Miscellaneous Components
+    { id: 'Box', name: 'Box', description: 'Polymorphic container', category: 'layout', props: [
+      { name: 'component', type: 'string', default: 'div' },
+    ], defaultProps: { component: 'div' } },
+    { id: 'ScrollArea', name: 'Scroll Area', description: 'Scrollable container', category: 'layout', props: [
+      { name: 'type', type: 'select', default: 'hover', options: ['auto', 'always', 'scroll', 'hover', 'never'] },
+      { name: 'offsetScrollbars', type: 'boolean', default: false },
+    ], defaultProps: { type: 'hover', offsetScrollbars: false } },
+    { id: 'Collapse', name: 'Collapse', description: 'Collapsible content', category: 'layout', props: [
+      { name: 'in', type: 'boolean', default: true },
+      { name: 'transitionDuration', type: 'number', default: 200 },
+    ], defaultProps: { in: true, transitionDuration: 200 } },
+    { id: 'CloseButton', name: 'Close Button', description: 'Close/dismiss button', category: 'buttons', props: [
+      { name: 'size', type: 'select', default: 'md', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      { name: 'iconSize', type: 'number', default: 18 },
+    ], defaultProps: { size: 'md', iconSize: 18 } },
+    { id: 'CopyButton', name: 'Copy Button', description: 'Copy to clipboard button', category: 'buttons', props: [
+      { name: 'value', type: 'string', default: '' },
+      { name: 'timeout', type: 'number', default: 1000 },
+    ], defaultProps: { value: '', timeout: 1000 } },
+    { id: 'FileButton', name: 'File Button', description: 'File input as button', category: 'buttons', props: [
+      { name: 'accept', type: 'string', default: '' },
+      { name: 'multiple', type: 'boolean', default: false },
+    ], defaultProps: { accept: '', multiple: false } },
+    { id: 'UnstyledButton', name: 'Unstyled Button', description: 'Button without styles', category: 'buttons', props: [], defaultProps: {} },
   ],
 };
 

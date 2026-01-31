@@ -14,7 +14,7 @@ export interface CanvasElement {
   props: Record<string, any>;
   styles: {
     position: { x: number; y: number };
-    size: { width: string; height: string };
+    size?: { width: number; height: number };  // Optional numeric size for resizable elements
     spacing: { margin: string; padding: string };
   };
   zIndex: number;
@@ -80,7 +80,7 @@ export function addElement(
     props,
     styles: {
       position,
-      size: { width: 'auto', height: 'auto' },
+      // No default size - let elements auto-size initially
       spacing: { margin: '0', padding: '0' },
     },
     zIndex: canvasElements.get().length,
@@ -122,7 +122,7 @@ export function updateElementPosition(id: string, position: { x: number; y: numb
   }
 }
 
-export function updateElementSize(id: string, size: { width: string; height: string }): void {
+export function updateElementSize(id: string, size: { width: number; height: number }): void {
   const element = canvasElements.get().find(el => el.id === id);
   if (element) {
     updateElement(id, {

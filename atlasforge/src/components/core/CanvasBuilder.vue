@@ -8,6 +8,7 @@ import {
   gridVisible,
   selectElement,
   updateElementPosition,
+  updateElementSize,
   removeElement,
   duplicateElement,
   moveElementUp,
@@ -23,30 +24,7 @@ import {
   Squares2X2Icon,
   XMarkIcon
 } from '@heroicons/vue/24/outline';
-
-// Vue component imports for rendering
-import * as HeroiconsVue from '@heroicons/vue/24/outline';
-
-// Custom Vue components
-import CustomCard from '../vue/CustomCard.vue';
-import CustomBadge from '../vue/CustomBadge.vue';
-import CustomAlert from '../vue/CustomAlert.vue';
-import CustomButton from '../vue/CustomButton.vue';
-import CustomInput from '../vue/CustomInput.vue';
-import CustomAvatar from '../vue/CustomAvatar.vue';
-import CustomProgress from '../vue/CustomProgress.vue';
-import CustomTabs from '../vue/CustomTabs.vue';
-
-const customComponents: Record<string, any> = {
-  Card: CustomCard,
-  Badge: CustomBadge,
-  Alert: CustomAlert,
-  Button: CustomButton,
-  Input: CustomInput,
-  Avatar: CustomAvatar,
-  Progress: CustomProgress,
-  Tabs: CustomTabs,
-};
+import CanvasElementRenderer from './CanvasElementRenderer.vue';
 
 const elements = useStore(canvasElements);
 const selectedId = useStore(selectedElementId);
@@ -60,16 +38,9 @@ const canvasRef = ref<HTMLElement | null>(null);
 const dragging = ref<string | null>(null);
 const dragOffset = ref({ x: 0, y: 0 });
 
-// Get Vue component for rendering
-function getVueComponent(libraryId: string, componentId: string) {
-  if (libraryId === 'heroicons-vue') {
-    return (HeroiconsVue as any)[componentId] || null;
-  }
-  if (libraryId === 'custom-vue') {
-    return customComponents[componentId] || null;
-  }
-  return null;
-}
+// Resize state
+const resizing = ref<{ elementId: string; handle: string } | null>(null);
+const resizeStart = ref({ x: 0, y: 0, width: 0, height: 0 });
 
 // Drag handlers
 function handleMouseDown(e: MouseEvent, elementId: string) {
@@ -90,6 +61,38 @@ function handleMouseDown(e: MouseEvent, elementId: string) {
 }
 
 function handleMouseMove(e: MouseEvent) {
+  // Handle resize
+  if (resizing.value && canvasRef.value) {
+    const dx = e.clientX - resizeStart.value.x;
+    const dy = e.clientY - resizeStart.value.y;
+    
+    let newWidth = resizeStart.value.width;
+    let newHeight = resizeStart.value.height;
+    
+    if (resizing.value.handle.includes('e')) {
+      newWidth = Math.max(60, resizeStart.value.width + dx);
+    }
+    if (resizing.value.handle.includes('s')) {
+      newHeight = Math.max(24, resizeStart.value.height + dy);
+    }
+    if (resizing.value.handle.includes('w')) {
+      newWidth = Math.max(60, resizeStart.value.width - dx);
+    }
+    if (resizing.value.handle.includes('n')) {
+      newHeight = Math.max(24, resizeStart.value.height - dy);
+    }
+    
+    // Snap to grid if enabled
+    if (showGrid.value) {
+      newWidth = Math.round(newWidth / 20) * 20;
+      newHeight = Math.round(newHeight / 20) * 20;
+    }
+    
+    updateElementSize(resizing.value.elementId, { width: newWidth, height: newHeight });
+    return;
+  }
+  
+  // Handle drag
   if (!dragging.value || !canvasRef.value) return;
   
   const rect = canvasRef.value.getBoundingClientRect();
@@ -105,6 +108,26 @@ function handleMouseMove(e: MouseEvent) {
 
 function handleMouseUp() {
   dragging.value = null;
+  resizing.value = null;
+}
+
+// Resize handlers
+function handleResizeStart(e: MouseEvent, elementId: string, handle: string) {
+  e.stopPropagation();
+  e.preventDefault();
+  
+  const element = elements.value.find(el => el.id === elementId);
+  if (!element) return;
+  
+  resizing.value = { elementId, handle };
+  resizeStart.value = {
+    x: e.clientX,
+    y: e.clientY,
+    width: element.styles.size?.width || 150,
+    height: element.styles.size?.height || 50,
+  };
+  
+  selectElement(elementId);
 }
 
 // Canvas click (deselect)
@@ -243,6 +266,8 @@ const selectedElement = computed(() => {
         :style="{
           left: element.styles.position.x + 'px',
           top: element.styles.position.y + 'px',
+          width: element.styles.size?.width ? element.styles.size.width + 'px' : 'auto',
+          height: element.styles.size?.height ? element.styles.size.height + 'px' : 'auto',
           zIndex: element.zIndex,
         }"
         :class="[
@@ -252,39 +277,60 @@ const selectedElement = computed(() => {
         ]"
       >
         <!-- Element wrapper -->
-        <div class="p-2 bg-night-900 rounded-lg border border-night-700">
-          <!-- Vue component -->
-          <template v-if="element.framework === 'vue'">
-            <component 
-              :is="getVueComponent(element.libraryId, element.componentId)"
-              v-if="getVueComponent(element.libraryId, element.componentId)"
-              v-bind="element.props"
-            />
-            <div v-else class="text-night-500 text-xs px-2">
-              {{ element.componentId }}
-            </div>
-          </template>
-          
-          <!-- React placeholder -->
-          <template v-else>
-            <div class="text-sky-400 text-xs px-2 py-1 bg-sky-500/10 rounded">
-              React: {{ element.componentId }}
-            </div>
-          </template>
+        <div class="p-2 bg-night-900/80 rounded-lg border border-night-700 h-full">
+          <CanvasElementRenderer
+            :libraryId="element.libraryId"
+            :componentId="element.componentId"
+            :componentProps="element.props"
+            :framework="element.framework"
+            :width="element.styles.size?.width ? element.styles.size.width - 16 : undefined"
+            :height="element.styles.size?.height ? element.styles.size.height - 16 : undefined"
+          />
         </div>
         
         <!-- Selection indicator -->
         <div 
           v-if="selectedId === element.id"
-          class="absolute -top-6 left-0 text-xs text-atlas-400 whitespace-nowrap"
+          class="absolute -top-6 left-0 text-xs text-atlas-400 whitespace-nowrap bg-night-900 px-2 py-0.5 rounded"
         >
           {{ getComponent(element.libraryId, element.componentId)?.name }}
         </div>
         
+        <!-- Resize handles (only when selected) -->
+        <template v-if="selectedId === element.id">
+          <!-- Corner handles -->
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 'se')"
+            class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-atlas-500 border border-atlas-400 rounded-sm cursor-se-resize z-10"
+          />
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 'sw')"
+            class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-atlas-500 border border-atlas-400 rounded-sm cursor-sw-resize z-10"
+          />
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 'ne')"
+            class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-atlas-500 border border-atlas-400 rounded-sm cursor-ne-resize z-10"
+          />
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 'nw')"
+            class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-atlas-500 border border-atlas-400 rounded-sm cursor-nw-resize z-10"
+          />
+          
+          <!-- Edge handles -->
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 'e')"
+            class="absolute top-1/2 -right-1.5 w-2 h-6 -translate-y-1/2 bg-atlas-500/50 border border-atlas-400/50 rounded-sm cursor-e-resize z-10"
+          />
+          <div 
+            @mousedown="handleResizeStart($event, element.id, 's')"
+            class="absolute -bottom-1.5 left-1/2 w-6 h-2 -translate-x-1/2 bg-atlas-500/50 border border-atlas-400/50 rounded-sm cursor-s-resize z-10"
+          />
+        </template>
+        
         <!-- Quick delete on hover -->
         <button
           @click.stop="removeElement(element.id)"
-          class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+          class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
         >
           <XMarkIcon class="w-3 h-3" />
         </button>
