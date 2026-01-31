@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { ClipboardDocumentListIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const loading = ref(true)
@@ -53,10 +54,14 @@ onMounted(fetchLog)
     <header class="bg-night-900 border-b border-night-800 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <router-link to="/dev/dashboard" class="text-night-400 hover:text-white transition-colors">
-            ← Back
+          <router-link to="/dev/dashboard" class="text-night-400 hover:text-white transition-colors flex items-center gap-1">
+            <ArrowLeftIcon class="w-4 h-4" />
+            Back
           </router-link>
-          <h1 class="text-xl font-bold text-white">📋 Master Log</h1>
+          <div class="flex items-center gap-2">
+            <ClipboardDocumentListIcon class="w-6 h-6 text-atlas-400" />
+            <h1 class="text-xl font-bold text-white">Master Log</h1>
+          </div>
         </div>
         <div class="flex items-center gap-4">
           <div class="flex bg-night-800 rounded-lg p-1">
@@ -81,9 +86,10 @@ onMounted(fetchLog)
           </div>
           <button
             @click="fetchLog"
-            class="px-4 py-2 text-sm bg-night-800 text-night-300 hover:text-white rounded-lg transition-colors"
+            class="px-4 py-2 text-sm bg-night-800 text-night-300 hover:text-white rounded-lg transition-colors flex items-center gap-2"
           >
-            🔄 Refresh
+            <ArrowPathIcon class="w-4 h-4" />
+            Refresh
           </button>
         </div>
       </div>

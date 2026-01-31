@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { WrenchScrewdriverIcon, ClipboardDocumentListIcon, FolderOpenIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const devToken = ref('')
@@ -22,13 +23,13 @@ const pages = [
     title: 'Master Log',
     description: 'View the running changelog of all project updates',
     path: '/dev/log',
-    icon: '📋'
+    icon: ClipboardDocumentListIcon
   },
   {
     title: 'Project Overview',
     description: 'Complete file inventory and architecture documentation',
     path: '/dev/overview',
-    icon: '🗂️'
+    icon: FolderOpenIcon
   }
 ]
 </script>
@@ -39,7 +40,7 @@ const pages = [
     <header class="bg-night-900 border-b border-night-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <span class="text-2xl">🛠️</span>
+          <WrenchScrewdriverIcon class="w-7 h-7 text-atlas-400" />
           <h1 class="text-xl font-bold text-white">Developer Portal</h1>
         </div>
         <div class="flex items-center gap-4">
@@ -71,7 +72,7 @@ const pages = [
           class="bg-night-900 border border-night-800 rounded-xl p-6 hover:border-atlas-500 transition-colors group"
         >
           <div class="flex items-start gap-4">
-            <span class="text-4xl">{{ page.icon }}</span>
+            <component :is="page.icon" class="w-10 h-10 text-atlas-400 group-hover:text-atlas-300 transition-colors flex-shrink-0" />
             <div>
               <h3 class="text-lg font-semibold text-white group-hover:text-atlas-400 transition-colors">
                 {{ page.title }}
