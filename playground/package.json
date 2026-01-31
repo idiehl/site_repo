@@ -1,0 +1,35 @@
+{
+  "name": "atlas-playground",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "UI Design System Playground - Compare Vue and React components",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "@astrojs/vue": "^4.5.0",
+    "@heroicons/react": "^2.1.1",
+    "@heroicons/vue": "^2.1.1",
+    "@headlessui/react": "^2.1.0",
+    "@headlessui/vue": "^1.7.22",
+    "astro": "^4.15.0",
+    "nanostores": "^0.10.3",
+    "@nanostores/vue": "^0.10.0",
+    "@nanostores/react": "^0.7.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vue": "^3.4.0",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "typescript": "^5.4.5"
+  }
+}
