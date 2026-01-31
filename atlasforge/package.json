@@ -1,8 +1,8 @@
 {
-  "name": "atlas-playground",
+  "name": "atlas-forge",
   "type": "module",
   "version": "1.0.0",
-  "description": "UI Design System Playground - Compare Vue and React components",
+  "description": "Atlas Forge - UI Design System Laboratory",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

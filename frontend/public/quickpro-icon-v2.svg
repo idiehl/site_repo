@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="QuickPRO icon v2">
+  <defs>
+    <linearGradient id="bg-2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#0f1a2e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="32" fill="url(#bg-2)"/>
+  <circle cx="32" cy="30" r="20" stroke="#7dd3fc" stroke-width="4" fill="none"/>
+  <path d="M42 40 L56 54" stroke="#22d3ee" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="32" cy="30" r="4" fill="#7dd3fc"/>
+</svg>
