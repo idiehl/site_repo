@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { 
   canvasElements, 
   selectedElementId, 
   canvasLayout, 
   gridVisible,
+  previewComponent,
   selectElement,
   updateElementPosition,
   updateElementSize,
@@ -22,7 +23,9 @@ import {
   ChevronUpIcon, 
   ChevronDownIcon,
   Squares2X2Icon,
-  XMarkIcon
+  XMarkIcon,
+  EyeIcon,
+  XCircleIcon
 } from '@heroicons/vue/24/outline';
 import CanvasElementRenderer from './CanvasElementRenderer.vue';
 
@@ -30,6 +33,36 @@ const elements = useStore(canvasElements);
 const selectedId = useStore(selectedElementId);
 const layout = useStore(canvasLayout);
 const showGrid = useStore(gridVisible);
+const preview = useStore(previewComponent);
+
+// Preview panel state
+const showPreviewPanel = ref(false);
+const localPreview = ref<{
+  libraryId: string | null;
+  componentId: string | null;
+  props: Record<string, any>;
+}>({
+  libraryId: null,
+  componentId: null,
+  props: {},
+});
+
+// Listen for preview updates
+function handlePreviewUpdate(event: CustomEvent) {
+  const { libraryId, componentId, props } = event.detail;
+  localPreview.value = { libraryId, componentId, props };
+  showPreviewPanel.value = true;
+}
+
+// Computed for preview display
+const previewLibrary = computed(() => 
+  localPreview.value.libraryId ? getLibrary(localPreview.value.libraryId) : null
+);
+const previewComponentMeta = computed(() => 
+  localPreview.value.libraryId && localPreview.value.componentId 
+    ? getComponent(localPreview.value.libraryId, localPreview.value.componentId) 
+    : null
+);
 
 // Canvas ref for drag calculations
 const canvasRef = ref<HTMLElement | null>(null);
@@ -156,12 +189,14 @@ onMounted(() => {
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
   window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
 });
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', handleMouseMove);
   window.removeEventListener('mouseup', handleMouseUp);
   window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
 });
 
 const selectedElement = computed(() => {
@@ -181,6 +216,14 @@ const selectedElement = computed(() => {
           title="Toggle grid"
         >
           <Squares2X2Icon class="w-4 h-4" />
+        </button>
+        <button
+          @click="showPreviewPanel = !showPreviewPanel"
+          class="p-2 rounded-lg transition-colors"
+          :class="showPreviewPanel ? 'bg-atlas-600/20 text-atlas-400' : 'hover:bg-night-800 text-night-400'"
+          title="Toggle preview panel"
+        >
+          <EyeIcon class="w-4 h-4" />
         </button>
       </div>
       
@@ -234,13 +277,15 @@ const selectedElement = computed(() => {
       </button>
     </div>
     
-    <!-- Canvas Area -->
-    <div 
-      ref="canvasRef"
-      @click="handleCanvasClick"
-      class="flex-1 relative overflow-auto"
-      :class="showGrid ? 'bg-[url(\'data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%230d0d12%22%2F%3E%3Cpath%20d%3D%22M%2020%200%20L%200%200%200%2020%22%20fill%3D%22none%22%20stroke%3D%22%23343446%22%20stroke-width%3D%220.5%22%2F%3E%3C%2Fsvg%3E\')]' : 'bg-night-950'"
-    >
+    <!-- Canvas + Preview Panel Container -->
+    <div class="flex-1 flex overflow-hidden">
+      <!-- Canvas Area -->
+      <div 
+        ref="canvasRef"
+        @click="handleCanvasClick"
+        class="flex-1 relative overflow-auto"
+        :class="showGrid ? 'bg-[url(\'data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%230d0d12%22%2F%3E%3Cpath%20d%3D%22M%2020%200%20L%200%200%200%2020%22%20fill%3D%22none%22%20stroke%3D%22%23343446%22%20stroke-width%3D%220.5%22%2F%3E%3C%2Fsvg%3E\')]' : 'bg-night-950'"
+      >
       <!-- Empty state -->
       <div 
         v-if="elements.length === 0"
@@ -337,6 +382,73 @@ const selectedElement = computed(() => {
           <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
+    </div>
+    
+    <!-- Preview Panel (Right Side) -->
+    <div 
+      v-if="showPreviewPanel"
+      class="w-72 border-l border-night-800 bg-night-900 flex flex-col overflow-hidden"
+    >
+      <!-- Preview Header -->
+      <div class="px-3 py-2 border-b border-night-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <EyeIcon class="w-4 h-4 text-atlas-400" />
+          <span class="text-sm font-medium text-white">Preview</span>
+        </div>
+        <button
+          @click="showPreviewPanel = false"
+          class="p-1 rounded hover:bg-night-800 text-night-400 hover:text-white transition-colors"
+        >
+          <XMarkIcon class="w-4 h-4" />
+        </button>
+      </div>
+      
+      <!-- Preview Content -->
+      <div class="flex-1 overflow-auto p-4">
+        <template v-if="localPreview.libraryId && localPreview.componentId">
+          <!-- Component Info -->
+          <div class="mb-4">
+            <h3 class="text-sm font-medium text-white">{{ previewComponentMeta?.name }}</h3>
+            <p class="text-xs text-night-400">{{ previewLibrary?.name }}</p>
+          </div>
+          
+          <!-- Preview Display -->
+          <div class="bg-night-950 rounded-lg border border-night-700 p-4 flex items-center justify-center min-h-[120px]">
+            <CanvasElementRenderer
+              :libraryId="localPreview.libraryId"
+              :componentId="localPreview.componentId"
+              :componentProps="localPreview.props"
+              :framework="previewLibrary?.framework || 'vue'"
+            />
+          </div>
+          
+          <!-- Component Details -->
+          <div class="mt-4 space-y-2">
+            <div class="text-xs text-night-500">
+              <span class="text-night-400">Category:</span> {{ previewComponentMeta?.category }}
+            </div>
+            <div class="text-xs text-night-500">
+              <span class="text-night-400">Framework:</span> 
+              <span :class="previewLibrary?.framework === 'vue' ? 'text-green-400' : 'text-blue-400'">
+                {{ previewLibrary?.framework === 'vue' ? 'Vue' : 'React' }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Hint -->
+          <div class="mt-4 p-2 bg-night-800/50 rounded text-xs text-night-400">
+            Double-click in sidebar to add to canvas
+          </div>
+        </template>
+        
+        <!-- Empty State -->
+        <div v-else class="flex flex-col items-center justify-center h-full text-center">
+          <EyeIcon class="w-10 h-10 text-night-700 mb-3" />
+          <p class="text-sm text-night-500">No component selected</p>
+          <p class="text-xs text-night-600 mt-1">Click a component in the sidebar</p>
+        </div>
+      </div>
+    </div>
     </div>
     
     <!-- Canvas Footer -->

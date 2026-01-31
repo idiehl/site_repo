@@ -1,32 +1,8 @@
 ---
 import PlaygroundLayout from '../layouts/PlaygroundLayout.astro';
 import PlaygroundApp from '../components/core/PlaygroundApp.vue';
-import ReactPreviewWrapper from '../components/react/ReactPreviewWrapper';
 ---
 
 <PlaygroundLayout title="Atlas Forge - UI Design Laboratory">
   <PlaygroundApp client:load />
-  <!-- React preview overlay - absolutely positioned in the center area -->
-  <div id="react-preview-overlay">
-    <ReactPreviewWrapper client:only="react" />
-  </div>
 </PlaygroundLayout>
-
-<style>
-  #react-preview-overlay {
-    position: fixed;
-    top: 56px; /* Height of top bar (h-14 = 3.5rem = 56px) */
-    left: 288px; /* Width of left sidebar (w-72 = 18rem = 288px) */
-    right: 320px; /* Width of right sidebar (w-80 = 20rem = 320px) */
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    pointer-events: none;
-  }
-  
-  #react-preview-overlay > div {
-    pointer-events: auto;
-  }
-</style>
