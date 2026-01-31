@@ -17,6 +17,9 @@ import CustomAvatar from '../vue/CustomAvatar.vue';
 import CustomProgress from '../vue/CustomProgress.vue';
 import CustomTabs from '../vue/CustomTabs.vue';
 
+// Mock preview for libraries without implementations
+import MockPreview from './MockPreview.vue';
+
 const customComponents: Record<string, any> = {
   Card: CustomCard,
   Badge: CustomBadge,
@@ -28,6 +31,9 @@ const customComponents: Record<string, any> = {
   Tabs: CustomTabs,
 };
 
+// Libraries with actual implementations
+const implementedLibraries = ['heroicons-vue', 'custom-vue'];
+
 const preview = useStore(previewComponent);
 
 // Dispatch event to React when preview changes (for cross-framework communication)
@@ -37,6 +43,8 @@ function notifyReact() {
       libraryId: preview.value.libraryId,
       componentId: preview.value.componentId,
       props: preview.value.props,
+      category: currentComponent.value?.category,
+      libraryName: currentLibrary.value?.name,
     };
     // Store in window for initial load
     (window as any).__forgePreview = detail;
@@ -62,7 +70,13 @@ const currentComponent = computed(() => {
   return getComponent(preview.value.libraryId, preview.value.componentId);
 });
 
-// Get the actual Vue component to render
+// Check if this library has actual implementations
+const hasImplementation = computed(() => {
+  if (!preview.value.libraryId) return false;
+  return implementedLibraries.includes(preview.value.libraryId);
+});
+
+// Get the actual Vue component to render (only for implemented libraries)
 const vueComponent = computed(() => {
   if (!currentLibrary.value || currentLibrary.value.framework !== 'vue') return null;
   if (!preview.value.componentId) return null;
@@ -123,19 +137,27 @@ const vueComponent = computed(() => {
         <p class="text-xs mt-1">Click to preview, double-click to add to canvas</p>
       </div>
       
-      <!-- Vue Component Preview -->
+      <!-- Vue Component Preview - Actual implementation -->
       <div 
-        v-else-if="currentLibrary?.framework === 'vue'"
+        v-else-if="currentLibrary?.framework === 'vue' && hasImplementation && vueComponent"
         class="p-12 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
       >
         <component 
-          v-if="vueComponent"
           :is="vueComponent" 
           v-bind="preview.props"
         />
-        <div v-else class="text-night-500 text-sm">
-          Component not available for preview
-        </div>
+      </div>
+      
+      <!-- Vue Component Preview - Mock preview for libraries without implementations -->
+      <div 
+        v-else-if="currentLibrary?.framework === 'vue' && currentComponent"
+        class="p-8 bg-night-900 rounded-xl border border-night-800 min-w-[200px] flex items-center justify-center"
+      >
+        <MockPreview 
+          :component="currentComponent"
+          :component-props="preview.props"
+          :library-name="currentLibrary.name"
+        />
       </div>
       
       <!-- React Component Preview - transparent area, actual component rendered by ReactPreviewWrapper overlay -->
