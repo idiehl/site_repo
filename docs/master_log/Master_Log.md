@@ -330,3 +330,55 @@ git commit -m "AU-C01-20260130-012: Add Developer Portal with protected document
 **Verification:** Pages accessible at /dev on main site with valid token  
 **Notes:** Set `DEV_TOKEN` in production .env file  
 **Concepts:** @concept:dev-portal @concept:documentation @concept:authentication
+
+---
+
+## AU-C01-20260131-001 — Build UI Playground Design System Laboratory
+
+**Type:** Feature (Major)  
+**Context:** User requested a tool to experiment with different UI frameworks, themes, and components with live preview  
+**Change summary:** 
+- Created new Astro project at `playground/` with Vue and React integrations
+- Built component registry system supporting multiple UI libraries (Heroicons, Headless UI, custom components)
+- Implemented ComponentBrowser with search, filter by framework, and categorization
+- Built PropsEditor with dynamic form generation, color pickers, Tailwind class builder
+- Created CanvasBuilder with drag-and-drop, element selection, layer management, grid snap
+- Added PreviewPanel for live component preview with framework indicator
+- Implemented CodeExporter modal with Vue SFC, React JSX, and HTML+Tailwind export formats
+- Added SaveDesignModal with localStorage persistence for designs
+- Created 8 custom Vue components: Card, Badge, Alert, Button, Input, Avatar, Progress, Tabs
+- Added playground API endpoint for server-side design persistence
+- Created nginx config for playground.atlasuniversalis.com subdomain
+
+**Rationale / tradeoffs:** 
+- Astro chosen for native Vue+React support ("islands" architecture)
+- nanostores used for cross-framework state management
+- Custom components render in both preview and canvas for WYSIWYG editing
+- localStorage used for quick saves, API for named persistent designs
+- Subdomain deployment requires DNS A record to be added by user
+
+**Files touched:**
+- `playground/` - Entire new Astro project (package.json, astro.config.mjs, tailwind.config.mjs, tsconfig.json)
+- `playground/src/lib/registry.ts` - Component metadata registry
+- `playground/src/lib/canvas-store.ts` - State management with nanostores
+- `playground/src/lib/code-generator.ts` - Export logic for Vue/React/HTML
+- `playground/src/components/core/` - PlaygroundApp, TopBar, ComponentBrowser, PropsEditor, CanvasBuilder, PreviewPanel, CodeExporter, SaveDesignModal
+- `playground/src/components/vue/` - 8 custom Vue component wrappers
+- `playground/src/layouts/PlaygroundLayout.astro` - Base layout
+- `playground/src/pages/index.astro` - Main page
+- `atlasops/api/v1/playground.py` - API for design persistence
+- `atlasops/api/v1/router.py` - Included playground router
+- `deploy/nginx-playground.conf` - Nginx configuration for subdomain
+
+**Commands run:**
+```bash
+npm install && npm run build  # In playground/
+git add -A && git commit && git push
+ssh root@... "git pull && cd playground && npm install && npm run build"
+```
+
+**Verification:** Build successful, deployed to server, accessible once DNS configured  
+**Notes:** 
+- DNS A record for playground.atlasuniversalis.com must be added pointing to 167.71.179.90
+- After DNS propagates, run: `certbot --nginx -d atlasuniversalis.com -d www.atlasuniversalis.com -d quickpro.atlasuniversalis.com -d playground.atlasuniversalis.com --expand`
+**Concepts:** @concept:playground @concept:design-system @concept:astro @concept:vue @concept:react
