@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, shallowRef, markRaw } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { 
   canvasElements, 
@@ -17,6 +17,7 @@ import {
   clearCanvas
 } from '../../lib/canvas-store';
 import { getLibrary, getComponent } from '../../lib/registry';
+import { loadLibrary, isLibraryLoaded, type LibraryId } from '../../lib/library-loader';
 import { 
   TrashIcon, 
   DocumentDuplicateIcon, 
@@ -24,16 +25,38 @@ import {
   ChevronDownIcon,
   Squares2X2Icon,
   XMarkIcon,
-  EyeIcon,
-  XCircleIcon
+  EyeIcon
 } from '@heroicons/vue/24/outline';
 import CanvasElementRenderer from './CanvasElementRenderer.vue';
+
+// Vue component imports (always available)
+import * as HeroiconsVue from '@heroicons/vue/24/outline';
+
+// Custom Vue components
+import CustomCard from '../vue/CustomCard.vue';
+import CustomBadge from '../vue/CustomBadge.vue';
+import CustomAlert from '../vue/CustomAlert.vue';
+import CustomButton from '../vue/CustomButton.vue';
+import CustomInput from '../vue/CustomInput.vue';
+import CustomAvatar from '../vue/CustomAvatar.vue';
+import CustomProgress from '../vue/CustomProgress.vue';
+import CustomTabs from '../vue/CustomTabs.vue';
+
+const customComponents: Record<string, any> = {
+  Card: CustomCard,
+  Badge: CustomBadge,
+  Alert: CustomAlert,
+  Button: CustomButton,
+  Input: CustomInput,
+  Avatar: CustomAvatar,
+  Progress: CustomProgress,
+  Tabs: CustomTabs,
+};
 
 const elements = useStore(canvasElements);
 const selectedId = useStore(selectedElementId);
 const layout = useStore(canvasLayout);
 const showGrid = useStore(gridVisible);
-const preview = useStore(previewComponent);
 
 // Preview panel state
 const showPreviewPanel = ref(false);
@@ -47,12 +70,85 @@ const localPreview = ref<{
   props: {},
 });
 
+// Component loading state for preview
+const previewLoading = ref(false);
+const previewError = ref<string | null>(null);
+const loadedPreviewComponent = shallowRef<any>(null);
+
+// Map registry IDs to loader IDs
+function getLoaderLibraryId(registryId: string): LibraryId | null {
+  const mapping: Record<string, LibraryId> = {
+    'heroicons-vue': 'heroicons-vue',
+    'heroicons-react': 'heroicons-react',
+    'headless-vue': 'headless-vue',
+    'headless-react': 'headless-react',
+    'custom-vue': 'custom-vue',
+    'custom-react': 'custom-react',
+    'vuetify': 'vuetify',
+    'primevue': 'primevue',
+    'naiveui': 'naiveui',
+    'chakraui': 'chakraui',
+    'mantine': 'mantine',
+    'radixui': 'radixui',
+    'shadcnui': 'shadcnui',
+  };
+  return mapping[registryId] || null;
+}
+
 // Listen for preview updates
 function handlePreviewUpdate(event: CustomEvent) {
   const { libraryId, componentId, props } = event.detail;
   localPreview.value = { libraryId, componentId, props };
   showPreviewPanel.value = true;
 }
+
+// Load component when preview changes
+watch(
+  [() => localPreview.value.libraryId, () => localPreview.value.componentId],
+  async ([libraryId, componentId]) => {
+    loadedPreviewComponent.value = null;
+    previewError.value = null;
+    
+    if (!libraryId || !componentId) return;
+    
+    // Handle always-available libraries first
+    if (libraryId === 'heroicons-vue') {
+      loadedPreviewComponent.value = markRaw((HeroiconsVue as any)[componentId] || null);
+      return;
+    }
+    
+    if (libraryId === 'custom-vue') {
+      loadedPreviewComponent.value = markRaw(customComponents[componentId] || null);
+      return;
+    }
+    
+    // For other libraries, load dynamically
+    const loaderLibraryId = getLoaderLibraryId(libraryId);
+    if (!loaderLibraryId) {
+      previewError.value = `Unknown library: ${libraryId}`;
+      return;
+    }
+    
+    previewLoading.value = true;
+    
+    try {
+      const library = await loadLibrary(loaderLibraryId);
+      const component = library.components[componentId];
+      
+      if (component) {
+        loadedPreviewComponent.value = markRaw(component);
+      } else {
+        previewError.value = `Component ${componentId} not found`;
+      }
+    } catch (err: any) {
+      console.error('Failed to load library:', err);
+      previewError.value = err.message || 'Failed to load library';
+    } finally {
+      previewLoading.value = false;
+    }
+  },
+  { immediate: true }
+);
 
 // Computed for preview display
 const previewLibrary = computed(() => 
@@ -63,6 +159,7 @@ const previewComponentMeta = computed(() =>
     ? getComponent(localPreview.value.libraryId, localPreview.value.componentId) 
     : null
 );
+const isVuePreview = computed(() => previewLibrary.value?.framework === 'vue');
 
 // Canvas ref for drag calculations
 const canvasRef = ref<HTMLElement | null>(null);
@@ -409,17 +506,57 @@ const selectedElement = computed(() => {
           <!-- Component Info -->
           <div class="mb-4">
             <h3 class="text-sm font-medium text-white">{{ previewComponentMeta?.name }}</h3>
-            <p class="text-xs text-night-400">{{ previewLibrary?.name }}</p>
+            <p class="text-xs text-night-400 flex items-center gap-2">
+              {{ previewLibrary?.name }}
+              <span 
+                class="text-xs px-1.5 py-0.5 rounded"
+                :class="previewLibrary?.framework === 'vue' 
+                  ? 'bg-emerald-500/20 text-emerald-400' 
+                  : 'bg-sky-500/20 text-sky-400'"
+              >
+                {{ previewLibrary?.framework === 'vue' ? 'Vue' : 'React' }}
+              </span>
+            </p>
           </div>
           
           <!-- Preview Display -->
           <div class="bg-night-950 rounded-lg border border-night-700 p-4 flex items-center justify-center min-h-[120px]">
-            <CanvasElementRenderer
-              :libraryId="localPreview.libraryId"
-              :componentId="localPreview.componentId"
-              :componentProps="localPreview.props"
-              :framework="previewLibrary?.framework || 'vue'"
-            />
+            <!-- Loading state -->
+            <div v-if="previewLoading" class="text-center">
+              <svg class="animate-spin h-8 w-8 mx-auto text-atlas-400" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <p class="text-xs text-night-400 mt-2">Loading...</p>
+            </div>
+            
+            <!-- Vue Component - Live Preview -->
+            <component 
+              v-else-if="isVuePreview && loadedPreviewComponent"
+              :is="loadedPreviewComponent" 
+              v-bind="localPreview.props"
+            >
+              <!-- Default slot content for components that need it -->
+              <template v-if="previewComponentMeta?.category === 'buttons'">
+                {{ localPreview.props.text || localPreview.props.label || previewComponentMeta?.name || 'Button' }}
+              </template>
+            </component>
+            
+            <!-- React Component - Show placeholder -->
+            <div v-else-if="!isVuePreview" class="text-center">
+              <div class="text-night-400 text-sm">{{ previewComponentMeta?.name }}</div>
+              <div class="text-night-500 text-xs mt-1">React component</div>
+            </div>
+            
+            <!-- Error state -->
+            <div v-else-if="previewError" class="text-center">
+              <div class="text-red-400 text-sm">{{ previewError }}</div>
+            </div>
+            
+            <!-- Fallback -->
+            <div v-else class="text-night-500 text-sm">
+              {{ previewComponentMeta?.name || 'Unknown' }}
+            </div>
           </div>
           
           <!-- Component Details -->
