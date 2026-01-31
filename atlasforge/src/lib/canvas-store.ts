@@ -181,15 +181,20 @@ export function clearCanvas(): void {
 
 // Preview actions
 export function setPreviewComponent(libraryId: string, componentId: string, props: Record<string, any>): void {
-  previewComponent.set({ libraryId, componentId, props });
+  // Use setKey for proper reactivity with map stores
+  previewComponent.setKey('libraryId', libraryId);
+  previewComponent.setKey('componentId', componentId);
+  previewComponent.setKey('props', props);
 }
 
 export function updatePreviewProps(props: Record<string, any>): void {
-  previewComponent.set({ ...previewComponent.get(), props });
+  previewComponent.setKey('props', props);
 }
 
 export function clearPreview(): void {
-  previewComponent.set({ libraryId: null, componentId: null, props: {} });
+  previewComponent.setKey('libraryId', null);
+  previewComponent.setKey('componentId', null);
+  previewComponent.setKey('props', {});
 }
 
 // Design persistence
