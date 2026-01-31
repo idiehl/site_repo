@@ -1,34 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { 
   Bars3Icon, 
   AdjustmentsHorizontalIcon,
-  EyeIcon,
-  Square2StackIcon,
   CodeBracketIcon,
   FolderIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps<{
-  mode: 'preview' | 'canvas';
   frameworkFilter: 'all' | 'vue' | 'react';
   leftPanelOpen: boolean;
   rightPanelOpen: boolean;
 }>();
 
 const emit = defineEmits<{
-  'update:mode': [value: 'preview' | 'canvas'];
   'update:frameworkFilter': [value: 'all' | 'vue' | 'react'];
   'update:leftPanelOpen': [value: boolean];
   'update:rightPanelOpen': [value: boolean];
   'export': [];
   'save': [];
 }>();
-
-const modes = [
-  { id: 'preview', label: 'Preview', icon: EyeIcon },
-  { id: 'canvas', label: 'Canvas', icon: Square2StackIcon },
-] as const;
 
 const frameworks = [
   { id: 'all', label: 'All' },
@@ -54,22 +44,6 @@ const frameworks = [
     >
       <Bars3Icon class="w-5 h-5" />
     </button>
-    
-    <!-- Mode Selector -->
-    <div class="flex bg-night-800 rounded-lg p-1">
-      <button
-        v-for="m in modes"
-        :key="m.id"
-        @click="emit('update:mode', m.id)"
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
-        :class="mode === m.id 
-          ? 'bg-atlas-600 text-white' 
-          : 'text-night-400 hover:text-white'"
-      >
-        <component :is="m.icon" class="w-4 h-4" />
-        <span class="hidden sm:inline">{{ m.label }}</span>
-      </button>
-    </div>
     
     <!-- Framework Filter -->
     <div class="flex bg-night-800 rounded-lg p-1">

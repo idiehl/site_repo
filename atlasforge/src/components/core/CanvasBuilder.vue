@@ -327,12 +327,14 @@ const selectedElement = computed(() => {
           />
         </template>
         
-        <!-- Quick delete on hover -->
+        <!-- Quick delete button (only when selected) -->
         <button
+          v-if="selectedId === element.id"
           @click.stop="removeElement(element.id)"
-          class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
+          class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-400 text-white flex items-center justify-center z-20 shadow-lg transition-colors"
+          title="Delete element"
         >
-          <XMarkIcon class="w-3 h-3" />
+          <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
     </div>
