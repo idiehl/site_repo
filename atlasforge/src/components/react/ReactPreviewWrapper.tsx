@@ -3,8 +3,11 @@
  * Supports all React libraries with provider injection
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useStore } from '@nanostores/react';
 import * as HeroiconsReact from '@heroicons/react/24/outline';
 import { loadLibrary, isLibraryLoaded, getLoadedLibrary, type LibraryId } from '../../lib/library-loader';
+import { previewComponent } from '../../lib/canvas-store';
+import { getComponent, getLibrary } from '../../lib/registry';
 
 // Custom React components (always available)
 function CustomCard({ className = '', hover = false, children }: any) {
@@ -309,15 +312,18 @@ interface PreviewState {
 }
 
 export default function ReactPreviewWrapper() {
-  const [preview, setPreview] = useState<PreviewState>({
-    libraryId: '',
-    componentId: '',
-    props: {},
-  });
+  const previewStore = useStore(previewComponent);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [LoadedComponent, setLoadedComponent] = useState<React.ComponentType<any> | null>(null);
   const [mode, setMode] = useState<'preview' | 'canvas'>('preview');
+
+  // Map preview state to a more convenient object
+  const preview = {
+    ...previewStore,
+    category: getComponent(previewStore.libraryId || '', previewStore.componentId || '')?.category,
+    libraryName: getLibrary(previewStore.libraryId || '')?.name,
+  };
   
   // Map registry IDs to loader IDs
   const getLoaderLibraryId = (registryId: string): LibraryId | null => {
@@ -392,29 +398,20 @@ export default function ReactPreviewWrapper() {
     }
   }, [preview.libraryId, preview.componentId]);
   
-  // Listen for preview changes from Vue
+  // Listen for mode changes from Vue
   useEffect(() => {
-    const handlePreviewChange = (event: CustomEvent<PreviewState>) => {
-      setPreview(event.detail);
-    };
-    
     const handleModeChange = (event: CustomEvent<{ mode: 'preview' | 'canvas' }>) => {
       setMode(event.detail.mode);
     };
     
-    window.addEventListener('forge:preview-change', handlePreviewChange as EventListener);
     window.addEventListener('forge:mode-change', handleModeChange as EventListener);
     
     // Check for initial state
-    if ((window as any).__forgePreview) {
-      setPreview((window as any).__forgePreview);
-    }
     if ((window as any).__forgeMode) {
       setMode((window as any).__forgeMode);
     }
     
     return () => {
-      window.removeEventListener('forge:preview-change', handlePreviewChange as EventListener);
       window.removeEventListener('forge:mode-change', handleModeChange as EventListener);
     };
   }, []);

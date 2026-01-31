@@ -75,7 +75,7 @@ const currentComponent = computed(() => {
 
 // Load and resolve component when preview changes
 watch(
-  () => [preview.value.libraryId, preview.value.componentId],
+  [() => preview.value.libraryId, () => preview.value.componentId],
   async ([libraryId, componentId]) => {
     loadedComponent.value = null;
     loadError.value = null;
@@ -120,24 +120,6 @@ watch(
   },
   { immediate: true }
 );
-
-// Notify React about preview changes for cross-framework communication
-function notifyReact() {
-  if (typeof window !== 'undefined') {
-    const detail = {
-      libraryId: preview.value.libraryId,
-      componentId: preview.value.componentId,
-      props: preview.value.props,
-      category: currentComponent.value?.category,
-      libraryName: currentLibrary.value?.name,
-    };
-    (window as any).__forgePreview = detail;
-    window.dispatchEvent(new CustomEvent('forge:preview-change', { detail }));
-  }
-}
-
-watch(preview, notifyReact, { deep: true, immediate: true });
-onMounted(notifyReact);
 
 // Check if current library is Vue-based
 const isVueLibrary = computed(() => {
