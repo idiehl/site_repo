@@ -48,8 +48,8 @@ onMounted(() => {
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
-              <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-8 h-8" />
-              <h1 class="text-xl font-bold text-atlas-400">Atlas Apply Admin</h1>
+              <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-8 h-8" />
+              <h1 class="text-xl font-bold text-atlas-400">tlas Apply Admin</h1>
             </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 

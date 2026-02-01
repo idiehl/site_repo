@@ -25,8 +25,8 @@ const downloadUrl = computed(() => {
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
-              <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-8 h-8" />
-              <h1 class="text-xl font-bold text-atlas-400">Atlas Apply</h1>
+              <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-8 h-8" />
+              <h1 class="text-xl font-bold text-atlas-400">tlas Apply</h1>
             </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 
@@ -69,10 +69,10 @@ const downloadUrl = computed(() => {
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Hero -->
       <div class="text-center mb-12">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-night-800 rounded-2xl mb-6">
-          <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-14 h-14" />
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-12 h-12" />
+          <h1 class="text-3xl font-bold">tlas Apply Browser Extension</h1>
         </div>
-        <h1 class="text-3xl font-bold mb-4">Atlas Apply Browser Extension</h1>
         <p class="text-night-300 text-lg max-w-2xl mx-auto">
           Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, Glassdoor, and more.
         </p>

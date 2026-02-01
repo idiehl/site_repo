@@ -31,8 +31,8 @@ const frameworks = [
   <header class="h-14 bg-night-900 border-b border-night-800 flex items-center px-4 gap-4">
     <!-- Logo -->
     <a href="https://atlasuniversalis.com" class="flex items-center gap-2 mr-4">
-      <img src="/atlas-icon.svg" alt="Atlas" class="h-8 w-8" />
-      <span class="font-semibold text-white hidden sm:block">Atlas Forge</span>
+      <img src="/atlas-icon.svg" alt="Atlas Forge logo" class="h-8 w-8" />
+      <span class="font-semibold text-white hidden sm:block">tlas Forge</span>
     </a>
     
     <!-- Left Panel Toggle -->

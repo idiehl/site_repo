@@ -14,18 +14,14 @@
     <div class="absolute inset-0 bg-[linear-gradient(rgba(94,107,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(94,107,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
     
     <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <!-- Logo - SVG icon with transparent background -->
-      <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
+      <!-- Heading -->
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up flex items-center justify-center gap-4" style="animation-delay: 0.2s;">
         <img 
           src="/atlas-icon.svg" 
-          alt="Atlas Universalis" 
-          class="h-40 w-auto mx-auto animate-float"
+          alt="Atlas Universalis logo" 
+          class="h-14 w-14 md:h-16 md:w-16 animate-float"
         />
-      </div>
-      
-      <!-- Heading -->
-      <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up" style="animation-delay: 0.2s;">
-        <span class="text-white">Atlas</span>
+        <span class="text-white">tlas</span>
         <span class="gradient-text">Universalis</span>
       </h1>
       

@@ -25,8 +25,8 @@ async function handleSubmit() {
       <!-- Logo/Brand -->
       <div class="text-center mb-8 animate-fade-in">
         <div class="flex items-center justify-center gap-3 mb-2">
-          <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-12 h-12" />
-          <h1 class="text-4xl font-bold text-atlas-400">Atlas Apply</h1>
+          <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-12 h-12" />
+          <h1 class="text-4xl font-bold text-atlas-400">tlas Apply</h1>
         </div>
         <p class="text-night-400">The tools you need to build the future you want</p>
       </div>

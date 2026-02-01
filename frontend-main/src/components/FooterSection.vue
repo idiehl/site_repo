@@ -17,11 +17,11 @@ const footerLinks = [
           <a href="/" class="flex items-center gap-3 mb-4">
             <img 
               src="/atlas-icon.svg" 
-              alt="Atlas Universalis" 
+              alt="Atlas Universalis logo" 
               class="h-8 w-auto"
             />
             <span class="text-xl font-bold">
-              <span class="text-white">Atlas</span>
+              <span class="text-white">tlas</span>
               <span class="text-atlas-400">Universalis</span>
             </span>
           </a>
