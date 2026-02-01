@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, shallowRef, markRaw } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { 
   canvasElements, 
   selectedElementId, 
   canvasLayout, 
   gridVisible,
-  previewComponent,
   selectElement,
   updateElementPosition,
   updateElementSize,
@@ -17,149 +16,20 @@ import {
   clearCanvas
 } from '../../lib/canvas-store';
 import { getLibrary, getComponent } from '../../lib/registry';
-import { loadLibrary, isLibraryLoaded, type LibraryId } from '../../lib/library-loader';
 import { 
   TrashIcon, 
   DocumentDuplicateIcon, 
   ChevronUpIcon, 
   ChevronDownIcon,
   Squares2X2Icon,
-  XMarkIcon,
-  EyeIcon
+  XMarkIcon
 } from '@heroicons/vue/24/outline';
 import CanvasElementRenderer from './CanvasElementRenderer.vue';
-
-// Vue component imports (always available)
-import * as HeroiconsVue from '@heroicons/vue/24/outline';
-
-// Custom Vue components
-import CustomCard from '../vue/CustomCard.vue';
-import CustomBadge from '../vue/CustomBadge.vue';
-import CustomAlert from '../vue/CustomAlert.vue';
-import CustomButton from '../vue/CustomButton.vue';
-import CustomInput from '../vue/CustomInput.vue';
-import CustomAvatar from '../vue/CustomAvatar.vue';
-import CustomProgress from '../vue/CustomProgress.vue';
-import CustomTabs from '../vue/CustomTabs.vue';
-
-const customComponents: Record<string, any> = {
-  Card: CustomCard,
-  Badge: CustomBadge,
-  Alert: CustomAlert,
-  Button: CustomButton,
-  Input: CustomInput,
-  Avatar: CustomAvatar,
-  Progress: CustomProgress,
-  Tabs: CustomTabs,
-};
 
 const elements = useStore(canvasElements);
 const selectedId = useStore(selectedElementId);
 const layout = useStore(canvasLayout);
 const showGrid = useStore(gridVisible);
-
-// Preview panel state
-const showPreviewPanel = ref(false);
-const localPreview = ref<{
-  libraryId: string | null;
-  componentId: string | null;
-  props: Record<string, any>;
-}>({
-  libraryId: null,
-  componentId: null,
-  props: {},
-});
-
-// Component loading state for preview
-const previewLoading = ref(false);
-const previewError = ref<string | null>(null);
-const loadedPreviewComponent = shallowRef<any>(null);
-
-// Map registry IDs to loader IDs
-function getLoaderLibraryId(registryId: string): LibraryId | null {
-  const mapping: Record<string, LibraryId> = {
-    'heroicons-vue': 'heroicons-vue',
-    'heroicons-react': 'heroicons-react',
-    'headless-vue': 'headless-vue',
-    'headless-react': 'headless-react',
-    'custom-vue': 'custom-vue',
-    'custom-react': 'custom-react',
-    'vuetify': 'vuetify',
-    'primevue': 'primevue',
-    'naiveui': 'naiveui',
-    'chakraui': 'chakraui',
-    'mantine': 'mantine',
-    'radixui': 'radixui',
-    'shadcnui': 'shadcnui',
-  };
-  return mapping[registryId] || null;
-}
-
-// Listen for preview updates
-function handlePreviewUpdate(event: CustomEvent) {
-  const { libraryId, componentId, props } = event.detail;
-  localPreview.value = { libraryId, componentId, props };
-  showPreviewPanel.value = true;
-}
-
-// Load component when preview changes
-watch(
-  [() => localPreview.value.libraryId, () => localPreview.value.componentId],
-  async ([libraryId, componentId]) => {
-    loadedPreviewComponent.value = null;
-    previewError.value = null;
-    
-    if (!libraryId || !componentId) return;
-    
-    // Handle always-available libraries first
-    if (libraryId === 'heroicons-vue') {
-      loadedPreviewComponent.value = markRaw((HeroiconsVue as any)[componentId] || null);
-      return;
-    }
-    
-    if (libraryId === 'custom-vue') {
-      loadedPreviewComponent.value = markRaw(customComponents[componentId] || null);
-      return;
-    }
-    
-    // For other libraries, load dynamically
-    const loaderLibraryId = getLoaderLibraryId(libraryId);
-    if (!loaderLibraryId) {
-      previewError.value = `Unknown library: ${libraryId}`;
-      return;
-    }
-    
-    previewLoading.value = true;
-    
-    try {
-      const library = await loadLibrary(loaderLibraryId);
-      const component = library.components[componentId];
-      
-      if (component) {
-        loadedPreviewComponent.value = markRaw(component);
-      } else {
-        previewError.value = `Component ${componentId} not found`;
-      }
-    } catch (err: any) {
-      console.error('Failed to load library:', err);
-      previewError.value = err.message || 'Failed to load library';
-    } finally {
-      previewLoading.value = false;
-    }
-  },
-  { immediate: true }
-);
-
-// Computed for preview display
-const previewLibrary = computed(() => 
-  localPreview.value.libraryId ? getLibrary(localPreview.value.libraryId) : null
-);
-const previewComponentMeta = computed(() => 
-  localPreview.value.libraryId && localPreview.value.componentId 
-    ? getComponent(localPreview.value.libraryId, localPreview.value.componentId) 
-    : null
-);
-const isVuePreview = computed(() => previewLibrary.value?.framework === 'vue');
 
 // Canvas ref for drag calculations
 const canvasRef = ref<HTMLElement | null>(null);
@@ -286,14 +156,12 @@ onMounted(() => {
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
   window.addEventListener('keydown', handleKeyDown);
-  window.addEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
 });
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', handleMouseMove);
   window.removeEventListener('mouseup', handleMouseUp);
   window.removeEventListener('keydown', handleKeyDown);
-  window.removeEventListener('forge:preview-update', handlePreviewUpdate as EventListener);
 });
 
 const selectedElement = computed(() => {
@@ -313,14 +181,6 @@ const selectedElement = computed(() => {
           title="Toggle grid"
         >
           <Squares2X2Icon class="w-4 h-4" />
-        </button>
-        <button
-          @click="showPreviewPanel = !showPreviewPanel"
-          class="p-2 rounded-lg transition-colors"
-          :class="showPreviewPanel ? 'bg-atlas-600/20 text-atlas-400' : 'hover:bg-night-800 text-night-400'"
-          title="Toggle preview panel"
-        >
-          <EyeIcon class="w-4 h-4" />
         </button>
       </div>
       
@@ -374,15 +234,13 @@ const selectedElement = computed(() => {
       </button>
     </div>
     
-    <!-- Canvas + Preview Panel Container -->
-    <div class="flex-1 flex overflow-hidden">
-      <!-- Canvas Area -->
-      <div 
-        ref="canvasRef"
-        @click="handleCanvasClick"
-        class="flex-1 relative overflow-auto"
-        :class="showGrid ? 'bg-[url(\'data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%230d0d12%22%2F%3E%3Cpath%20d%3D%22M%2020%200%20L%200%200%200%2020%22%20fill%3D%22none%22%20stroke%3D%22%23343446%22%20stroke-width%3D%220.5%22%2F%3E%3C%2Fsvg%3E\')]' : 'bg-night-950'"
-      >
+    <!-- Canvas Area -->
+    <div 
+      ref="canvasRef"
+      @click="handleCanvasClick"
+      class="flex-1 relative overflow-auto"
+      :class="showGrid ? 'bg-[url(\'data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%230d0d12%22%2F%3E%3Cpath%20d%3D%22M%2020%200%20L%200%200%200%2020%22%20fill%3D%22none%22%20stroke%3D%22%23343446%22%20stroke-width%3D%220.5%22%2F%3E%3C%2Fsvg%3E\')]' : 'bg-night-950'"
+    >
       <!-- Empty state -->
       <div 
         v-if="elements.length === 0"
@@ -479,113 +337,6 @@ const selectedElement = computed(() => {
           <XMarkIcon class="w-4 h-4" />
         </button>
       </div>
-    </div>
-    
-    <!-- Preview Panel (Right Side) -->
-    <div 
-      v-if="showPreviewPanel"
-      class="w-72 border-l border-night-800 bg-night-900 flex flex-col overflow-hidden"
-    >
-      <!-- Preview Header -->
-      <div class="px-3 py-2 border-b border-night-800 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <EyeIcon class="w-4 h-4 text-atlas-400" />
-          <span class="text-sm font-medium text-white">Preview</span>
-        </div>
-        <button
-          @click="showPreviewPanel = false"
-          class="p-1 rounded hover:bg-night-800 text-night-400 hover:text-white transition-colors"
-        >
-          <XMarkIcon class="w-4 h-4" />
-        </button>
-      </div>
-      
-      <!-- Preview Content -->
-      <div class="flex-1 overflow-auto p-4">
-        <template v-if="localPreview.libraryId && localPreview.componentId">
-          <!-- Component Info -->
-          <div class="mb-4">
-            <h3 class="text-sm font-medium text-white">{{ previewComponentMeta?.name }}</h3>
-            <p class="text-xs text-night-400 flex items-center gap-2">
-              {{ previewLibrary?.name }}
-              <span 
-                class="text-xs px-1.5 py-0.5 rounded"
-                :class="previewLibrary?.framework === 'vue' 
-                  ? 'bg-emerald-500/20 text-emerald-400' 
-                  : 'bg-sky-500/20 text-sky-400'"
-              >
-                {{ previewLibrary?.framework === 'vue' ? 'Vue' : 'React' }}
-              </span>
-            </p>
-          </div>
-          
-          <!-- Preview Display -->
-          <div class="bg-night-950 rounded-lg border border-night-700 p-4 flex items-center justify-center min-h-[120px]">
-            <!-- Loading state -->
-            <div v-if="previewLoading" class="text-center">
-              <svg class="animate-spin h-8 w-8 mx-auto text-atlas-400" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-              </svg>
-              <p class="text-xs text-night-400 mt-2">Loading...</p>
-            </div>
-            
-            <!-- Vue Component - Live Preview -->
-            <component 
-              v-else-if="isVuePreview && loadedPreviewComponent"
-              :is="loadedPreviewComponent" 
-              v-bind="localPreview.props"
-            >
-              <!-- Default slot content for components that need it -->
-              <template v-if="previewComponentMeta?.category === 'buttons'">
-                {{ localPreview.props.text || localPreview.props.label || previewComponentMeta?.name || 'Button' }}
-              </template>
-            </component>
-            
-            <!-- React Component - Show placeholder -->
-            <div v-else-if="!isVuePreview" class="text-center">
-              <div class="text-night-400 text-sm">{{ previewComponentMeta?.name }}</div>
-              <div class="text-night-500 text-xs mt-1">React component</div>
-            </div>
-            
-            <!-- Error state -->
-            <div v-else-if="previewError" class="text-center">
-              <div class="text-red-400 text-sm">{{ previewError }}</div>
-            </div>
-            
-            <!-- Fallback -->
-            <div v-else class="text-night-500 text-sm">
-              {{ previewComponentMeta?.name || 'Unknown' }}
-            </div>
-          </div>
-          
-          <!-- Component Details -->
-          <div class="mt-4 space-y-2">
-            <div class="text-xs text-night-500">
-              <span class="text-night-400">Category:</span> {{ previewComponentMeta?.category }}
-            </div>
-            <div class="text-xs text-night-500">
-              <span class="text-night-400">Framework:</span> 
-              <span :class="previewLibrary?.framework === 'vue' ? 'text-green-400' : 'text-blue-400'">
-                {{ previewLibrary?.framework === 'vue' ? 'Vue' : 'React' }}
-              </span>
-            </div>
-          </div>
-          
-          <!-- Hint -->
-          <div class="mt-4 p-2 bg-night-800/50 rounded text-xs text-night-400">
-            Double-click in sidebar to add to canvas
-          </div>
-        </template>
-        
-        <!-- Empty State -->
-        <div v-else class="flex flex-col items-center justify-center h-full text-center">
-          <EyeIcon class="w-10 h-10 text-night-700 mb-3" />
-          <p class="text-sm text-night-500">No component selected</p>
-          <p class="text-xs text-night-600 mt-1">Click a component in the sidebar</p>
-        </div>
-      </div>
-    </div>
     </div>
     
     <!-- Canvas Footer -->
