@@ -13,8 +13,9 @@ This document provides a comprehensive inventory of all files in the Atlas Unive
 Atlas Universalis is a multi-application platform consisting of:
 
 1. **Main Portfolio Site** (`atlasuniversalis.com`) - Company landing page showcasing projects and applications
-2. **QuickPRO** (`quickpro.atlasuniversalis.com`) - AI-powered job application management and resume generation platform (AtlasOps)
-3. **Browser Extension** - Chrome/Edge extension for capturing job postings
+2. **Atlas Apply** (`apply.atlasuniversalis.com`) - AI-powered job application management and resume generation platform (AtlasOps)
+3. **Atlas Forge** (`forge.atlasuniversalis.com`) - UI Design Laboratory for exploring Vue and React components
+4. **Browser Extension** - Chrome/Edge extension for capturing job postings
 
 ---
 
@@ -27,7 +28,8 @@ Atlas Universalis is a multi-application platform consisting of:
 | **Migrations** | Alembic |
 | **Queue** | Redis + Celery |
 | **Frontend (Main)** | Vue 3 + Vite + Tailwind CSS |
-| **Frontend (QuickPRO)** | Vue 3 + Vite + Pinia + Vue Router |
+| **Frontend (Atlas Apply)** | Vue 3 + Vite + Pinia + Vue Router |
+| **Frontend (Atlas Forge)** | Astro + Vue 3 + React |
 | **Reverse Proxy** | Nginx |
 | **Hosting** | DigitalOcean Droplet |
 | **CI/CD** | GitHub Actions (SSH deploy) |
@@ -39,11 +41,12 @@ Atlas Universalis is a multi-application platform consisting of:
 ```
 site_repo/
 ├── alembic/                 # Database migrations
-├── atlasops/                # QuickPRO backend application
+├── atlasops/                # Atlas Apply backend application
 ├── deploy/                  # Deployment configurations
 ├── docs/                    # Documentation
 ├── extension/               # Browser extension (legacy location)
-├── frontend/                # QuickPRO Vue frontend
+├── frontend/                # Atlas Apply Vue frontend
+├── atlasforge/              # Atlas Forge (Astro + Vue + React)
 ├── frontend-main/           # Main portfolio site Vue frontend
 ├── internal/                # Internal assets (wireframes, logo concepts)
 ├── mcp/                     # Model Context Protocol server
@@ -74,7 +77,7 @@ site_repo/
 
 ### Backend: `atlasops/`
 
-Core QuickPRO/AtlasOps backend application.
+Core Atlas Apply/AtlasOps backend application.
 
 #### Configuration & Database
 
@@ -190,9 +193,9 @@ Versioned LLM prompt templates.
 
 ---
 
-### QuickPRO Frontend: `frontend/`
+### Atlas Apply Frontend: `frontend/`
 
-Vue 3 SPA for the QuickPRO application (served at `quickpro.atlasuniversalis.com`).
+Vue 3 SPA for the Atlas Apply application (served at `apply.atlasuniversalis.com`).
 
 #### Configuration
 
@@ -261,8 +264,8 @@ Vue 3 SPA for the QuickPRO application (served at `quickpro.atlasuniversalis.com
 
 | File | Purpose |
 |------|---------|
-| `quickpro-icon.svg` | QuickPRO app icon |
-| `quickpro-extension.zip` | Packaged browser extension |
+| `atlas-icon.svg` | Atlas Apply app icon |
+| `atlas-apply-extension.zip` | Packaged browser extension |
 | `templates/*.svg` | Resume template preview images |
 
 ---
@@ -320,14 +323,14 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 | `atlas-icon.png` | Legacy PNG icon |
 | `atlas-logo.png` | Legacy banner logo |
 | `profile.png` | Profile photo |
-| `quickpro-icon.svg` | QuickPRO icon |
+| `atlas-icon.svg` | Atlas icon |
 | `logo-option-1.svg` through `logo-option-5.svg` | Logo design exploration |
 | `logo-hex-1.svg` through `logo-hex-5.svg` | Hexagon logo variations |
 | `logo-preview.html` | Logo comparison preview page |
 
 ---
 
-### Browser Extension: `quickpro-extension/`
+### Browser Extension: `quickpro-extension/` (Atlas Apply Extension)
 
 Chrome/Edge extension for capturing job postings from web pages.
 
@@ -370,8 +373,8 @@ Nginx configurations and deployment utilities.
 | File | Purpose |
 |------|---------|
 | `nginx-main-site.conf` | Nginx config for atlasuniversalis.com |
-| `nginx-quickpro.conf` | Nginx config for quickpro subdomain |
-| `nginx-quickpro-fixed.conf` | Updated QuickPRO nginx config |
+| `nginx-atlas-apply.conf` | Nginx config for apply subdomain |
+| `nginx-quickpro.conf` | Legacy nginx config (deprecated) |
 | `SETUP.md` | Deployment setup documentation |
 | `clean_env.py` | Environment cleanup utility |
 | `fix_env.py` | Environment fix utility |
@@ -436,9 +439,12 @@ Model Context Protocol server for Cursor IDE integration.
                     │    ├── atlasuniversalis.com         │
                     │    │   └── /var/www/.../frontend-main/dist
                     │    │                                │
-                    │    ├── quickpro.atlasuniversalis.com│
+                    │    ├── apply.atlasuniversalis.com   │
                     │    │   ├── /app/* → frontend/dist   │
                     │    │   └── /api/* → FastAPI :8000   │
+                    │    │                                │
+                    │    ├── forge.atlasuniversalis.com   │
+                    │    │   └── atlasforge/dist          │
                     │    │                                │
                     │    └── FastAPI (Gunicorn/Uvicorn)   │
                     │        └── app.py                   │

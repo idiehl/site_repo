@@ -7,7 +7,7 @@ with open('/var/www/atlasuniversalis.com/.env', 'r') as f:
 # Fix ALLOWED_ORIGINS
 content = re.sub(
     r"ALLOWED_ORIGINS=.*",
-    'ALLOWED_ORIGINS=["https://atlasuniversalis.com","https://www.atlasuniversalis.com","https://quickpro.atlasuniversalis.com"]',
+    'ALLOWED_ORIGINS=["https://atlasuniversalis.com","https://www.atlasuniversalis.com","https://apply.atlasuniversalis.com"]',
     content
 )
 

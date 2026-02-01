@@ -5,7 +5,7 @@ import os
 from PIL import Image, ImageDraw
 
 def create_icon(size):
-    """Create the QuickPRO Q compass icon at the specified size."""
+    """Create the Atlas Apply icon at the specified size."""
     # Create image with dark background
     img = Image.new('RGBA', (size, size), (13, 13, 18, 255))  # #0d0d12
     draw = ImageDraw.Draw(img)

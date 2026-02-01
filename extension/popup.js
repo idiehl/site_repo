@@ -1,6 +1,6 @@
-// QuickPRO Browser Extension - Popup Script
+// Atlas Apply Browser Extension - Popup Script
 
-const API_BASE = 'https://quickpro.atlasuniversalis.com';
+const API_BASE = 'https://apply.atlasuniversalis.com';
 
 // DOM Elements
 const loginView = document.getElementById('login-view');

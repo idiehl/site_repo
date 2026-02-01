@@ -92,7 +92,7 @@ const pages = [
           </div>
           <div>
             <span class="text-night-500">API Endpoint</span>
-            <p class="text-white font-medium">quickpro.atlasuniversalis.com</p>
+            <p class="text-white font-medium">apply.atlasuniversalis.com</p>
           </div>
           <div>
             <span class="text-night-500">Last Deploy</span>

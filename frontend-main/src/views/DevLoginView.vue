@@ -13,7 +13,7 @@ async function handleLogin() {
   
   try {
     // Verify token with backend
-    const response = await fetch(`https://quickpro.atlasuniversalis.com/api/v1/dev/verify?token=${encodeURIComponent(token.value)}`)
+    const response = await fetch(`https://apply.atlasuniversalis.com/api/v1/dev/verify?token=${encodeURIComponent(token.value)}`)
     const data = await response.json()
     
     if (response.ok && data.valid) {

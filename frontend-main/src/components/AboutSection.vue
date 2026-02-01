@@ -12,7 +12,7 @@ const experience = [
     title: 'Founder & Developer',
     company: 'Atlas Universalis LLC',
     period: '2024 - Present',
-    description: 'Building innovative software tools including QuickPRO and creative applications for artists, musicians, and researchers.',
+    description: 'Building innovative software tools including Atlas Apply, Atlas Forge, and creative applications for artists, musicians, and researchers.',
     current: true,
   },
   {

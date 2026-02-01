@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     allowed_origins: List[str] = [
         "http://localhost:5173",
         "http://localhost:8000",
-        "https://quickpro.atlasuniversalis.com",
+        "https://apply.atlasuniversalis.com",
         "https://atlasuniversalis.com",
     ]
 
@@ -44,13 +44,13 @@ class Settings(BaseSettings):
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
-    # Production: https://quickpro.atlasuniversalis.com/api/v1/auth/linkedin/callback
+    # Production: https://apply.atlasuniversalis.com/api/v1/auth/linkedin/callback
 
     # Google OAuth
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
-    # Production: https://quickpro.atlasuniversalis.com/api/v1/auth/google/callback
+    # Production: https://apply.atlasuniversalis.com/api/v1/auth/google/callback
 
     # Billing (Stripe)
     stripe_secret_key: str = ""
@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     stripe_price_id: str = ""
     stripe_success_url: str = "http://localhost:5173/profile?billing=success"
     stripe_cancel_url: str = "http://localhost:5173/profile?billing=cancel"
-    # Production: https://quickpro.atlasuniversalis.com/profile?billing=success|cancel
+    # Production: https://apply.atlasuniversalis.com/profile?billing=success|cancel
 
     # Subscription limits
     free_resume_generation_limit: int = 3

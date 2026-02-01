@@ -1,8 +1,8 @@
 <script setup>
 const apps = [
   {
-    id: 'quickpro',
-    name: 'QuickPRO',
+    id: 'atlas-apply',
+    name: 'Atlas Apply',
     tagline: 'AI-Powered Job Application Manager',
     description: 'Streamline your job search with intelligent resume generation, application tracking, and company insights. Save job postings with one click and let AI tailor your materials for each opportunity.',
     features: [
@@ -11,8 +11,8 @@ const apps = [
       'Company deep-dive insights',
       'Application status tracking',
     ],
-    url: 'https://quickpro.atlasuniversalis.com',
-    icon: '/quickpro-icon.svg',
+    url: 'https://apply.atlasuniversalis.com',
+    icon: '/atlas-icon.svg',
     color: 'atlas',
     status: 'Live',
   },

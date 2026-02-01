@@ -1,4 +1,4 @@
-// QuickPRO Browser Extension - Background Service Worker
+// Atlas Apply Browser Extension - Background Service Worker
 
 const API_BASE = 'https://atlasuniversalis.com';
 

@@ -2,13 +2,13 @@
 // Featured projects (hosted apps)
 const featuredProjects = [
   {
-    id: 'quickpro',
-    name: 'QuickPRO Platform',
+    id: 'atlas-apply',
+    name: 'Atlas Apply',
     description: 'Full-stack job application management platform with AI-powered resume generation, browser extension for one-click job saving, and comprehensive application tracking.',
     technologies: ['Vue 3', 'FastAPI', 'PostgreSQL', 'OpenAI', 'Celery', 'Redis'],
     category: 'Web Application',
     github: 'https://github.com/idiehl/site_repo',
-    demo: 'https://quickpro.atlasuniversalis.com',
+    demo: 'https://apply.atlasuniversalis.com',
     featured: true,
   },
 ]

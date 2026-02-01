@@ -7,7 +7,7 @@ alwaysApply: true
 
 You are working on **Atlas Universalis**, a multi-application platform consisting of:
 - **Main Site** (`atlasuniversalis.com`) — Portfolio/landing page
-- **QuickPRO/AtlasOps** (`quickpro.atlasuniversalis.com`) — AI job application platform
+- **Atlas Apply/AtlasOps** (`apply.atlasuniversalis.com`) — AI job application platform
 - **AtlasForge** (`playground.atlasuniversalis.com`) — UI component playground
 - **Browser Extension** — Job posting capture
 

@@ -56,10 +56,10 @@ onUnmounted(() => {
             {{ link.name }}
           </a>
           <a 
-            href="https://quickpro.atlasuniversalis.com" 
+            href="https://apply.atlasuniversalis.com" 
             class="btn btn-primary text-sm"
           >
-            Launch QuickPRO
+            Launch Atlas Apply
           </a>
         </div>
         
@@ -94,10 +94,10 @@ onUnmounted(() => {
           {{ link.name }}
         </a>
         <a 
-          href="https://quickpro.atlasuniversalis.com" 
+          href="https://apply.atlasuniversalis.com" 
           class="block px-4 py-2 bg-atlas-600 text-white rounded-lg text-center font-medium"
         >
-          Launch QuickPRO
+          Launch Atlas Apply
         </a>
       </div>
     </div>

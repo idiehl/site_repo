@@ -5,7 +5,8 @@ This document describes how to set up the server for the Atlas Universalis websi
 ## Architecture Overview
 
 - **atlasuniversalis.com** - Main portfolio/hub site (static Vue app)
-- **quickpro.atlasuniversalis.com** - QuickPRO application (Vue + FastAPI)
+- **apply.atlasuniversalis.com** - Atlas Apply application (Vue + FastAPI)
+- **forge.atlasuniversalis.com** - Atlas Forge UI playground (Astro + Vue + React)
 
 ## Prerequisites
 
@@ -16,11 +17,11 @@ This document describes how to set up the server for the Atlas Universalis websi
 
 ## Step 1: DNS Configuration
 
-Add an A record for the QuickPRO subdomain:
+Add an A record for the Atlas Apply subdomain:
 
 ```
 Type: A
-Host: quickpro
+Host: apply
 Value: [Your Droplet IP]
 TTL: 3600
 ```
@@ -33,7 +34,8 @@ Run certbot to add the subdomain to your existing certificate:
 sudo certbot certonly --expand \
   -d atlasuniversalis.com \
   -d www.atlasuniversalis.com \
-  -d quickpro.atlasuniversalis.com
+  -d apply.atlasuniversalis.com \
+  -d forge.atlasuniversalis.com
 ```
 
 Or if using nginx plugin:
@@ -42,7 +44,8 @@ Or if using nginx plugin:
 sudo certbot --nginx --expand \
   -d atlasuniversalis.com \
   -d www.atlasuniversalis.com \
-  -d quickpro.atlasuniversalis.com
+  -d apply.atlasuniversalis.com \
+  -d forge.atlasuniversalis.com
 ```
 
 ## Step 3: Install Nginx Configurations
@@ -51,7 +54,7 @@ sudo certbot --nginx --expand \
 
 ```bash
 sudo cp deploy/nginx-main-site.conf /etc/nginx/sites-available/atlasuniversalis-main
-sudo cp deploy/nginx-quickpro.conf /etc/nginx/sites-available/quickpro
+sudo cp deploy/nginx-atlas-apply.conf /etc/nginx/sites-available/atlas-apply
 ```
 
 2. Remove the old configuration:
@@ -64,7 +67,7 @@ sudo rm /etc/nginx/sites-enabled/atlasuniversalis.com
 
 ```bash
 sudo ln -sf /etc/nginx/sites-available/atlasuniversalis-main /etc/nginx/sites-enabled/
-sudo ln -sf /etc/nginx/sites-available/quickpro /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/atlas-apply /etc/nginx/sites-enabled/
 ```
 
 4. Test and reload:
@@ -79,12 +82,12 @@ sudo systemctl reload nginx
 Update `/var/www/atlasuniversalis.com/.env` with subdomain URLs:
 
 ```env
-ALLOWED_ORIGINS=https://quickpro.atlasuniversalis.com,https://atlasuniversalis.com
-FRONTEND_URL=https://quickpro.atlasuniversalis.com
-LINKEDIN_REDIRECT_URI=https://quickpro.atlasuniversalis.com/api/v1/auth/linkedin/callback
-GOOGLE_REDIRECT_URI=https://quickpro.atlasuniversalis.com/api/v1/auth/google/callback
-STRIPE_SUCCESS_URL=https://quickpro.atlasuniversalis.com/profile?billing=success
-STRIPE_CANCEL_URL=https://quickpro.atlasuniversalis.com/profile?billing=cancel
+ALLOWED_ORIGINS=https://apply.atlasuniversalis.com,https://atlasuniversalis.com
+FRONTEND_URL=https://apply.atlasuniversalis.com
+LINKEDIN_REDIRECT_URI=https://apply.atlasuniversalis.com/api/v1/auth/linkedin/callback
+GOOGLE_REDIRECT_URI=https://apply.atlasuniversalis.com/api/v1/auth/google/callback
+STRIPE_SUCCESS_URL=https://apply.atlasuniversalis.com/profile?billing=success
+STRIPE_CANCEL_URL=https://apply.atlasuniversalis.com/profile?billing=cancel
 ```
 
 ## Step 5: Build Both Frontends
@@ -102,7 +105,7 @@ npm ci
 npm run build
 cd ..
 
-# Build QuickPRO app
+# Build Atlas Apply app
 cd frontend
 npm ci
 npm run build
@@ -119,5 +122,5 @@ sudo systemctl reload nginx
 ## Verification
 
 1. Visit https://atlasuniversalis.com - should show the portfolio site
-2. Visit https://quickpro.atlasuniversalis.com - should show QuickPRO login
-3. Test the API: https://quickpro.atlasuniversalis.com/health
+2. Visit https://apply.atlasuniversalis.com - should show Atlas Apply login
+3. Test the API: https://apply.atlasuniversalis.com/health

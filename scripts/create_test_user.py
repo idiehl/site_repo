@@ -13,7 +13,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def create_test_user():
     async with async_session_maker() as session:
         # Check if test user exists
-        result = await session.execute(text("SELECT id FROM users WHERE email = 'demo@quickpro.test'"))
+        result = await session.execute(text("SELECT id FROM users WHERE email = 'demo@atlasapply.test'"))
         if result.first():
             print('Test user already exists')
             return
@@ -22,7 +22,7 @@ async def create_test_user():
         hashed_password = pwd_context.hash('QuickProDemo2026!')
         
         user = User(
-            email='demo@quickpro.test',
+            email='demo@atlasapply.test',
             hashed_password=hashed_password,
             is_admin=False,
             subscription_tier='paid',
@@ -46,7 +46,7 @@ async def create_test_user():
         await session.commit()
         
         print('Test user created successfully!')
-        print('Email: demo@quickpro.test')
+        print('Email: demo@atlasapply.test')
         print('Password: QuickProDemo2026!')
 
 if __name__ == "__main__":

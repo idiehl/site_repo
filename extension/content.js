@@ -1,10 +1,10 @@
-// QuickPRO Browser Extension - Content Script
+// Atlas Apply Browser Extension - Content Script
 // This script runs on job posting pages
 
 (function() {
   // Only run once
-  if (window.quickproInjected) return;
-  window.quickproInjected = true;
+  if (window.atlasApplyInjected) return;
+  window.atlasApplyInjected = true;
 
   // Listen for messages from popup
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -17,14 +17,14 @@
   // Create floating save button
   function createFloatingButton() {
     const button = document.createElement('div');
-    button.id = 'quickpro-save-btn';
+    button.id = 'atlas-apply-save-btn';
     button.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="32" cy="30" r="20" stroke="#5e6bf1" stroke-width="4" fill="none"/>
         <path d="M42 40 L56 54" stroke="#06b6d4" stroke-width="5" stroke-linecap="round"/>
         <circle cx="32" cy="30" r="4" fill="#06b6d4"/>
       </svg>
-      <span>Save to QuickPRO</span>
+      <span>Save to Atlas Apply</span>
     `;
     
     button.addEventListener('click', handleSaveClick);
@@ -35,10 +35,10 @@
 
   // Handle save click
   async function handleSaveClick() {
-    const button = document.getElementById('quickpro-save-btn');
+    const button = document.getElementById('atlas-apply-save-btn');
     const originalContent = button.innerHTML;
     
-    button.innerHTML = '<span class="quickpro-loading"></span><span>Saving...</span>';
+    button.innerHTML = '<span class="atlas-apply-loading"></span><span>Saving...</span>';
     button.classList.add('saving');
     
     try {
@@ -85,7 +85,7 @@
       }
     } catch (err) {
       // Extension context may have been invalidated
-      console.log('QuickPRO: Could not check auth status');
+      console.log('Atlas Apply: Could not check auth status');
     }
   }
 

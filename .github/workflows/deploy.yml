@@ -35,7 +35,7 @@ jobs:
             npm run build
             cd ..
             
-            # Build QuickPRO app (quickpro.atlasuniversalis.com)
+            # Build Atlas Apply app (apply.atlasuniversalis.com)
             cd frontend
             npm ci
             npm run build

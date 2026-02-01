@@ -20,7 +20,7 @@ for line in lines:
     new_lines.append(line)
 
 # Add the correct ALLOWED_ORIGINS
-new_lines.append('ALLOWED_ORIGINS=["https://atlasuniversalis.com","https://www.atlasuniversalis.com","https://quickpro.atlasuniversalis.com"]')
+new_lines.append('ALLOWED_ORIGINS=["https://atlasuniversalis.com","https://www.atlasuniversalis.com","https://apply.atlasuniversalis.com"]')
 
 with open(env_path, 'w') as f:
     f.write('\n'.join(new_lines) + '\n')

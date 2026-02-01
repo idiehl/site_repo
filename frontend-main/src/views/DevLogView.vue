@@ -21,7 +21,7 @@ async function fetchLog() {
   error.value = ''
   
   try {
-    const response = await fetch('https://quickpro.atlasuniversalis.com/api/v1/dev/log', {
+    const response = await fetch('https://apply.atlasuniversalis.com/api/v1/dev/log', {
       headers: {
         'X-Dev-Token': devToken.value
       }

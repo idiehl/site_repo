@@ -1,13 +1,13 @@
-# QuickPRO Browser Extension
+# Atlas Apply Browser Extension
 
-Save job postings to QuickPRO with one click. Works on LinkedIn, Indeed, Glassdoor, and any job site.
+Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, Glassdoor, and any job site.
 
 ## Features
 
 - **One-click save**: Click the toolbar button or floating button to save any job posting
 - **Auto-detection**: Extension detects when you're on a job posting page
 - **Works everywhere**: Bypasses site restrictions by capturing the page you're viewing
-- **Syncs instantly**: Saved jobs appear in your QuickPRO dashboard immediately
+- **Syncs instantly**: Saved jobs appear in your Atlas Apply dashboard immediately
 
 ## Installation (Developer Mode)
 
@@ -15,7 +15,7 @@ Save job postings to QuickPRO with one click. Works on LinkedIn, Indeed, Glassdo
 2. Enable "Developer mode" (toggle in top right)
 3. Click "Load unpacked"
 4. Select this `extension` folder
-5. The QuickPRO icon should appear in your toolbar
+5. The Atlas Apply icon should appear in your toolbar
 
 ## Icon Generation
 
@@ -40,9 +40,9 @@ Create simple colored squares as placeholders - the extension will still work.
 
 ## Usage
 
-1. **Login**: Click the extension icon and sign in with your QuickPRO account
+1. **Login**: Click the extension icon and sign in with your Atlas Apply account
 2. **Browse jobs**: Navigate to any job posting on LinkedIn, Indeed, etc.
-3. **Save**: Click "Save to QuickPRO" in the popup or the floating button
+3. **Save**: Click "Save to Atlas Apply" in the popup or the floating button
 4. **View**: Open your dashboard to see the saved job with extracted details
 
 ## Supported Sites

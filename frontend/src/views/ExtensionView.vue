@@ -13,7 +13,7 @@ function handleLogout() {
 
 // Direct download from our server
 const downloadUrl = computed(() => {
-  return '/quickpro-extension.zip'
+  return '/atlas-apply-extension.zip'
 })
 </script>
 
@@ -24,9 +24,9 @@ const downloadUrl = computed(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
-            <div class="flex items-center">
-              <img src="/quickpro-icon.svg" alt="Q" class="w-8 h-8 -mr-0.5" />
-              <h1 class="text-xl font-bold text-atlas-400">uickPRO</h1>
+            <div class="flex items-center gap-2">
+              <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-8 h-8" />
+              <h1 class="text-xl font-bold text-atlas-400">Atlas Apply</h1>
             </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 
@@ -70,11 +70,11 @@ const downloadUrl = computed(() => {
       <!-- Hero -->
       <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-20 h-20 bg-night-800 rounded-2xl mb-6">
-          <img src="/quickpro-icon.svg" alt="QuickPRO" class="w-14 h-14" />
+          <img src="/atlas-icon.svg" alt="Atlas Apply" class="w-14 h-14" />
         </div>
-        <h1 class="text-3xl font-bold mb-4">QuickPRO Browser Extension</h1>
+        <h1 class="text-3xl font-bold mb-4">Atlas Apply Browser Extension</h1>
         <p class="text-night-300 text-lg max-w-2xl mx-auto">
-          Save job postings to QuickPRO with one click. Works on LinkedIn, Indeed, Glassdoor, and more.
+          Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, Glassdoor, and more.
         </p>
       </div>
 
@@ -126,7 +126,7 @@ const downloadUrl = computed(() => {
             </h3>
             <a 
               :href="downloadUrl" 
-              download="quickpro-extension.zip"
+              download="atlas-apply-extension.zip"
               class="btn-accent inline-flex items-center gap-2"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +177,7 @@ const downloadUrl = computed(() => {
               <span class="w-6 h-6 rounded-full bg-green-500 text-white text-sm flex items-center justify-center">✓</span>
               Pin to Toolbar
             </h3>
-            <p class="text-night-400">Click the puzzle piece icon in your toolbar, then click the pin icon next to QuickPRO to keep it visible.</p>
+            <p class="text-night-400">Click the puzzle piece icon in your toolbar, then click the pin icon next to Atlas Apply to keep it visible.</p>
           </div>
         </div>
       </div>

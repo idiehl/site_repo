@@ -44,10 +44,10 @@ const footerLinks = [
             </li>
             <li>
               <a 
-                href="https://quickpro.atlasuniversalis.com" 
+                href="https://apply.atlasuniversalis.com" 
                 class="text-night-400 hover:text-white transition-colors text-sm"
               >
-                QuickPRO
+                Atlas Apply
               </a>
             </li>
           </ul>

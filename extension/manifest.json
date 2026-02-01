@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "QuickPRO - Job Saver",
+  "name": "Atlas Apply - Job Saver",
   "version": "1.0.0",
-  "description": "Save job postings to QuickPRO with one click. Works on LinkedIn, Indeed, and any job site.",
+  "description": "Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, and any job site.",
   "permissions": [
     "activeTab",
     "storage",
