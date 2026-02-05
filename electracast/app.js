@@ -11,13 +11,34 @@ const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
 const logoutBtn = document.getElementById("logout-btn");
 
+let memoryAuth = false;
+const storageAvailable = (() => {
+  try {
+    localStorage.setItem("__electracast_test__", "1");
+    localStorage.removeItem("__electracast_test__");
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 function setAuthed(isAuthed) {
+  if (!loginView || !siteView) {
+    return;
+  }
   if (isAuthed) {
-    localStorage.setItem(AUTH_KEY, "true");
+    if (storageAvailable) {
+      localStorage.setItem(AUTH_KEY, "true");
+    } else {
+      memoryAuth = true;
+    }
     loginView.classList.add("hidden");
     siteView.classList.remove("hidden");
   } else {
-    localStorage.removeItem(AUTH_KEY);
+    if (storageAvailable) {
+      localStorage.removeItem(AUTH_KEY);
+    }
+    memoryAuth = false;
     loginView.classList.remove("hidden");
     siteView.classList.add("hidden");
   }
@@ -28,25 +49,31 @@ function checkCredentials(email, password) {
   return USERS[key] && USERS[key] === password;
 }
 
-if (localStorage.getItem(AUTH_KEY) === "true") {
+if (storageAvailable && localStorage.getItem(AUTH_KEY) === "true") {
   setAuthed(true);
 }
 
-loginForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  loginError.textContent = "";
+if (loginForm) {
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (loginError) {
+      loginError.textContent = "";
+    }
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-  if (checkCredentials(email, password)) {
-    setAuthed(true);
-    loginForm.reset();
-  } else {
-    loginError.textContent = "Invalid email or password.";
-  }
-});
+    if (checkCredentials(email, password)) {
+      setAuthed(true);
+      loginForm.reset();
+    } else if (loginError) {
+      loginError.textContent = "Invalid email or password.";
+    }
+  });
+}
 
-logoutBtn.addEventListener("click", () => {
-  setAuthed(false);
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    setAuthed(false);
+  });
+}
