@@ -315,9 +315,8 @@ const completenessColor = computed(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-              <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-8 h-8" />
-              <h1 class="text-xl font-bold text-atlas-400">tlas Apply</h1>
+            <div class="flex items-center">
+              <img src="/atlas-apply-wordmark.svg" alt="Atlas Apply" class="h-8 w-auto" />
             </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 

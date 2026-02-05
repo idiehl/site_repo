@@ -33,6 +33,11 @@ body {
   height: 28px;
 }
 
+.logo-wordmark {
+  height: 24px;
+  width: auto;
+}
+
 .logo-text {
   font-size: 20px;
   font-weight: 700;

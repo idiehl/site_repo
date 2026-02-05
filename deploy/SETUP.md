@@ -7,6 +7,7 @@ This document describes how to set up the server for the Atlas Universalis websi
 - **atlasuniversalis.com** - Main portfolio/hub site (static Vue app)
 - **apply.atlasuniversalis.com** - Atlas Apply application (Vue + FastAPI)
 - **forge.atlasuniversalis.com** - Atlas Forge UI playground (Astro + Vue + React)
+- **electracast.atlasuniversalis.com** - ElectraCast development mirror (static)
 
 ## Prerequisites
 
@@ -17,11 +18,16 @@ This document describes how to set up the server for the Atlas Universalis websi
 
 ## Step 1: DNS Configuration
 
-Add an A record for the Atlas Apply subdomain:
+Add A records for the Atlas Apply and ElectraCast subdomains:
 
 ```
 Type: A
 Host: apply
+Value: [Your Droplet IP]
+TTL: 3600
+
+Type: A
+Host: electracast
 Value: [Your Droplet IP]
 TTL: 3600
 ```
@@ -35,7 +41,8 @@ sudo certbot certonly --expand \
   -d atlasuniversalis.com \
   -d www.atlasuniversalis.com \
   -d apply.atlasuniversalis.com \
-  -d forge.atlasuniversalis.com
+  -d forge.atlasuniversalis.com \
+  -d electracast.atlasuniversalis.com
 ```
 
 Or if using nginx plugin:
@@ -45,7 +52,8 @@ sudo certbot --nginx --expand \
   -d atlasuniversalis.com \
   -d www.atlasuniversalis.com \
   -d apply.atlasuniversalis.com \
-  -d forge.atlasuniversalis.com
+  -d forge.atlasuniversalis.com \
+  -d electracast.atlasuniversalis.com
 ```
 
 ## Step 3: Install Nginx Configurations
@@ -55,6 +63,7 @@ sudo certbot --nginx --expand \
 ```bash
 sudo cp deploy/nginx-main-site.conf /etc/nginx/sites-available/atlasuniversalis-main
 sudo cp deploy/nginx-atlas-apply.conf /etc/nginx/sites-available/atlas-apply
+sudo cp deploy/nginx-electracast.conf /etc/nginx/sites-available/electracast
 ```
 
 2. Remove the old configuration:
@@ -68,6 +77,7 @@ sudo rm /etc/nginx/sites-enabled/atlasuniversalis.com
 ```bash
 sudo ln -sf /etc/nginx/sites-available/atlasuniversalis-main /etc/nginx/sites-enabled/
 sudo ln -sf /etc/nginx/sites-available/atlas-apply /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/electracast /etc/nginx/sites-enabled/
 ```
 
 4. Test and reload:
@@ -110,6 +120,8 @@ cd frontend
 npm ci
 npm run build
 cd ..
+
+# ElectraCast mirror is static (no build step)
 ```
 
 ## Step 6: Restart Services

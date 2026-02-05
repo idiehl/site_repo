@@ -69,9 +69,8 @@ const downloadUrl = computed(() => {
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Hero -->
       <div class="text-center mb-12">
-        <div class="flex items-center justify-center gap-3 mb-4">
-          <img src="/atlas-icon.svg" alt="Atlas Apply logo" class="w-12 h-12" />
-          <h1 class="text-3xl font-bold">tlas Apply Browser Extension</h1>
+        <div class="flex items-center justify-center mb-6">
+          <img src="/atlas-apply-wordmark.svg" alt="Atlas Apply" class="h-20 w-auto" />
         </div>
         <p class="text-night-300 text-lg max-w-2xl mx-auto">
           Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, Glassdoor, and more.

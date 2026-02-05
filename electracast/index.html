@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ElectraCast | Atlas Universalis</title>
+    <meta
+      name="description"
+      content="ElectraCast development mirror hosted by Atlas Universalis."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="login-view" class="auth">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <span class="brand-pill">ElectraCast</span>
+          <h1>Sign in to continue</h1>
+          <p>Access the ElectraCast development mirror.</p>
+        </div>
+        <form id="login-form" class="auth-form">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required />
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+          <button type="submit" class="btn primary">Sign In</button>
+          <p id="login-error" class="error" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <div id="site-view" class="site hidden">
+      <header class="site-header">
+        <div class="logo">ElectraCast</div>
+        <nav class="nav">
+          <a href="#podcasts">Podcasts</a>
+          <a href="#networks">Networks</a>
+          <a href="#custom">Custom Branded Podcasts</a>
+          <a href="#music">Music</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+          <a href="#account">My ElectraCast Account</a>
+        </nav>
+        <button id="logout-btn" class="btn ghost">Log out</button>
+      </header>
+
+      <main>
+        <section id="custom" class="hero">
+          <div class="hero-eyebrow">Custom Podcast Production</div>
+          <h1>Transform your influence.</h1>
+          <p>
+            We produce award-winning custom podcasts for your brand.
+            Development, talent, marketing, and distribution - all in one place.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#about">Click to learn more</a>
+            <a class="btn ghost" href="#podcasts">Hear the culture</a>
+          </div>
+          <div class="hero-meta">
+            Development &middot; Talent &middot; Marketing &middot; Distribution
+          </div>
+        </section>
+
+        <section id="about" class="section">
+          <div class="section-header">
+            <h2>Hear the Culture.</h2>
+            <p>
+              We create community and amplify diverse voices through compelling
+              entertainment and story.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <span class="tag">ElectraCast Original</span>
+              <h3>The Last Saturday Night</h3>
+              <p>
+                It seems like a lifetime ago. So much has happened since then,
+                from sanitizer shortages to European escapes.
+              </p>
+            </article>
+            <article class="feature-card">
+              <span class="tag">ElectraCast Original</span>
+              <h3>TechTalk</h3>
+              <p>
+                Jonny Caplan and Jessy Katz take you on an eye-opening journey to
+                discover revolutionary new technology start-ups around the world.
+              </p>
+            </article>
+            <article class="feature-card">
+              <span class="tag">Nightmare Road Stories</span>
+              <h3>Nightmare Road Stories</h3>
+              <p>
+                Comedian Alycia Cooper interviews her stand-up comic friends, who
+                share their most insane, dangerous, and hilarious tales.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="podcasts" class="section dark">
+          <div class="section-header">
+            <h2>Featured Podcasts</h2>
+            <p>Originals and network favorites from ElectraCast.</p>
+          </div>
+          <div class="podcast-grid">
+            <article class="podcast-card">
+              <h3>The Last Saturday Night</h3>
+              <p>ElectraCast Original</p>
+              <button class="btn ghost">Listen</button>
+            </article>
+            <article class="podcast-card">
+              <h3>TechTalk</h3>
+              <p>ElectraCast Original</p>
+              <button class="btn ghost">Listen</button>
+            </article>
+            <article class="podcast-card">
+              <h3>Nightmare Road Stories</h3>
+              <p>ElectraCast Original</p>
+              <button class="btn ghost">Listen</button>
+            </article>
+            <article class="podcast-card">
+              <h3>Unapologetically Fab</h3>
+              <p>Network</p>
+              <button class="btn ghost">Listen</button>
+            </article>
+          </div>
+        </section>
+
+        <section id="news" class="section">
+          <div class="section-header">
+            <h2>Latest News From ElectraCast</h2>
+            <p>Trends, releases, and community highlights.</p>
+          </div>
+          <div class="news-list">
+            <article>
+              <h3>Podcasting 2025 Trends &amp; Predictions from ElectraCast</h3>
+              <p>Podcasting has evolved significantly, and 2025 marks a new chapter.</p>
+            </article>
+            <article>
+              <h3>Are You Thinking of Starting a Podcast?</h3>
+              <p>Is podcasting the next step in your creative vision? Start here.</p>
+            </article>
+            <article>
+              <h3>Building Your Brand with Superstar Women Entrepreneurs</h3>
+              <p>A dynamic podcast network hosted by multiple industry veterans.</p>
+            </article>
+            <article>
+              <h3>ElectraCast Takes You Behind the Scenes of Congress - Every Day!</h3>
+              <p>Get a clear, unbiased look into Capitol Hill's activities.</p>
+            </article>
+            <article>
+              <h3>Every Five Minutes (Elegy, Pt 2) by Jeff Symonds</h3>
+              <p>A punk rock attack on gun violence in America.</p>
+            </article>
+            <article>
+              <h3>ElectraCast's First Music Compilation Album Released</h3>
+              <p>ElectraCast announces the release of its first compilation.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="music" class="section dark">
+          <div class="section-header">
+            <h2>Music</h2>
+            <p>Featured artists and releases.</p>
+          </div>
+          <div class="music-grid">
+            <div class="music-card">
+              <h3>Bindi Heit</h3>
+              <p>Sourced by Spirit</p>
+            </div>
+            <div class="music-card">
+              <h3>Jeralyn Glass</h3>
+              <p>Pentatonic Visions &middot; Joy Reboot</p>
+            </div>
+            <div class="music-card">
+              <h3>Jeff Symonds</h3>
+              <p>48 Lines</p>
+            </div>
+            <div class="music-card">
+              <h3>Pod Till You Drop</h3>
+              <p>Network Original</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="networks" class="section">
+          <div class="section-header">
+            <h2>Networks</h2>
+            <p>Explore the ElectraCast network lineup.</p>
+          </div>
+          <div class="pill-grid">
+            <span>Podcasts</span>
+            <span>Networks</span>
+            <span>Custom Branded Podcasts</span>
+            <span>Music</span>
+            <span>About</span>
+            <span>Register</span>
+            <span>Advertise</span>
+            <span>Contact</span>
+          </div>
+        </section>
+
+        <section id="contact" class="section dark">
+          <div class="section-header">
+            <h2>Contact</h2>
+            <p>Let's build your next show together.</p>
+          </div>
+          <div class="contact-card">
+            <div>
+              <h3>ElectraCast Media</h3>
+              <p>Hear the Culture.</p>
+            </div>
+            <button class="btn primary">Get in touch</button>
+          </div>
+        </section>
+
+        <section id="account" class="section">
+          <div class="section-header">
+            <h2>My ElectraCast Account</h2>
+            <p>Access your personalized dashboard and subscriptions.</p>
+          </div>
+          <div class="account-card">
+            <p>Account access is available to approved team members only.</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div>ElectraCast &copy; 2025 ElectraCast Media LLC. All Rights Reserved.</div>
+        <div>Development mirror hosted on Atlas Universalis.</div>
+      </footer>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

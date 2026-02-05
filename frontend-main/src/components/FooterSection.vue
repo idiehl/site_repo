@@ -14,16 +14,12 @@ const footerLinks = [
       <div class="grid md:grid-cols-3 gap-8">
         <!-- Brand -->
         <div>
-          <a href="/" class="flex items-center gap-3 mb-4">
+          <a href="/" class="mb-4 block">
             <img 
-              src="/atlas-icon.svg" 
-              alt="Atlas Universalis logo" 
+              src="/atlas-universalis-wordmark.svg" 
+              alt="Atlas Universalis" 
               class="h-8 w-auto"
             />
-            <span class="text-xl font-bold">
-              <span class="text-white">tlas</span>
-              <span class="text-atlas-400">Universalis</span>
-            </span>
           </a>
           <p class="text-night-400 text-sm">
             Building innovative software solutions for the modern world.

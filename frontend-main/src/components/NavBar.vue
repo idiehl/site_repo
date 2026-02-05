@@ -33,16 +33,12 @@ onUnmounted(() => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-3 group">
+        <a href="/" class="group">
           <img 
-            src="/atlas-icon.svg" 
-            alt="Atlas Universalis logo" 
+            src="/atlas-universalis-wordmark.svg" 
+            alt="Atlas Universalis" 
             class="h-8 w-auto transition-transform group-hover:scale-105"
           />
-          <span class="text-xl font-bold">
-            <span class="text-white">tlas</span>
-            <span class="text-atlas-400">Universalis</span>
-          </span>
         </a>
         
         <!-- Desktop Navigation -->
