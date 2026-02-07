@@ -20,6 +20,12 @@ node_modules/
 # Build output
 dist/
 
+# Runtime uploads
+atlasops/uploads/
+
+# Internal archives
+internal/Electracast_Codebase.zip
+
 # Logs
 *.log
 npm-debug.log*

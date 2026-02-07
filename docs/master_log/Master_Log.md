@@ -571,3 +571,30 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && cd frontend-main && 
 **Verification:** Build logs completed on droplet  
 **Notes:** Local gcloud ADC auth was triggered during a wait command; credentials saved to `AppData\\Roaming\\gcloud\\application_default_credentials.json`  
 **Concepts:** @concept:deployment @concept:git-hygiene @concept:electracast @concept:meridian
+
+---
+
+## AU-C01-20260207-002 — Ignore ElectraCast archive and clear server stashes
+
+**Type:** Ops  
+**Context:** User requested cleanup to avoid future deploy conflicts and ignore local archive artifacts  
+**Change summary:**
+- Added `internal/Electracast_Codebase.zip` to `.gitignore`
+- Cleared remaining git stashes on the production droplet
+
+**Rationale / tradeoffs:** Prevents accidental commits of large archives and keeps server history clean for future pulls  
+**Files touched:**
+- `.gitignore`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 'cd /var/www/atlasuniversalis.com && git stash drop "stash@{0}"'
+git add .gitignore docs/master_log/Master_Log.md
+git commit -m "AU-C01-20260207-002: Ignore ElectraCast archive and clear stashes"
+git push origin master
+```
+
+**Verification:** None  
+**Notes:** Droplet still has runtime `atlasops/uploads/` as untracked data  
+**Concepts:** @concept:git-hygiene @concept:deployment
