@@ -9,10 +9,10 @@ const error = ref('')
 const docData = ref(null)
 const viewMode = ref('html') // 'html' or 'markdown'
 
-const devToken = computed(() => localStorage.getItem('dev_token') || '')
+const accessToken = computed(() => localStorage.getItem('access_token') || '')
 
 async function fetchOverview() {
-  if (!devToken.value) {
+  if (!accessToken.value) {
     router.push('/dev')
     return
   }
@@ -23,12 +23,13 @@ async function fetchOverview() {
   try {
     const response = await fetch('https://apply.atlasuniversalis.com/api/v1/dev/overview', {
       headers: {
-        'X-Dev-Token': devToken.value
+        Authorization: `Bearer ${accessToken.value}`
       }
     })
     
-    if (response.status === 401) {
-      localStorage.removeItem('dev_token')
+    if (response.status === 401 || response.status === 403) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
       router.push('/dev')
       return
     }

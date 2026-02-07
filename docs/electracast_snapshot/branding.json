@@ -1,0 +1,56 @@
+{
+  "colorScheme": "dark",
+  "fonts": [
+    {"family": "Montserrat", "role": "heading"},
+    {"family": "Roboto", "role": "body"},
+    {"family": "Helvetica", "role": "body"},
+    {"family": "Georgia", "role": "body"}
+  ],
+  "colors": {
+    "primary": "#C9C16C",
+    "accent": "#C9C16C",
+    "background": "#000000",
+    "textPrimary": "#000000",
+    "link": "#007ACC"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Roboto",
+      "heading": "Montserrat"
+    },
+    "fontStacks": {
+      "heading": ["Helvetica", "Georgia", "sans-serif"],
+      "body": ["Helvetica", "Georgia", "sans-serif"],
+      "paragraph": ["Montserrat", "Helvetica", "sans-serif"]
+    },
+    "fontSizes": {
+      "h1": "16px",
+      "h2": "16px",
+      "body": "28px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "2px"
+  },
+  "components": {
+    "buttonPrimary": {
+      "background": "#C9C16C",
+      "textColor": "#FFFFFF",
+      "borderRadius": "3px",
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#FFFFFF",
+      "textColor": "#000000",
+      "borderRadius": "3px",
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png",
+    "favicon": "https://electracast.com/wp-content/uploads/2022/02/cropped-favicon.ico%EF%B9%96format100w-32x32.png",
+    "ogImage": "https://electracast.com/wp-content/uploads/2022/04/ec-social.png"
+  },
+  "frameworkHints": ["WordPress 6.9.1", "bootstrap"]
+}

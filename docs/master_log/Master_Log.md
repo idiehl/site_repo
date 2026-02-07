@@ -491,3 +491,49 @@ git push origin master
 **Verification:** Manual review of updated markdown and dev portal mappings  
 **Notes:** Dev portal endpoints read docs from disk on request  
 **Concepts:** @concept:documentation @concept:dev-portal @concept:electracast
+
+---
+
+## AU-C01-20260205-002 — Sync Meridian groundwork and ElectraCast assets
+
+**Type:** Feature  
+**Context:** User requested pushing uncommitted ElectraCast rebuild work, Meridian scaffolding, and dev portal updates to production  
+**Change summary:**
+- Added Meridian API router/schemas plus a landing view and wordmark
+- Switched dev portal access from token-based login to admin credential auth
+- Added ElectraCast frontend scaffold and captured snapshot assets for rebuild
+- Added per-app logs/overviews/checklists and ElectraCast snapshot docs
+- Tweaked main site hero/footer sizing and Atlas Apply admin/extension headers
+
+**Rationale / tradeoffs:** Consolidates local progress into tracked history so dev portal and rebuild assets stay in sync  
+**Files touched:**
+- `atlasops/api/v1/router.py`
+- `atlasops/api/v1/meridian.py`
+- `atlasops/schemas/__init__.py`
+- `atlasops/schemas/meridian.py`
+- `frontend-main/src/components/AppsSection.vue`
+- `frontend-main/src/components/HeroSection.vue`
+- `frontend-main/src/components/FooterSection.vue`
+- `frontend-main/src/views/DevLoginView.vue`
+- `frontend-main/src/views/DevLogView.vue`
+- `frontend-main/src/views/DevOverviewView.vue`
+- `frontend-main/src/views/MeridianView.vue`
+- `frontend-main/public/atlas-meridian-wordmark.svg`
+- `frontend/src/views/AdminDashboardView.vue`
+- `frontend/src/views/ExtensionView.vue`
+- `docs/master_log/*.md`
+- `docs/electracast_snapshot/*`
+- `electracast/*`
+- `internal/Electracast_Codebase/*`
+- `meridian/*`
+
+**Commands run:**
+```bash
+git add -A
+git commit -m "AU-C01-20260205-002: Sync Meridian and ElectraCast groundwork"
+git push origin master
+```
+
+**Verification:** Not run (CI deploy expected on push)  
+**Notes:** ElectraCast snapshot assets add a large volume of static files  
+**Concepts:** @concept:documentation @concept:electracast @concept:meridian @concept:dev-portal @concept:frontend @concept:api

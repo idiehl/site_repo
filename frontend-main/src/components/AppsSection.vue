@@ -12,9 +12,26 @@ const apps = [
       'Application status tracking',
     ],
     url: 'https://apply.atlasuniversalis.com',
+    ctaLabel: 'Launch Atlas Apply',
     icon: '/atlas-icon.svg',
     color: 'atlas',
     status: 'Live',
+  },
+  {
+    id: 'atlas-meridian',
+    name: 'Atlas Meridian',
+    tagline: 'Interactive Canvas Platform',
+    description: 'Atlas Meridian is a next-generation visual workspace for mapping ideas, systems, and creative projects with a desktop-first experience.',
+    features: [
+      'Spatial canvas with linked nodes',
+      'Advanced media and text editing',
+      'Live collaboration roadmap',
+    ],
+    url: '/meridian',
+    ctaLabel: 'Explore Meridian',
+    icon: '/atlas-icon.svg',
+    color: 'night',
+    status: 'Coming Soon',
   },
   // Future apps can be added here
 ]
@@ -93,10 +110,11 @@ const apps = [
               
               <!-- Launch Button -->
               <a 
+                v-if="app.url"
                 :href="app.url"
                 class="inline-flex items-center gap-2 btn btn-primary"
               >
-                Launch {{ app.name }}
+                {{ app.ctaLabel || `Launch ${app.name}` }}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>

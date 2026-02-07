@@ -14,7 +14,7 @@ const footerLinks = [
       <div class="grid md:grid-cols-3 gap-8">
         <!-- Brand -->
         <div>
-          <a href="/" class="mb-4 block">
+          <a href="/" class="mb-4 inline-block">
             <img 
               src="/atlas-universalis-wordmark.svg" 
               alt="Atlas Universalis" 

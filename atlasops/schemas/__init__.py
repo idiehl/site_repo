@@ -21,6 +21,17 @@ from atlasops.schemas.resume import (
     ResumeGenerateRequest,
     ResumeResponse,
 )
+from atlasops.schemas.meridian import (
+    MeridianDocumentPayload,
+    MeridianProjectCreate,
+    MeridianProjectDetail,
+    MeridianProjectSummary,
+    MeridianStatusResponse,
+    MeridianSyncPullRequest,
+    MeridianSyncPullResponse,
+    MeridianSyncPushRequest,
+    MeridianSyncPushResponse,
+)
 
 __all__ = [
     "TokenResponse",
@@ -36,4 +47,13 @@ __all__ = [
     "ApplicationUpdate",
     "ResumeGenerateRequest",
     "ResumeResponse",
+    "MeridianDocumentPayload",
+    "MeridianProjectCreate",
+    "MeridianProjectDetail",
+    "MeridianProjectSummary",
+    "MeridianStatusResponse",
+    "MeridianSyncPullRequest",
+    "MeridianSyncPullResponse",
+    "MeridianSyncPushRequest",
+    "MeridianSyncPushResponse",
 ]

@@ -47,8 +47,9 @@ onMounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-4">
-            <div class="flex items-center">
-              <img src="/atlas-apply-wordmark.svg" alt="Atlas Apply Admin" class="h-8 w-auto" />
+            <div class="flex items-center gap-3">
+              <img src="/atlas-apply-wordmark.svg" alt="Atlas Apply" class="h-8 w-auto" />
+              <span class="text-xs font-semibold uppercase tracking-wider text-night-400">Admin</span>
             </div>
             <nav class="hidden md:flex items-center gap-1">
               <router-link 
