@@ -537,3 +537,37 @@ git push origin master
 **Verification:** Not run (CI deploy expected on push)  
 **Notes:** ElectraCast snapshot assets add a large volume of static files  
 **Concepts:** @concept:documentation @concept:electracast @concept:meridian @concept:dev-portal @concept:frontend @concept:api
+
+---
+
+## AU-C01-20260207-001 — Reconcile server worktree and deploy updates
+
+**Type:** Ops  
+**Context:** Production droplet had local changes blocking pull; reconcile and deploy latest master  
+**Change summary:**
+- Captured server-local changes and rebased onto origin/master (duplicate changes skipped)
+- Deployed latest builds for `frontend-main`, `frontend`, and `electracast`
+- Left runtime uploads (`atlasops/uploads/`) untracked to avoid committing user data
+
+**Rationale / tradeoffs:** Keeps production repo clean and aligned with origin while avoiding data loss from runtime uploads  
+**Files touched:**
+- `atlasops/api/v1/*`
+- `atlasops/schemas/*`
+- `docs/master_log/*.md`
+- `docs/electracast_snapshot/*`
+- `electracast/*`
+- `frontend-main/src/*`
+- `frontend/src/*`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git add -A && git reset -- atlasops/uploads"
+ssh root@167.71.179.90 "git -C /var/www/atlasuniversalis.com commit-tree ... -m \"AU-C01-20260205-002: Sync Meridian and ElectraCast groundwork\""
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull --rebase origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git rebase --skip"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && cd frontend-main && npm install && npm run build && cd ../frontend && npm install && npm run build && cd ../electracast && npm install && npm run build"
+```
+
+**Verification:** Build logs completed on droplet  
+**Notes:** Local gcloud ADC auth was triggered during a wait command; credentials saved to `AppData\\Roaming\\gcloud\\application_default_credentials.json`  
+**Concepts:** @concept:deployment @concept:git-hygiene @concept:electracast @concept:meridian
