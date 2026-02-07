@@ -627,3 +627,32 @@ git push origin master
 **Verification:** Manual review of updated markdown  
 **Notes:** Focus kept on current build state; troubleshooting details minimized  
 **Concepts:** @concept:documentation @concept:electracast @concept:n8n
+
+---
+
+## AU-C01-20260207-004 — Add ElectraCast build to CI deploy
+
+**Type:** Ops  
+**Context:** User requested integrating ElectraCast into the CI deployment pipeline and updating dev docs  
+**Change summary:**
+- Added ElectraCast build steps to the GitHub Actions deploy workflow
+- Updated ElectraCast log, overview, and checklist with current state and CI status
+
+**Rationale / tradeoffs:** Ensures `electracast.atlasuniversalis.com` is built on every deploy and dev portal reflects current status  
+**Files touched:**
+- `.github/workflows/deploy.yml`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add .github/workflows/deploy.yml docs/master_log/Electracast_Log.md docs/master_log/Electracast_Overview.md docs/master_log/Electracast_Checklist.md docs/master_log/Master_Log.md
+git commit -m "AU-C01-20260207-004: Add ElectraCast build to CI deploy"
+git push origin master
+```
+
+**Verification:** Not run (awaiting deploy after push)  
+**Notes:** CI deploy should build ElectraCast on next workflow run  
+**Concepts:** @concept:deployment @concept:electracast @concept:documentation

@@ -40,6 +40,12 @@ jobs:
             npm ci
             npm run build
             cd ..
+
+            # Build ElectraCast site (electracast.atlasuniversalis.com)
+            cd electracast
+            npm ci
+            npm run build
+            cd ..
             
             # Restart services
             sudo systemctl restart atlasuniversalis

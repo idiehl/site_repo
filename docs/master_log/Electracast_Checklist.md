@@ -23,7 +23,7 @@
 5. [ ] Connect n8n intake workflow to populate assets/content and open PRs
 6. [ ] Add podcast creation + publishing flows
 7. [ ] Integrate Megaphone and external services
-8. [ ] Update CI deploy to build the ElectraCast app
+8. [x] Update CI deploy to build the ElectraCast app
 
 ## Notes / Dependencies
 - Asset ingest pipeline and storage path for media files (`ELECTRACAST_ASSET_DIR`)

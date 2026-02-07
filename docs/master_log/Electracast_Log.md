@@ -12,3 +12,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Implemented a static HTML prototype in `electracast/index.html` with login shell and homepage sections.
 - Confirmed subdomain routing support via `deploy/nginx-electracast.conf` and manual build steps on the droplet.
 - Documented the n8n automation workflow plan for asset ingest, mapping, checklist tracking, and GitHub issue/PR/deploy triggers.
+- Integrated ElectraCast build steps into the CI deploy workflow.

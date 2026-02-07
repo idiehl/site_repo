@@ -16,6 +16,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Static UI prototype lives in `electracast/index.html` with login shell and homepage sections for layout reference.
 - Vue route view components are not implemented yet; the static HTML is the current source of truth.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.
+- CI deploy workflow now builds the ElectraCast app on pushes to `master`.
 
 ## n8n Integration (Automation)
 An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migration work.
@@ -39,4 +40,3 @@ An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migrat
 - Wire asset ingestion and resolve local asset paths (planned alias `/electracast-assets` or `VITE_ELECTRACAST_ASSET_BASE`).
 - Implement auth/account flows and decide backend integration path.
 - Integrate Megaphone APIs for publishing and analytics.
-- Extend CI deploy to build the ElectraCast app in GitHub Actions.
