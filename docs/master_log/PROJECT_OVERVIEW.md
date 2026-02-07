@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-01-30  
+**Last Updated:** 2026-02-05  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -16,6 +16,7 @@ Atlas Universalis is a multi-application platform consisting of:
 2. **Atlas Apply** (`apply.atlasuniversalis.com`) - AI-powered job application management and resume generation platform (AtlasOps)
 3. **Atlas Forge** (`forge.atlasuniversalis.com`) - UI Design Laboratory for exploring Vue and React components
 4. **Browser Extension** - Chrome/Edge extension for capturing job postings
+5. **ElectraCast** (`electracast.atlasuniversalis.com`) - Podcast network site rebuild
 
 ---
 
@@ -30,6 +31,7 @@ Atlas Universalis is a multi-application platform consisting of:
 | **Frontend (Main)** | Vue 3 + Vite + Tailwind CSS |
 | **Frontend (Atlas Apply)** | Vue 3 + Vite + Pinia + Vue Router |
 | **Frontend (Atlas Forge)** | Astro + Vue 3 + React |
+| **Frontend (ElectraCast)** | Vue 3 + Vite + Tailwind CSS |
 | **Reverse Proxy** | Nginx |
 | **Hosting** | DigitalOcean Droplet |
 | **CI/CD** | GitHub Actions (SSH deploy) |
@@ -48,6 +50,7 @@ site_repo/
 ├── frontend/                # Atlas Apply Vue frontend
 ├── atlasforge/              # Atlas Forge (Astro + Vue + React)
 ├── frontend-main/           # Main portfolio site Vue frontend
+├── electracast/             # ElectraCast site Vue frontend
 ├── internal/                # Internal assets (wireframes, logo concepts)
 ├── mcp/                     # Model Context Protocol server
 ├── quickpro-extension/      # Browser extension (current)
@@ -330,6 +333,31 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 
 ---
 
+### ElectraCast Frontend: `electracast/`
+
+Vue 3 SPA for the ElectraCast site (served at `electracast.atlasuniversalis.com`).
+
+#### Configuration
+
+| File | Purpose |
+|------|---------|
+| `index.html` | HTML entry point |
+| `package.json` | npm dependencies |
+| `vite.config.js` | Vite build configuration |
+| `tailwind.config.js` | Tailwind CSS configuration |
+| `postcss.config.js` | PostCSS configuration |
+
+#### Source: `electracast/src/`
+
+| File | Purpose |
+|------|---------|
+| `main.js` | Vue app initialization |
+| `App.vue` | Root component wrapper |
+| `assets/main.css` | Global styles, Tailwind imports |
+| `router/index.js` | Route definitions and page metadata |
+
+---
+
 ### Browser Extension: `quickpro-extension/` (Atlas Apply Extension)
 
 Chrome/Edge extension for capturing job postings from web pages.
@@ -386,6 +414,31 @@ Nginx configurations and deployment utilities.
 | File | Purpose |
 |------|---------|
 | `deploy.yml` | CI/CD workflow: SSH deploy on push to master |
+
+---
+
+### Documentation: `docs/master_log/`
+
+| File | Purpose |
+|------|---------|
+| `Master_Log.md` | Chronological change history for the platform |
+| `PROJECT_OVERVIEW.md` | File inventory and architecture overview |
+| `pdf.css` | Stylesheet for PDF rendering of docs |
+| `Apply_Log.md` | Atlas Apply change log |
+| `Apply_Overview.md` | Atlas Apply project overview |
+| `Apply_Checklist.md` | Atlas Apply objectives checklist |
+| `Forge_Log.md` | Atlas Forge change log |
+| `Forge_Overview.md` | Atlas Forge project overview |
+| `Forge_Checklist.md` | Atlas Forge objectives checklist |
+| `Universalis_Log.md` | Atlas Universalis change log |
+| `Universalis_Overview.md` | Atlas Universalis project overview |
+| `Universalis_Checklist.md` | Atlas Universalis objectives checklist |
+| `Meridian_Log.md` | Atlas Meridian change log |
+| `Meridian_Overview.md` | Atlas Meridian project overview |
+| `Meridian_Checklist.md` | Atlas Meridian objectives checklist |
+| `Electracast_Log.md` | ElectraCast change log |
+| `Electracast_Overview.md` | ElectraCast project overview |
+| `Electracast_Checklist.md` | ElectraCast objectives checklist |
 
 ---
 

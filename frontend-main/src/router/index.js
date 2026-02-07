@@ -6,6 +6,11 @@ const routes = [
     name: 'home',
     component: () => import('../views/HomeView.vue'),
   },
+  {
+    path: '/meridian',
+    name: 'meridian',
+    component: () => import('../views/MeridianView.vue'),
+  },
   // Developer portal routes
   {
     path: '/dev',
@@ -26,6 +31,21 @@ const routes = [
     path: '/dev/overview',
     name: 'dev-overview',
     component: () => import('../views/DevOverviewView.vue'),
+  },
+  {
+    path: '/dev/apps/:appId/log',
+    name: 'dev-app-log',
+    component: () => import('../views/DevAppLogView.vue'),
+  },
+  {
+    path: '/dev/apps/:appId/overview',
+    name: 'dev-app-overview',
+    component: () => import('../views/DevAppOverviewView.vue'),
+  },
+  {
+    path: '/dev/apps/:appId/checklist',
+    name: 'dev-app-checklist',
+    component: () => import('../views/DevAppChecklistView.vue'),
   },
 ]
 

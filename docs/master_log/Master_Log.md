@@ -455,3 +455,39 @@ npm run build  # Successful with code splitting
 - Some libraries have large chunks due to comprehensive component sets
 
 **Concepts:** @concept:atlas-forge @concept:ui-libraries @concept:lazy-loading @concept:code-splitting @concept:vuetify @concept:primevue @concept:naive-ui @concept:chakra-ui @concept:mantine @concept:radix-ui @concept:shadcn
+
+---
+
+## AU-C01-20260205-001 — Add ElectraCast to developer portal
+
+**Type:** Feature  
+**Context:** User requested tracking the ElectraCast rebuild on the dev dashboard  
+**Change summary:**
+- Added ElectraCast to the dev portal application list and labels
+- Added ElectraCast dev docs in the master_log folder
+- Wired ElectraCast docs into the dev API mapping
+- Updated project overview to include ElectraCast documentation
+
+**Rationale / tradeoffs:** Keeps dev portal aligned with active rebuild work and ensures docs are accessible in one place  
+**Files touched:**
+- `frontend-main/src/views/DevDashboardView.vue`
+- `frontend-main/src/views/DevAppOverviewView.vue`
+- `frontend-main/src/views/DevAppLogView.vue`
+- `frontend-main/src/views/DevAppChecklistView.vue`
+- `atlasops/api/v1/dev.py`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add frontend-main/src/views/DevDashboardView.vue frontend-main/src/views/DevAppOverviewView.vue frontend-main/src/views/DevAppLogView.vue frontend-main/src/views/DevAppChecklistView.vue frontend-main/src/router/index.js atlasops/api/v1/dev.py docs/master_log/Electracast_Log.md docs/master_log/Electracast_Overview.md docs/master_log/Electracast_Checklist.md docs/master_log/PROJECT_OVERVIEW.md docs/master_log/Master_Log.md
+git commit -m "AU-C01-20260205-001: Add ElectraCast to dev portal"
+git push origin master
+```
+
+**Verification:** Manual review of updated markdown and dev portal mappings  
+**Notes:** Dev portal endpoints read docs from disk on request  
+**Concepts:** @concept:documentation @concept:dev-portal @concept:electracast

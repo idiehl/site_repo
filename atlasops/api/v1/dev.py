@@ -4,17 +4,49 @@ from pathlib import Path
 from typing import Optional
 
 import markdown
-from fastapi import APIRouter, HTTPException, Header, Query
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from atlasops.config import get_settings
+from atlasops.api.deps import AdminUser
 
 router = APIRouter(prefix="/dev", tags=["dev"])
-settings = get_settings()
 
 # Paths to documentation files
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
 DOCS_DIR = REPO_ROOT / "docs" / "master_log"
+
+APP_DOCS = {
+    "atlas-forge": {
+        "name": "Atlas Forge",
+        "log": "Forge_Log.md",
+        "overview": "Forge_Overview.md",
+        "checklist": "Forge_Checklist.md",
+    },
+    "atlas-apply": {
+        "name": "Atlas Apply",
+        "log": "Apply_Log.md",
+        "overview": "Apply_Overview.md",
+        "checklist": "Apply_Checklist.md",
+    },
+    "atlas-universalis": {
+        "name": "Atlas Universalis",
+        "log": "Universalis_Log.md",
+        "overview": "Universalis_Overview.md",
+        "checklist": "Universalis_Checklist.md",
+    },
+    "electracast": {
+        "name": "ElectraCast",
+        "log": "Electracast_Log.md",
+        "overview": "Electracast_Overview.md",
+        "checklist": "Electracast_Checklist.md",
+    },
+    "atlas-meridian": {
+        "name": "Atlas Meridian",
+        "log": "Meridian_Log.md",
+        "overview": "Meridian_Overview.md",
+        "checklist": "Meridian_Checklist.md",
+    },
+}
 
 
 class DevDocResponse(BaseModel):
@@ -25,9 +57,9 @@ class DevDocResponse(BaseModel):
     last_modified: Optional[str] = None
 
 
-def verify_dev_token(token: str) -> bool:
-    """Verify the developer access token."""
-    return token == settings.dev_token
+class DevChecklistTaskRequest(BaseModel):
+    """Request payload for checklist task creation."""
+    task: str
 
 
 def get_markdown_content(filename: str) -> tuple[str, str]:
@@ -44,70 +76,161 @@ def get_markdown_content(filename: str) -> tuple[str, str]:
     return md_content, html_content
 
 
+def normalize_checklist_task(task: str) -> str:
+    """Normalize and validate a checklist task line."""
+    cleaned = " ".join(task.replace("\r", " ").replace("\n", " ").split())
+    if not cleaned:
+        raise HTTPException(status_code=400, detail="Task cannot be empty")
+    if len(cleaned) > 240:
+        raise HTTPException(status_code=400, detail="Task must be 240 characters or less")
+    return cleaned
+
+
+def append_checklist_task(filename: str, task: str) -> None:
+    """Append a task under the Rapid Capture section."""
+    filepath = DOCS_DIR / filename
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail=f"Document not found: {filename}")
+
+    lines = filepath.read_text(encoding="utf-8").splitlines()
+    header = "## Rapid Capture (Objectives)"
+    placeholder = "- [ ] Add objectives here"
+    task_line = f"- [ ] {task}"
+
+    if header in lines:
+        header_index = lines.index(header)
+        insert_index = header_index + 1
+        while insert_index < len(lines) and not lines[insert_index].strip():
+            insert_index += 1
+        if insert_index < len(lines) and lines[insert_index].strip() == placeholder:
+            lines[insert_index] = task_line
+        else:
+            lines.insert(insert_index, task_line)
+    else:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append(header)
+        lines.append(task_line)
+
+    updated = "\n".join(lines)
+    if not updated.endswith("\n"):
+        updated += "\n"
+    filepath.write_text(updated, encoding="utf-8")
+
+
+def build_doc_response(filename: str, title: str) -> DevDocResponse:
+    """Build a DevDocResponse from a markdown file."""
+    md_content, html_content = get_markdown_content(filename)
+    filepath = DOCS_DIR / filename
+    last_modified = filepath.stat().st_mtime if filepath.exists() else None
+    return DevDocResponse(
+        title=title,
+        content_md=md_content,
+        content_html=html_content,
+        last_modified=str(last_modified) if last_modified else None,
+    )
+
+
 @router.get("/verify")
-async def verify_access(
-    token: str = Query(..., description="Developer access token")
-):
-    """Verify developer access token."""
-    if not verify_dev_token(token):
-        raise HTTPException(status_code=401, detail="Invalid developer token")
-    return {"valid": True, "message": "Developer access granted"}
+async def verify_access(admin: AdminUser):
+    """Verify developer access (admin-only)."""
+    return {
+        "valid": True,
+        "message": "Admin access granted",
+        "email": admin.email,
+    }
+
+
+@router.get("/apps")
+async def list_apps(admin: AdminUser):
+    """List available applications for the dev portal."""
+    apps = []
+    for app_id, info in APP_DOCS.items():
+        apps.append(
+            {
+                "id": app_id,
+                "name": info["name"],
+                "log": f"/api/v1/dev/apps/{app_id}/log",
+                "overview": f"/api/v1/dev/apps/{app_id}/overview",
+                "checklist": f"/api/v1/dev/apps/{app_id}/checklist",
+            }
+        )
+    return {"apps": apps}
 
 
 @router.get("/log", response_model=DevDocResponse)
-async def get_master_log(
-    x_dev_token: str = Header(..., alias="X-Dev-Token", description="Developer access token")
-):
+async def get_master_log(admin: AdminUser):
     """Get the Master Log documentation."""
-    if not verify_dev_token(x_dev_token):
-        raise HTTPException(status_code=401, detail="Invalid developer token")
-    
     try:
-        md_content, html_content = get_markdown_content("Master_Log.md")
-        filepath = DOCS_DIR / "Master_Log.md"
-        last_modified = filepath.stat().st_mtime if filepath.exists() else None
-        
-        return DevDocResponse(
-            title="Master Log",
-            content_md=md_content,
-            content_html=html_content,
-            last_modified=str(last_modified) if last_modified else None
-        )
+        return build_doc_response("Master_Log.md", "Master Log")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/overview", response_model=DevDocResponse)
-async def get_project_overview(
-    x_dev_token: str = Header(..., alias="X-Dev-Token", description="Developer access token")
-):
+async def get_project_overview(admin: AdminUser):
     """Get the Project Overview documentation."""
-    if not verify_dev_token(x_dev_token):
-        raise HTTPException(status_code=401, detail="Invalid developer token")
-    
     try:
-        md_content, html_content = get_markdown_content("PROJECT_OVERVIEW.md")
-        filepath = DOCS_DIR / "PROJECT_OVERVIEW.md"
-        last_modified = filepath.stat().st_mtime if filepath.exists() else None
-        
-        return DevDocResponse(
-            title="Project Overview",
-            content_md=md_content,
-            content_html=html_content,
-            last_modified=str(last_modified) if last_modified else None
-        )
+        return build_doc_response("PROJECT_OVERVIEW.md", "Project Overview")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/apps/{app_id}/log", response_model=DevDocResponse)
+async def get_app_log(app_id: str, admin: AdminUser):
+    """Get an application's log document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        return build_doc_response(app["log"], f"{app['name']} — Log")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/apps/{app_id}/overview", response_model=DevDocResponse)
+async def get_app_overview(app_id: str, admin: AdminUser):
+    """Get an application's overview document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        return build_doc_response(app["overview"], f"{app['name']} — Overview")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/apps/{app_id}/checklist", response_model=DevDocResponse)
+async def get_app_checklist(app_id: str, admin: AdminUser):
+    """Get an application's checklist document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        return build_doc_response(app["checklist"], f"{app['name']} — Checklist")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/apps/{app_id}/checklist/tasks", response_model=DevDocResponse)
+async def add_app_checklist_task(app_id: str, payload: DevChecklistTaskRequest, admin: AdminUser):
+    """Add a task to an application's checklist document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        task = normalize_checklist_task(payload.task)
+        append_checklist_task(app["checklist"], task)
+        return build_doc_response(app["checklist"], f"{app['name']} — Checklist")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/docs")
-async def list_available_docs(
-    x_dev_token: str = Header(..., alias="X-Dev-Token", description="Developer access token")
-):
+async def list_available_docs(admin: AdminUser):
     """List available documentation files."""
-    if not verify_dev_token(x_dev_token):
-        raise HTTPException(status_code=401, detail="Invalid developer token")
-    
     docs = []
     if DOCS_DIR.exists():
         for f in DOCS_DIR.glob("*.md"):
