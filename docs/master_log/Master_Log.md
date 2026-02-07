@@ -598,3 +598,32 @@ git push origin master
 **Verification:** None  
 **Notes:** Droplet still has runtime `atlasops/uploads/` as untracked data  
 **Concepts:** @concept:git-hygiene @concept:deployment
+
+---
+
+## AU-C01-20260207-003 — Expand ElectraCast dev docs and n8n plan
+
+**Type:** Docs  
+**Context:** User requested a detailed ElectraCast status update for transferring context to another chat  
+**Change summary:**
+- Expanded ElectraCast log, overview, and checklist with current build state, UI prototype, and routing status
+- Documented n8n automation workflow and how it will drive asset ingest, mapping, and GitHub actions
+- Clarified next steps for componentization, asset pipeline, and Megaphone integration
+
+**Rationale / tradeoffs:** Keeps dev portal aligned with the current ElectraCast rebuild phase and captures automation strategy  
+**Files touched:**
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add docs/master_log/Electracast_Log.md docs/master_log/Electracast_Overview.md docs/master_log/Electracast_Checklist.md docs/master_log/Master_Log.md
+git commit -m "AU-C01-20260207-003: Expand ElectraCast dev docs and n8n plan"
+git push origin master
+```
+
+**Verification:** Manual review of updated markdown  
+**Notes:** Focus kept on current build state; troubleshooting details minimized  
+**Concepts:** @concept:documentation @concept:electracast @concept:n8n
