@@ -783,3 +783,36 @@ cd frontend-main && npm audit --json
 **Verification:** Builds succeeded for `frontend-main`, `frontend`, and `electracast`; npm audit shows zero vulnerabilities in `frontend-main`  
 **Notes:** Atlas Apply build warns about large chunks; existing warning retained  
 **Concepts:** @concept:frontend @concept:security @concept:build-system
+
+---
+
+## AU-C01-20260208-001 — Fix jsPDF vulnerability in Atlas Apply
+
+**Type:** Fix  
+**Context:** User requested remediating the npm audit jsPDF advisory in the Atlas Apply frontend  
+**Change summary:**
+- Upgraded `jspdf` to 4.1.0 in `frontend` to remove the audit finding
+- Rebuilt the Atlas Apply frontend and re-ran npm audit to confirm clean results
+- Updated Apply log with the vulnerability fix
+
+**Rationale / tradeoffs:** Directly pinning the patched jsPDF version removes the security advisory without altering the app feature set  
+**Files touched:**
+- `frontend/package.json`
+- `frontend/package-lock.json`
+- `docs/master_log/Apply_Log.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+cd frontend && npm install jspdf@^4.1.0 --no-audit --no-fund --progress=false
+cd frontend && npm audit --json
+cd frontend && npm run build
+git add -A
+git commit -m "AU-C01-20260208-001: Fix jsPDF vulnerability in Atlas Apply"
+git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Atlas Apply build succeeded; npm audit now shows zero vulnerabilities  
+**Notes:** Dev portal status toggled to PENDING during fix and returned to READY after deploy  
+**Concepts:** @concept:frontend @concept:security @concept:atlas-apply
