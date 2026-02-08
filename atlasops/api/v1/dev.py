@@ -1,7 +1,9 @@
 """Developer-only API endpoints for internal documentation and tools."""
 
+import json
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 import markdown
 from fastapi import APIRouter, HTTPException
@@ -14,6 +16,7 @@ router = APIRouter(prefix="/dev", tags=["dev"])
 # Paths to documentation files
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
 DOCS_DIR = REPO_ROOT / "docs" / "master_log"
+STATUS_FILE = DOCS_DIR / "dev_status.json"
 
 APP_DOCS = {
     "atlas-forge": {
@@ -60,6 +63,20 @@ class DevDocResponse(BaseModel):
 class DevChecklistTaskRequest(BaseModel):
     """Request payload for checklist task creation."""
     task: str
+
+
+class DevStatus(BaseModel):
+    """Current dev portal status."""
+    status: Literal["READY", "PENDING", "BLOCKED"]
+    message: Optional[str] = None
+    updated_at: Optional[str] = None
+    updated_by: Optional[str] = None
+
+
+class DevStatusUpdate(BaseModel):
+    """Payload for updating dev portal status."""
+    status: Literal["READY", "PENDING", "BLOCKED"]
+    message: Optional[str] = None
 
 
 def get_markdown_content(filename: str) -> tuple[str, str]:
@@ -129,6 +146,46 @@ def build_doc_response(filename: str, title: str) -> DevDocResponse:
         content_html=html_content,
         last_modified=str(last_modified) if last_modified else None,
     )
+
+
+def build_default_status() -> DevStatus:
+    """Create a default dev portal status payload."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    return DevStatus(
+        status="READY",
+        message="All systems ready.",
+        updated_at=timestamp,
+        updated_by="system",
+    )
+
+
+def serialize_status(status: DevStatus) -> dict:
+    """Convert status model to dict across Pydantic versions."""
+    if hasattr(status, "model_dump"):
+        return status.model_dump()
+    return status.dict()
+
+
+def load_status() -> DevStatus:
+    """Load status from disk, falling back to defaults."""
+    if not STATUS_FILE.exists():
+        status = build_default_status()
+        STATUS_FILE.write_text(
+            json.dumps(serialize_status(status), indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return status
+
+    try:
+        payload = json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+        return DevStatus(**payload)
+    except (json.JSONDecodeError, ValueError):
+        status = build_default_status()
+        STATUS_FILE.write_text(
+            json.dumps(serialize_status(status), indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return status
 
 
 @router.get("/verify")
@@ -242,3 +299,26 @@ async def list_available_docs(admin: AdminUser):
             })
     
     return {"docs": docs, "docs_dir": str(DOCS_DIR)}
+
+
+@router.get("/status", response_model=DevStatus)
+async def get_dev_status(admin: AdminUser):
+    """Get the current dev portal status."""
+    return load_status()
+
+
+@router.put("/status", response_model=DevStatus)
+async def update_dev_status(payload: DevStatusUpdate, admin: AdminUser):
+    """Update the dev portal status."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    updated = DevStatus(
+        status=payload.status,
+        message=payload.message,
+        updated_at=timestamp,
+        updated_by=admin.email,
+    )
+    STATUS_FILE.write_text(
+        json.dumps(serialize_status(updated), indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return updated

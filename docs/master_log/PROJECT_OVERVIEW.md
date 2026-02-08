@@ -311,6 +311,7 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 | `ProjectsSection.vue` | Project portfolio section |
 | `AboutSection.vue` | About/company information |
 | `FooterSection.vue` | Site footer with contact info |
+| `DevStatusBanner.vue` | Status indicator banner for the dev portal |
 
 #### Views: `frontend-main/src/views/`
 
@@ -449,6 +450,7 @@ Nginx configurations and deployment utilities.
 | `Electracast_Log.md` | ElectraCast change log |
 | `Electracast_Overview.md` | ElectraCast project overview |
 | `Electracast_Checklist.md` | ElectraCast objectives checklist |
+| `dev_status.json` | Dev portal status indicator state |
 
 ---
 

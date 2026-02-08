@@ -709,3 +709,41 @@ cd electracast && npm run build
 **Verification:** `npm run build` succeeded for the ElectraCast app  
 **Notes:** Legacy login stub removed to avoid hardcoded credentials; future auth should be wired to the backend  
 **Concepts:** @concept:electracast @concept:frontend @concept:react
+
+---
+
+## AU-C01-20260207-006 — Add dev portal status indicator
+
+**Type:** Feature  
+**Context:** User requested a STATUS indicator for the dev portal to track READY/PENDING states  
+**Change summary:**
+- Added dev status storage in `docs/master_log/dev_status.json`
+- Created dev status API endpoints (`GET/PUT /api/v1/dev/status`)
+- Added a status banner component to the dev portal views
+- Updated project overview inventory to include the new status file and component
+
+**Rationale / tradeoffs:** Centralizes release readiness tracking in the dev portal without changing the existing docs workflow  
+**Files touched:**
+- `atlasops/api/v1/dev.py`
+- `docs/master_log/dev_status.json`
+- `frontend-main/src/components/DevStatusBanner.vue`
+- `frontend-main/src/views/DevDashboardView.vue`
+- `frontend-main/src/views/DevLogView.vue`
+- `frontend-main/src/views/DevOverviewView.vue`
+- `frontend-main/src/views/DevAppLogView.vue`
+- `frontend-main/src/views/DevAppOverviewView.vue`
+- `frontend-main/src/views/DevAppChecklistView.vue`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add -A
+git commit -m "AU-C01-20260207-006: Add dev portal status indicator"
+git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis"
+```
+
+**Verification:** Not run (awaiting deploy)  
+**Notes:** Default status seeded as READY; message is optional  
+**Concepts:** @concept:dev-portal @concept:documentation @concept:frontend

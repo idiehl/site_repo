@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ClipboardDocumentCheckIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
+import DevStatusBanner from '../components/DevStatusBanner.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -184,6 +185,8 @@ onMounted(fetchChecklist)
         </div>
       </div>
     </header>
+
+    <DevStatusBanner />
 
     <!-- Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

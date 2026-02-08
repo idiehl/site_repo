@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ClipboardDocumentListIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
+import DevStatusBanner from '../components/DevStatusBanner.vue'
 
 const router = useRouter()
 const loading = ref(true)
@@ -95,6 +96,8 @@ onMounted(fetchLog)
         </div>
       </div>
     </header>
+
+    <DevStatusBanner />
     
     <!-- Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

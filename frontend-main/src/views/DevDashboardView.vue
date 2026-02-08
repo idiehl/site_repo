@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { WrenchScrewdriverIcon, ClipboardDocumentListIcon, FolderOpenIcon } from '@heroicons/vue/24/outline'
+import DevStatusBanner from '../components/DevStatusBanner.vue'
 
 const router = useRouter()
 const accessToken = ref('')
@@ -129,6 +130,8 @@ const platformPages = [
         </div>
       </div>
     </header>
+
+    <DevStatusBanner />
     
     <!-- Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
