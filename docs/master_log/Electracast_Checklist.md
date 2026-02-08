@@ -5,9 +5,9 @@
 **Purpose:** Rapid capture of medium-term objectives, then refine into a step-by-step path.
 
 ## Rapid Capture (Objectives)
-- [ ] Convert static homepage prototype into Vue components
-- [ ] Implement navigation, footer, and global styling system in Vue
-- [ ] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register
+- [x] Convert static homepage prototype into React components
+- [x] Implement navigation, footer, and global styling system in React
+- [x] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register
 - [ ] Migrate podcast and network data with thumbnail coverage
 - [ ] Wire asset ingestion to local media paths and finalize asset base URL
 - [ ] Implement account creation and login flows (UI + backend integration)
@@ -16,8 +16,8 @@
 - [ ] Plan Megaphone API integration and data syncing
 
 ## Focused Path (Step-by-step)
-1. [ ] Split `electracast/index.html` into reusable Vue components and route views
-2. [ ] Create data modules for podcasts, networks, news, and music with asset references
+1. [x] Split `electracast/index.html` into reusable React components and route views
+2. [x] Create data modules for podcasts, networks, news, and music (asset base helper wired)
 3. [ ] Wire asset pipeline (mounted asset dir + base URL resolution)
 4. [ ] Implement auth/account flows and define backend integration
 5. [ ] Connect n8n intake workflow to populate assets/content and open PRs

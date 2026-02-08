@@ -656,3 +656,56 @@ git push origin master
 **Verification:** Not run (awaiting deploy after push)  
 **Notes:** CI deploy should build ElectraCast on next workflow run  
 **Concepts:** @concept:deployment @concept:electracast @concept:documentation
+
+---
+
+## AU-C01-20260207-005 — Migrate ElectraCast to React SPA
+
+**Type:** Refactor  
+**Context:** User requested rebuilding ElectraCast as a React island while keeping the rest of the platform in Vue  
+**Change summary:**
+- Replaced the Vue app with a Vite + React + TypeScript SPA entry, layout, and routing
+- Ported the homepage prototype into React components backed by data modules
+- Added asset base helper and TypeScript config; removed legacy Vue files and the login stub
+- Updated project overview to reflect the React stack and new file inventory
+
+**Rationale / tradeoffs:** React is isolated to the ElectraCast subdomain while Vite and static hosting remain unchanged, minimizing deployment risk and keeping the rebuild aligned with the new frontend direction  
+**Files touched:**
+- `electracast/index.html`
+- `electracast/package.json`
+- `electracast/package-lock.json`
+- `electracast/vite.config.js`
+- `electracast/tailwind.config.js`
+- `electracast/tsconfig.json`
+- `electracast/tsconfig.node.json`
+- `electracast/src/main.tsx`
+- `electracast/src/App.tsx`
+- `electracast/src/routes.tsx`
+- `electracast/src/vite-env.d.ts`
+- `electracast/src/hooks/usePageTitle.ts`
+- `electracast/src/components/*`
+- `electracast/src/pages/*`
+- `electracast/src/data/*`
+- `electracast/src/lib/assets.ts`
+- `electracast/src/App.vue` (deleted)
+- `electracast/src/main.js` (deleted)
+- `electracast/src/router/index.js` (deleted)
+- `electracast/app.js` (deleted)
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+taskkill /PID 38452 /F
+cd electracast && npm install --no-audit --no-fund --progress=false
+cd electracast && npm install react@latest react-dom@latest react-router-dom@latest --no-audit --no-fund --progress=false
+cd electracast && npm install -D @types/react@latest @types/react-dom@latest @vitejs/plugin-react@latest typescript@latest --no-audit --no-fund --progress=false
+cd electracast && npm run build
+```
+
+**Verification:** `npm run build` succeeded for the ElectraCast app  
+**Notes:** Legacy login stub removed to avoid hardcoded credentials; future auth should be wired to the backend  
+**Concepts:** @concept:electracast @concept:frontend @concept:react

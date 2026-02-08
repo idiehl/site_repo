@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-05  
+**Last Updated:** 2026-02-07  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -31,7 +31,7 @@ Atlas Universalis is a multi-application platform consisting of:
 | **Frontend (Main)** | Vue 3 + Vite + Tailwind CSS |
 | **Frontend (Atlas Apply)** | Vue 3 + Vite + Pinia + Vue Router |
 | **Frontend (Atlas Forge)** | Astro + Vue 3 + React |
-| **Frontend (ElectraCast)** | Vue 3 + Vite + Tailwind CSS |
+| **Frontend (ElectraCast)** | React + Vite + Tailwind CSS |
 | **Reverse Proxy** | Nginx |
 | **Hosting** | DigitalOcean Droplet |
 | **CI/CD** | GitHub Actions (SSH deploy) |
@@ -50,7 +50,7 @@ site_repo/
 ├── frontend/                # Atlas Apply Vue frontend
 ├── atlasforge/              # Atlas Forge (Astro + Vue + React)
 ├── frontend-main/           # Main portfolio site Vue frontend
-├── electracast/             # ElectraCast site Vue frontend
+├── electracast/             # ElectraCast site React frontend
 ├── internal/                # Internal assets (wireframes, logo concepts)
 ├── mcp/                     # Model Context Protocol server
 ├── quickpro-extension/      # Browser extension (current)
@@ -335,7 +335,7 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 
 ### ElectraCast Frontend: `electracast/`
 
-Vue 3 SPA for the ElectraCast site (served at `electracast.atlasuniversalis.com`).
+React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversalis.com`).
 
 #### Configuration
 
@@ -343,18 +343,28 @@ Vue 3 SPA for the ElectraCast site (served at `electracast.atlasuniversalis.com`
 |------|---------|
 | `index.html` | HTML entry point |
 | `package.json` | npm dependencies |
+| `package-lock.json` | npm lock file |
 | `vite.config.js` | Vite build configuration |
 | `tailwind.config.js` | Tailwind CSS configuration |
 | `postcss.config.js` | PostCSS configuration |
+| `tsconfig.json` | TypeScript configuration |
+| `tsconfig.node.json` | TypeScript config for tooling |
+| `styles.css` | Global layout styles for the ElectraCast UI |
 
 #### Source: `electracast/src/`
 
 | File | Purpose |
 |------|---------|
-| `main.js` | Vue app initialization |
-| `App.vue` | Root component wrapper |
+| `main.tsx` | React app initialization |
+| `App.tsx` | Root layout and route host |
+| `routes.tsx` | Route definitions and titles |
 | `assets/main.css` | Global styles, Tailwind imports |
-| `router/index.js` | Route definitions and page metadata |
+| `components/*` | Site layout, hero, and section components |
+| `pages/*` | Route views (home, podcasts, networks, etc.) |
+| `data/*` | Structured content data modules |
+| `hooks/usePageTitle.ts` | Route-aware document title logic |
+| `lib/assets.ts` | Asset base URL helper |
+| `vite-env.d.ts` | Vite environment typing |
 
 ---
 

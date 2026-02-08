@@ -10,11 +10,11 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Subdomain routing: `deploy/nginx-electracast.conf`
 
 ## Current State
-- ElectraCast frontend scaffolded in `electracast/` using Vite + Vue 3 + Tailwind.
+- ElectraCast frontend now runs as a React + TypeScript SPA in `electracast/` using Vite + Tailwind.
 - Tailwind config captures ElectraCast fonts and gold/black palette; base styles live in `src/assets/main.css`.
-- Router skeleton defines core pages: home, podcasts, networks, custom branded podcasts, music, about, contact, advertising, register.
-- Static UI prototype lives in `electracast/index.html` with login shell and homepage sections for layout reference.
-- Vue route view components are not implemented yet; the static HTML is the current source of truth.
+- React routes cover core pages: home, podcasts, networks, custom branded podcasts, music, about, contact, advertising, register.
+- Homepage prototype has been ported into React components with data modules backing the content.
+- `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.
 - CI deploy workflow now builds the ElectraCast app on pushes to `master`.
 
@@ -35,8 +35,8 @@ An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migrat
 - Integrate Megaphone APIs and external services for sync and analytics.
 
 ## Next Steps
-- Convert the static HTML prototype into Vue components and route views.
-- Centralize content data (podcasts, networks, news, music) into structured files.
+- Expand route views with full content from the HTML snapshot folders.
+- Enrich content data (podcasts, networks, news, music) with media assets and metadata.
 - Wire asset ingestion and resolve local asset paths (planned alias `/electracast-assets` or `VITE_ELECTRACAST_ASSET_BASE`).
 - Implement auth/account flows and decide backend integration path.
 - Integrate Megaphone APIs for publishing and analytics.
