@@ -747,3 +747,39 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (awaiting deploy)  
 **Notes:** Default status seeded as READY; message is optional  
 **Concepts:** @concept:dev-portal @concept:documentation @concept:frontend
+
+---
+
+## AU-C01-20260207-007 — Upgrade Vite to 7.x
+
+**Type:** Fix  
+**Context:** User requested upgrading Vite to 7.x to address dev dependency vulnerabilities  
+**Change summary:**
+- Upgraded Vite and plugins in `frontend-main`, `frontend`, and `electracast`
+- Rebuilt all three Vite apps to validate the upgrade
+- Verified npm audit for `frontend-main` is clean after upgrade
+
+**Rationale / tradeoffs:** Removes the esbuild/Vite dev-server vulnerability by moving to the latest major release  
+**Files touched:**
+- `frontend-main/package.json`
+- `frontend-main/package-lock.json`
+- `frontend/package.json`
+- `frontend/package-lock.json`
+- `electracast/package.json`
+- `electracast/package-lock.json`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+cd frontend-main && npm install -D vite@latest @vitejs/plugin-vue@latest --no-audit --no-fund --progress=false
+cd frontend && npm install -D vite@latest @vitejs/plugin-vue@latest --no-audit --no-fund --progress=false
+cd electracast && npm install -D vite@latest @vitejs/plugin-react@latest --no-audit --no-fund --progress=false
+cd frontend-main && npm run build
+cd frontend && npm run build
+cd electracast && npm run build
+cd frontend-main && npm audit --json
+```
+
+**Verification:** Builds succeeded for `frontend-main`, `frontend`, and `electracast`; npm audit shows zero vulnerabilities in `frontend-main`  
+**Notes:** Atlas Apply build warns about large chunks; existing warning retained  
+**Concepts:** @concept:frontend @concept:security @concept:build-system
