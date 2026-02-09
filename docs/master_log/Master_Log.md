@@ -1253,3 +1253,32 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (manual testing not performed)  
 **Notes:** Reset tokens only returned when `debug=true`; production will need email delivery  
 **Concepts:** @concept:electracast @concept:backend @concept:auth
+
+---
+
+## AU-C01-20260208-015 — Enable IPv6 listeners for Nginx
+
+**Type:** Ops  
+**Context:** Mobile users were seeing "page isn't working" while desktop loaded; suspected IPv6 mismatch  
+**Change summary:**
+- Added IPv6 listen directives for main, apply, and ElectraCast Nginx configs
+- Planned Nginx reload to serve IPv6 traffic alongside IPv4
+
+**Rationale / tradeoffs:** IPv6 AAAA DNS was present but Nginx only listened on IPv4, causing mobile failures on IPv6-first networks  
+**Files touched:**
+- `deploy/nginx-main-site.conf`
+- `deploy/nginx-atlas-apply.conf`
+- `deploy/nginx-electracast.conf`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add deploy docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && sudo cp deploy/nginx-main-site.conf /etc/nginx/sites-available/atlasuniversalis-main && sudo cp deploy/nginx-atlas-apply.conf /etc/nginx/sites-available/atlas-apply && sudo cp deploy/nginx-electracast.conf /etc/nginx/sites-available/electracast && sudo nginx -t && sudo systemctl reload nginx"
+```
+
+**Verification:** Pending (need to re-test mobile load)  
+**Notes:** If mobile issues persist, remove AAAA DNS or validate IPv6 firewall rules  
+**Concepts:** @concept:deployment @concept:nginx
