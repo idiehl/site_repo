@@ -1,5 +1,6 @@
 """Authentication endpoints."""
 
+import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
@@ -19,6 +20,9 @@ from atlasops.models.user import User, UserProfile
 from atlasops.models.electracast import ElectraCastProfile
 from atlasops.schemas.user import (
     CurrentUserResponse,
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    PasswordResetResponse,
     TokenResponse,
     UserCreate,
     UserResponse,
@@ -61,6 +65,17 @@ def create_refresh_token(data: dict) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
+def create_password_reset_token() -> str:
+    """Create a password reset token."""
+    return secrets.token_urlsafe(32)
+
+
+def hash_reset_token(token: str) -> str:
+    """Hash a password reset token."""
+    salted = f"{token}{settings.secret_key}"
+    return hashlib.sha256(salted.encode("utf-8")).hexdigest()
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_in: UserCreate, db: DbSession) -> User:
     """Register a new user."""
@@ -99,7 +114,9 @@ async def login(
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    if not user or not user.hashed_password or not verify_password(
+        form_data.password, user.hashed_password
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -131,6 +148,67 @@ async def get_current_user_info(current_user: CurrentUser) -> dict:
 async def logout() -> dict:
     """Logout user (client should discard tokens)."""
     return {"message": "Successfully logged out"}
+
+
+@router.post("/password-reset/request", response_model=PasswordResetResponse)
+async def request_password_reset(
+    payload: PasswordResetRequest,
+    db: DbSession,
+) -> dict:
+    """Request a password reset link."""
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    reset_token = None
+    expires_at = None
+    if user:
+        reset_token = create_password_reset_token()
+        user.password_reset_token_hash = hash_reset_token(reset_token)
+        user.password_reset_requested_at = datetime.now(timezone.utc)
+        user.password_reset_expires_at = datetime.now(timezone.utc) + timedelta(hours=2)
+        expires_at = user.password_reset_expires_at
+        await db.commit()
+
+    response = {
+        "message": "If an account exists for that email, a reset link will be sent shortly.",
+    }
+    if settings.debug and reset_token:
+        response["reset_token"] = reset_token
+        response["expires_at"] = expires_at
+    return response
+
+
+@router.post("/password-reset/confirm", response_model=PasswordResetResponse)
+async def confirm_password_reset(
+    payload: PasswordResetConfirm,
+    db: DbSession,
+) -> dict:
+    """Confirm a password reset with a valid token."""
+    token_hash = hash_reset_token(payload.token)
+    result = await db.execute(
+        select(User).where(User.password_reset_token_hash == token_hash)
+    )
+    user = result.scalar_one_or_none()
+    now = datetime.now(timezone.utc)
+
+    if (
+        not user
+        or not user.password_reset_expires_at
+        or user.password_reset_expires_at < now
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    user.password_reset_token_hash = None
+    user.password_reset_requested_at = None
+    user.password_reset_expires_at = None
+
+    await db.commit()
+
+    return {"message": "Password updated successfully."}
 
 
 # LinkedIn OAuth endpoints

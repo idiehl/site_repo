@@ -39,6 +39,27 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class PasswordResetRequest(BaseModel):
+    """Schema for requesting a password reset."""
+
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    """Schema for confirming a password reset."""
+
+    token: str = Field(min_length=32)
+    new_password: str = Field(min_length=8, max_length=100)
+
+
+class PasswordResetResponse(BaseModel):
+    """Schema for password reset responses."""
+
+    message: str
+    reset_token: Optional[str] = None
+    expires_at: Optional[datetime] = None
+
+
 class CurrentUserResponse(UserResponse):
     """Extended user response with entitlements."""
 

@@ -205,6 +205,7 @@ Versioned LLM prompt templates.
 | `versions/20260115_0012_add_subscription_fields.py` | Subscription tier fields |
 | `versions/20260116_0001_add_job_application_status.py` | Application status enhancements |
 | `versions/20260208_0014_add_electracast_profiles.py` | ElectraCast profile table |
+| `versions/20260208_0015_add_password_reset_fields.py` | Password reset token fields |
 
 ---
 

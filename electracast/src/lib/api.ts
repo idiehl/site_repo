@@ -4,6 +4,12 @@ export type AuthTokens = {
   token_type: string
 }
 
+export type PasswordResetResponse = {
+  message: string
+  reset_token?: string
+  expires_at?: string
+}
+
 export type ElectraCastProfile = {
   id: string
   user_id: string
@@ -29,7 +35,8 @@ export type ElectraCastAccount = {
 }
 
 const AUTH_STORAGE_KEY = 'electracast_auth'
-const rawApiBase = import.meta.env.VITE_API_BASE_URL || ''
+const defaultApiBase = import.meta.env.PROD ? 'https://apply.atlasuniversalis.com' : ''
+const rawApiBase = import.meta.env.VITE_API_BASE_URL || defaultApiBase
 const apiBase = rawApiBase.replace(/\/+$/, '')
 
 const buildUrl = (path: string) => {
@@ -108,6 +115,31 @@ export const loginUser = async (email: string, password: string): Promise<AuthTo
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: form.toString(),
+  })
+}
+
+export const requestPasswordReset = async (
+  email: string
+): Promise<PasswordResetResponse> => {
+  return requestJson<PasswordResetResponse>('/api/v1/auth/password-reset/request', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  })
+}
+
+export const confirmPasswordReset = async (
+  token: string,
+  newPassword: string
+): Promise<PasswordResetResponse> => {
+  return requestJson<PasswordResetResponse>('/api/v1/auth/password-reset/confirm', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token, new_password: newPassword }),
   })
 }
 

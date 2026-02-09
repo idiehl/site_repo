@@ -1213,3 +1213,43 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (manual testing not performed)  
 **Notes:** ElectraCast profiles auto-create on first API access  
 **Concepts:** @concept:electracast @concept:frontend @concept:backend @concept:auth
+
+---
+
+## AU-C01-20260208-014 — Add ElectraCast password reset flow
+
+**Type:** Feature  
+**Context:** User requested password reset support after account wiring  
+**Change summary:**
+- Added password reset request/confirm endpoints and DB fields
+- Updated ElectraCast account page with reset forms and API wiring
+- Expanded CORS origins and updated docs
+
+**Rationale / tradeoffs:** Enables account recovery now while email delivery is still pending  
+**Files touched:**
+- `atlasops/api/v1/auth.py`
+- `atlasops/models/user.py`
+- `atlasops/schemas/user.py`
+- `atlasops/schemas/__init__.py`
+- `atlasops/config.py`
+- `alembic/versions/20260208_0015_add_password_reset_fields.py`
+- `electracast/src/lib/api.ts`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/pages/Register.tsx`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+- `README.md`
+
+**Commands run:**
+```bash
+git add atlasops electracast alembic docs/master_log README.md
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Not run (manual testing not performed)  
+**Notes:** Reset tokens only returned when `debug=true`; production will need email delivery  
+**Concepts:** @concept:electracast @concept:backend @concept:auth

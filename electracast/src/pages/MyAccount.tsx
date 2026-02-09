@@ -2,10 +2,12 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import SectionHeader from '../components/SectionHeader'
 import {
   clearStoredAuth,
+  confirmPasswordReset,
   ElectraCastAccount,
   getElectraCastAccount,
   getStoredAuth,
   loginUser,
+  requestPasswordReset,
   setStoredAuth,
   updateElectraCastProfile,
 } from '../lib/api'
@@ -105,6 +107,14 @@ const MyAccount = () => {
   const [account, setAccount] = useState<ElectraCastAccount | null>(null)
   const [loading, setLoading] = useState(false)
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [resetRequest, setResetRequest] = useState({ email: '' })
+  const [resetConfirm, setResetConfirm] = useState({
+    token: '',
+    password: '',
+    confirmPassword: '',
+  })
+  const [resetTokenHint, setResetTokenHint] = useState<string | null>(null)
+  const [resetLoading, setResetLoading] = useState(false)
   const [profileForm, setProfileForm] = useState({
     display_name: '',
     handle: '',
@@ -116,6 +126,7 @@ const MyAccount = () => {
   })
   const [loginStatus, setLoginStatus] = useState<StatusMessage | null>(null)
   const [profileStatus, setProfileStatus] = useState<StatusMessage | null>(null)
+  const [resetStatus, setResetStatus] = useState<StatusMessage | null>(null)
 
   useEffect(() => {
     if (!auth) {
@@ -137,6 +148,9 @@ const MyAccount = () => {
           location: data.profile.location ?? '',
           bio: data.profile.bio ?? '',
         })
+        setResetRequest((prev) =>
+          prev.email ? prev : { ...prev, email: data.user.email }
+        )
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load account.'
         setLoginStatus({ type: 'error', message })
@@ -151,6 +165,18 @@ const MyAccount = () => {
   const handleLoginChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
     setLoginForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleResetRequestChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setResetRequest((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleResetConfirmChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target
+    setResetConfirm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleProfileChange = (
@@ -190,6 +216,56 @@ const MyAccount = () => {
       location: '',
       bio: '',
     })
+    setResetRequest({ email: '' })
+    setResetConfirm({ token: '', password: '', confirmPassword: '' })
+    setResetTokenHint(null)
+  }
+
+  const handleResetRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setResetStatus(null)
+    setResetLoading(true)
+    try {
+      const response = await requestPasswordReset(resetRequest.email.trim())
+      setResetStatus({ type: 'success', message: response.message })
+      if (response.reset_token) {
+        setResetTokenHint(response.reset_token)
+        setResetConfirm((prev) => ({ ...prev, token: response.reset_token ?? '' }))
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Password reset request failed.'
+      setResetStatus({ type: 'error', message })
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
+  const handleResetConfirm = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setResetStatus(null)
+
+    if (resetConfirm.password !== resetConfirm.confirmPassword) {
+      setResetStatus({ type: 'error', message: 'Passwords do not match.' })
+      return
+    }
+
+    setResetLoading(true)
+    try {
+      const response = await confirmPasswordReset(
+        resetConfirm.token.trim(),
+        resetConfirm.password
+      )
+      setResetStatus({ type: 'success', message: response.message })
+      setResetConfirm({ token: '', password: '', confirmPassword: '' })
+      setResetTokenHint(null)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Password reset failed.'
+      setResetStatus({ type: 'error', message })
+    } finally {
+      setResetLoading(false)
+    }
   }
 
   const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -287,6 +363,79 @@ const MyAccount = () => {
         )}
         {loginStatus ? (
           <p className={`status-message ${loginStatus.type}`}>{loginStatus.message}</p>
+        ) : null}
+      </div>
+
+      <div className="account-card" id="password-reset">
+        <h3>Password reset</h3>
+        <p>
+          Request a reset link to update your password. During development we will show
+          the reset token below.
+        </p>
+        <form className="contact-form" onSubmit={handleResetRequest}>
+          <div className="form-grid">
+            <label className="form-field full">
+              <span>Email</span>
+              <input
+                type="email"
+                name="email"
+                value={resetRequest.email}
+                onChange={handleResetRequestChange}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-actions">
+            <button className="btn ghost" type="submit" disabled={resetLoading}>
+              {resetLoading ? 'Requesting...' : 'Send reset link'}
+            </button>
+          </div>
+        </form>
+        {resetTokenHint ? (
+          <p className="form-note">Dev reset token: {resetTokenHint}</p>
+        ) : null}
+        <form className="contact-form" onSubmit={handleResetConfirm}>
+          <div className="form-grid">
+            <label className="form-field full">
+              <span>Reset Token</span>
+              <input
+                type="text"
+                name="token"
+                value={resetConfirm.token}
+                onChange={handleResetConfirmChange}
+                required
+              />
+            </label>
+            <label className="form-field full">
+              <span>New Password</span>
+              <input
+                type="password"
+                name="password"
+                value={resetConfirm.password}
+                onChange={handleResetConfirmChange}
+                required
+              />
+            </label>
+            <label className="form-field full">
+              <span>Confirm Password</span>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={resetConfirm.confirmPassword}
+                onChange={handleResetConfirmChange}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-actions">
+            <button className="btn" type="submit" disabled={resetLoading}>
+              {resetLoading ? 'Updating...' : 'Set new password'}
+            </button>
+            <span className="form-note">Passwords must be at least 8 characters.</span>
+          </div>
+        </form>
+        {resetStatus ? (
+          <p className={`status-message ${resetStatus.type}`}>{resetStatus.message}</p>
         ) : null}
       </div>
 

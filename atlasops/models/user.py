@@ -26,6 +26,17 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Password reset
+    password_reset_token_hash: Mapped[Optional[str]] = mapped_column(
+        String(128), nullable=True, index=True
+    )
+    password_reset_requested_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    password_reset_expires_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     
     # OAuth fields
     oauth_provider: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)

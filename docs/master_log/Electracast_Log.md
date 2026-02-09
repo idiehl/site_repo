@@ -30,3 +30,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Updated homepage copy to mirror featured originals from the legacy snapshot.
 - Mapped artwork for featured podcasts, music releases, and network tiles.
 - Wired ElectraCast registration, login, and profile updates to new backend endpoints.
+- Added a password reset flow for ElectraCast accounts.

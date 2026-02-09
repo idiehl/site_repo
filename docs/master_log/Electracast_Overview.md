@@ -24,6 +24,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Homepage featured originals copy now aligns with the legacy snapshot.
 - Artwork mapping now covers featured podcast covers, music releases, and network tiles.
 - ElectraCast account registration, login, and profile updates are now wired to backend endpoints.
+- Password reset requests and confirmations are now supported for ElectraCast accounts.
 - Homepage prototype has been ported into React components with data modules backing the content.
 - `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.

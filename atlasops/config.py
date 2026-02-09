@@ -30,9 +30,11 @@ class Settings(BaseSettings):
     # CORS - includes subdomain for production
     allowed_origins: List[str] = [
         "http://localhost:5173",
+        "http://localhost:5175",
         "http://localhost:8000",
         "https://apply.atlasuniversalis.com",
         "https://atlasuniversalis.com",
+        "https://electracast.atlasuniversalis.com",
     ]
 
     # OpenAI

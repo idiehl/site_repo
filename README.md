@@ -116,6 +116,8 @@ celery -A atlasops.workers.tasks beat --loglevel=info
 - `POST /api/v1/auth/login` - Login and get tokens
 - `GET /api/v1/auth/me` - Get current user
 - `POST /api/v1/auth/logout` - Logout
+- `POST /api/v1/auth/password-reset/request` - Request password reset
+- `POST /api/v1/auth/password-reset/confirm` - Confirm password reset
 
 ### Jobs
 - `POST /api/v1/jobs/ingest` - Submit job URLs for processing

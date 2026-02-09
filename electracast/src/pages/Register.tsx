@@ -80,7 +80,8 @@ const Register = () => {
           </li>
         </ul>
         <p>
-          Already a member? <a href="/account">Log in</a>.
+          Already a member? <a href="/account">Log in</a> or{' '}
+          <a href="/account#password-reset">reset your password</a>.
         </p>
       </div>
       <div className="account-card">

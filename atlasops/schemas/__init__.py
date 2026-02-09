@@ -1,6 +1,9 @@
 """Pydantic schemas for request/response validation."""
 
 from atlasops.schemas.user import (
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    PasswordResetResponse,
     TokenResponse,
     UserCreate,
     UserResponse,
@@ -40,6 +43,9 @@ from atlasops.schemas.electracast import (
 
 __all__ = [
     "TokenResponse",
+    "PasswordResetConfirm",
+    "PasswordResetRequest",
+    "PasswordResetResponse",
     "UserCreate",
     "UserResponse",
     "UserProfileResponse",
