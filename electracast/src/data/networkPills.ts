@@ -1,10 +1,3 @@
-export const networkPills = [
-  'Podcasts',
-  'Networks',
-  'Custom Branded Podcasts',
-  'Music',
-  'About',
-  'Register',
-  'Advertise',
-  'Contact',
-]
+import { networkDirectory } from './networks'
+
+export const networkPills = networkDirectory.map((network) => network.name)

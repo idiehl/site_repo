@@ -44,8 +44,8 @@
 
 ### Legacy Content Migration (HTML → React)
 - [ ] Home: mirror headline, CTA, and section copy from snapshot
-- [ ] Podcasts: port legacy copy + artwork mapping
-- [ ] Networks: port legacy copy + network list/artwork
+- [x] Podcasts: directory list + legacy links (artwork pending)
+- [x] Networks: network directory list + legacy links (artwork pending)
 - [ ] Custom Branded Podcasts: port legacy copy + example roster
 - [ ] Music: port artist/release blocks and imagery
 - [x] Advertising: advertisers banner + inquiry form layout (submission pending)

@@ -254,6 +254,21 @@ main {
   background: var(--panel-2);
 }
 
+.podcast-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.podcast-image {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
 .account-card h3 {
   margin: 0 0 8px;
   font-size: 18px;
@@ -270,6 +285,24 @@ main {
   margin-top: 24px;
   display: grid;
   gap: 20px;
+}
+
+.network-grid {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.network-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.network-card h4 {
+  margin: 0;
+  font-size: 16px;
 }
 
 .resource-list {

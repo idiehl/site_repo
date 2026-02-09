@@ -1005,3 +1005,37 @@ N/A
 **Verification:** Not run (content updates only)  
 **Notes:** Contact form submission remains disabled until the intake pipeline is wired  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-008 — Add ElectraCast podcasts + networks directories
+
+**Type:** Feature  
+**Context:** User asked to continue the legacy page migration with podcasts and networks  
+**Change summary:**
+- Added a full podcast directory list with legacy links alongside the featured lineup
+- Added the network directory list and aligned the network pill data with legacy categories
+- Updated ElectraCast checklist and overview to reflect podcasts/networks progress
+
+**Rationale / tradeoffs:** Using legacy slugs and links provides complete coverage while artwork ingestion is still pending  
+**Files touched:**
+- `electracast/src/data/podcasts.ts`
+- `electracast/src/components/PodcastGrid.tsx`
+- `electracast/src/pages/Podcasts.tsx`
+- `electracast/src/data/networks.ts`
+- `electracast/src/data/networkPills.ts`
+- `electracast/src/pages/Networks.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+N/A
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Directory cards link to legacy ElectraCast pages until detail routes are built  
+**Concepts:** @concept:electracast @concept:frontend

@@ -371,6 +371,8 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `components/*` | Site layout, hero, and section components |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
 | `pages/MyAccount.tsx` | My ElectraCast Account page with login links + resources |
+| `data/podcasts.ts` | Featured podcast list and directory slugs |
+| `data/networks.ts` | Network directory metadata and legacy links |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |

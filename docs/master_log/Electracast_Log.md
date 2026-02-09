@@ -22,3 +22,5 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Restored the production webhook endpoint (`/webhook/electracast-rebuild-live`) and removed smoke test workflows.
 - Began legacy page migration by rebuilding the Advertising page banner + inquiry form layout.
 - Ported About and Contact pages with legacy mission copy, team/advisor bios, and contact form layout.
+- Added the Podcasts directory list with legacy links and featured lineup.
+- Added the Networks directory list and updated the network pill data.
