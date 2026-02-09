@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-07  
+**Last Updated:** 2026-02-08  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -75,6 +75,14 @@ site_repo/
 | `.gitignore` | Git ignore patterns for node_modules, dist, __pycache__, .env |
 | `README.md` | Project readme |
 | `package-lock.json` | Root-level npm lock file |
+
+---
+
+### Cursor IDE Configuration: `.cursor/`
+
+| File | Purpose |
+|------|---------|
+| `.cursor/mcp.json` | Local Cursor MCP config for n8n-mcp integration |
 
 ---
 
@@ -362,6 +370,7 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `assets/main.css` | Global styles, Tailwind imports |
 | `components/*` | Site layout, hero, and section components |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
+| `pages/MyAccount.tsx` | My ElectraCast Account page with login links + resources |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |
@@ -474,9 +483,14 @@ Non-deployed internal resources.
 
 | Directory | Contents |
 |-----------|----------|
-| `atlasops_wireframes/` | UI wireframe mockups |
-| `Logo_Icon/` | Logo design concepts and high-res assets |
-| `*.pdf` | Project overview documents |
+| `Documentation/` | Archived PDF snapshots (Master Log, Project Overview, AtlasOps docs) |
+| `Electracast_Codebase/` | Legacy HTML + asset snapshot of electracast.com |
+| `UI/` | Consolidated UI assets (logos, wireframes, Figma exports) |
+| `UI/atlasops_wireframes/` | UI wireframe mockups |
+| `UI/Figma/` | Clean wordmarks + Figma exports |
+| `UI/Logo_Icon/` | Logo design concepts and high-res assets |
+| `n8n_workflows_backup_20260208.json` | n8n workflow export backup (pre-reset) |
+| `n8n_workflows_backup_20260208_postreset.json` | n8n workflow export backup (post-reset) |
 
 ---
 

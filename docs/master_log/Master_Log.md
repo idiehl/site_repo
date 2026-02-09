@@ -816,3 +816,133 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Atlas Apply build succeeded; npm audit now shows zero vulnerabilities  
 **Notes:** Dev portal status toggled to PENDING during fix and returned to READY after deploy  
 **Concepts:** @concept:frontend @concept:security @concept:atlas-apply
+
+---
+
+## AU-C01-20260208-002 — Configure Cursor n8n-mcp integration
+
+**Type:** Ops  
+**Context:** User requested integrating the n8n-mcp toolkit into Cursor for local n8n workflow management  
+**Change summary:**
+- Added a Cursor MCP server config to launch n8n-mcp via Docker against the local n8n API
+- Ignored the local MCP config to prevent accidental API key commits
+- Documented the new Cursor config file in the project overview
+
+**Rationale / tradeoffs:** Docker-based MCP avoids a Node install while keeping the config local; gitignore reduces risk of committing secrets  
+**Files touched:**
+- `.cursor/mcp.json`
+- `.gitignore`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+.\scripts\build_master_log.ps1
+```
+
+**Verification:** Config file created; PDF build failed (no generator installed)  
+**Notes:** Replace `N8N_API_KEY` placeholder in `.cursor/mcp.json` before use; install Pandoc or markdown-pdf to regenerate the PDF  
+**Concepts:** @concept:deployment @concept:master-log
+
+---
+
+## AU-C01-20260208-003 — Add ElectraCast account page + validate n8n intake
+
+**Type:** Feature  
+**Context:** User requested resuming ElectraCast rebuild work and validating the n8n pipeline end-to-end  
+**Change summary:**
+- Added a `/account` route with legacy login and resource link lists for My ElectraCast Account
+- Styled account/resource sections to match existing ElectraCast UI cards
+- Enabled env access in n8n Code nodes and confirmed a safe test webhook run
+- Updated ElectraCast logs, overview, checklist, and project inventory
+
+**Rationale / tradeoffs:** Delivered the missing account page as static content while backend auth is defined; used test-mode webhook to validate the pipeline without production side effects  
+**Files touched:**
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/routes.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+docker stop n8n
+docker rm n8n
+docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n -v "C:\Users\ihigg\Git\github\site_repo\internal\Electracast_Assets:/data/electracast-assets" -e ELECTRACAST_ASSET_DIR=/data/electracast-assets -e GITHUB_TOKEN=[set] -e N8N_BLOCK_ENV_ACCESS_IN_NODE=false n8nio/n8n:latest
+docker exec n8n /bin/sh -c 'echo N8N_BLOCK_ENV_ACCESS_IN_NODE="$N8N_BLOCK_ENV_ACCESS_IN_NODE"'
+Invoke-RestMethod -Method Post -Uri http://localhost:5678/webhook-test/electracast-rebuild -ContentType application/json -Body [payload]
+```
+
+**Verification:** Safe test webhook returned success response; n8n execution status recorded as success  
+**Notes:** Production webhook `/webhook/electracast-rebuild` still returns 404 and needs re-registration  
+**Concepts:** @concept:frontend @concept:deployment
+
+---
+
+## AU-C01-20260208-004 — Restore ElectraCast production webhook intake
+
+**Type:** Fix  
+**Context:** User provided the new n8n API key and requested the production intake webhook be restored immediately  
+**Change summary:**
+- Updated local n8n MCP config with the new API key
+- Backed up workflows after the n8n reset and restarted the n8n container
+- Verified the production intake endpoint at `/webhook/electracast-rebuild-live`
+- Removed smoke test workflows after confirming production webhook success
+- Updated ElectraCast logs, overview, checklist, and project inventory
+
+**Rationale / tradeoffs:** Confirming the exact production path resolved the 404s while preserving the existing workflow; removing smoke tests keeps the workspace clean  
+**Files touched:**
+- `.cursor/mcp.json`
+- `internal/n8n_workflows_backup_20260208_postreset.json`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+docker exec n8n n8n export:workflow --all --output=/home/node/.n8n/workflows-backup.json --pretty
+docker cp n8n:/home/node/.n8n/workflows-backup.json C:\Users\ihigg\Git\github\site_repo\internal\n8n_workflows_backup_20260208_postreset.json
+docker rm -f n8n
+docker pull n8nio/n8n:2.34.5
+docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n -v "C:\Users\ihigg\Git\github\site_repo\internal\Electracast_Assets:/data/electracast-assets" -e ELECTRACAST_ASSET_DIR=/data/electracast-assets -e GITHUB_TOKEN=[set] -e N8N_BLOCK_ENV_ACCESS_IN_NODE=false n8nio/n8n:latest
+docker logs n8n --tail 200
+Invoke-RestMethod -Method Get -Uri http://localhost:5678/api/v1/workflows -Headers [api key]
+Invoke-RestMethod -Method Post -Uri http://localhost:5678/webhook/electracast-rebuild-live -ContentType application/json -Body [payload]
+Invoke-RestMethod -Method Delete -Uri http://localhost:5678/api/v1/workflows/{id} -Headers [api key]
+```
+
+**Verification:** Production webhook returned a success response; workflow list shows only ElectraCast intake active  
+**Notes:** Production intake path is `/webhook/electracast-rebuild-live`; Docker tag `2.34.5` not found  
+**Concepts:** @concept:electracast @concept:api @concept:deployment
+
+---
+
+## AU-C01-20260208-005 — Reorganize internal asset library
+
+**Type:** Refactor  
+**Context:** User reorganized internal assets and removed outdated images to keep resources tidy  
+**Change summary:**
+- Moved internal PDF snapshots into `internal/Documentation/`
+- Consolidated UI assets (logos, wireframes, Figma exports) under `internal/UI/`
+- Updated project overview to reflect the new internal folder structure
+
+**Rationale / tradeoffs:** A structured internal asset layout reduces clutter and makes visual assets easier to locate  
+**Files touched:**
+- `internal/Documentation/*`
+- `internal/UI/*`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+N/A (manual file reorg)
+```
+
+**Verification:** Reviewed `internal/` layout and confirmed assets exist under new folders  
+**Notes:** Removed duplicate/outdated UI images during cleanup  
+**Concepts:** @concept:documentation @concept:branding

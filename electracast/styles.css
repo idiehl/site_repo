@@ -254,6 +254,44 @@ main {
   background: var(--panel-2);
 }
 
+.account-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.resource-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.resource-list {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.resource-list li {
+  margin-bottom: 8px;
+}
+
+.resource-list a {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.resource-list a:hover {
+  color: var(--accent-2);
+}
+
 .feature-card .tag {
   font-size: 11px;
   letter-spacing: 0.1em;

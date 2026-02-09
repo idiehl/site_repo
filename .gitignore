@@ -10,6 +10,9 @@ venv/
 # Environment variables / secrets
 .env
 
+# Cursor MCP config (local secrets)
+.cursor/mcp.json
+
 # OS junk
 .DS_Store
 Thumbs.db

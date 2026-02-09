@@ -1,6 +1,6 @@
 # ElectraCast — Checklist
 
-**Last Updated:** 2026-02-07
+**Last Updated:** 2026-02-08
 
 **Purpose:** Rapid capture of medium-term objectives, then refine into a step-by-step path.
 
@@ -8,6 +8,8 @@
 - [x] Convert static homepage prototype into React components
 - [x] Implement navigation, footer, and global styling system in React
 - [x] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register
+- [x] Add My ElectraCast Account page with legacy login + resource links
+- [x] Restore production webhook registration for the ElectraCast intake
 - [ ] Migrate podcast and network data with thumbnail coverage
 - [ ] Wire asset ingestion to local media paths and finalize asset base URL
 - [ ] Implement account creation and login flows (UI + backend integration)
@@ -18,12 +20,13 @@
 ## Focused Path (Step-by-step)
 1. [x] Split `electracast/index.html` into reusable React components and route views
 2. [x] Create data modules for podcasts, networks, news, and music (asset base helper wired)
-3. [ ] Wire asset pipeline (mounted asset dir + base URL resolution)
-4. [ ] Implement auth/account flows and define backend integration
-5. [ ] Connect n8n intake workflow to populate assets/content and open PRs
-6. [ ] Add podcast creation + publishing flows
-7. [ ] Integrate Megaphone and external services
-8. [x] Update CI deploy to build the ElectraCast app
+3. [x] Add My ElectraCast Account page content + resource lists
+4. [ ] Wire asset pipeline (mounted asset dir + base URL resolution)
+5. [ ] Implement auth/account flows and define backend integration
+6. [ ] Connect n8n intake workflow to populate assets/content and open PRs (production webhook verified)
+7. [ ] Add podcast creation + publishing flows
+8. [ ] Integrate Megaphone and external services
+9. [x] Update CI deploy to build the ElectraCast app
 
 ## Notes / Dependencies
 - Asset ingest pipeline and storage path for media files (`ELECTRACAST_ASSET_DIR`)

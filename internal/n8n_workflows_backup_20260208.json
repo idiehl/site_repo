@@ -1,0 +1,743 @@
+[
+  {
+    "updatedAt": "2026-02-08T19:56:17.000Z",
+    "createdAt": "2026-02-06T21:28:14.277Z",
+    "id": "vqrb8fghLDm1b7Dq",
+    "name": "ElectraCast Rebuild Intake",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "webhook-electracast-rebuild",
+        "name": "ElectraCast Rebuild Intake",
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "electracast-rebuild-live",
+          "responseData": "firstEntryJson",
+          "responseMode": "lastNode"
+        },
+        "position": [
+          240,
+          300
+        ],
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1
+      },
+      {
+        "id": "normalize-payload",
+        "name": "Normalize Payload",
+        "parameters": {
+          "jsCode": "const input = items[0]?.json ?? {};\nreturn [{\n  json: {\n    request: input,\n    assets: Array.isArray(input.assets) ? input.assets : [],\n    homepage: input.homepage ?? {},\n    checklist: Array.isArray(input.checklist) ? input.checklist : [],\n    github: input.github ?? {},\n    deploy: input.deploy ?? {},\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          520,
+          300
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "asset-manifest",
+        "name": "Build Asset Manifest",
+        "parameters": {
+          "jsCode": "const assets = Array.isArray($json.assets) ? $json.assets : [];\nconst assetManifest = assets\n  .map((asset, index) => {\n    if (typeof asset === 'string') {\n      const filename = asset.split('/').pop() || `asset-${index}`;\n      return { url: asset, filename };\n    }\n    const url = asset.url || '';\n    const filename = asset.filename || url.split('/').pop() || `asset-${index}`;\n    return {\n      url,\n      filename,\n      type: asset.type || null,\n      section: asset.section || null,\n      notes: asset.notes || null,\n    };\n  })\n  .filter((asset) => asset.url);\n\nreturn [{\n  json: {\n    ...$json,\n    assetManifest,\n    assetCount: assetManifest.length,\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          760,
+          300
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "homepage-map",
+        "name": "Map Homepage Sections",
+        "parameters": {
+          "jsCode": "const defaults = {\n  hero: {\n    eyebrow: 'Custom Podcast Production',\n    headline: 'Transform your influence.',\n    body: 'We produce award-winning custom podcasts for your brand.',\n  },\n  originals: ['The Last Saturday Night', 'TechTalk', 'Nightmare Road Stories'],\n  featuredPodcasts: 'Grid of featured podcast cover art',\n  news: 'Latest News From ElectraCast',\n  networks: 'Network tile grid',\n};\n\nconst homepageMap = {\n  ...defaults,\n  ...(typeof $json.homepage === 'object' ? $json.homepage : {}),\n};\n\nreturn [{\n  json: {\n    ...$json,\n    homepageMap,\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          1000,
+          300
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "checklist-tracker",
+        "name": "Track Rebuild Checklist",
+        "parameters": {
+          "jsCode": "const defaults = [\n  'Import ElectraCast media assets',\n  'Map homepage sections to component structure',\n  'Build subpage templates for podcasts/networks/music',\n  'Wire GitHub issue + PR tracking',\n  'Trigger deploy pipeline',\n];\n\nconst checklist = Array.isArray($json.checklist) && $json.checklist.length\n  ? $json.checklist\n  : defaults;\n\nreturn [{\n  json: {\n    ...$json,\n    rebuildChecklist: checklist,\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          1240,
+          300
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "github-context",
+        "name": "Prepare GitHub Context",
+        "parameters": {
+          "jsCode": "const input = $json;\nconst github = input.github ?? {};\nreturn [{\n  json: {\n    ...input,\n    ghOwner: github.owner || 'idiehl',\n    ghRepo: github.repo || 'site_repo',\n    ghBase: github.base || 'master',\n    ghHead: github.head || 'electracast-rebuild',\n    ghToken: github.token || $env.GITHUB_TOKEN || '',\n    checklistPath: github.checklistPath || 'docs/master_log/ElectraCast_Checklist.md',\n    commitMessage: github.commitMessage || 'Update ElectraCast checklist (n8n)',\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          1480,
+          300
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "set-electracast-response",
+        "name": "Compose Response",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "status",
+                "name": "status",
+                "type": "string",
+                "value": "ok"
+              },
+              {
+                "id": "message",
+                "name": "message",
+                "type": "string",
+                "value": "ElectraCast rebuild intake captured"
+              },
+              {
+                "id": "project",
+                "name": "project",
+                "type": "string",
+                "value": "electracast.atlasuniversalis.com"
+              },
+              {
+                "id": "assetCount",
+                "name": "assetCount",
+                "type": "number",
+                "value": "={{ $json.assetCount || 0 }}"
+              },
+              {
+                "id": "homepageMapped",
+                "name": "homepageMapped",
+                "type": "boolean",
+                "value": "={{ !!$json.homepageMap }}"
+              },
+              {
+                "id": "checklistItems",
+                "name": "checklistItems",
+                "type": "number",
+                "value": "={{ ($json.rebuildChecklist || []).length }}"
+              },
+              {
+                "id": "receivedAt",
+                "name": "receivedAt",
+                "type": "string",
+                "value": "={{ $now }}"
+              },
+              {
+                "id": "nextSteps",
+                "name": "nextSteps",
+                "type": "string",
+                "value": "Asset ingest manifest built, homepage mapped, checklist prepared, GitHub tracking and deploy steps queued."
+              }
+            ]
+          },
+          "includeOtherFields": false,
+          "mode": "manual"
+        },
+        "position": [
+          1720,
+          300
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "asset-download-prepare",
+        "name": "Prepare Asset Downloads",
+        "parameters": {
+          "jsCode": "const assetDir = $env.ELECTRACAST_ASSET_DIR || '/data/electracast-assets';\nconst assetManifest = Array.isArray($json.assetManifest) ? $json.assetManifest : [];\n\nif (!assetManifest.length) {\n  return [];\n}\n\nreturn assetManifest.map((asset, index) => {\n  const filename = (asset.filename || `asset-${index}`)\n    .replace(/\\\\|\\//g, '_')\n    .replace(/\\s+/g, '_');\n  return {\n    json: {\n      ...asset,\n      url: asset.url,\n      filename,\n      outputPath: `${assetDir}/${filename}`,\n    }\n  };\n});",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          760,
+          80
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "continueOnFail": true,
+        "id": "download-asset",
+        "name": "Download Asset",
+        "parameters": {
+          "method": "GET",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "file"
+              }
+            },
+            "timeout": 30000
+          },
+          "url": "={{ $json.url }}"
+        },
+        "position": [
+          1000,
+          80
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "save-asset",
+        "name": "Save Asset",
+        "parameters": {
+          "dataPropertyName": "data",
+          "fileName": "={{ $json.outputPath }}"
+        },
+        "position": [
+          1240,
+          80
+        ],
+        "type": "n8n-nodes-base.writeBinaryFile",
+        "typeVersion": 1
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-get-base",
+        "name": "Get Base Branch SHA",
+        "parameters": {
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "GET",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + $json.ghOwner + '/' + $json.ghRepo + '/git/ref/heads/' + $json.ghBase }}"
+        },
+        "position": [
+          1720,
+          120
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-create-branch",
+        "name": "Create Branch",
+        "parameters": {
+          "contentType": "json",
+          "jsonBody": "={{ { ref: 'refs/heads/' + ($node['Prepare GitHub Context'].json.ghHead || 'electracast-rebuild'), sha: ($json.object && $json.object.sha) ? $json.object.sha : $json.sha } }}",
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "POST",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + $node['Prepare GitHub Context'].json.ghOwner + '/' + $node['Prepare GitHub Context'].json.ghRepo + '/git/refs' }}"
+        },
+        "position": [
+          1960,
+          120
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-issue",
+        "name": "Create GitHub Issue",
+        "parameters": {
+          "contentType": "json",
+          "jsonBody": "={{ { title: $node['Prepare GitHub Context'].json.github?.issueTitle || 'ElectraCast rebuild: asset ingest + homepage map', body: ($node['Prepare GitHub Context'].json.github?.issueBody || 'Automated issue created from n8n workflow.') + '\\n\\nChecklist:\\n' + ($node['Track Rebuild Checklist'].json.rebuildChecklist || []).map(t => '- [ ] ' + t).join('\\n') } }}",
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "POST",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + ($node['Prepare GitHub Context'].json.ghOwner || 'idiehl') + '/' + ($node['Prepare GitHub Context'].json.ghRepo || 'site_repo') + '/issues' }}"
+        },
+        "position": [
+          2200,
+          40
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-pr",
+        "name": "Create GitHub PR",
+        "parameters": {
+          "contentType": "json",
+          "jsonBody": "={{ { title: $node['Prepare GitHub Context'].json.github?.prTitle || 'ElectraCast rebuild draft', head: $node['Prepare GitHub Context'].json.ghHead || 'electracast-rebuild', base: $node['Prepare GitHub Context'].json.ghBase || 'master', body: $node['Prepare GitHub Context'].json.github?.prBody || 'Automated PR placeholder for ElectraCast rebuild.' } }}",
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "POST",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + ($node['Prepare GitHub Context'].json.ghOwner || 'idiehl') + '/' + ($node['Prepare GitHub Context'].json.ghRepo || 'site_repo') + '/pulls' }}"
+        },
+        "position": [
+          2440,
+          40
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "deploy-trigger",
+        "name": "Trigger Deploy",
+        "parameters": {
+          "contentType": "json",
+          "jsonBody": "={{ { ref: $node['Prepare GitHub Context'].json.deploy?.ref || 'master', inputs: { app: 'electracast' } } }}",
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "POST",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + ($node['Prepare GitHub Context'].json.ghOwner || 'idiehl') + '/' + ($node['Prepare GitHub Context'].json.ghRepo || 'site_repo') + '/actions/workflows/' + ($node['Prepare GitHub Context'].json.deploy?.workflowId || 'deploy.yml') + '/dispatches' }}"
+        },
+        "position": [
+          2680,
+          40
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-get-checklist",
+        "name": "Fetch Checklist Doc",
+        "parameters": {
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "GET",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + $node['Prepare GitHub Context'].json.ghOwner + '/' + $node['Prepare GitHub Context'].json.ghRepo + '/contents/' + $node['Prepare GitHub Context'].json.checklistPath }}"
+        },
+        "position": [
+          1720,
+          220
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      },
+      {
+        "id": "github-build-checklist",
+        "name": "Build Checklist Update",
+        "parameters": {
+          "jsCode": "const checklist = $node['Track Rebuild Checklist'].json.rebuildChecklist || [];\nconst existingContent = $json.content\n  ? Buffer.from($json.content, 'base64').toString('utf8')\n  : '';\nconst date = new Date().toISOString().split('T')[0];\nconst section = `\\n\\n## Workflow Run ${date}\\n` + checklist.map(item => `- [ ] ${item}`).join('\\n');\nconst updatedContent = existingContent\n  ? existingContent + section + '\\n'\n  : `# ElectraCast — Checklist\\n\\n## Workflow Run ${date}\\n${checklist.map(item => `- [ ] ${item}`).join('\\n')}\\n`;\n\nreturn [{\n  json: {\n    owner: $node['Prepare GitHub Context'].json.ghOwner,\n    repo: $node['Prepare GitHub Context'].json.ghRepo,\n    path: $node['Prepare GitHub Context'].json.checklistPath,\n    commitMessage: $node['Prepare GitHub Context'].json.commitMessage,\n    fileSha: $json.sha || null,\n    contentBase64: Buffer.from(updatedContent).toString('base64'),\n  }\n}];",
+          "language": "javaScript",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          1960,
+          220
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "continueOnFail": true,
+        "id": "github-commit-checklist",
+        "name": "Commit Checklist Update",
+        "parameters": {
+          "contentType": "json",
+          "jsonBody": "={{ { message: $json.commitMessage || 'Update ElectraCast checklist (n8n)', content: $json.contentBase64, sha: $json.fileSha || undefined } }}",
+          "jsonHeaders": "={{ { Authorization: 'Bearer ' + ($node['Prepare GitHub Context'].json.ghToken || $env.GITHUB_TOKEN), Accept: 'application/vnd.github+json' } }}",
+          "method": "PUT",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "specifyHeaders": "json",
+          "url": "={{ 'https://api.github.com/repos/' + $json.owner + '/' + $json.repo + '/contents/' + $json.path }}"
+        },
+        "position": [
+          2200,
+          220
+        ],
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3
+      }
+    ],
+    "connections": {
+      "Build Asset Manifest": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Map Homepage Sections",
+              "type": "main"
+            },
+            {
+              "index": 0,
+              "node": "Prepare Asset Downloads",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Build Checklist Update": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Commit Checklist Update",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Create Branch": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Create GitHub Issue",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Create GitHub Issue": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Create GitHub PR",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Create GitHub PR": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Trigger Deploy",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Download Asset": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Save Asset",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ElectraCast Rebuild Intake": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Normalize Payload",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Fetch Checklist Doc": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Checklist Update",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Get Base Branch SHA": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Create Branch",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Map Homepage Sections": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Track Rebuild Checklist",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Normalize Payload": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Asset Manifest",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Prepare Asset Downloads": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Download Asset",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Prepare GitHub Context": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Compose Response",
+              "type": "main"
+            },
+            {
+              "index": 0,
+              "node": "Get Base Branch SHA",
+              "type": "main"
+            },
+            {
+              "index": 0,
+              "node": "Fetch Checklist Doc",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Track Rebuild Checklist": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Prepare GitHub Context",
+              "type": "main"
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "saveDataErrorExecution": "all",
+      "saveDataSuccessExecution": "all",
+      "saveManualExecutions": true,
+      "saveExecutionProgress": true,
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false,
+      "timeSavedMode": "fixed"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "e81d3840-f086-41d0-8064-a8074f380ba6",
+    "activeVersionId": "e81d3840-f086-41d0-8064-a8074f380ba6",
+    "versionCounter": 43,
+    "triggerCount": 1,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-02-06T21:28:14.436Z",
+        "createdAt": "2026-02-06T21:28:14.436Z",
+        "role": "workflow:owner",
+        "workflowId": "vqrb8fghLDm1b7Dq",
+        "projectId": "TeZOY2wuqjVj2Rvw",
+        "project": {
+          "updatedAt": "2026-02-06T20:56:59.811Z",
+          "createdAt": "2026-01-03T21:02:22.884Z",
+          "id": "TeZOY2wuqjVj2Rvw",
+          "name": "Ian Diehl <iajdiehl@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "f5ec6cf5-656f-47bc-83c4-b3a7f4c6997d"
+        }
+      }
+    ]
+  },
+  {
+    "updatedAt": "2026-02-08T19:58:16.000Z",
+    "createdAt": "2026-02-08T19:58:00.406Z",
+    "id": "a4UuqBJOSuBpe5tx",
+    "name": "Webhook Smoke Test",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "smoke-webhook",
+        "name": "Smoke Webhook",
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "electracast-webhook-smoke",
+          "responseData": "firstEntryJson",
+          "responseMode": "lastNode"
+        },
+        "position": [
+          200,
+          300
+        ],
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1
+      },
+      {
+        "id": "smoke-set",
+        "name": "Smoke Response",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "status",
+                "name": "status",
+                "type": "string",
+                "value": "ok"
+              },
+              {
+                "id": "message",
+                "name": "message",
+                "type": "string",
+                "value": "smoke webhook ok"
+              }
+            ]
+          },
+          "includeOtherFields": false,
+          "mode": "manual"
+        },
+        "position": [
+          420,
+          300
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3
+      }
+    ],
+    "connections": {
+      "Smoke Webhook": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Smoke Response",
+              "type": "main"
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "ade6c5d0-6558-4d52-94da-835af5296a5d",
+    "activeVersionId": "ade6c5d0-6558-4d52-94da-835af5296a5d",
+    "versionCounter": 6,
+    "triggerCount": 1,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-02-08T19:58:00.413Z",
+        "createdAt": "2026-02-08T19:58:00.413Z",
+        "role": "workflow:owner",
+        "workflowId": "a4UuqBJOSuBpe5tx",
+        "projectId": "TeZOY2wuqjVj2Rvw",
+        "project": {
+          "updatedAt": "2026-02-06T20:56:59.811Z",
+          "createdAt": "2026-01-03T21:02:22.884Z",
+          "id": "TeZOY2wuqjVj2Rvw",
+          "name": "Ian Diehl <iajdiehl@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "creatorId": "f5ec6cf5-656f-47bc-83c4-b3a7f4c6997d"
+        }
+      }
+    ]
+  }
+]
