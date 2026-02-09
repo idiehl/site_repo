@@ -969,7 +969,10 @@ N/A (manual file reorg)
 
 **Commands run:**
 ```bash
-N/A
+git add electracast docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
 ```
 
 **Verification:** Not run (content updates only)  
@@ -1039,3 +1042,23 @@ N/A
 **Verification:** Not run (content updates only)  
 **Notes:** Directory cards link to legacy ElectraCast pages until detail routes are built  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-009 — Log deployment commands for podcasts + networks
+
+**Type:** Docs  
+**Context:** Capture the exact git and deployment commands used for the podcasts/networks rollout  
+**Change summary:** Added the command list to the AU-C01-20260208-008 entry  
+**Rationale / tradeoffs:** Keeping the command history explicit helps with repeatable deployments and audits  
+**Files touched:**
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+N/A
+```
+
+**Verification:** N/A (documentation update only)  
+**Notes:** None  
+**Concepts:** @concept:master-log @concept:documentation
