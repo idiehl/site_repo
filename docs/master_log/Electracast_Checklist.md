@@ -28,6 +28,32 @@
 8. [ ] Integrate Megaphone and external services
 9. [x] Update CI deploy to build the ElectraCast app
 
+## Page Coverage Checklist
+
+### Route Shells (added to app)
+- [x] Home
+- [x] Podcasts
+- [x] Networks
+- [x] Custom Branded Podcasts
+- [x] Music
+- [x] Advertising
+- [x] About
+- [x] Contact
+- [x] Register
+- [x] My ElectraCast Account
+
+### Legacy Content Migration (HTML → React)
+- [ ] Home: mirror headline, CTA, and section copy from snapshot
+- [ ] Podcasts: port legacy copy + artwork mapping
+- [ ] Networks: port legacy copy + network list/artwork
+- [ ] Custom Branded Podcasts: port legacy copy + example roster
+- [ ] Music: port artist/release blocks and imagery
+- [ ] Advertising: add advertisers banner + inquiry form fields (in progress)
+- [ ] About: port legacy mission/brand story content
+- [ ] Contact: port legacy contact details + CTA copy
+- [ ] Register: port registration guidance + CTA content
+- [x] My ElectraCast Account: legacy links + resource lists
+
 ## Notes / Dependencies
 - Asset ingest pipeline and storage path for media files (`ELECTRACAST_ASSET_DIR`)
 - GitHub token + workflow dispatch for n8n GitHub automation

@@ -20,3 +20,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Added the My ElectraCast Account page with legacy login links and resource lists.
 - Styled the account/resource layout and wired a new `/account` route.
 - Restored the production webhook endpoint (`/webhook/electracast-rebuild-live`) and removed smoke test workflows.
+- Began legacy page migration by rebuilding the Advertising page banner + inquiry form layout.

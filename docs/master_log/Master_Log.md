@@ -946,3 +946,32 @@ N/A (manual file reorg)
 **Verification:** Reviewed `internal/` layout and confirmed assets exist under new folders  
 **Notes:** Removed duplicate/outdated UI images during cleanup  
 **Concepts:** @concept:documentation @concept:branding
+
+---
+
+## AU-C01-20260208-006 — Start ElectraCast page migration checklist
+
+**Type:** Feature  
+**Context:** User requested a full checklist to ensure every ElectraCast page is incorporated into the rebuild  
+**Change summary:**
+- Added a page coverage checklist to track route shells and content migration status
+- Rebuilt the Advertising page with the legacy advertisers banner and inquiry form layout
+- Added advertising form styles and updated ElectraCast overview/log entries
+
+**Rationale / tradeoffs:** A dedicated page checklist keeps the migration deterministic while content is ported page by page  
+**Files touched:**
+- `electracast/src/pages/Advertising.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+N/A
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Advertising form submission is intentionally disabled until backend wiring is ready  
+**Concepts:** @concept:electracast @concept:frontend
