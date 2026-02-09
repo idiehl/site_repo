@@ -15,6 +15,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - React routes cover core pages: home, podcasts, networks, custom branded podcasts, music, about, contact, advertising, register.
 - Added a dedicated `/account` page with legacy login links and production resource lists.
 - Advertising page now includes the legacy advertisers banner and an inquiry form layout.
+- About and Contact pages now mirror the legacy mission copy, leadership bios, and inquiry form layout.
 - Homepage prototype has been ported into React components with data modules backing the content.
 - `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.

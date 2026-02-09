@@ -48,9 +48,9 @@
 - [ ] Networks: port legacy copy + network list/artwork
 - [ ] Custom Branded Podcasts: port legacy copy + example roster
 - [ ] Music: port artist/release blocks and imagery
-- [ ] Advertising: add advertisers banner + inquiry form fields (in progress)
-- [ ] About: port legacy mission/brand story content
-- [ ] Contact: port legacy contact details + CTA copy
+- [x] Advertising: advertisers banner + inquiry form layout (submission pending)
+- [x] About: mission statement + team/advisor bios
+- [x] Contact: inquiry form layout (submission pending)
 - [ ] Register: port registration guidance + CTA content
 - [x] My ElectraCast Account: legacy links + resource lists
 

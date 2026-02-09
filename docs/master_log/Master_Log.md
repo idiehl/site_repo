@@ -975,3 +975,33 @@ N/A
 **Verification:** Not run (content updates only)  
 **Notes:** Advertising form submission is intentionally disabled until backend wiring is ready  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-007 — Port ElectraCast About and Contact content
+
+**Type:** Feature  
+**Context:** User approved continuous migration until every ElectraCast page is incorporated  
+**Change summary:**
+- Ported the About page mission statement and leadership/advisor bios
+- Added Contact page inquiry form layout aligned with the legacy Gravity Forms structure
+- Updated ElectraCast checklist and documentation to reflect progress
+
+**Rationale / tradeoffs:** Porting the highest-visibility narrative content early keeps the rebuild aligned with the original brand voice while backend form handling is finalized  
+**Files touched:**
+- `electracast/src/pages/About.tsx`
+- `electracast/src/pages/Contact.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+N/A
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Contact form submission remains disabled until the intake pipeline is wired  
+**Concepts:** @concept:electracast @concept:frontend
