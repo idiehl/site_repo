@@ -1167,3 +1167,49 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (content updates only)  
 **Notes:** Artwork currently references legacy URLs until asset ingestion is wired  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-013 — Wire ElectraCast accounts and profiles
+
+**Type:** Feature  
+**Context:** User approved moving into backend/user profile functionality  
+**Change summary:**
+- Added ElectraCast profile model, migration, and API endpoints
+- Wired Register + Account pages to auth and ElectraCast profile updates
+- Added ElectraCast API helpers and updated project documentation
+
+**Rationale / tradeoffs:** Establishing core account flows now unblocks profile onboarding while deeper content ingestion continues  
+**Files touched:**
+- `atlasops/api/v1/auth.py`
+- `atlasops/api/v1/electracast.py`
+- `atlasops/api/v1/router.py`
+- `atlasops/models/electracast.py`
+- `atlasops/models/user.py`
+- `atlasops/models/__init__.py`
+- `atlasops/schemas/electracast.py`
+- `atlasops/schemas/__init__.py`
+- `alembic/env.py`
+- `alembic/versions/20260208_0014_add_electracast_profiles.py`
+- `electracast/src/lib/api.ts`
+- `electracast/src/pages/Register.tsx`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+- `README.md`
+
+**Commands run:**
+```bash
+git add atlasops electracast alembic docs/master_log README.md
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Not run (manual testing not performed)  
+**Notes:** ElectraCast profiles auto-create on first API access  
+**Concepts:** @concept:electracast @concept:frontend @concept:backend @concept:auth

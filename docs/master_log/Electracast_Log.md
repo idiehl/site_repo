@@ -29,3 +29,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Ported the Register page welcome copy with a static registration form layout.
 - Updated homepage copy to mirror featured originals from the legacy snapshot.
 - Mapped artwork for featured podcasts, music releases, and network tiles.
+- Wired ElectraCast registration, login, and profile updates to new backend endpoints.

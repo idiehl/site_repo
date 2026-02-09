@@ -12,7 +12,7 @@
 - [x] Restore production webhook registration for the ElectraCast intake
 - [x] Migrate podcast and network data with thumbnail coverage
 - [ ] Wire asset ingestion to local media paths and finalize asset base URL
-- [ ] Implement account creation and login flows (UI + backend integration)
+- [x] Implement account creation and login flows (UI + backend integration)
 - [ ] Add podcast creation, publishing, and management tools
 - [ ] Finalize n8n workflow automation for ingest, mapping, checklist, and GitHub actions
 - [ ] Plan Megaphone API integration and data syncing
@@ -22,7 +22,7 @@
 2. [x] Create data modules for podcasts, networks, news, and music (asset base helper wired)
 3. [x] Add My ElectraCast Account page content + resource lists
 4. [ ] Wire asset pipeline (mounted asset dir + base URL resolution)
-5. [ ] Implement auth/account flows and define backend integration
+5. [x] Implement auth/account flows and define backend integration
 6. [ ] Connect n8n intake workflow to populate assets/content and open PRs (production webhook verified)
 7. [ ] Add podcast creation + publishing flows
 8. [ ] Integrate Megaphone and external services

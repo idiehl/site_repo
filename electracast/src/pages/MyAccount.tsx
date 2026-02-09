@@ -1,4 +1,14 @@
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import SectionHeader from '../components/SectionHeader'
+import {
+  clearStoredAuth,
+  ElectraCastAccount,
+  getElectraCastAccount,
+  getStoredAuth,
+  loginUser,
+  setStoredAuth,
+  updateElectraCastProfile,
+} from '../lib/api'
 
 const podcasterLinks = [
   {
@@ -85,7 +95,122 @@ const artistLinks = [
   },
 ]
 
+type StatusMessage = {
+  type: 'success' | 'error'
+  message: string
+}
+
 const MyAccount = () => {
+  const [auth, setAuth] = useState(() => getStoredAuth())
+  const [account, setAccount] = useState<ElectraCastAccount | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [profileForm, setProfileForm] = useState({
+    display_name: '',
+    handle: '',
+    role: '',
+    company: '',
+    website: '',
+    location: '',
+    bio: '',
+  })
+  const [loginStatus, setLoginStatus] = useState<StatusMessage | null>(null)
+  const [profileStatus, setProfileStatus] = useState<StatusMessage | null>(null)
+
+  useEffect(() => {
+    if (!auth) {
+      setAccount(null)
+      return
+    }
+
+    const loadAccount = async () => {
+      setLoading(true)
+      try {
+        const data = await getElectraCastAccount(auth.access_token)
+        setAccount(data)
+        setProfileForm({
+          display_name: data.profile.display_name ?? '',
+          handle: data.profile.handle ?? '',
+          role: data.profile.role ?? '',
+          company: data.profile.company ?? '',
+          website: data.profile.website ?? '',
+          location: data.profile.location ?? '',
+          bio: data.profile.bio ?? '',
+        })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to load account.'
+        setLoginStatus({ type: 'error', message })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadAccount()
+  }, [auth])
+
+  const handleLoginChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setLoginForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleProfileChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target
+    setProfileForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setLoginStatus(null)
+    setLoading(true)
+    try {
+      const tokens = await loginUser(loginForm.email.trim(), loginForm.password)
+      setStoredAuth(tokens)
+      setAuth(tokens)
+      setLoginStatus({ type: 'success', message: 'Signed in successfully.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed.'
+      setLoginStatus({ type: 'error', message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    clearStoredAuth()
+    setAuth(null)
+    setAccount(null)
+    setProfileForm({
+      display_name: '',
+      handle: '',
+      role: '',
+      company: '',
+      website: '',
+      location: '',
+      bio: '',
+    })
+  }
+
+  const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!auth) {
+      return
+    }
+    setProfileStatus(null)
+    setLoading(true)
+    try {
+      const updated = await updateElectraCastProfile(auth.access_token, profileForm)
+      setAccount((prev) => (prev ? { ...prev, profile: updated } : prev))
+      setProfileStatus({ type: 'success', message: 'Profile updated.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Profile update failed.'
+      setProfileStatus({ type: 'error', message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section className="section">
       <SectionHeader
@@ -114,6 +239,142 @@ const MyAccount = () => {
           </a>
         </div>
       </div>
+
+      <div className="account-card">
+        <h3>New portal login</h3>
+        {auth ? (
+          <>
+            <p>
+              Signed in as <strong>{account?.user.email ?? 'loading...'}</strong>.
+            </p>
+            <div className="account-actions">
+              <button className="btn ghost" type="button" onClick={handleLogout}>
+                Sign out
+              </button>
+            </div>
+          </>
+        ) : (
+          <form className="contact-form" onSubmit={handleLogin}>
+            <div className="form-grid">
+              <label className="form-field full">
+                <span>Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  value={loginForm.email}
+                  onChange={handleLoginChange}
+                  required
+                />
+              </label>
+              <label className="form-field full">
+                <span>Password</span>
+                <input
+                  type="password"
+                  name="password"
+                  value={loginForm.password}
+                  onChange={handleLoginChange}
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-actions">
+              <button className="btn" type="submit" disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+              <span className="form-note">Use your new ElectraCast account credentials.</span>
+            </div>
+          </form>
+        )}
+        {loginStatus ? (
+          <p className={`status-message ${loginStatus.type}`}>{loginStatus.message}</p>
+        ) : null}
+      </div>
+
+      {auth ? (
+        <div className="account-card">
+          <h3>ElectraCast profile</h3>
+          <form className="contact-form" onSubmit={handleProfileSubmit}>
+            <div className="form-grid">
+              <label className="form-field">
+                <span>Display Name</span>
+                <input
+                  type="text"
+                  name="display_name"
+                  value={profileForm.display_name}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field">
+                <span>Handle</span>
+                <input
+                  type="text"
+                  name="handle"
+                  value={profileForm.handle}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field full">
+                <span>Role</span>
+                <input
+                  type="text"
+                  name="role"
+                  value={profileForm.role}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field">
+                <span>Company</span>
+                <input
+                  type="text"
+                  name="company"
+                  value={profileForm.company}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field">
+                <span>Website</span>
+                <input
+                  type="text"
+                  name="website"
+                  value={profileForm.website}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field">
+                <span>Location</span>
+                <input
+                  type="text"
+                  name="location"
+                  value={profileForm.location}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label className="form-field full">
+                <span>Bio</span>
+                <textarea
+                  name="bio"
+                  rows={5}
+                  value={profileForm.bio}
+                  onChange={handleProfileChange}
+                />
+              </label>
+            </div>
+            <div className="form-actions">
+              <button className="btn" type="submit" disabled={loading}>
+                {loading ? 'Saving...' : 'Save profile'}
+              </button>
+              <span className="form-note">
+                This info powers your ElectraCast creator profile.
+              </span>
+            </div>
+            {profileStatus ? (
+              <p className={`status-message ${profileStatus.type}`}>
+                {profileStatus.message}
+              </p>
+            ) : null}
+          </form>
+        </div>
+      ) : null}
 
       <div className="resource-grid">
         <div className="account-card">

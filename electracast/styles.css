@@ -427,6 +427,20 @@ main {
   color: var(--muted);
 }
 
+.status-message {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.status-message.success {
+  color: #4ade80;
+}
+
+.status-message.error {
+  color: #f87171;
+}
+
 .form-actions button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;

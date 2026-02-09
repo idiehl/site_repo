@@ -16,6 +16,7 @@ from sqlalchemy import select, and_
 from atlasops.api.deps import CurrentUser, DbSession
 from atlasops.config import get_settings
 from atlasops.models.user import User, UserProfile
+from atlasops.models.electracast import ElectraCastProfile
 from atlasops.schemas.user import (
     CurrentUserResponse,
     TokenResponse,
@@ -82,6 +83,7 @@ async def register(user_in: UserCreate, db: DbSession) -> User:
     # Create empty profile
     profile = UserProfile(user_id=user.id)
     db.add(profile)
+    db.add(ElectraCastProfile(user_id=user.id))
 
     await db.commit()
     await db.refresh(user)

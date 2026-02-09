@@ -17,6 +17,7 @@ from atlasops.config import get_settings
 from atlasops.models import (  # noqa: F401
     User,
     UserProfile,
+    ElectraCastProfile,
     JobPosting,
     CompanyDeepDive,
     Application,

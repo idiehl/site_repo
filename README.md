@@ -128,6 +128,11 @@ celery -A atlasops.workers.tasks beat --loglevel=info
 - `PATCH /api/v1/profile` - Update profile
 - `POST /api/v1/profile/enhance` - AI profile enhancement
 
+### ElectraCast
+- `GET /api/v1/electracast/account` - Get ElectraCast account summary
+- `GET /api/v1/electracast/profile` - Get or create ElectraCast profile
+- `PATCH /api/v1/electracast/profile` - Update ElectraCast profile
+
 ### Applications
 - `GET /api/v1/applications` - List applications
 - `POST /api/v1/applications` - Create application

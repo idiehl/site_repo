@@ -23,6 +23,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Register page now mirrors the legacy welcome copy and registration form layout.
 - Homepage featured originals copy now aligns with the legacy snapshot.
 - Artwork mapping now covers featured podcast covers, music releases, and network tiles.
+- ElectraCast account registration, login, and profile updates are now wired to backend endpoints.
 - Homepage prototype has been ported into React components with data modules backing the content.
 - `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.
@@ -50,5 +51,5 @@ An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migrat
 - Enrich content data (podcasts, networks, news, music) with media assets and metadata.
 - Wire asset ingestion and resolve local asset paths (planned alias `/electracast-assets` or `VITE_ELECTRACAST_ASSET_BASE`).
 - Connect intake workflow outputs to asset ingestion + GitHub automation steps.
-- Implement auth/account flows and decide backend integration path.
+- Expand ElectraCast profile fields and onboarding flows.
 - Integrate Megaphone APIs for publishing and analytics.

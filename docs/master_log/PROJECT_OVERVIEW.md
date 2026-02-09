@@ -110,6 +110,7 @@ Core Atlas Apply/AtlasOps backend application.
 | `api/v1/jobs.py` | Job posting endpoints (ingest, list, detail, deep-dive) |
 | `api/v1/applications.py` | Application tracking endpoints (status updates, follow-ups) |
 | `api/v1/profile.py` | User profile endpoints (resume upload, profile enhancement) |
+| `api/v1/electracast.py` | ElectraCast account + profile endpoints |
 | `api/v1/admin.py` | Admin dashboard endpoints (user management, analytics) |
 | `api/v1/billing.py` | Subscription/billing endpoints |
 
@@ -121,6 +122,7 @@ SQLAlchemy ORM models for database tables.
 |------|---------|
 | `models/__init__.py` | Model exports |
 | `models/user.py` | User model (auth, profile, subscription) |
+| `models/electracast.py` | ElectraCast profile model |
 | `models/job.py` | JobPosting model (scraped job data) |
 | `models/application.py` | Application model (status tracking, events) |
 | `models/resume.py` | GeneratedResume model (content, file paths) |
@@ -134,6 +136,7 @@ Pydantic models for request/response validation.
 |------|---------|
 | `schemas/__init__.py` | Schema exports |
 | `schemas/user.py` | User-related schemas (registration, profile, auth) |
+| `schemas/electracast.py` | ElectraCast profile schemas |
 | `schemas/job.py` | Job posting schemas (ingest request, job detail response) |
 | `schemas/application.py` | Application schemas (status updates, events) |
 | `schemas/resume.py` | Resume schemas (generation request, content structure) |
@@ -201,6 +204,7 @@ Versioned LLM prompt templates.
 | `versions/20260115_0011_add_admin_and_analytics.py` | Admin/analytics tables |
 | `versions/20260115_0012_add_subscription_fields.py` | Subscription tier fields |
 | `versions/20260116_0001_add_job_application_status.py` | Application status enhancements |
+| `versions/20260208_0014_add_electracast_profiles.py` | ElectraCast profile table |
 
 ---
 
@@ -370,12 +374,13 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `assets/main.css` | Global styles, Tailwind imports |
 | `components/*` | Site layout, hero, and section components |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
-| `pages/MyAccount.tsx` | My ElectraCast Account page with login links + resources |
+| `pages/MyAccount.tsx` | My ElectraCast Account page with login, profile, + resources |
 | `data/podcasts.ts` | Featured podcast list and directory slugs |
 | `data/networks.ts` | Network directory metadata and legacy links |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |
+| `lib/api.ts` | ElectraCast API client helpers |
 | `vite-env.d.ts` | Vite environment typing |
 
 ---
