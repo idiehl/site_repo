@@ -25,3 +25,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Added the Podcasts directory list with legacy links and featured lineup.
 - Added the Networks directory list and updated the network pill data.
 - Added the Custom Branded Podcasts demo reel and contact form layout.
+- Ported the Music page release copy and featured catalog list.
+- Ported the Register page welcome copy with a static registration form layout.
+- Updated homepage copy to mirror featured originals from the legacy snapshot.

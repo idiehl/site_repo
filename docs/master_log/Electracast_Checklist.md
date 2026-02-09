@@ -43,15 +43,15 @@
 - [x] My ElectraCast Account
 
 ### Legacy Content Migration (HTML → React)
-- [ ] Home: mirror headline, CTA, and section copy from snapshot
+- [x] Home: headline, CTA, and featured originals copy aligned
 - [x] Podcasts: directory list + legacy links (artwork pending)
 - [x] Networks: network directory list + legacy links (artwork pending)
 - [x] Custom Branded Podcasts: demo reel + contact form layout (artwork pending)
-- [ ] Music: port artist/release blocks and imagery
+- [x] Music: release copy + catalog list (artwork pending)
 - [x] Advertising: advertisers banner + inquiry form layout (submission pending)
 - [x] About: mission statement + team/advisor bios
 - [x] Contact: inquiry form layout (submission pending)
-- [ ] Register: port registration guidance + CTA content
+- [x] Register: welcome copy + registration form layout
 - [x] My ElectraCast Account: legacy links + resource lists
 
 ## Notes / Dependencies

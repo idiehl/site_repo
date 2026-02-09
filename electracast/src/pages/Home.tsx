@@ -16,7 +16,7 @@ const Home = () => {
       <section id="about" className="section">
         <SectionHeader
           title="Hear the Culture."
-          description="We create community and amplify diverse voices through compelling entertainment and story."
+          description="Featured originals including The Last Saturday Night, TechTalk, and Nightmare Road Stories."
         />
         <FeatureGrid />
       </section>

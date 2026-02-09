@@ -1094,3 +1094,39 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (content updates only)  
 **Notes:** Form submission is intentionally disabled until the intake pipeline is wired  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-011 — Port Music, Register, and Home copy
+
+**Type:** Feature  
+**Context:** User requested all pages be updated before artwork mapping  
+**Change summary:**
+- Added Music page release copy and expanded the featured catalog list
+- Rebuilt the Register page with legacy welcome copy and registration form layout
+- Updated homepage featured originals copy to match the legacy snapshot
+- Updated ElectraCast checklist, overview, and log entries
+
+**Rationale / tradeoffs:** Shipping complete text layouts unblocks final page coverage while artwork ingestion is deferred  
+**Files touched:**
+- `electracast/src/components/MusicGrid.tsx`
+- `electracast/src/data/music.ts`
+- `electracast/src/pages/Music.tsx`
+- `electracast/src/pages/Register.tsx`
+- `electracast/src/pages/Home.tsx`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add electracast docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Registration and custom form submissions remain disabled pending backend wiring  
+**Concepts:** @concept:electracast @concept:frontend
