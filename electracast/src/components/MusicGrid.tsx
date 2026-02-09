@@ -9,6 +9,14 @@ const MusicGrid = ({ items = musicItems }: MusicGridProps) => {
     <div className="music-grid">
       {items.map((item) => (
         <div key={`${item.artist}-${item.release}`} className="music-card">
+          {item.image ? (
+            <img
+              className="music-image"
+              src={item.image}
+              alt={`${item.artist} - ${item.release}`}
+              loading="lazy"
+            />
+          ) : null}
           <h3>{item.artist}</h3>
           <p>{item.release}</p>
           {item.href ? (

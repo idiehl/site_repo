@@ -10,7 +10,7 @@
 - [x] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register
 - [x] Add My ElectraCast Account page with legacy login + resource links
 - [x] Restore production webhook registration for the ElectraCast intake
-- [ ] Migrate podcast and network data with thumbnail coverage
+- [x] Migrate podcast and network data with thumbnail coverage
 - [ ] Wire asset ingestion to local media paths and finalize asset base URL
 - [ ] Implement account creation and login flows (UI + backend integration)
 - [ ] Add podcast creation, publishing, and management tools

@@ -266,6 +266,25 @@ main {
   align-content: start;
 }
 
+.music-image {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.music-cover {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin-top: 12px;
+}
+
 .podcast-image {
   width: 100%;
   border-radius: 12px;
@@ -304,6 +323,15 @@ main {
   display: grid;
   gap: 12px;
   align-content: start;
+}
+
+.network-image {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
 }
 
 .network-card h4 {

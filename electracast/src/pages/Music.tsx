@@ -10,6 +10,12 @@ const Music = () => {
       />
       <div className="account-card">
         <h3>Pod Till You Drop, Vol. 1</h3>
+        <img
+          className="music-cover"
+          src="https://electracast.com/wp-content/uploads/2022/09/Pod-Till-You-Drop-Vol1-FINAL-Cover-Art-3000x3000-1-1024x1024.jpg"
+          alt="Pod Till You Drop, Vol. 1 cover art"
+          loading="lazy"
+        />
         <p>
           ElectraCast is proud to announce the release of the first-ever
           original podcast music compilation album, featuring original songs and

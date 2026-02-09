@@ -1130,3 +1130,40 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Not run (content updates only)  
 **Notes:** Registration and custom form submissions remain disabled pending backend wiring  
 **Concepts:** @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260208-012 — Map ElectraCast artwork for pages
+
+**Type:** Feature  
+**Context:** User approved starting artwork mapping after completing page coverage  
+**Change summary:**
+- Mapped network tile artwork from the legacy networks grid
+- Added cover art for featured podcasts and music releases
+- Added album art to the Music page and updated logs/checklist
+
+**Rationale / tradeoffs:** Using legacy URLs provides immediate visuals while local asset ingestion is pending  
+**Files touched:**
+- `electracast/src/data/networks.ts`
+- `electracast/src/pages/Networks.tsx`
+- `electracast/src/data/podcasts.ts`
+- `electracast/src/data/music.ts`
+- `electracast/src/components/MusicGrid.tsx`
+- `electracast/src/pages/Music.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add electracast docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Artwork currently references legacy URLs until asset ingestion is wired  
+**Concepts:** @concept:electracast @concept:frontend

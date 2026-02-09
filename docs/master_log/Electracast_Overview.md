@@ -22,6 +22,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Music page now includes the Pod Till You Drop album copy and featured release list.
 - Register page now mirrors the legacy welcome copy and registration form layout.
 - Homepage featured originals copy now aligns with the legacy snapshot.
+- Artwork mapping now covers featured podcast covers, music releases, and network tiles.
 - Homepage prototype has been ported into React components with data modules backing the content.
 - `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.

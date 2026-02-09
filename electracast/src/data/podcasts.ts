@@ -115,20 +115,25 @@ export const featuredPodcasts: Podcast[] = [
     title: 'The Last Saturday Night',
     label: 'ElectraCast Original',
     href: 'https://electracast.com/podcast/the-last-saturday-night',
+    image: 'https://electracast.com/wp-content/uploads/2022/02/TLSNcoverNEW22021-07-21-300x300.jpeg',
   },
   {
     title: 'TechTalk Revolution',
     label: 'ElectraCast Original',
     href: 'https://electracast.com/podcast/techtalk-revolution',
+    image: 'https://electracast.com/wp-content/uploads/2022/02/ScreenShot2021-09-08at3.54.16PM-300x300.png',
   },
   {
     title: 'Nightmare Road Stories',
     label: 'ElectraCast Original',
     href: 'https://electracast.com/podcast/nightmare-road-stories',
+    image: 'https://electracast.com/wp-content/uploads/2022/03/NightmareRoadStories_logo_FINAL.jpeg',
   },
   {
     title: 'Unapologetically Fab',
     label: 'Network Favorite',
     href: 'https://electracast.com/podcast/unapologetically-fab',
+    image:
+      'https://electracast.com/wp-content/uploads/2023/12/UNAPOLOGETICALLY-FAB-FINAL-stronger-outline-1024x1024.png',
   },
 ]

@@ -18,6 +18,14 @@ const Networks = () => {
         <div className="network-grid">
           {networkDirectory.map((network) => (
             <article key={network.slug} className="account-card network-card">
+              {network.image ? (
+                <img
+                  className="network-image"
+                  src={network.image}
+                  alt={`${network.name} artwork`}
+                  loading="lazy"
+                />
+              ) : null}
               <h4>{network.name}</h4>
               <a
                 className="btn ghost"
