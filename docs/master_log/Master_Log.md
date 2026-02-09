@@ -1062,3 +1062,35 @@ N/A
 **Verification:** N/A (documentation update only)  
 **Notes:** None  
 **Concepts:** @concept:master-log @concept:documentation
+
+---
+
+## AU-C01-20260208-010 — Port Custom Branded Podcasts layout
+
+**Type:** Feature  
+**Context:** User asked to get all legacy pages up before artwork mapping  
+**Change summary:**
+- Added the custom branded podcast demo reel and contact form layout
+- Replaced the placeholder feature grid with legacy page structure
+- Updated ElectraCast checklist, overview, and log entries
+
+**Rationale / tradeoffs:** Shipping the layout and intake form keeps migration moving while artwork ingestion waits  
+**Files touched:**
+- `electracast/src/pages/CustomBranded.tsx`
+- `electracast/styles.css`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add electracast docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && .venv/bin/pip install -r requirements.txt && .venv/bin/alembic upgrade head && cd frontend-main && npm ci && npm run build && cd ../frontend && npm ci && npm run build && cd ../electracast && npm ci && npm run build && cd .. && sudo systemctl restart atlasuniversalis && sudo systemctl restart celery-worker || true"
+```
+
+**Verification:** Not run (content updates only)  
+**Notes:** Form submission is intentionally disabled until the intake pipeline is wired  
+**Concepts:** @concept:electracast @concept:frontend

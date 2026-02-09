@@ -24,3 +24,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Ported About and Contact pages with legacy mission copy, team/advisor bios, and contact form layout.
 - Added the Podcasts directory list with legacy links and featured lineup.
 - Added the Networks directory list and updated the network pill data.
+- Added the Custom Branded Podcasts demo reel and contact form layout.

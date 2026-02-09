@@ -333,6 +333,16 @@ main {
   background: var(--panel);
 }
 
+.demo-reel {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.demo-reel audio {
+  width: 100%;
+}
+
 .advertising-form,
 .contact-form {
   margin-top: 16px;
