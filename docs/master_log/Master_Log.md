@@ -1308,12 +1308,13 @@ nslookup -type=A electracast.atlasuniversalis.com
 nslookup -type=AAAA electracast.atlasuniversalis.com
 curl -I https://electracast.atlasuniversalis.com
 curl -I http://electracast.atlasuniversalis.com
+python -c "import urllib.request; html=urllib.request.urlopen('https://electracast.atlasuniversalis.com/').read().decode('utf-8','replace'); print('/assets/' in html)"
 ssh root@167.71.179.90 "sudo certbot certificates"
 git add deploy docs/master_log
 git commit -F -
 git push
 ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && sudo cp deploy/nginx-electracast.conf /etc/nginx/sites-available/electracast && sudo nginx -t && sudo systemctl reload nginx"
-ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm run build"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm install && npm run build"
 ```
 
 **Verification:** HTTPS cert validates and homepage HTML references `/assets/` bundles (no `/src/main.tsx`)  
