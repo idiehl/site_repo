@@ -1551,3 +1551,28 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Reviewed new rules and skill files in repo  
 **Notes:** Unrelated working tree changes left untouched  
 **Concepts:** @concept:tooling @concept:docs
+
+---
+
+## AU-C01-20260209-010 — Set dev status to PENDING for deploy
+
+**Type:** Ops  
+**Context:** Task pipeline required status update during deployment  
+**Change summary:** Updated dev status to PENDING while deploy completed  
+**Rationale / tradeoffs:** Keeps dev portal aligned with in-flight deploy state.  
+**Files touched:**
+- `docs/master_log/dev_status.json`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+MCP tool: set_dev_status (PENDING)
+git add docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+```
+
+**Verification:** Confirmed dev_status.json updated locally  
+**Notes:** None  
+**Concepts:** @concept:docs @concept:deployment
