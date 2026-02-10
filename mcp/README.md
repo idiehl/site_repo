@@ -17,6 +17,12 @@ This MCP server exposes the following tools:
 | `get_architecture_diagram` | Mermaid diagram of system architecture |
 | `get_celery_status` | Background task queue health |
 | `get_recent_activity` | Recent jobs, applications, and resumes |
+| `append_master_log_entry` | Append a formatted entry to `Master_Log.md` with auto log ID |
+| `append_app_log_entry` | Append dated bullets to an app log (ElectraCast, Apply, etc.) |
+| `update_app_checklist` | Add/check/uncheck tasks in app checklists |
+| `update_app_overview_section` | Append or replace bullets in an overview section |
+| `get_dev_status` | Read current dev portal status from `dev_status.json` |
+| `set_dev_status` | Update dev portal status (`READY`, `PENDING`, `BLOCKED`) |
 
 ## Setup
 
@@ -36,6 +42,7 @@ The server reads from the parent directory's `.env` file. Ensure `DATABASE_URL` 
 ```bash
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/atlasops
 REDIS_URL=redis://localhost:6379/0
+LOG_TZ=America/Kentucky/Louisville
 ```
 
 ### 3. Configure Cursor
@@ -82,6 +89,14 @@ Once configured, you can ask the AI assistant things like:
 - "Any security events I should know about?" → calls `get_security_events`
 - "How many users do we have?" → calls `get_user_stats`
 - "Show me the system architecture" → calls `get_architecture_diagram`
+
+### Documentation & Status Examples
+
+- "Log this change" → calls `append_master_log_entry`
+- "Add a checklist item to ElectraCast" → calls `update_app_checklist`
+- "Append notes to the ElectraCast log for today" → calls `append_app_log_entry`
+- "Update ElectraCast Current State bullets" → calls `update_app_overview_section`
+- "Set status to PENDING with a note" → calls `set_dev_status`
 
 ## Development
 

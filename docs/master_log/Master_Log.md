@@ -1320,3 +1320,36 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm inst
 **Verification:** HTTPS cert validates and homepage HTML references `/assets/` bundles (no `/src/main.tsx`)  
 **Notes:** If warnings persist, reissue cert for `electracast.atlasuniversalis.com` and confirm DNS/CAA records  
 **Concepts:** @concept:deployment @concept:electracast @concept:frontend
+
+---
+
+## AU-C01-20260209-002 — Add MCP doc-ops tools for logging workflow
+
+**Type:** Feature  
+**Context:** User requested MCP-based automation for log, overview, checklist, and status updates  
+**Change summary:**
+- Added MCP tools to append Master Log entries, app logs, checklist updates, overview section updates, and dev status updates
+- Documented new tooling and LOG_TZ usage in the MCP README and config example
+- Updated Project Overview to reflect the expanded MCP tooling and local MCP config purpose
+
+**Rationale / tradeoffs:** Centralizing doc updates in MCP tools reduces manual workload while preserving consistent formatting and audit trails.  
+**Files touched:**
+- `mcp/server.py`
+- `mcp/README.md`
+- `mcp/cursor-mcp-config.example.json`
+- `.cursor/mcp.json`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+cmd /c "if exist mcp\.venv (echo EXISTS) else (echo MISSING)"
+python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%d'))"
+git add mcp docs/master_log
+git commit -F -
+git push
+```
+
+**Verification:** Not run (tool wiring only)  
+**Notes:** `.cursor/mcp.json` updated locally (untracked) to register the MCP server  
+**Concepts:** @concept:docs @concept:tooling @concept:mcp

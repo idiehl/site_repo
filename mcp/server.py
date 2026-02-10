@@ -8,11 +8,13 @@ Provides tools for project overview, analytics, and architecture insights.
 import os
 import sys
 import json
+import re
 import subprocess
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 from collections import Counter
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from mcp.server import Server
@@ -36,6 +38,46 @@ if DATABASE_URL.startswith("postgresql+asyncpg://"):
 
 engine = None
 SessionLocal = None
+
+# Documentation paths
+DOCS_DIR = PROJECT_ROOT / "docs" / "master_log"
+MASTER_LOG = DOCS_DIR / "Master_Log.md"
+STATUS_FILE = DOCS_DIR / "dev_status.json"
+
+APP_DOCS = {
+    "atlas-forge": {
+        "name": "Atlas Forge",
+        "log": "Forge_Log.md",
+        "overview": "Forge_Overview.md",
+        "checklist": "Forge_Checklist.md",
+    },
+    "atlas-apply": {
+        "name": "Atlas Apply",
+        "log": "Apply_Log.md",
+        "overview": "Apply_Overview.md",
+        "checklist": "Apply_Checklist.md",
+    },
+    "atlas-universalis": {
+        "name": "Atlas Universalis",
+        "log": "Universalis_Log.md",
+        "overview": "Universalis_Overview.md",
+        "checklist": "Universalis_Checklist.md",
+    },
+    "electracast": {
+        "name": "ElectraCast",
+        "log": "Electracast_Log.md",
+        "overview": "Electracast_Overview.md",
+        "checklist": "Electracast_Checklist.md",
+    },
+    "atlas-meridian": {
+        "name": "Atlas Meridian",
+        "log": "Meridian_Log.md",
+        "overview": "Meridian_Overview.md",
+        "checklist": "Meridian_Checklist.md",
+    },
+}
+
+LOG_TZ = ZoneInfo(os.getenv("LOG_TZ", "America/Kentucky/Louisville"))
 
 def init_db():
     """Initialize database connection lazily."""
@@ -163,12 +205,432 @@ TOOLS = [
             "required": []
         }
     ),
+    Tool(
+        name="append_master_log_entry",
+        description="Append a formatted entry to Master_Log.md with an auto-generated log ID.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "title": {"type": "string", "description": "Short title for the entry"},
+                "entry_type": {
+                    "type": "string",
+                    "enum": ["Feature", "Fix", "Refactor", "Decision", "Docs", "Ops"]
+                },
+                "context": {"type": "string"},
+                "change_summary": {
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "array", "items": {"type": "string"}}
+                    ]
+                },
+                "rationale": {"type": "string"},
+                "files_touched": {"type": "array", "items": {"type": "string"}},
+                "commands_run": {
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "array", "items": {"type": "string"}}
+                    ]
+                },
+                "verification": {"type": "string"},
+                "notes": {"type": "string"},
+                "concepts": {
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "array", "items": {"type": "string"}}
+                    ]
+                },
+                "cycle": {"type": "string", "default": "C01"}
+            },
+            "required": ["title", "entry_type", "context", "change_summary"]
+        }
+    ),
+    Tool(
+        name="append_app_log_entry",
+        description="Append bullets under a dated section in an app log file.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string",
+                    "enum": ["atlas-forge", "atlas-apply", "atlas-universalis", "electracast", "atlas-meridian"]
+                },
+                "date": {"type": "string", "description": "YYYY-MM-DD (defaults to today)"},
+                "items": {"type": "array", "items": {"type": "string"}}
+            },
+            "required": ["app_id", "items"]
+        }
+    ),
+    Tool(
+        name="update_app_checklist",
+        description="Add or toggle tasks in an app checklist and update the Last Updated date.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string",
+                    "enum": ["atlas-forge", "atlas-apply", "atlas-universalis", "electracast", "atlas-meridian"]
+                },
+                "tasks_to_add": {"type": "array", "items": {"type": "string"}},
+                "tasks_to_check": {"type": "array", "items": {"type": "string"}},
+                "tasks_to_uncheck": {"type": "array", "items": {"type": "string"}},
+                "last_updated": {"type": "string", "description": "YYYY-MM-DD (defaults to today)"}
+            },
+            "required": ["app_id"]
+        }
+    ),
+    Tool(
+        name="update_app_overview_section",
+        description="Update a section in an app overview file with bullet items.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string",
+                    "enum": ["atlas-forge", "atlas-apply", "atlas-universalis", "electracast", "atlas-meridian"]
+                },
+                "section": {"type": "string", "description": "Section header text (without ##)"},
+                "items": {"type": "array", "items": {"type": "string"}},
+                "mode": {"type": "string", "enum": ["append", "prepend", "replace"], "default": "append"}
+            },
+            "required": ["app_id", "section", "items"]
+        }
+    ),
+    Tool(
+        name="get_dev_status",
+        description="Read the current dev portal status from dev_status.json.",
+        inputSchema={
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    ),
+    Tool(
+        name="set_dev_status",
+        description="Update the dev portal status JSON (READY, PENDING, BLOCKED).",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "status": {"type": "string", "enum": ["READY", "PENDING", "BLOCKED"]},
+                "message": {"type": "string"},
+                "updated_by": {"type": "string"}
+            },
+            "required": ["status"]
+        }
+    ),
 ]
 
 
 # =============================================================================
 # Tool implementations
 # =============================================================================
+
+def _now_local() -> datetime:
+    return datetime.now(LOG_TZ)
+
+
+def _normalize_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        items = value
+    else:
+        items = [value]
+    normalized = []
+    for item in items:
+        if item is None:
+            continue
+        text = str(item).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
+def _ensure_trailing_newline(text: str) -> str:
+    return text if text.endswith("\n") else text + "\n"
+
+
+def _normalize_task(text: str) -> str:
+    return " ".join(text.replace("\r", " ").replace("\n", " ").split()).lower()
+
+
+def _get_next_log_id(cycle: str) -> str:
+    date_str = _now_local().strftime("%Y%m%d")
+    pattern = re.compile(rf"AU-{re.escape(cycle)}-{date_str}-(\d{{3}})")
+    existing = MASTER_LOG.read_text(encoding="utf-8", errors="ignore") if MASTER_LOG.exists() else ""
+    matches = [int(match.group(1)) for match in pattern.finditer(existing)]
+    next_seq = (max(matches) + 1) if matches else 1
+    return f"AU-{cycle}-{date_str}-{next_seq:03d}"
+
+
+def _append_checklist_task(lines: list[str], task: str) -> bool:
+    header = "## Rapid Capture (Objectives)"
+    placeholder = "- [ ] Add objectives here"
+    task_line = f"- [ ] {task}"
+
+    if header in lines:
+        header_index = lines.index(header)
+        insert_index = header_index + 1
+        while insert_index < len(lines) and not lines[insert_index].strip():
+            insert_index += 1
+        if insert_index < len(lines) and lines[insert_index].strip() == placeholder:
+            lines[insert_index] = task_line
+        else:
+            lines.insert(insert_index, task_line)
+        return True
+
+    if lines and lines[-1].strip():
+        lines.append("")
+    lines.append(header)
+    lines.append(task_line)
+    return True
+
+
+def _load_status() -> dict:
+    if not STATUS_FILE.exists():
+        return {
+            "status": "READY",
+            "message": "All systems ready.",
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": "system",
+        }
+    try:
+        return json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {
+            "status": "READY",
+            "message": "All systems ready.",
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": "system",
+        }
+
+
+def impl_append_master_log_entry(arguments: dict) -> str:
+    cycle = arguments.get("cycle", "C01")
+    log_id = _get_next_log_id(cycle)
+
+    title = str(arguments.get("title", "")).strip()
+    entry_type = str(arguments.get("entry_type", "")).strip()
+    context = str(arguments.get("context", "")).strip() or "Not provided"
+    rationale = str(arguments.get("rationale", "")).strip() or "Not provided"
+    verification = str(arguments.get("verification", "")).strip() or "Not provided"
+    notes = str(arguments.get("notes", "")).strip() or "None"
+
+    change_summary = _normalize_list(arguments.get("change_summary"))
+    files_touched = _normalize_list(arguments.get("files_touched"))
+    commands_run = _normalize_list(arguments.get("commands_run"))
+    concepts = _normalize_list(arguments.get("concepts"))
+
+    if not change_summary:
+        change_summary = ["None"]
+    if not files_touched:
+        files_touched = ["None"]
+    if not commands_run:
+        commands_run = ["None"]
+    if not concepts:
+        concepts = ["None"]
+
+    entry_lines = [
+        "---",
+        "",
+        f"## {log_id} — {title}",
+        "",
+        f"**Type:** {entry_type}  ",
+        f"**Context:** {context}  ",
+        "**Change summary:**",
+        *[f"- {item}" for item in change_summary],
+        "",
+        f"**Rationale / tradeoffs:** {rationale}  ",
+        "**Files touched:**",
+        *[f"- `{item}`" for item in files_touched],
+        "",
+        "**Commands run:**",
+        "```bash",
+        *commands_run,
+        "```",
+        "",
+        f"**Verification:** {verification}  ",
+        f"**Notes:** {notes}  ",
+        f"**Concepts:** {' '.join(concepts)}",
+        "",
+    ]
+
+    existing = MASTER_LOG.read_text(encoding="utf-8", errors="ignore") if MASTER_LOG.exists() else ""
+    combined = existing
+    if combined and not combined.endswith("\n"):
+        combined += "\n"
+    combined += "\n".join(entry_lines)
+    MASTER_LOG.write_text(_ensure_trailing_newline(combined), encoding="utf-8")
+
+    return json.dumps({"log_id": log_id, "path": str(MASTER_LOG)}, indent=2)
+
+
+def impl_append_app_log_entry(arguments: dict) -> str:
+    app_id = arguments.get("app_id")
+    app = APP_DOCS.get(app_id)
+    if not app:
+        return json.dumps({"error": f"Unknown app_id: {app_id}"})
+
+    date_str = arguments.get("date") or _now_local().strftime("%Y-%m-%d")
+    items = _normalize_list(arguments.get("items"))
+    if not items:
+        return json.dumps({"error": "No log items provided"})
+
+    log_path = DOCS_DIR / app["log"]
+    lines = log_path.read_text(encoding="utf-8", errors="ignore").splitlines() if log_path.exists() else []
+    header = f"## {date_str}"
+    bullets = [f"- {item}" for item in items]
+
+    if header in lines:
+        header_index = lines.index(header)
+        insert_index = header_index + 1
+        while insert_index < len(lines) and not lines[insert_index].startswith("## "):
+            insert_index += 1
+        lines[insert_index:insert_index] = bullets
+    else:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append(header)
+        lines.extend(bullets)
+
+    updated = "\n".join(lines)
+    log_path.write_text(_ensure_trailing_newline(updated), encoding="utf-8")
+    return json.dumps({"path": str(log_path), "date": date_str, "added": len(bullets)}, indent=2)
+
+
+def impl_update_app_checklist(arguments: dict) -> str:
+    app_id = arguments.get("app_id")
+    app = APP_DOCS.get(app_id)
+    if not app:
+        return json.dumps({"error": f"Unknown app_id: {app_id}"})
+
+    checklist_path = DOCS_DIR / app["checklist"]
+    lines = checklist_path.read_text(encoding="utf-8", errors="ignore").splitlines() if checklist_path.exists() else []
+
+    date_str = arguments.get("last_updated") or _now_local().strftime("%Y-%m-%d")
+    updated_last = False
+    for idx, line in enumerate(lines):
+        if line.startswith("**Last Updated:**"):
+            lines[idx] = f"**Last Updated:** {date_str}"
+            updated_last = True
+            break
+    if not updated_last and lines:
+        lines.insert(1, f"**Last Updated:** {date_str}")
+        lines.insert(2, "")
+
+    tasks_to_add = _normalize_list(arguments.get("tasks_to_add"))
+    tasks_to_check = set(_normalize_task(t) for t in _normalize_list(arguments.get("tasks_to_check")))
+    tasks_to_uncheck = set(_normalize_task(t) for t in _normalize_list(arguments.get("tasks_to_uncheck")))
+
+    existing_tasks = set()
+    checked = 0
+    unchecked = 0
+    for idx, line in enumerate(lines):
+        match = re.match(r"- \[( |x|X)\] (.+)", line.strip())
+        if not match:
+            continue
+        task_text = match.group(2).strip()
+        key = _normalize_task(task_text)
+        existing_tasks.add(key)
+        if key in tasks_to_check:
+            lines[idx] = f"- [x] {task_text}"
+            checked += 1
+        elif key in tasks_to_uncheck:
+            lines[idx] = f"- [ ] {task_text}"
+            unchecked += 1
+
+    added = 0
+    for task in tasks_to_add:
+        key = _normalize_task(task)
+        if key in existing_tasks:
+            continue
+        if _append_checklist_task(lines, task):
+            existing_tasks.add(key)
+            added += 1
+
+    updated = "\n".join(lines)
+    checklist_path.write_text(_ensure_trailing_newline(updated), encoding="utf-8")
+
+    return json.dumps(
+        {
+            "path": str(checklist_path),
+            "last_updated": date_str,
+            "added": added,
+            "checked": checked,
+            "unchecked": unchecked,
+        },
+        indent=2,
+    )
+
+
+def impl_update_app_overview_section(arguments: dict) -> str:
+    app_id = arguments.get("app_id")
+    app = APP_DOCS.get(app_id)
+    if not app:
+        return json.dumps({"error": f"Unknown app_id: {app_id}"})
+
+    section = str(arguments.get("section", "")).strip()
+    if not section:
+        return json.dumps({"error": "Section is required"})
+
+    items = _normalize_list(arguments.get("items"))
+    if not items:
+        return json.dumps({"error": "No items provided"})
+
+    mode = arguments.get("mode", "append")
+    overview_path = DOCS_DIR / app["overview"]
+    lines = overview_path.read_text(encoding="utf-8", errors="ignore").splitlines() if overview_path.exists() else []
+
+    header_line = None
+    header_index = None
+    for idx, line in enumerate(lines):
+        if line.strip() == f"## {section}" or line.strip() == f"### {section}":
+            header_line = line.strip()
+            header_index = idx
+            break
+
+    bullets = [f"- {item}" for item in items]
+    if header_index is None:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append(f"## {section}")
+        lines.extend(bullets)
+    else:
+        end_index = header_index + 1
+        while end_index < len(lines) and not lines[end_index].startswith("## "):
+            end_index += 1
+
+        if mode == "replace":
+            lines[header_index + 1:end_index] = []
+            insert_at = header_index + 1
+        elif mode == "prepend":
+            insert_at = header_index + 1
+        else:
+            insert_at = end_index
+
+        lines[insert_at:insert_at] = bullets
+
+    overview_path.write_text(_ensure_trailing_newline("\n".join(lines)), encoding="utf-8")
+    return json.dumps({"path": str(overview_path), "section": section, "mode": mode}, indent=2)
+
+
+def impl_get_dev_status() -> str:
+    return json.dumps(_load_status(), indent=2)
+
+
+def impl_set_dev_status(arguments: dict) -> str:
+    status = arguments.get("status")
+    message = arguments.get("message")
+    updated_by = arguments.get("updated_by") or "mcp"
+
+    payload = {
+        "status": status,
+        "message": message,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_by": updated_by,
+    }
+    STATUS_FILE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return json.dumps(payload, indent=2)
+
 
 def impl_get_project_stats() -> str:
     """Get project statistics."""
@@ -667,6 +1129,18 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         elif name == "get_recent_activity":
             limit = arguments.get("limit", 20)
             result = impl_get_recent_activity(limit)
+        elif name == "append_master_log_entry":
+            result = impl_append_master_log_entry(arguments)
+        elif name == "append_app_log_entry":
+            result = impl_append_app_log_entry(arguments)
+        elif name == "update_app_checklist":
+            result = impl_update_app_checklist(arguments)
+        elif name == "update_app_overview_section":
+            result = impl_update_app_overview_section(arguments)
+        elif name == "get_dev_status":
+            result = impl_get_dev_status()
+        elif name == "set_dev_status":
+            result = impl_set_dev_status(arguments)
         else:
             result = json.dumps({"error": f"Unknown tool: {name}"})
         

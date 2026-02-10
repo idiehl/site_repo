@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-08  
+**Last Updated:** 2026-02-09  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -82,7 +82,7 @@ site_repo/
 
 | File | Purpose |
 |------|---------|
-| `.cursor/mcp.json` | Local Cursor MCP config for n8n-mcp integration |
+| `.cursor/mcp.json` | Local Cursor MCP config for n8n + atlasops dashboard tools |
 
 ---
 
@@ -508,7 +508,7 @@ Model Context Protocol server for Cursor IDE integration.
 
 | File | Purpose |
 |------|---------|
-| `server.py` | MCP server implementation |
+| `server.py` | MCP server for analytics + documentation/status automation |
 | `requirements.txt` | Python dependencies |
 | `README.md` | Setup instructions |
 | `cursor-mcp-config.example.json` | Example Cursor configuration |
