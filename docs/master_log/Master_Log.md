@@ -1379,3 +1379,29 @@ mcp\.venv\Scripts\python.exe -m pip install -r mcp\requirements.txt
 **Verification:** Dependencies installed successfully; venv Python available for MCP server  
 **Notes:** PowerShell requires `.\mcp\.venv\Scripts\python.exe` when running from repo root; restart Cursor to reload MCP  
 **Concepts:** @concept:tooling @concept:mcp
+
+---
+
+## AU-C01-20260209-004 — Fix MCP timezone dependency for Windows
+
+**Type:** Fix  
+**Context:** MCP server crashed on Windows due to missing tzdata for `ZoneInfo`  
+**Change summary:**
+- Added `tzdata` to MCP requirements
+- Added a safe fallback to UTC when the configured timezone is unavailable
+- Reinstalled MCP requirements to include tzdata
+
+**Rationale / tradeoffs:** Ensures MCP server starts reliably on Windows while preserving preferred timezone when available.  
+**Files touched:**
+- `mcp/requirements.txt`
+- `mcp/server.py`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+cmd /c mcp\.venv\Scripts\python.exe -m pip install -r mcp\requirements.txt
+```
+
+**Verification:** MCP dependencies installed; timezone fallback guards against missing tzdata  
+**Notes:** Restart Cursor to reload MCP servers after installing dependencies  
+**Concepts:** @concept:tooling @concept:mcp

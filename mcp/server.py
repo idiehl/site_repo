@@ -10,11 +10,11 @@ import sys
 import json
 import re
 import subprocess
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 from typing import Any, Optional
 from collections import Counter
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dotenv import load_dotenv
 from mcp.server import Server
@@ -77,7 +77,15 @@ APP_DOCS = {
     },
 }
 
-LOG_TZ = ZoneInfo(os.getenv("LOG_TZ", "America/Kentucky/Louisville"))
+def _load_log_timezone() -> tuple[tzinfo, str]:
+    tz_name = os.getenv("LOG_TZ", "America/Kentucky/Louisville")
+    try:
+        return ZoneInfo(tz_name), tz_name
+    except (ZoneInfoNotFoundError, ValueError, OSError):
+        return timezone.utc, "UTC"
+
+
+LOG_TZ, LOG_TZ_NAME = _load_log_timezone()
 
 def init_db():
     """Initialize database connection lazily."""

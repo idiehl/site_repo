@@ -9,6 +9,7 @@ sqlalchemy>=2.0.25
 
 # Environment
 python-dotenv>=1.0.0
+tzdata
 
 # Utilities
 pydantic>=2.5.0
