@@ -1353,3 +1353,29 @@ git push
 **Verification:** Not run (tool wiring only)  
 **Notes:** `.cursor/mcp.json` updated locally (untracked) to register the MCP server  
 **Concepts:** @concept:docs @concept:tooling @concept:mcp
+
+---
+
+## AU-C01-20260209-003 — Initialize MCP virtualenv for doc-ops tooling
+
+**Type:** Ops  
+**Context:** MCP server failed to start because the venv Python path was missing  
+**Change summary:**
+- Created the `mcp/.venv` environment
+- Installed MCP server dependencies from `mcp/requirements.txt`
+
+**Rationale / tradeoffs:** Installing dependencies locally keeps MCP tooling isolated from system Python and ensures Cursor can spawn the server.  
+**Files touched:**
+- `mcp/.venv/` (local environment)
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+python --version
+python -m venv mcp\.venv
+mcp\.venv\Scripts\python.exe -m pip install -r mcp\requirements.txt
+```
+
+**Verification:** Dependencies installed successfully; venv Python available for MCP server  
+**Notes:** PowerShell requires `.\mcp\.venv\Scripts\python.exe` when running from repo root; restart Cursor to reload MCP  
+**Concepts:** @concept:tooling @concept:mcp
