@@ -1491,3 +1491,30 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Reviewed new skill and rule files in repo  
 **Notes:** Unrelated working tree changes left untouched  
 **Concepts:** @concept:docs @concept:tooling
+---
+
+## AU-C01-20260209-008 — Add subagent profile skills
+
+**Type:** Feature  
+**Context:** User requested subagents be added and visible in Cursor settings  
+**Change summary:**
+- Added subagent profile skills for doc-ops, deploy, test-runner, and code exploration
+- Updated Project Overview to reflect new subagent profiles
+
+**Rationale / tradeoffs:** Subagents are runtime-only, so profile skills make them discoverable and standardized in Cursor.  
+**Files touched:**
+- `.cursor/skills/subagent-doc-ops/SKILL.md`
+- `.cursor/skills/subagent-deploy/SKILL.md`
+- `.cursor/skills/subagent-test-runner/SKILL.md`
+- `.cursor/skills/subagent-code-explorer/SKILL.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+MCP tool: append_master_log_entry
+```
+
+**Verification:** Reviewed skill files in repo  
+**Notes:** Subagents remain runtime-only; profiles appear under Skills in Cursor.  
+**Concepts:** @concept:tooling @concept:docs

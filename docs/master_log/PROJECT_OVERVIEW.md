@@ -84,7 +84,7 @@ site_repo/
 |------|---------|
 | `.cursor/mcp.json` | Local Cursor MCP config for n8n + atlasops dashboard tools |
 | `.cursor/rules/` | Cursor rules for workflow tiering, subagent usage, and standard commands |
-| `.cursor/skills/` | Project skills (version-logger, doc-ops, deploy-checklist, test-runner) |
+| `.cursor/skills/` | Project skills (version-logger, doc-ops, deploy-checklist, test-runner, subagent profiles) |
 
 ---
 
