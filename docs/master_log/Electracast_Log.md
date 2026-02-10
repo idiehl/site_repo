@@ -36,3 +36,4 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Fixed ElectraCast HTTPS by pointing Nginx at the cert that includes the electracast SAN.
 - Updated Nginx to serve the built Vite `dist` output instead of the source root, resolving the blank page.
 - Rebuilt the ElectraCast SPA on the droplet and reloaded Nginx.
+- MCP doc-ops test entry to confirm logging automation is working.

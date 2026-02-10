@@ -1405,3 +1405,27 @@ cmd /c mcp\.venv\Scripts\python.exe -m pip install -r mcp\requirements.txt
 **Verification:** MCP dependencies installed; timezone fallback guards against missing tzdata  
 **Notes:** Restart Cursor to reload MCP servers after installing dependencies  
 **Concepts:** @concept:tooling @concept:mcp
+---
+
+## AU-C01-20260209-005 — Validate MCP doc-ops logging
+
+**Type:** Docs  
+**Context:** User requested a test run to confirm MCP logging updates work  
+**Change summary:**
+- Added a test bullet to ElectraCast log via MCP tooling
+- Recorded this test in Master Log
+
+**Rationale / tradeoffs:** Confirm the new MCP tools can safely update log files before wider use  
+**Files touched:**
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+MCP tool: append_app_log_entry
+MCP tool: append_master_log_entry
+```
+
+**Verification:** Reviewed updated log files locally  
+**Notes:** Test entry can be removed later if desired  
+**Concepts:** @concept:docs @concept:mcp @concept:tooling
