@@ -11,6 +11,9 @@ Use subagents to reduce latency for multi-step tasks:
 - **Deploy**: run push + droplet pull + build/restart checks.
 - **Test Runner**: run smoke checks after deploys.
 - **Code Explorer**: rapid repo search when scope is unclear.
+- **Ops Auditor**: check DNS/SSL/Nginx health during incidents.
+- **Content Migrator**: extract legacy HTML/assets into structured data.
+- **CI Monitor**: review GitHub Actions status after pushes.
 
 Default pattern:
 1) Launch doc-ops in parallel with code changes.

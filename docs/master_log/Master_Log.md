@@ -1518,3 +1518,36 @@ MCP tool: append_master_log_entry
 **Verification:** Reviewed skill files in repo  
 **Notes:** Subagents remain runtime-only; profiles appear under Skills in Cursor.  
 **Concepts:** @concept:tooling @concept:docs
+
+---
+
+## AU-C01-20260209-009 — Require subagents and add ops profiles
+
+**Type:** Feature  
+**Context:** User requested mandatory subagent usage rules and additional subagent roles  
+**Change summary:**
+- Added required subagent rule and expanded subagent usage guidance
+- Added ops-auditor, content-migrator, and ci-monitor subagent profiles
+- Updated Project Overview to reflect new rules and profiles
+
+**Rationale / tradeoffs:** Standardizing subagent usage ensures recurring tasks are parallelized and reduces manual overhead.  
+**Files touched:**
+- `.cursor/rules/subagents-required.mdc`
+- `.cursor/rules/subagents.mdc`
+- `.cursor/skills/subagent-ops-auditor/SKILL.md`
+- `.cursor/skills/subagent-content-migrator/SKILL.md`
+- `.cursor/skills/subagent-ci-monitor/SKILL.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add .cursor docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+```
+
+**Verification:** Reviewed new rules and skill files in repo  
+**Notes:** Unrelated working tree changes left untouched  
+**Concepts:** @concept:tooling @concept:docs
