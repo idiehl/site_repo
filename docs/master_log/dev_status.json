@@ -1,6 +1,6 @@
 {
-  "status": "PENDING",
-  "message": "Deploying subagent rules and profiles.",
-  "updated_at": "2026-02-10T05:08:37.189230+00:00",
+  "status": "READY",
+  "message": "Deploy complete.",
+  "updated_at": "2026-02-10T05:10:06.598863+00:00",
   "updated_by": "cursor"
 }
