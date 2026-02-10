@@ -1282,3 +1282,40 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Pending (need to re-test mobile load)  
 **Notes:** If mobile issues persist, remove AAAA DNS or validate IPv6 firewall rules  
 **Concepts:** @concept:deployment @concept:nginx
+
+---
+
+## AU-C01-20260209-001 — Fix ElectraCast HTTPS and serve built SPA
+
+**Type:** Ops  
+**Context:** User reported HTTPS warnings and a blank white page on electracast.atlasuniversalis.com  
+**Change summary:**
+- Pointed ElectraCast Nginx at the SAN cert that includes the electracast subdomain
+- Updated Nginx root to serve the Vite `dist` build output instead of source files
+- Rebuilt the ElectraCast SPA on the droplet and reloaded Nginx
+
+**Rationale / tradeoffs:** Serving source `index.html` produced `/src/main.tsx` references (blank page). Using the correct SAN cert prevents browser security warnings while keeping existing cert management.  
+**Files touched:**
+- `deploy/nginx-electracast.conf`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Electracast_Overview.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+nslookup -type=A electracast.atlasuniversalis.com
+nslookup -type=AAAA electracast.atlasuniversalis.com
+curl -I https://electracast.atlasuniversalis.com
+curl -I http://electracast.atlasuniversalis.com
+ssh root@167.71.179.90 "sudo certbot certificates"
+git add deploy docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master && sudo cp deploy/nginx-electracast.conf /etc/nginx/sites-available/electracast && sudo nginx -t && sudo systemctl reload nginx"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm run build"
+```
+
+**Verification:** HTTPS cert validates and homepage HTML references `/assets/` bundles (no `/src/main.tsx`)  
+**Notes:** If warnings persist, reissue cert for `electracast.atlasuniversalis.com` and confirm DNS/CAA records  
+**Concepts:** @concept:deployment @concept:electracast @concept:frontend

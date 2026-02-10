@@ -29,6 +29,7 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - `electracast/index.html` is now the Vite SPA entry point; legacy login stub was removed.
 - Dev portal tracking is active via ElectraCast log/overview/checklist entries.
 - CI deploy workflow now builds the ElectraCast app on pushes to `master`.
+- Production Nginx now serves the built `dist` output and uses the SAN cert that includes electracast.
 
 ## n8n Integration (Automation)
 An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migration work.

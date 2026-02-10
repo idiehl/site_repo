@@ -31,3 +31,8 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Mapped artwork for featured podcasts, music releases, and network tiles.
 - Wired ElectraCast registration, login, and profile updates to new backend endpoints.
 - Added a password reset flow for ElectraCast accounts.
+
+## 2026-02-09
+- Fixed ElectraCast HTTPS by pointing Nginx at the cert that includes the electracast SAN.
+- Updated Nginx to serve the built Vite `dist` output instead of the source root, resolving the blank page.
+- Rebuilt the ElectraCast SPA on the droplet and reloaded Nginx.

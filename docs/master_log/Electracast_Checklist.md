@@ -1,6 +1,6 @@
 # ElectraCast — Checklist
 
-**Last Updated:** 2026-02-08
+**Last Updated:** 2026-02-09
 
 **Purpose:** Rapid capture of medium-term objectives, then refine into a step-by-step path.
 
@@ -10,6 +10,7 @@
 - [x] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register
 - [x] Add My ElectraCast Account page with legacy login + resource links
 - [x] Restore production webhook registration for the ElectraCast intake
+- [x] Fix production HTTPS cert and serve the built ElectraCast SPA
 - [x] Migrate podcast and network data with thumbnail coverage
 - [ ] Wire asset ingestion to local media paths and finalize asset base URL
 - [x] Implement account creation and login flows (UI + backend integration)
