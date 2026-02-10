@@ -1,0 +1,22 @@
+---
+description: Tiered workflow to balance speed and documentation accuracy
+alwaysApply: true
+---
+
+# Workflow Tiering
+
+Classify each task before acting:
+
+**Fast Path** (minor edits)
+- Master Log only
+- No deploy unless requested
+
+**Standard Path** (normal feature/bug)
+- Master Log + App Log
+- Checklist/Overview only if changed
+- Deploy if public-facing
+
+**Full Path** (infra/backend/schema)
+- Master Log + App Log + Checklist/Overview as needed
+- STATUS PENDING → READY
+- Deploy + verification required

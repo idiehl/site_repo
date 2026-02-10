@@ -1,0 +1,18 @@
+---
+description: Recommended subagent usage for Atlas Universalis workflows
+alwaysApply: true
+---
+
+# Subagent Usage
+
+Use subagents to reduce latency for multi-step tasks:
+
+- **Doc Ops**: prepare MCP payloads for logs/overview/checklist/status.
+- **Deploy**: run push + droplet pull + build/restart checks.
+- **Test Runner**: run smoke checks after deploys.
+- **Code Explorer**: rapid repo search when scope is unclear.
+
+Default pattern:
+1) Launch doc-ops in parallel with code changes.
+2) Use deploy subagent for production updates.
+3) Use test-runner if verification is required.

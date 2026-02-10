@@ -1456,3 +1456,38 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Reviewed updated log files locally  
 **Notes:** None  
 **Concepts:** @concept:docs @concept:mcp @concept:tooling
+
+---
+
+## AU-C01-20260209-007 — Add doc-ops skills and workflow rules
+
+**Type:** Feature  
+**Context:** User requested subagents, skills, and command guidance to speed up workflows  
+**Change summary:**
+- Added doc-ops, deploy-checklist, and test-runner skills for repeatable workflows
+- Added workflow tiering, subagent usage, and standard commands Cursor rules
+- Updated Project Overview to document new Cursor rules and skills
+
+**Rationale / tradeoffs:** Codifying common workflows reduces latency and keeps documentation consistent without overburdening the primary agent.  
+**Files touched:**
+- `.cursor/skills/doc-ops/SKILL.md`
+- `.cursor/skills/deploy-checklist/SKILL.md`
+- `.cursor/skills/test-runner/SKILL.md`
+- `.cursor/rules/workflow-tiering.mdc`
+- `.cursor/rules/subagents.mdc`
+- `.cursor/rules/standard-commands.mdc`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+python -c "import datetime; print(datetime.datetime.now().strftime('%Y-%m-%d'))"
+git add .cursor docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+```
+
+**Verification:** Reviewed new skill and rule files in repo  
+**Notes:** Unrelated working tree changes left untouched  
+**Concepts:** @concept:docs @concept:tooling
