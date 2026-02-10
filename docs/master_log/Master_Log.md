@@ -1429,3 +1429,30 @@ MCP tool: append_master_log_entry
 **Verification:** Reviewed updated log files locally  
 **Notes:** Test entry can be removed later if desired  
 **Concepts:** @concept:docs @concept:mcp @concept:tooling
+
+---
+
+## AU-C01-20260209-006 — Remove MCP log test bullet
+
+**Type:** Docs  
+**Context:** User requested removal of the MCP logging test entry  
+**Change summary:**
+- Removed the MCP doc-ops test bullet from the ElectraCast log
+- Recorded the cleanup in Master Log
+
+**Rationale / tradeoffs:** Keeps production logs clean after validation.  
+**Files touched:**
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add docs/master_log
+git commit -F -
+git push
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+```
+
+**Verification:** Reviewed updated log files locally  
+**Notes:** None  
+**Concepts:** @concept:docs @concept:mcp @concept:tooling
