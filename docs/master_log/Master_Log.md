@@ -1939,3 +1939,31 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm ci &
 **Verification:** Build completed successfully.  
 **Notes:** No service restart required for static build.  
 **Concepts:** @concept:deployment @concept:electracast
+---
+
+## AU-C01-20260211-006 — Scrape ElectraCast podcasts and networks
+
+**Type:** Feature  
+**Context:** User requested a full scrape of electracast.com podcasts and networks to populate the ElectraCast mirror app.  
+**Change summary:**
+- Added ElectraCast scrape and normalization scripts
+- Scraped 90 podcasts and 19 networks with HTML, assets, cover images, summaries, and network podcast lists
+- Normalized folder names and updated project overview inventory
+
+**Rationale / tradeoffs:** Create structured, local snapshots of ElectraCast content for migration and future UI/data work.  
+**Files touched:**
+- `scripts/scrape_electracast_entries.py`
+- `scripts/normalize_electracast_dirs.py`
+- `internal/Electracast_Codebase/electracast_podcasts/**`
+- `internal/Electracast_Codebase/electracast_networks/**`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+python scripts/scrape_electracast_entries.py --type all --delay 0.2
+python scripts/normalize_electracast_dirs.py
+```
+
+**Verification:** Spot-checked directory structure; 90 podcast entries + 19 networks; confirmed assets/HTML/cover/summary/network_podcasts.txt outputs.  
+**Notes:** Listing-page assets remain under Electracast_Codebase for reference.  
+**Concepts:** @concept:content-migration @concept:electracast

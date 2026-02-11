@@ -57,3 +57,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Added API fetch debug logging to capture Failed to fetch errors.
 - Updated CORS example config to include electracast.atlasuniversalis.com.
 - Removed temporary fetch debug logging from the ElectraCast API client after confirming account flow.
+- Scraped 90 podcasts and 19 networks from electracast.com into internal/Electracast_Codebase
+- Added scrape_electracast_entries.py and normalize_electracast_dirs.py to automate snapshots
+- Per-entry folders now include HTML, assets, cover images, summaries, and network_podcasts.txt

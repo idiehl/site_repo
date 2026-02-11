@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-10  
+**Last Updated:** 2026-02-11  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -486,6 +486,8 @@ Nginx configurations and deployment utilities.
 | `test_templates.py` | Template testing utility |
 | `build_master_log.ps1` | Windows script to build Master_Log.pdf |
 | `build_master_log.sh` | Linux/Mac script to build Master_Log.pdf |
+| `scrape_electracast_entries.py` | Scrape ElectraCast podcasts/networks into internal snapshots |
+| `normalize_electracast_dirs.py` | Normalize ElectraCast scrape folder names |
 
 ---
 
@@ -496,7 +498,9 @@ Non-deployed internal resources.
 | Directory | Contents |
 |-----------|----------|
 | `Documentation/` | Archived PDF snapshots (Master Log, Project Overview, AtlasOps docs) |
-| `Electracast_Codebase/` | Legacy HTML + asset snapshot of electracast.com |
+| `Electracast_Codebase/` | Legacy + scraped HTML/asset snapshot of electracast.com |
+| `Electracast_Codebase/electracast_podcasts/` | Per-podcast HTML, assets, cover images, summaries |
+| `Electracast_Codebase/electracast_networks/` | Per-network HTML, assets, cover images, network podcast lists |
 | `UI/` | Consolidated UI assets (logos, wireframes, Figma exports) |
 | `UI/atlasops_wireframes/` | UI wireframe mockups |
 | `UI/Figma/` | Clean wordmarks + Figma exports |
