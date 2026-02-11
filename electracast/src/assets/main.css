@@ -60,3 +60,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #C9C16C;
 }
+
+.line-clamp-1 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}

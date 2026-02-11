@@ -5,7 +5,6 @@ import Contact from './pages/Contact'
 import CustomBranded from './pages/CustomBranded'
 import Home from './pages/Home'
 import Music from './pages/Music'
-import MyAccount from './pages/MyAccount'
 import Networks from './pages/Networks'
 import Podcasts from './pages/Podcasts'
 import Register from './pages/Register'
@@ -32,5 +31,4 @@ export const routes: AppRoute[] = [
   { path: '/contact', element: <Contact />, title: 'Contact | ElectraCast' },
   { path: '/advertising', element: <Advertising />, title: 'Advertising | ElectraCast' },
   { path: '/register', element: <Register />, title: 'Register | ElectraCast' },
-  { path: '/account', element: <MyAccount />, title: 'My ElectraCast Account' },
 ]

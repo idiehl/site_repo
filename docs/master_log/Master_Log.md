@@ -1967,3 +1967,78 @@ python scripts/normalize_electracast_dirs.py
 **Verification:** Spot-checked directory structure; 90 podcast entries + 19 networks; confirmed assets/HTML/cover/summary/network_podcasts.txt outputs.  
 **Notes:** Listing-page assets remain under Electracast_Codebase for reference.  
 **Concepts:** @concept:content-migration @concept:electracast
+---
+
+## AU-C01-20260211-007 — Ingest ElectraCast Content
+
+**Type:** Feature  
+**Context:** Ingesting scraped ElectraCast content into the database to prepare for UI overhaul.  
+**Change summary:**
+- Added ElectraCastNetwork model and updated ElectraCastPodcast with network_id and cover_image_url
+- Created and ran ingestion script to populate database with 90 podcasts and 19 networks from scraped data
+- Verified data integrity and asset placement on production server
+
+**Rationale / tradeoffs:** Backend integration of scraped content allows building the new UI with real data immediately.  
+**Files touched:**
+- `atlasops/models/electracast.py`
+- `alembic/versions/20260211_0017_add_electracast_networks.py`
+- `scripts/ingest_electracast.py`
+- `scripts/verify_ingest.py`
+
+**Commands run:**
+```bash
+alembic upgrade head
+python scripts/ingest_electracast.py
+python scripts/verify_ingest.py
+```
+
+**Verification:** Verified 90 podcasts and 19 networks in DB. Confirmed assets in /var/www/atlasuniversalis.com/electracast/public/uploads.  
+**Notes:** Assets copied to public/uploads. Database populated with imported status.  
+**Concepts:** @concept:electracast @concept:content-ingestion @concept:database-migration
+---
+
+## AU-C01-20260211-008 — ElectraCast podcaster dashboard integration
+
+**Type:** Feature  
+**Context:** Integrated the new podcaster dashboard design from the Dashboard repo into ElectraCast so logged-in users see the full dashboard UI.  
+**Change summary:**
+- Added dashboard layout/components (DashboardLayout, Overview, Analytics, Episodes, Recording, Upload, Settings) with nested account routes.
+- Implemented login gate and dashboard data context with mock data mapped to account/podcast API.
+- Added dashboard logo asset plus lucide-react and recharts dependencies.
+- Updated PROJECT_OVERVIEW inventory for ElectraCast dashboard structure.
+- Cloned Dashboard design repo under internal/UI/External for reference.
+
+**Rationale / tradeoffs:** Use the finalized Figma export as the base UI while preserving a path to wire real data incrementally.  
+**Files touched:**
+- `electracast/package.json`
+- `electracast/package-lock.json`
+- `electracast/src/App.tsx`
+- `electracast/src/assets/main.css`
+- `electracast/src/assets/dashboard-logo.png`
+- `electracast/src/hooks/usePageTitle.ts`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/routes.tsx`
+- `electracast/src/dashboard/DashboardDataContext.tsx`
+- `electracast/src/dashboard/components/Analytics.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/dashboard/components/Episodes.tsx`
+- `electracast/src/dashboard/components/Overview.tsx`
+- `electracast/src/dashboard/components/Recording.tsx`
+- `electracast/src/dashboard/components/Settings.tsx`
+- `electracast/src/dashboard/components/Upload.tsx`
+- `electracast/src/dashboard/data/mockData.ts`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `internal/UI/External/Dashboard/**`
+
+**Commands run:**
+```bash
+mkdir internal/UI/External
+git clone https://github.com/idiehl/Dashboard internal/UI/External/Dashboard
+Copy-Item internal/UI/External/Dashboard/src/assets/966e1088bba6a777e504debf5381b9001d102f77.png electracast/src/assets/dashboard-logo.png
+npm install lucide-react recharts
+npm run build
+```
+
+**Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
+**Notes:** Dashboard routes live under /account; mock data is ready for live API wiring.  
+**Concepts:** @concept:electracast @concept:frontend @concept:dashboard

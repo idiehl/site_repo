@@ -6,6 +6,11 @@ const usePageTitle = () => {
   const location = useLocation()
 
   useEffect(() => {
+    if (location.pathname.startsWith('/account')) {
+      document.title = 'ElectraCast Dashboard'
+      return
+    }
+
     const match = routes.find((route) =>
       matchPath({ path: route.path, end: true }, location.pathname)
     )

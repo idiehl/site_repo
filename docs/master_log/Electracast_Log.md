@@ -60,3 +60,10 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Scraped 90 podcasts and 19 networks from electracast.com into internal/Electracast_Codebase
 - Added scrape_electracast_entries.py and normalize_electracast_dirs.py to automate snapshots
 - Per-entry folders now include HTML, assets, cover images, summaries, and network_podcasts.txt
+- Ingested 90 podcasts and 19 networks into database
+- Added ElectraCastNetwork model and cover_image_url to Podcast model
+- Copied scraped assets to public/uploads for serving
+- Integrated podcaster dashboard from Dashboard repo with layout, nav, and nested account routes (/account/overview, /account/analytics, etc.).
+- Added dashboard components (Overview, Analytics, Episodes, Recording, Upload, Settings) plus dashboard data context mapped to account/podcast API.
+- Added dashboard-logo.png asset and lucide-react/recharts dependencies.
+- Updated PROJECT_OVERVIEW inventory for ElectraCast dashboard structure.
