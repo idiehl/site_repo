@@ -1,4 +1,5 @@
 import { ReactNode, createContext, useContext } from 'react'
+import type { ElectraCastAccount, ElectraCastPodcast } from '../lib/api'
 import {
   dashboardDefaults,
   Episode,
@@ -15,9 +16,21 @@ export type DashboardData = {
   analyticsData: AnalyticsData
   recentComments: Comment[]
   globalRankings: Ranking[]
+  account: ElectraCastAccount | null
+  podcasts: ElectraCastPodcast[]
+  authToken: string | null
+  addPodcast: (podcast: ElectraCastPodcast) => void
 }
 
-const DashboardDataContext = createContext<DashboardData>(dashboardDefaults)
+const defaultDashboardData: DashboardData = {
+  ...dashboardDefaults,
+  account: null,
+  podcasts: [],
+  authToken: null,
+  addPodcast: () => {},
+}
+
+const DashboardDataContext = createContext<DashboardData>(defaultDashboardData)
 
 export const DashboardDataProvider = ({
   value,

@@ -1,8 +1,9 @@
 import {
   TrendingUp,
-  Users,
   Radio,
-  Headphones,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
   Play,
   Star,
   TrendingDown,
@@ -19,41 +20,68 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { Link } from 'react-router-dom'
 import { useDashboardData } from '../DashboardDataContext'
 
 export const Overview = () => {
-  const { podcaster, episodes, analyticsData, recentComments, globalRankings } =
-    useDashboardData()
-  const recentEpisodes = episodes
-    .filter((episode) => episode.status === 'published')
-    .slice(0, 3)
+  const {
+    podcaster,
+    episodes,
+    podcasts,
+    analyticsData,
+    recentComments,
+    globalRankings,
+  } = useDashboardData()
+  const hasPodcasts = podcasts.length > 0
+  const recentEpisodes = hasPodcasts
+    ? episodes.filter((episode) => episode.status === 'published').slice(0, 3)
+    : []
+
+  const totalPodcasts = podcasts.length || podcaster.totalEpisodes
+  const pendingCount = podcasts.filter((podcast) => podcast.status === 'pending').length
+  const syncedCount = podcasts.filter((podcast) =>
+    ['synced', 'imported'].includes(podcast.status)
+  ).length
+  const errorCount = podcasts.filter((podcast) => podcast.sync_error).length
+  const publishedCount = hasPodcasts
+    ? episodes.filter((episode) => episode.status === 'published').length
+    : 0
+  const scheduledCount = hasPodcasts
+    ? episodes.filter((episode) => episode.status === 'scheduled').length
+    : 0
 
   const stats = [
     {
-      label: 'TOTAL SUBSCRIBERS',
-      value: podcaster.subscriberCount.toLocaleString(),
-      icon: Users,
-      trend: '+12.3%',
-    },
-    {
-      label: 'TOTAL LISTENS',
-      value: podcaster.totalListens.toLocaleString(),
-      icon: Headphones,
-      trend: '+18.7%',
-    },
-    {
-      label: 'EPISODES PUBLISHED',
-      value: podcaster.totalEpisodes.toString(),
+      label: 'TOTAL PODCASTS',
+      value: totalPodcasts.toString(),
       icon: Radio,
-      trend: '+3',
+      trend: `${syncedCount} LIVE`,
     },
     {
-      label: 'AVG. ENGAGEMENT',
-      value: '76.4%',
-      icon: TrendingUp,
-      trend: '+5.2%',
+      label: 'PENDING REVIEW',
+      value: pendingCount.toString(),
+      icon: Clock,
+      trend: pendingCount ? 'AWAITING' : 'CLEAR',
+    },
+    {
+      label: 'SYNCED TO MEGAPHONE',
+      value: syncedCount.toString(),
+      icon: CheckCircle2,
+      trend: syncedCount ? 'ACTIVE' : 'NEW',
+    },
+    {
+      label: 'SYNC ERRORS',
+      value: errorCount.toString(),
+      icon: AlertTriangle,
+      trend: errorCount ? 'ACTION' : 'CLEAR',
     },
   ]
+
+  const statusStyles = {
+    published: 'text-[#D4A94E]',
+    scheduled: 'text-[#E8C97A]',
+    draft: 'text-[#8A94A6]',
+  }
 
   return (
     <div className="space-y-8">
@@ -184,59 +212,70 @@ export const Overview = () => {
 
       <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg text-[#EEFCF1]">Episode Pipeline</h3>
+          <h3 className="text-lg text-[#EEFCF1]">Podcast Pipeline</h3>
           <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
-            {recentEpisodes.length} PUBLISHED • 2 IN STAGING
+            {publishedCount} LIVE • {scheduledCount} PENDING
           </span>
         </div>
         <div className="space-y-3">
-          {recentEpisodes.map((episode) => (
-            <div
-              key={episode.id}
-              className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all group"
-            >
-              <div className="flex items-start gap-4">
-                <button className="w-8 h-8 bg-[#1A2744] border border-[#1D1B35] rounded-md flex items-center justify-center hover:bg-[#C89E3E] hover:border-[#C89E3E] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C89E3E]">
-                  <Play className="w-4 h-4 text-[#BCC5D0] ml-0.5" />
-                </button>
+          {recentEpisodes.length ? (
+            recentEpisodes.map((episode) => (
+              <div
+                key={episode.id}
+                className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all group"
+              >
+                <div className="flex items-start gap-4">
+                  <button className="w-8 h-8 bg-[#1A2744] border border-[#1D1B35] rounded-md flex items-center justify-center hover:bg-[#C89E3E] hover:border-[#C89E3E] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C89E3E]">
+                    <Play className="w-4 h-4 text-[#BCC5D0] ml-0.5" />
+                  </button>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3 mb-1">
-                    <h4 className="text-[#EEFCF1] text-sm leading-tight">
-                      {episode.title}
-                    </h4>
-                    <span className="text-xs text-[#D4A94E] bg-[#1A2744] px-2 py-1 rounded border border-[#1D1B35] whitespace-nowrap flex-shrink-0">
-                      PUBLISHED
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#8A94A6] mb-2 line-clamp-1">
-                    {episode.description}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-[#8A94A6]">
-                    <span>
-                      {episode.publishDate
-                        ? new Date(episode.publishDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                          })
-                        : 'TBD'}
-                    </span>
-                    <span>•</span>
-                    <span>{episode.duration}</span>
-                    <span>•</span>
-                    <span>{episode.listens.toLocaleString()} listens</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <h4 className="text-[#EEFCF1] text-sm leading-tight">
+                        {episode.title}
+                      </h4>
+                      <span
+                        className={`text-xs bg-[#1A2744] px-2 py-1 rounded border border-[#1D1B35] whitespace-nowrap flex-shrink-0 ${
+                          statusStyles[episode.status]
+                        }`}
+                      >
+                        {episode.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#8A94A6] mb-2 line-clamp-1">
+                      {episode.description}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-[#8A94A6]">
+                      <span>
+                        {episode.publishDate
+                          ? new Date(episode.publishDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : 'TBD'}
+                      </span>
+                      <span>•</span>
+                      <span>{episode.duration}</span>
+                      <span>•</span>
+                      <span>{episode.listens.toLocaleString()} listens</span>
+                    </div>
                   </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg text-sm text-[#8A94A6]">
+              No podcasts yet. Create your first show to populate this feed.
             </div>
-          ))}
+          )}
         </div>
-        <button
-          className="w-full text-center text-xs text-[#8A94A6] hover:text-[#D4A94E] mt-4 py-2 transition-colors"
+        <Link
+          to="/account/episodes"
+          className="block w-full text-center text-xs text-[#8A94A6] hover:text-[#D4A94E] mt-4 py-2 transition-colors"
           style={{ fontFamily: 'monospace' }}
         >
-          VIEW CONTENT ARCHIVE →
-        </button>
+          VIEW PODCAST LIBRARY →
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-6">

@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { BarChart3, Mic, Upload, Radio, Settings, Home, LogOut } from 'lucide-react'
+import { BarChart3, Mic, Upload, Radio, Settings, Home, LogOut, Plus } from 'lucide-react'
 import { useDashboardData } from '../DashboardDataContext'
 import logo from '../../assets/dashboard-logo.png'
 
@@ -13,12 +13,13 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
   const basePath = '/account'
 
   const navItems = [
-    { path: basePath, label: 'OVERVIEW', icon: Home },
-    { path: `${basePath}/episodes`, label: 'EPISODES', icon: Radio },
-    { path: `${basePath}/analytics`, label: 'ANALYTICS', icon: BarChart3 },
-    { path: `${basePath}/upload`, label: 'UPLOAD', icon: Upload },
-    { path: `${basePath}/recording`, label: 'RECORD', icon: Mic },
-    { path: `${basePath}/settings`, label: 'SETTINGS', icon: Settings },
+    { path: basePath, label: 'OVERVIEW', icon: Home, group: 'show' },
+    { path: `${basePath}/episodes`, label: 'PODCASTS', icon: Radio, group: 'show' },
+    { path: `${basePath}/create`, label: 'CREATE PODCAST', icon: Plus, group: 'show' },
+    { path: `${basePath}/analytics`, label: 'ANALYTICS', icon: BarChart3, group: 'tools' },
+    { path: `${basePath}/upload`, label: 'UPLOAD', icon: Upload, group: 'tools' },
+    { path: `${basePath}/recording`, label: 'RECORD', icon: Mic, group: 'tools' },
+    { path: `${basePath}/settings`, label: 'SETTINGS', icon: Settings, group: 'tools' },
   ]
 
   const isActive = (path: string) => {
@@ -82,26 +83,28 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
             >
               MY SHOW
             </p>
-            {navItems.slice(0, 3).map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
+            {navItems
+              .filter((item) => item.group === 'show')
+              .map((item) => {
+                const Icon = item.icon
+                const active = isActive(item.path)
 
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
-                    active
-                      ? 'bg-[#1A2744] text-[#D4A94E]'
-                      : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
-                  }`}
-                  style={{ fontFamily: 'system-ui' }}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
+                      active
+                        ? 'bg-[#1A2744] text-[#D4A94E]'
+                        : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
+                    }`}
+                    style={{ fontFamily: 'system-ui' }}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
 
             <p
               className="text-xs text-[#8A94A6] tracking-widest px-3 py-2 pt-4"
@@ -109,26 +112,28 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
             >
               SESSION TOOLS
             </p>
-            {navItems.slice(3).map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
+            {navItems
+              .filter((item) => item.group === 'tools')
+              .map((item) => {
+                const Icon = item.icon
+                const active = isActive(item.path)
 
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
-                    active
-                      ? 'bg-[#1A2744] text-[#D4A94E]'
-                      : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
-                  }`}
-                  style={{ fontFamily: 'system-ui' }}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
+                      active
+                        ? 'bg-[#1A2744] text-[#D4A94E]'
+                        : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
+                    }`}
+                    style={{ fontFamily: 'system-ui' }}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
           </div>
         </nav>
 

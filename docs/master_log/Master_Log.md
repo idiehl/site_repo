@@ -2042,3 +2042,38 @@ npm run build
 **Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
 **Notes:** Dashboard routes live under /account; mock data is ready for live API wiring.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dashboard
+
+---
+
+## AU-C01-20260211-009 — Wire ElectraCast dashboard data + create podcast route
+
+**Type:** Feature  
+**Context:** User requested a Create Podcast menu item and real data wiring for the ElectraCast podcaster dashboard.  
+**Change summary:**
+- Added Create Podcast route (/account/create) and sidebar menu entry.
+- Implemented CreatePodcast form wired to the ElectraCast podcast API and local list updates.
+- Extended dashboard data context to expose account, podcasts, and auth token.
+- Updated Overview and Podcasts views to use real podcast counts/statuses and empty states.
+- Updated PROJECT_OVERVIEW inventory for dashboard flow.
+
+**Rationale / tradeoffs:** Expose the core creation workflow while mapping available account and podcast data into the dashboard UI.  
+**Files touched:**
+- `electracast/src/App.tsx`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/dashboard/DashboardDataContext.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/dashboard/components/Episodes.tsx`
+- `electracast/src/dashboard/components/Overview.tsx`
+- `electracast/src/dashboard/components/CreatePodcast.tsx`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+npm install (electracast)
+npm run build (failed: vite missing)
+npm run build (success)
+```
+
+**Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
+**Notes:** Build initially failed due to missing Vite; resolved with npm install. Analytics and comments remain mock until API support exists.  
+**Concepts:** @concept:electracast @concept:frontend @concept:dashboard

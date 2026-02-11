@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DashboardLayout } from '../dashboard/components/DashboardLayout'
 import { DashboardDataProvider } from '../dashboard/DashboardDataContext'
@@ -37,6 +37,9 @@ const MyAccount = () => {
   const [loading, setLoading] = useState(false)
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [loginStatus, setLoginStatus] = useState<StatusMessage | null>(null)
+  const addPodcast = useCallback((podcast: ElectraCastPodcast) => {
+    setPodcasts((prev) => [podcast, ...prev])
+  }, [])
 
   useEffect(() => {
     if (!auth) {
@@ -101,6 +104,7 @@ const MyAccount = () => {
         account?.user.email?.split('@')[0] ||
         dashboardDefaults.podcaster.name,
       podcastName: podcasts[0]?.title || dashboardDefaults.podcaster.podcastName,
+      avatar: account?.profile.avatar_url || dashboardDefaults.podcaster.avatar,
       joinDate: account?.user.created_at || dashboardDefaults.podcaster.joinDate,
       bio: account?.profile.bio || dashboardDefaults.podcaster.bio,
       totalEpisodes: podcasts.length || dashboardDefaults.podcaster.totalEpisodes,
@@ -123,8 +127,12 @@ const MyAccount = () => {
       ...dashboardDefaults,
       podcaster,
       episodes: mappedEpisodes,
+      account,
+      podcasts,
+      authToken: auth?.access_token ?? null,
+      addPodcast,
     }
-  }, [account, podcasts])
+  }, [account, podcasts, auth, addPodcast])
 
   if (!auth) {
     return (

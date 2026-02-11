@@ -10,6 +10,7 @@ import { Analytics } from './dashboard/components/Analytics'
 import { Upload } from './dashboard/components/Upload'
 import { Recording } from './dashboard/components/Recording'
 import { Settings } from './dashboard/components/Settings'
+import { CreatePodcast } from './dashboard/components/CreatePodcast'
 
 const App = () => {
   usePageTitle()
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/account" element={<MyAccount />}>
           <Route index element={<Overview />} />
           <Route path="episodes" element={<Episodes />} />
+          <Route path="create" element={<CreatePodcast />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="upload" element={<Upload />} />
           <Route path="recording" element={<Recording />} />
