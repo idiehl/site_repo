@@ -75,6 +75,7 @@ class ElectraCastPodcast(Base):
     owner_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     explicit: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     status: Mapped[str] = mapped_column(String(40), default="pending")
+    cover_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     megaphone_podcast_id: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
     sync_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
@@ -88,3 +89,32 @@ class ElectraCastPodcast(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="electracast_podcasts")
+    network_id: Mapped[Optional[UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("electracast_networks.id", ondelete="SET NULL"), nullable=True
+    )
+    network: Mapped[Optional["ElectraCastNetwork"]] = relationship("ElectraCastNetwork", back_populates="podcasts")
+
+
+class ElectraCastNetwork(Base):
+    """ElectraCast network record."""
+
+    __tablename__ = "electracast_networks"
+
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    title: Mapped[str] = mapped_column(String(255))
+    slug: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    cover_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    podcasts: Mapped[list["ElectraCastPodcast"]] = relationship("ElectraCastPodcast", back_populates="network")
