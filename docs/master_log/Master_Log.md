@@ -1917,3 +1917,25 @@ None
 **Verification:** Not run (manual review only).  
 **Notes:** Account flow remains intact; no functional changes expected.  
 **Concepts:** @concept:electracast @concept:frontend
+---
+
+## AU-C01-20260211-005 — Deploy ElectraCast API client cleanup
+
+**Type:** Ops  
+**Context:** Production deploy of ElectraCast API client cleanup after removing debug logging.  
+**Change summary:**
+- Pulled latest master and rebuilt ElectraCast frontend.
+
+**Rationale / tradeoffs:** Ship production cleanup without altering backend services.  
+**Files touched:**
+- `None`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm ci && npm run build"
+```
+
+**Verification:** Build completed successfully.  
+**Notes:** No service restart required for static build.  
+**Concepts:** @concept:deployment @concept:electracast
