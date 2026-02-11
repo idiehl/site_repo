@@ -134,6 +134,8 @@ celery -A atlasops.workers.tasks beat --loglevel=info
 - `GET /api/v1/electracast/account` - Get ElectraCast account summary
 - `GET /api/v1/electracast/profile` - Get or create ElectraCast profile
 - `PATCH /api/v1/electracast/profile` - Update ElectraCast profile
+- `GET /api/v1/electracast/podcasts` - List ElectraCast podcasts
+- `POST /api/v1/electracast/podcasts` - Create ElectraCast podcast
 
 ### Applications
 - `GET /api/v1/applications` - List applications
@@ -146,6 +148,17 @@ celery -A atlasops.workers.tasks beat --loglevel=info
 ## Environment Variables
 
 See `.env.example` for all required environment variables.
+
+### Megaphone Configuration
+
+To enable ElectraCast podcast creation syncs, configure:
+
+```bash
+MEGAPHONE_API_BASE=https://cms.megaphone.fm/api
+MEGAPHONE_API_TOKEN=your_megaphone_token
+MEGAPHONE_NETWORK_ID=your_network_id
+MEGAPHONE_AUTH_SCHEME=Token
+```
 
 ### Stripe Billing Configuration
 

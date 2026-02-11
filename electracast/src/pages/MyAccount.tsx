@@ -4,7 +4,10 @@ import {
   clearStoredAuth,
   confirmPasswordReset,
   ElectraCastAccount,
+  ElectraCastPodcast,
+  createElectraCastPodcast,
   getElectraCastAccount,
+  getElectraCastPodcasts,
   getStoredAuth,
   loginUser,
   requestPasswordReset,
@@ -97,6 +100,14 @@ const artistLinks = [
   },
 ]
 
+const languageOptions = [
+  { value: 'en', label: 'English (en)' },
+  { value: 'en-US', label: 'English (United States) - en-US' },
+  { value: 'en-GB', label: 'English (United Kingdom) - en-GB' },
+  { value: 'es', label: 'Spanish (es)' },
+  { value: 'fr', label: 'French (fr)' },
+]
+
 type StatusMessage = {
   type: 'success' | 'error'
   message: string
@@ -124,6 +135,21 @@ const MyAccount = () => {
     location: '',
     bio: '',
   })
+  const [podcasts, setPodcasts] = useState<ElectraCastPodcast[]>([])
+  const [podcastForm, setPodcastForm] = useState({
+    title: '',
+    summary: '',
+    subtitle: '',
+    language: 'en',
+    itunesCategories: '',
+    website: '',
+    owner_name: '',
+    owner_email: '',
+    explicit: 'clean',
+  })
+  const [podcastLoading, setPodcastLoading] = useState(false)
+  const [podcastSubmitting, setPodcastSubmitting] = useState(false)
+  const [podcastStatus, setPodcastStatus] = useState<StatusMessage | null>(null)
   const [loginStatus, setLoginStatus] = useState<StatusMessage | null>(null)
   const [profileStatus, setProfileStatus] = useState<StatusMessage | null>(null)
   const [resetStatus, setResetStatus] = useState<StatusMessage | null>(null)
@@ -136,6 +162,7 @@ const MyAccount = () => {
 
     const loadAccount = async () => {
       setLoading(true)
+      setPodcastLoading(true)
       try {
         const data = await getElectraCastAccount(auth.access_token)
         setAccount(data)
@@ -151,11 +178,19 @@ const MyAccount = () => {
         setResetRequest((prev) =>
           prev.email ? prev : { ...prev, email: data.user.email }
         )
+        setPodcastForm((prev) => ({
+          ...prev,
+          owner_name: data.profile.display_name ?? prev.owner_name,
+          owner_email: data.user.email ?? prev.owner_email,
+        }))
+        const podcastData = await getElectraCastPodcasts(auth.access_token)
+        setPodcasts(podcastData)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load account.'
         setLoginStatus({ type: 'error', message })
       } finally {
         setLoading(false)
+        setPodcastLoading(false)
       }
     }
 
@@ -184,6 +219,13 @@ const MyAccount = () => {
   ) => {
     const { name, value } = event.target
     setProfileForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handlePodcastChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = event.target
+    setPodcastForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -219,6 +261,21 @@ const MyAccount = () => {
     setResetRequest({ email: '' })
     setResetConfirm({ token: '', password: '', confirmPassword: '' })
     setResetTokenHint(null)
+    setPodcasts([])
+    setPodcastForm({
+      title: '',
+      summary: '',
+      subtitle: '',
+      language: 'en',
+      itunesCategories: '',
+      website: '',
+      owner_name: '',
+      owner_email: '',
+      explicit: 'clean',
+    })
+    setPodcastStatus(null)
+    setPodcastSubmitting(false)
+    setPodcastLoading(false)
   }
 
   const handleResetRequest = async (event: FormEvent<HTMLFormElement>) => {
@@ -286,6 +343,65 @@ const MyAccount = () => {
       setLoading(false)
     }
   }
+
+  const handleCreatePodcast = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!auth) {
+      return
+    }
+    setPodcastStatus(null)
+
+    const categories = podcastForm.itunesCategories
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+
+    if (!categories.length) {
+      setPodcastStatus({
+        type: 'error',
+        message: 'Select at least one iTunes category.',
+      })
+      return
+    }
+
+    setPodcastSubmitting(true)
+    try {
+      const created = await createElectraCastPodcast(auth.access_token, {
+        title: podcastForm.title.trim(),
+        summary: podcastForm.summary.trim(),
+        subtitle: podcastForm.subtitle.trim() || undefined,
+        language: podcastForm.language || 'en',
+        itunes_categories: categories,
+        website: podcastForm.website.trim() || undefined,
+        owner_name: podcastForm.owner_name.trim() || undefined,
+        owner_email: podcastForm.owner_email.trim() || undefined,
+        explicit: podcastForm.explicit || undefined,
+      })
+      setPodcasts((prev) => [created, ...prev])
+      setPodcastForm((prev) => ({
+        ...prev,
+        title: '',
+        summary: '',
+        subtitle: '',
+        itunesCategories: '',
+      }))
+      setPodcastStatus({
+        type: 'success',
+        message: 'Podcast submitted! We will sync it to Megaphone shortly.',
+      })
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Podcast creation failed.'
+      setPodcastStatus({ type: 'error', message })
+    } finally {
+      setPodcastSubmitting(false)
+    }
+  }
+
+  const memberSince = account?.user.created_at
+    ? new Date(account.user.created_at).toLocaleDateString()
+    : null
+  const podcastCount = podcasts.length
 
   return (
     <section className="section">
@@ -522,6 +638,190 @@ const MyAccount = () => {
               </p>
             ) : null}
           </form>
+        </div>
+      ) : null}
+
+      {auth ? (
+        <div className="resource-grid">
+          <div className="account-card">
+            <h3>Dashboard overview</h3>
+            <div className="form-grid">
+              <div className="form-field">
+                <span>Account email</span>
+                <strong>{account?.user.email ?? 'Loading...'}</strong>
+              </div>
+              <div className="form-field">
+                <span>Member since</span>
+                <strong>{memberSince ?? 'N/A'}</strong>
+              </div>
+              <div className="form-field">
+                <span>Plan</span>
+                <strong>{account?.user.subscription_tier ?? 'Free'}</strong>
+              </div>
+              <div className="form-field">
+                <span>Podcasts</span>
+                <strong>{podcastCount}</strong>
+              </div>
+            </div>
+            <div className="form-actions">
+              <a className="btn ghost" href="/register">
+                Add another member
+              </a>
+              <a className="btn ghost" href="/contact">
+                Contact support
+              </a>
+            </div>
+          </div>
+
+          <div className="account-card">
+            <h3>Create a podcast</h3>
+            <p className="form-note">
+              We will review your submission and sync it to Megaphone once approved.
+            </p>
+            <form className="contact-form" onSubmit={handleCreatePodcast}>
+              <div className="form-grid">
+                <label className="form-field full">
+                  <span>Podcast title</span>
+                  <input
+                    type="text"
+                    name="title"
+                    value={podcastForm.title}
+                    onChange={handlePodcastChange}
+                    required
+                  />
+                </label>
+                <label className="form-field full">
+                  <span>Short summary</span>
+                  <textarea
+                    name="summary"
+                    rows={4}
+                    value={podcastForm.summary}
+                    onChange={handlePodcastChange}
+                    required
+                  />
+                </label>
+                <label className="form-field full">
+                  <span>Subtitle (optional)</span>
+                  <input
+                    type="text"
+                    name="subtitle"
+                    value={podcastForm.subtitle}
+                    onChange={handlePodcastChange}
+                  />
+                </label>
+                <label className="form-field">
+                  <span>Language</span>
+                  <select
+                    name="language"
+                    value={podcastForm.language}
+                    onChange={handlePodcastChange}
+                  >
+                    {languageOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-field">
+                  <span>Explicit?</span>
+                  <select
+                    name="explicit"
+                    value={podcastForm.explicit}
+                    onChange={handlePodcastChange}
+                  >
+                    <option value="clean">Clean</option>
+                    <option value="explicit">Explicit</option>
+                  </select>
+                </label>
+                <label className="form-field full">
+                  <span>iTunes categories (comma-separated)</span>
+                  <input
+                    type="text"
+                    name="itunesCategories"
+                    placeholder="Business, News, Society & Culture"
+                    value={podcastForm.itunesCategories}
+                    onChange={handlePodcastChange}
+                    required
+                  />
+                </label>
+                <label className="form-field full">
+                  <span>Website</span>
+                  <input
+                    type="url"
+                    name="website"
+                    value={podcastForm.website}
+                    onChange={handlePodcastChange}
+                  />
+                </label>
+                <label className="form-field">
+                  <span>Owner name</span>
+                  <input
+                    type="text"
+                    name="owner_name"
+                    value={podcastForm.owner_name}
+                    onChange={handlePodcastChange}
+                  />
+                </label>
+                <label className="form-field">
+                  <span>Owner email</span>
+                  <input
+                    type="email"
+                    name="owner_email"
+                    value={podcastForm.owner_email}
+                    onChange={handlePodcastChange}
+                  />
+                </label>
+              </div>
+              <div className="form-actions">
+                <button className="btn" type="submit" disabled={podcastSubmitting}>
+                  {podcastSubmitting ? 'Submitting...' : 'Submit podcast'}
+                </button>
+                <span className="form-note">
+                  Required: title, summary, and at least one category.
+                </span>
+              </div>
+              {podcastStatus ? (
+                <p className={`status-message ${podcastStatus.type}`}>
+                  {podcastStatus.message}
+                </p>
+              ) : null}
+            </form>
+          </div>
+
+          <div className="account-card">
+            <h3>Your podcasts</h3>
+            {podcastLoading ? (
+              <p className="form-note">Loading podcasts...</p>
+            ) : podcasts.length ? (
+              <div className="podcast-grid">
+                {podcasts.map((podcast) => (
+                  <article className="podcast-card" key={podcast.id}>
+                    <h4>{podcast.title}</h4>
+                    <p className="form-note">{podcast.summary}</p>
+                    <p className="form-note">
+                      Status: <strong>{podcast.status}</strong>
+                    </p>
+                    {podcast.megaphone_podcast_id ? (
+                      <p className="form-note">
+                        Megaphone ID: {podcast.megaphone_podcast_id}
+                      </p>
+                    ) : null}
+                    {podcast.sync_error ? (
+                      <p className="status-message error">{podcast.sync_error}</p>
+                    ) : null}
+                    <p className="form-note">
+                      Categories: {podcast.itunes_categories.join(', ')}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="form-note">
+                No podcasts yet. Submit your first show to get started.
+              </p>
+            )}
+          </div>
         </div>
       ) : null}
 

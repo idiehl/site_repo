@@ -1,10 +1,12 @@
 # ElectraCast — Checklist
 
-**Last Updated:** 2026-02-09
+**Last Updated:** 2026-02-10
 
 **Purpose:** Rapid capture of medium-term objectives, then refine into a step-by-step path.
 
 ## Rapid Capture (Objectives)
+- [x] Wire Megaphone podcast creation on submission
+- [x] Add podcast creation dashboard + API scaffolding (pre-Megaphone)
 - [x] Convert static homepage prototype into React components
 - [x] Implement navigation, footer, and global styling system in React
 - [x] Build route views for podcasts, networks, custom branded podcasts, music, about, contact, advertising, register

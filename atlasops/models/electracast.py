@@ -49,3 +49,42 @@ class ElectraCastProfile(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="electracast_profile")
+
+
+class ElectraCastPodcast(Base):
+    """ElectraCast podcast record."""
+
+    __tablename__ = "electracast_podcasts"
+
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+    )
+
+    title: Mapped[str] = mapped_column(String(255))
+    summary: Mapped[str] = mapped_column(Text)
+    subtitle: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    language: Mapped[str] = mapped_column(String(10), default="en")
+    itunes_categories: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    owner_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    owner_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    explicit: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    status: Mapped[str] = mapped_column(String(40), default="pending")
+    megaphone_podcast_id: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+    sync_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="electracast_podcasts")

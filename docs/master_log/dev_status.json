@@ -1,6 +1,6 @@
 {
-  "status": "READY",
-  "message": "Deploy complete.",
-  "updated_at": "2026-02-10T05:10:06.598863+00:00",
+  "status": "PENDING",
+  "message": "Deploying ElectraCast updates (Megaphone sync + nav/auth fixes).",
+  "updated_at": "2026-02-11T02:17:51.917708+00:00",
   "updated_by": "cursor"
 }

@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-09  
+**Last Updated:** 2026-02-10  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -84,7 +84,7 @@ site_repo/
 |------|---------|
 | `.cursor/mcp.json` | Local Cursor MCP config for n8n + atlasops dashboard tools |
 | `.cursor/rules/` | Cursor rules for workflow tiering, subagent usage, required subagents, and standard commands |
-| `.cursor/skills/` | Project skills (version-logger, doc-ops, deploy-checklist, test-runner, subagent profiles incl. ops-auditor/content-migrator/ci-monitor) |
+| `.cursor/skills/` | Project skills (meridian-map-generator, version-logger, doc-ops, deploy-checklist, test-runner, subagent profiles incl. ops-auditor/content-migrator/ci-monitor) |
 
 ---
 
@@ -155,6 +155,7 @@ Business logic layer.
 | `services/resume_generator.py` | Resume generation service (template rendering, PDF) |
 | `services/resume_parser.py` | Resume parsing service (extract structure from uploaded resume) |
 | `services/entitlements.py` | Subscription/entitlement checking |
+| `services/megaphone.py` | Megaphone API client for ElectraCast podcast sync |
 
 #### Prompts: `atlasops/prompts/`
 
@@ -208,6 +209,7 @@ Versioned LLM prompt templates.
 | `versions/20260116_0001_add_job_application_status.py` | Application status enhancements |
 | `versions/20260208_0014_add_electracast_profiles.py` | ElectraCast profile table |
 | `versions/20260208_0015_add_password_reset_fields.py` | Password reset token fields |
+| `versions/20260210_0016_add_electracast_podcasts.py` | ElectraCast podcasts table |
 
 ---
 

@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     free_resume_generation_limit: int = 3
     paid_resume_generation_limit: int = 9999
 
+    # Megaphone
+    megaphone_api_base: str = "https://cms.megaphone.fm/api"
+    megaphone_api_token: str = ""
+    megaphone_network_id: str = ""
+    megaphone_auth_scheme: str = "Token"
+
     # Application
     debug: bool = False
     environment: str = "development"

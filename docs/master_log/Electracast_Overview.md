@@ -31,6 +31,13 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - CI deploy workflow now builds the ElectraCast app on pushes to `master`.
 - Production Nginx now serves the built `dist` output and uses the SAN cert that includes electracast.
 
+- ElectraCast dashboard now includes podcast submission and listing for signed-in users.
+- Backend now stores ElectraCast podcast records with create/list API endpoints and a migration.
+- ElectraCast frontend API client now supports podcast creation and retrieval.
+- Podcast submissions now attempt Megaphone creation and record sync status + IDs.
+- Megaphone API settings are now configurable via environment variables.
+- Navigation now routes to standalone pages (no more home-page anchors).
+- Header logout now clears auth and redirects to the account dashboard.
 ## n8n Integration (Automation)
 An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migration work.
 - Trigger: Webhook `POST /webhook/electracast-rebuild-live`.

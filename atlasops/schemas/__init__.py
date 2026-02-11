@@ -37,6 +37,8 @@ from atlasops.schemas.meridian import (
 )
 from atlasops.schemas.electracast import (
     ElectraCastAccountResponse,
+    ElectraCastPodcastCreate,
+    ElectraCastPodcastResponse,
     ElectraCastProfileResponse,
     ElectraCastProfileUpdate,
 )
@@ -68,6 +70,8 @@ __all__ = [
     "MeridianSyncPushRequest",
     "MeridianSyncPushResponse",
     "ElectraCastAccountResponse",
+    "ElectraCastPodcastCreate",
+    "ElectraCastPodcastResponse",
     "ElectraCastProfileResponse",
     "ElectraCastProfileUpdate",
 ]

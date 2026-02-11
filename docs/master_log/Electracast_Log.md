@@ -36,3 +36,14 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Fixed ElectraCast HTTPS by pointing Nginx at the cert that includes the electracast SAN.
 - Updated Nginx to serve the built Vite `dist` output instead of the source root, resolving the blank page.
 - Rebuilt the ElectraCast SPA on the droplet and reloaded Nginx.
+
+## 2026-02-10
+- Added ElectraCast podcast data model, migration, and create/list API endpoints.
+- Expanded the My Account dashboard with podcast submission and listing UI.
+- Updated ElectraCast frontend API client/types and README endpoint list.
+- Added Megaphone API client + configuration for ElectraCast.
+- Podcast submissions now attempt Megaphone creation and store sync status + IDs.
+- Documented Megaphone env vars in README and .env example.
+- Updated nav links to route to standalone pages instead of home anchors.
+- Fixed the site header logout button and added auth state syncing.
+- Updated the homepage account card CTA to point to /account and /register.

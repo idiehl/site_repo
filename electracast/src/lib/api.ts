@@ -30,14 +30,54 @@ export type ElectraCastAccount = {
   user: {
     id: string
     email: string
+    subscription_tier?: string | null
+    subscription_status?: string | null
+    created_at?: string
   }
   profile: ElectraCastProfile
+}
+
+export type ElectraCastPodcast = {
+  id: string
+  user_id: string
+  title: string
+  summary: string
+  subtitle?: string | null
+  language: string
+  itunes_categories: string[]
+  website?: string | null
+  owner_name?: string | null
+  owner_email?: string | null
+  explicit?: string | null
+  status: string
+  megaphone_podcast_id?: string | null
+  sync_error?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ElectraCastPodcastCreate = {
+  title: string
+  summary: string
+  subtitle?: string
+  language?: string
+  itunes_categories: string[]
+  website?: string
+  owner_name?: string
+  owner_email?: string
+  explicit?: string
 }
 
 const AUTH_STORAGE_KEY = 'electracast_auth'
 const defaultApiBase = import.meta.env.PROD ? 'https://apply.atlasuniversalis.com' : ''
 const rawApiBase = import.meta.env.VITE_API_BASE_URL || defaultApiBase
 const apiBase = rawApiBase.replace(/\/+$/, '')
+
+const notifyAuthChange = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('electracast-auth-change'))
+  }
+}
 
 const buildUrl = (path: string) => {
   if (!apiBase) {
@@ -88,10 +128,12 @@ export const getStoredAuth = (): AuthTokens | null => {
 
 export const setStoredAuth = (tokens: AuthTokens) => {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(tokens))
+  notifyAuthChange()
 }
 
 export const clearStoredAuth = () => {
   localStorage.removeItem(AUTH_STORAGE_KEY)
+  notifyAuthChange()
 }
 
 export const registerUser = async (email: string, password: string) => {
@@ -157,6 +199,30 @@ export const updateElectraCastProfile = async (
 ): Promise<ElectraCastProfile> => {
   return requestJson<ElectraCastProfile>('/api/v1/electracast/profile', {
     method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+}
+
+export const getElectraCastPodcasts = async (
+  token: string
+): Promise<ElectraCastPodcast[]> => {
+  return requestJson<ElectraCastPodcast[]>('/api/v1/electracast/podcasts', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
+
+export const createElectraCastPodcast = async (
+  token: string,
+  payload: ElectraCastPodcastCreate
+): Promise<ElectraCastPodcast> => {
+  return requestJson<ElectraCastPodcast>('/api/v1/electracast/podcasts', {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,

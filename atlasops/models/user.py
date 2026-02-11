@@ -13,7 +13,7 @@ from atlasops.db import Base
 if TYPE_CHECKING:
     from atlasops.models.application import Application
     from atlasops.models.job import JobPosting
-    from atlasops.models.electracast import ElectraCastProfile
+    from atlasops.models.electracast import ElectraCastProfile, ElectraCastPodcast
 
 
 class User(Base):
@@ -89,6 +89,9 @@ class User(Base):
     )
     electracast_profile: Mapped[Optional["ElectraCastProfile"]] = relationship(
         "ElectraCastProfile", back_populates="user", uselist=False
+    )
+    electracast_podcasts: Mapped[List["ElectraCastPodcast"]] = relationship(
+        "ElectraCastPodcast", back_populates="user"
     )
 
 

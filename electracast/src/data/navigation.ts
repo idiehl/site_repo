@@ -4,11 +4,11 @@ export type NavLink = {
 }
 
 export const navLinks: NavLink[] = [
-  { label: 'Podcasts', href: '/#podcasts' },
-  { label: 'Networks', href: '/#networks' },
-  { label: 'Custom Branded Podcasts', href: '/#custom' },
-  { label: 'Music', href: '/#music' },
-  { label: 'About', href: '/#about' },
-  { label: 'Contact', href: '/#contact' },
-  { label: 'My ElectraCast Account', href: '/#account' },
+  { label: 'Podcasts', href: '/podcasts' },
+  { label: 'Networks', href: '/networks' },
+  { label: 'Custom Branded Podcasts', href: '/custom-branded-podcasts' },
+  { label: 'Music', href: '/music' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'My ElectraCast Account', href: '/account' },
 ]

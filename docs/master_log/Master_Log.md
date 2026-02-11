@@ -1601,3 +1601,140 @@ ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin mast
 **Verification:** Confirmed dev_status.json updated locally  
 **Notes:** None  
 **Concepts:** @concept:docs @concept:deployment
+---
+
+## AU-C01-20260210-001 — Add meridian map generator skill
+
+**Type:** Feature  
+**Context:** User requested a Cursor skill to generate Atlas Meridian .atlas maps from a topic prompt.  
+**Change summary:**
+- Added a new meridian-map-generator skill with map format guidance, layout defaults, and file placement rules.
+- Updated project overview to include the new skill in the Cursor skills inventory.
+
+**Rationale / tradeoffs:** Provide a repeatable, prompt-driven workflow for creating Meridian Map files with consistent formatting and storage.  
+**Files touched:**
+- `.cursor/skills/meridian-map-generator/SKILL.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (skill file and documentation update only).  
+**Notes:** None  
+**Concepts:** @concept:atlas-meridian @concept:master-log
+---
+
+## AU-C01-20260210-002 — Update Meridian paths after folder rename
+
+**Type:** Fix  
+**Context:** User renamed the Atlas Meridian folder to Atlas_Meridian and requested path updates.  
+**Change summary:**
+- Updated Cursor rules and Meridian map generator skill to point at the new Atlas_Meridian path.
+- Adjusted Meridian build notes to reference the renamed folder root.
+
+**Rationale / tradeoffs:** Keep automation and build guidance aligned with the new Atlas Meridian folder name.  
+**Files touched:**
+- `.cursor/rules/OVERVIEW.mdc`
+- `.cursor/skills/meridian-map-generator/SKILL.md`
+- `C:/Users/ihigg/Desktop/USR_ROOT/dev/CS/Atlas_Meridian/BUILD MERIDIAN.txt`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (documentation/path updates only).  
+**Notes:** None  
+**Concepts:** @concept:atlas-meridian @concept:docs
+---
+
+## AU-C01-20260210-003 — Add ElectraCast podcast dashboard + API scaffolding
+
+**Type:** Feature  
+**Context:** User requested initial ElectraCast registration, podcast creation, and dashboard functionality before Megaphone integration.  
+**Change summary:**
+- Added ElectraCast podcast data model, migration, and create/list endpoints.
+- Expanded ElectraCast account dashboard to submit and list podcasts with profile summary.
+- Updated ElectraCast frontend API client/types and styled select inputs.
+- Documented new ElectraCast podcast endpoints in README and migration list in PROJECT_OVERVIEW.
+
+**Rationale / tradeoffs:** Establish a persistent podcast repository and user-facing dashboard now, while deferring Megaphone sync to a later integration phase.  
+**Files touched:**
+- `alembic/versions/20260210_0016_add_electracast_podcasts.py`
+- `atlasops/models/electracast.py`
+- `atlasops/models/user.py`
+- `atlasops/models/__init__.py`
+- `atlasops/schemas/electracast.py`
+- `atlasops/schemas/__init__.py`
+- `atlasops/api/v1/electracast.py`
+- `electracast/src/lib/api.ts`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/styles.css`
+- `README.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (manual review only).  
+**Notes:** Megaphone sync and publishing workflows remain pending.  
+**Concepts:** @concept:electracast @concept:api @concept:frontend
+---
+
+## AU-C01-20260210-004 — Wire Megaphone podcast sync on create
+
+**Type:** Feature  
+**Context:** User requested Megaphone integration for ElectraCast podcast creation workflow.  
+**Change summary:**
+- Added Megaphone API client and configuration settings.
+- Wired ElectraCast podcast creation to call Megaphone and persist sync status/IDs.
+- Documented Megaphone environment variables and added service entry to project overview.
+
+**Rationale / tradeoffs:** Connects the new podcast repository to the external hosting platform while keeping failures visible in the dashboard.  
+**Files touched:**
+- `atlasops/services/megaphone.py`
+- `atlasops/api/v1/electracast.py`
+- `atlasops/config.py`
+- `.env.example`
+- `README.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (manual review only).  
+**Notes:** Megaphone credentials must be configured in the environment for sync to succeed.  
+**Concepts:** @concept:electracast @concept:api @concept:megaphone
+---
+
+## AU-C01-20260210-005 — Route nav links to pages and fix ElectraCast logout
+
+**Type:** Fix  
+**Context:** User reported nav still anchored to home sections and non-functional logout button, blocking access to the new account dashboard.  
+**Change summary:**
+- Updated ElectraCast navigation links to route to standalone pages.
+- Reworked the site header auth button to log out properly and show login when signed out.
+- Updated the homepage account card copy to direct users to the dashboard or registration.
+- Added auth-change event dispatch to keep header state in sync.
+
+**Rationale / tradeoffs:** Separating routes prepares each page for deeper content while making the account dashboard and logout behavior accessible.  
+**Files touched:**
+- `electracast/src/data/navigation.ts`
+- `electracast/src/components/SiteHeader.tsx`
+- `electracast/src/components/AccountCard.tsx`
+- `electracast/src/lib/api.ts`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (manual review only).  
+**Notes:** Nav now lands on `/account`, which includes the podcast submission UI.  
+**Concepts:** @concept:electracast @concept:frontend @concept:auth

@@ -1,7 +1,7 @@
 """ElectraCast profile schemas."""
 
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -43,3 +43,35 @@ class ElectraCastAccountResponse(BaseModel):
 
     user: UserResponse
     profile: ElectraCastProfileResponse
+
+
+class ElectraCastPodcastBase(BaseModel):
+    """Shared ElectraCast podcast fields."""
+
+    title: str
+    summary: str
+    subtitle: Optional[str] = None
+    language: str = "en"
+    itunes_categories: List[str]
+    website: Optional[str] = None
+    owner_name: Optional[str] = None
+    owner_email: Optional[str] = None
+    explicit: Optional[str] = None
+
+
+class ElectraCastPodcastCreate(ElectraCastPodcastBase):
+    """Podcast creation payload."""
+
+
+class ElectraCastPodcastResponse(ElectraCastPodcastBase):
+    """Podcast response payload."""
+
+    id: UUID
+    user_id: UUID
+    status: str
+    megaphone_podcast_id: Optional[str] = None
+    sync_error: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
