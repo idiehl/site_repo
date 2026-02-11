@@ -1738,3 +1738,28 @@ None
 **Verification:** Not run (manual review only).  
 **Notes:** Nav now lands on `/account`, which includes the podcast submission UI.  
 **Concepts:** @concept:electracast @concept:frontend @concept:auth
+---
+
+## AU-C01-20260210-006 — Deploy ElectraCast Megaphone + nav updates
+
+**Type:** Ops  
+**Context:** Production deploy after wiring Megaphone sync and routing fixes for ElectraCast.  
+**Change summary:**
+- Pulled latest master on droplet, ran Alembic upgrade, built ElectraCast, restarted app service, and reloaded Nginx.
+
+**Rationale / tradeoffs:** Ship public-facing ElectraCast updates and apply DB migration.  
+**Files touched:**
+- `None`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && ./.venv/bin/alembic upgrade head"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm ci && npm run build"
+ssh root@167.71.179.90 "sudo systemctl restart atlasuniversalis"
+ssh root@167.71.179.90 "sudo systemctl reload nginx"
+```
+
+**Verification:** Command exit codes only (no additional smoke checks run).  
+**Notes:** If Megaphone credentials are missing in production env, sync will show failed status in dashboard.  
+**Concepts:** @concept:deployment @concept:electracast
