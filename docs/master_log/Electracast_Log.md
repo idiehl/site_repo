@@ -50,3 +50,9 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Removed legacy login CTA and clarified internal account access messaging.
 - Improved API fetch error messaging for account actions.
 - Updated CORS env/setup examples to include electracast.atlasuniversalis.com.
+- Deployed updated ALLOWED_ORIGINS on production, rebuilt the ElectraCast frontend, and restarted app + Nginx.
+
+## 2026-02-11
+- Removed legacy login CTA and clarified internal account access.
+- Added API fetch debug logging to capture Failed to fetch errors.
+- Updated CORS example config to include electracast.atlasuniversalis.com.

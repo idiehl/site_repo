@@ -40,6 +40,8 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Header logout now clears auth and redirects to the account dashboard.
 - Legacy ElectraCast.com login CTA removed; account page now reflects internal account flow only.
 - CORS config examples now include the ElectraCast subdomain for API access.
+- Account page now reflects internal ElectraCast auth only (legacy login removed).
+- ElectraCast API client now includes debug logging for fetch failures during registration/login.
 ## n8n Integration (Automation)
 An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migration work.
 - Trigger: Webhook `POST /webhook/electracast-rebuild-live`.

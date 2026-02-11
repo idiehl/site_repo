@@ -1789,3 +1789,62 @@ None
 **Verification:** Not run (manual review only).  
 **Notes:** If registration still fails, verify production ALLOWED_ORIGINS includes the ElectraCast subdomain.  
 **Concepts:** @concept:electracast @concept:frontend @concept:auth
+---
+
+## AU-C01-20260210-008 - Deploy ElectraCast CORS env update
+
+**Type:** Ops  
+**Context:** User requested production deploy to update ALLOWED_ORIGINS and rebuild ElectraCast.  
+**Change summary:**
+- Pulled latest master on droplet.
+- Updated production ALLOWED_ORIGINS to include apply/atlas/electracast origins.
+- Rebuilt ElectraCast frontend on droplet.
+- Restarted atlasuniversalis service and reloaded Nginx.
+
+**Rationale / tradeoffs:** Ensure CORS config matches deployed ElectraCast UI and refresh production build.  
+**Files touched:**
+- `docs/master_log/Master_Log.md`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/dev_status.json`
+- `remote:/var/www/atlasuniversalis.com/.env` (production)
+- `remote:/var/www/atlasuniversalis.com/electracast/dist` (build output)
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && (grep -q '^ALLOWED_ORIGINS=' .env && sed -i 's#^ALLOWED_ORIGINS=.*#ALLOWED_ORIGINS=https://apply.atlasuniversalis.com,https://atlasuniversalis.com,https://electracast.atlasuniversalis.com#' .env || echo 'ALLOWED_ORIGINS=https://apply.atlasuniversalis.com,https://atlasuniversalis.com,https://electracast.atlasuniversalis.com' >> .env)"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm ci && npm run build"
+ssh root@167.71.179.90 "sudo systemctl restart atlasuniversalis"
+ssh root@167.71.179.90 "sudo systemctl reload nginx"
+```
+
+**Verification:** curl -I https://electracast.atlasuniversalis.com returned 200 OK.  
+**Notes:** dev status set to READY after deploy; MCP unavailable so logs updated manually.  
+**Concepts:** @concept:deployment @concept:electracast @concept:configuration
+
+---
+
+## AU-C01-20260211-001 — Instrument ElectraCast account fetch failures
+
+**Type:** Fix  
+**Context:** User reported account registration failing with "Failed to fetch" and requested removal of legacy login CTA.  
+**Change summary:**
+- Removed legacy login CTA and updated account sign-in messaging.
+- Added debug instrumentation for ElectraCast API fetch failures.
+- Updated CORS examples to include the ElectraCast subdomain.
+
+**Rationale / tradeoffs:** Clarifies the internal account system while capturing runtime evidence for the fetch failure.  
+**Files touched:**
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/lib/api.ts`
+- `.env.example`
+- `deploy/SETUP.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (debug instrumentation deployed for runtime evidence).  
+**Notes:** Debug logs will be collected during reproduction to confirm root cause.  
+**Concepts:** @concept:electracast @concept:frontend @concept:auth

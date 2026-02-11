@@ -1,6 +1,6 @@
 {
-  "status": "PENDING",
-  "message": "Deploying ElectraCast account UI + CORS updates.",
-  "updated_at": "2026-02-11T02:44:23.975867+00:00",
+  "status": "READY",
+  "message": "Deploy complete: CORS update + ElectraCast build.",
+  "updated_at": "2026-02-11T02:57:21.8799210Z",
   "updated_by": "cursor"
 }
