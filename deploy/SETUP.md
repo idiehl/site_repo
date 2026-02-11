@@ -92,7 +92,7 @@ sudo systemctl reload nginx
 Update `/var/www/atlasuniversalis.com/.env` with subdomain URLs:
 
 ```env
-ALLOWED_ORIGINS=https://apply.atlasuniversalis.com,https://atlasuniversalis.com
+ALLOWED_ORIGINS=https://apply.atlasuniversalis.com,https://atlasuniversalis.com,https://electracast.atlasuniversalis.com
 FRONTEND_URL=https://apply.atlasuniversalis.com
 LINKEDIN_REDIRECT_URI=https://apply.atlasuniversalis.com/api/v1/auth/linkedin/callback
 GOOGLE_REDIRECT_URI=https://apply.atlasuniversalis.com/api/v1/auth/google/callback

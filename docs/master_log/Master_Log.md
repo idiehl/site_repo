@@ -1763,3 +1763,29 @@ ssh root@167.71.179.90 "sudo systemctl reload nginx"
 **Verification:** Command exit codes only (no additional smoke checks run).  
 **Notes:** If Megaphone credentials are missing in production env, sync will show failed status in dashboard.  
 **Concepts:** @concept:deployment @concept:electracast
+---
+
+## AU-C01-20260210-007 — Remove legacy login CTA for ElectraCast
+
+**Type:** Fix  
+**Context:** User requested removing legacy ElectraCast.com login and clarifying the new internal account flow; registration was failing with a generic fetch error.  
+**Change summary:**
+- Removed the legacy login CTA from the ElectraCast account page and updated sign-in messaging.
+- Added a clearer API fetch failure message for account actions.
+- Updated environment/setup docs to include the ElectraCast origin in CORS examples.
+
+**Rationale / tradeoffs:** Keeps account management fully separate from ElectraCast.com and improves user guidance during onboarding.  
+**Files touched:**
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/lib/api.ts`
+- `.env.example`
+- `deploy/SETUP.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (manual review only).  
+**Notes:** If registration still fails, verify production ALLOWED_ORIGINS includes the ElectraCast subdomain.  
+**Concepts:** @concept:electracast @concept:frontend @concept:auth

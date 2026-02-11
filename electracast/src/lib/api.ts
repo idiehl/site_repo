@@ -103,7 +103,14 @@ const getErrorMessage = async (response: Response) => {
 }
 
 const requestJson = async <T>(path: string, options?: RequestInit): Promise<T> => {
-  const response = await fetch(buildUrl(path), options)
+  let response: Response
+  try {
+    response = await fetch(buildUrl(path), options)
+  } catch (error) {
+    throw new Error(
+      'Unable to reach the ElectraCast API. Please check your connection and try again.'
+    )
+  }
   if (!response.ok) {
     throw new Error(await getErrorMessage(response))
   }

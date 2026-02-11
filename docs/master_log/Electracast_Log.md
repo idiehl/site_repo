@@ -47,3 +47,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Updated nav links to route to standalone pages instead of home anchors.
 - Fixed the site header logout button and added auth state syncing.
 - Updated the homepage account card CTA to point to /account and /register.
+- Removed legacy login CTA and clarified internal account access messaging.
+- Improved API fetch error messaging for account actions.
+- Updated CORS env/setup examples to include electracast.atlasuniversalis.com.

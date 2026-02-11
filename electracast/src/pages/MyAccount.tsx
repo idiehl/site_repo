@@ -413,27 +413,21 @@ const MyAccount = () => {
       <div className="account-card">
         <h3>Account access</h3>
         <p>
-          The legacy ElectraCast login is still available while we finish the new
-          portal experience. Use the legacy login for existing accounts, or register
-          for updates on the rebuild.
+          Create an ElectraCast account to manage podcast submissions, profile details,
+          and creator resources.
         </p>
         <div className="account-actions">
-          <a
-            className="btn primary"
-            href="https://electracast.com/account/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Open legacy login
+          <a className="btn primary" href="/register">
+            Create an account
           </a>
-          <a className="btn ghost" href="/register">
-            Register for updates
+          <a className="btn ghost" href="#password-reset">
+            Forgot password
           </a>
         </div>
       </div>
 
       <div className="account-card">
-        <h3>New portal login</h3>
+        <h3>Sign in to your dashboard</h3>
         {auth ? (
           <>
             <p>
@@ -473,7 +467,9 @@ const MyAccount = () => {
               <button className="btn" type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
-              <span className="form-note">Use your new ElectraCast account credentials.</span>
+              <span className="form-note">
+                New here? <a href="/register">Create an account</a>.
+              </span>
             </div>
           </form>
         )}

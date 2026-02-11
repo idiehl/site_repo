@@ -38,6 +38,8 @@ ElectraCast is a faithful rebuild of electracast.com, hosted at
 - Megaphone API settings are now configurable via environment variables.
 - Navigation now routes to standalone pages (no more home-page anchors).
 - Header logout now clears auth and redirects to the account dashboard.
+- Legacy ElectraCast.com login CTA removed; account page now reflects internal account flow only.
+- CORS config examples now include the ElectraCast subdomain for API access.
 ## n8n Integration (Automation)
 An n8n workflow ("ElectraCast Rebuild Intake") is set up to reduce manual migration work.
 - Trigger: Webhook `POST /webhook/electracast-rebuild-live`.
