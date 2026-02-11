@@ -104,68 +104,15 @@ const getErrorMessage = async (response: Response) => {
 
 const requestJson = async <T>(path: string, options?: RequestInit): Promise<T> => {
   const url = buildUrl(path)
-  const method = options?.method ?? 'GET'
-  const origin =
-    typeof window !== 'undefined' && window.location ? window.location.origin : 'unknown'
-
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/bcd7af8d-7ce5-40a3-9923-8f868cb97eda', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      runId: 'ec-auth-req-1',
-      hypothesisId: 'H1',
-      location: 'electracast/src/lib/api.ts:requestJson:beforeFetch',
-      message: 'Starting API request',
-      data: { path, url, method, apiBase, origin },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {})
-  // #endregion agent log
-
   let response: Response
   try {
     response = await fetch(url, options)
   } catch (error) {
-    const online =
-      typeof navigator !== 'undefined' && 'onLine' in navigator ? navigator.onLine : null
-    const errorMessage = error instanceof Error ? error.message : String(error)
-
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/bcd7af8d-7ce5-40a3-9923-8f868cb97eda', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        runId: 'ec-auth-req-1',
-        hypothesisId: 'H2',
-        location: 'electracast/src/lib/api.ts:requestJson:fetchError',
-        message: 'API request failed before response',
-        data: { path, url, method, origin, online, errorMessage },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion agent log
-
     throw new Error(
       'Unable to reach the ElectraCast API. Please check your connection and try again.'
     )
   }
   if (!response.ok) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/bcd7af8d-7ce5-40a3-9923-8f868cb97eda', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        runId: 'ec-auth-req-1',
-        hypothesisId: 'H3',
-        location: 'electracast/src/lib/api.ts:requestJson:nonOk',
-        message: 'API responded with non-OK status',
-        data: { path, url, method, status: response.status, statusText: response.statusText },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion agent log
-
     throw new Error(await getErrorMessage(response))
   }
   return response.json() as Promise<T>

@@ -1848,3 +1848,72 @@ None
 **Verification:** Not run (debug instrumentation deployed for runtime evidence).  
 **Notes:** Debug logs will be collected during reproduction to confirm root cause.  
 **Concepts:** @concept:electracast @concept:frontend @concept:auth
+---
+
+## AU-C01-20260211-002 — Deploy ElectraCast debug instrumentation
+
+**Type:** Ops  
+**Context:** Production deploy after adding ElectraCast fetch debug logging and account CTA updates.  
+**Change summary:**
+- Pulled latest master, built ElectraCast, restarted the FastAPI service; SSH commands intermittently stalled during reload checks.
+
+**Rationale / tradeoffs:** Ship account UI changes and debug logging to capture the Failed to fetch error in production.  
+**Files touched:**
+- `None`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm ci && npm run build"
+ssh root@167.71.179.90 "sudo systemctl restart atlasuniversalis"
+ssh root@167.71.179.90 "systemctl status atlasuniversalis --no-pager"
+```
+
+**Verification:** Service reported active after restart; nginx reload commands hung (SSH stall) and were aborted.  
+**Notes:** SSH connections intermittently stalled; avoid cycling droplet unless stalls persist after network check.  
+**Concepts:** @concept:deployment @concept:electracast @concept:debugging
+---
+
+## AU-C01-20260211-003 — Fix production ALLOWED_ORIGINS parsing error
+
+**Type:** Ops  
+**Context:** Health checks returned 502; atlasuniversalis service failed on startup.  
+**Change summary:**
+- Updated production .env ALLOWED_ORIGINS to JSON list and restarted atlasuniversalis; health checks returned 200 and login POST now returns expected 401.
+
+**Rationale / tradeoffs:** Pydantic settings require JSON for List fields; comma-separated string caused startup failure and 502s.  
+**Files touched:**
+- `None`
+
+**Commands run:**
+```bash
+ssh root@167.71.179.90 "python3 - <<'PY' ... update ALLOWED_ORIGINS ..."
+ssh root@167.71.179.90 "systemctl restart atlasuniversalis"
+ssh root@167.71.179.90 "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/health"
+curl.exe -s -o NUL -w "%{http_code}" https://apply.atlasuniversalis.com/health
+```
+
+**Verification:** Droplet local /health returned 200; external /health returned 200; login POST returned 401 as expected.  
+**Notes:** Nginx logs show deprecated http2 directives warnings; not blocking.  
+**Concepts:** @concept:deployment @concept:ops @concept:electracast
+---
+
+## AU-C01-20260211-004 — Remove ElectraCast debug fetch logging
+
+**Type:** Refactor  
+**Context:** User confirmed account flow working; removed temporary debug instrumentation from the ElectraCast API client.  
+**Change summary:**
+- Removed temporary fetch debug logging from the ElectraCast frontend API client.
+
+**Rationale / tradeoffs:** Keep production client lean after confirming the fetch issue was resolved.  
+**Files touched:**
+- `electracast/src/lib/api.ts`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run (manual review only).  
+**Notes:** Account flow remains intact; no functional changes expected.  
+**Concepts:** @concept:electracast @concept:frontend
