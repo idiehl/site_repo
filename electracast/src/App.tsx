@@ -22,7 +22,7 @@ const App = () => {
         <Route path="/account" element={<MyAccount />}>
           <Route index element={<Overview />} />
           <Route path="episodes" element={<Episodes />} />
-          <Route path="create" element={<CreatePodcast />} />
+          <Route path="create-podcast" element={<CreatePodcast />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="upload" element={<Upload />} />
           <Route path="recording" element={<Recording />} />

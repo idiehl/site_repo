@@ -5,10 +5,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Play,
-  Star,
-  TrendingDown,
-  TrendingUp as TrendingUpIcon,
-  Minus,
   MessageSquare,
 } from 'lucide-react'
 import {
@@ -20,42 +16,35 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { Link } from 'react-router-dom'
 import { useDashboardData } from '../DashboardDataContext'
 
 export const Overview = () => {
-  const {
-    podcaster,
-    episodes,
-    podcasts,
-    analyticsData,
-    recentComments,
-    globalRankings,
-  } = useDashboardData()
-  const hasPodcasts = podcasts.length > 0
-  const recentEpisodes = hasPodcasts
-    ? episodes.filter((episode) => episode.status === 'published').slice(0, 3)
-    : []
+  const { podcaster, episodes, podcasts, analyticsData, recentSubmissions } =
+    useDashboardData()
 
+  const sortedEpisodes = [...episodes].sort((a, b) => {
+    const aTime = new Date(a.publishDate).getTime() || 0
+    const bTime = new Date(b.publishDate).getTime() || 0
+    return bTime - aTime
+  })
+  const recentEpisodes = sortedEpisodes.slice(0, 3)
+  const publishedCount = episodes.filter((episode) => episode.status === 'published')
+    .length
+  const scheduledCount = episodes.filter((episode) => episode.status === 'scheduled')
+    .length
   const totalPodcasts = podcasts.length || podcaster.totalEpisodes
   const pendingCount = podcasts.filter((podcast) => podcast.status === 'pending').length
   const syncedCount = podcasts.filter((podcast) =>
     ['synced', 'imported'].includes(podcast.status)
   ).length
   const errorCount = podcasts.filter((podcast) => podcast.sync_error).length
-  const publishedCount = hasPodcasts
-    ? episodes.filter((episode) => episode.status === 'published').length
-    : 0
-  const scheduledCount = hasPodcasts
-    ? episodes.filter((episode) => episode.status === 'scheduled').length
-    : 0
 
   const stats = [
     {
       label: 'TOTAL PODCASTS',
       value: totalPodcasts.toString(),
       icon: Radio,
-      trend: `${syncedCount} LIVE`,
+      trend: `${syncedCount} synced`,
     },
     {
       label: 'PENDING REVIEW',
@@ -76,12 +65,6 @@ export const Overview = () => {
       trend: errorCount ? 'ACTION' : 'CLEAR',
     },
   ]
-
-  const statusStyles = {
-    published: 'text-[#D4A94E]',
-    scheduled: 'text-[#E8C97A]',
-    draft: 'text-[#8A94A6]',
-  }
 
   return (
     <div className="space-y-8">
@@ -168,10 +151,10 @@ export const Overview = () => {
           className="text-xl text-[#D4A94E] mb-6 tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
-          WEEKLY ACTIVITY
+          WEEKLY SUBMISSIONS
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={analyticsData.weeklyListens}>
+          <BarChart data={analyticsData.weeklyActivity}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1D1B35" />
             <XAxis
               dataKey="day"
@@ -190,21 +173,21 @@ export const Overview = () => {
                 fontSize: '12px',
               }}
             />
-            <Bar dataKey="listens" fill="#C89E3E" />
-            <Bar dataKey="downloads" fill="#1A2744" />
+            <Bar dataKey="submitted" fill="#C89E3E" />
+            <Bar dataKey="synced" fill="#1A2744" />
           </BarChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-8 mt-4">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-[#C89E3E] border border-[#A8782F]" />
             <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
-              LISTENS
+              SUBMISSIONS
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-[#1A2744] border border-[#1D1B35]" />
             <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
-              DOWNLOADS
+              SYNCED
             </span>
           </div>
         </div>
@@ -212,117 +195,100 @@ export const Overview = () => {
 
       <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg text-[#EEFCF1]">Podcast Pipeline</h3>
+          <h3 className="text-lg text-[#EEFCF1]">Episode Pipeline</h3>
           <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
-            {publishedCount} LIVE • {scheduledCount} PENDING
+            {publishedCount} SYNCED • {scheduledCount} PENDING
           </span>
         </div>
         <div className="space-y-3">
-          {recentEpisodes.length ? (
-            recentEpisodes.map((episode) => (
-              <div
-                key={episode.id}
-                className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all group"
-              >
-                <div className="flex items-start gap-4">
-                  <button className="w-8 h-8 bg-[#1A2744] border border-[#1D1B35] rounded-md flex items-center justify-center hover:bg-[#C89E3E] hover:border-[#C89E3E] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C89E3E]">
-                    <Play className="w-4 h-4 text-[#BCC5D0] ml-0.5" />
-                  </button>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3 mb-1">
-                      <h4 className="text-[#EEFCF1] text-sm leading-tight">
-                        {episode.title}
-                      </h4>
-                      <span
-                        className={`text-xs bg-[#1A2744] px-2 py-1 rounded border border-[#1D1B35] whitespace-nowrap flex-shrink-0 ${
-                          statusStyles[episode.status]
-                        }`}
-                      >
-                        {episode.status.toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#8A94A6] mb-2 line-clamp-1">
-                      {episode.description}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-[#8A94A6]">
-                      <span>
-                        {episode.publishDate
-                          ? new Date(episode.publishDate).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                            })
-                          : 'TBD'}
-                      </span>
-                      <span>•</span>
-                      <span>{episode.duration}</span>
-                      <span>•</span>
-                      <span>{episode.listens.toLocaleString()} listens</span>
-                    </div>
+          {recentEpisodes.map((episode) => (
+            <div
+              key={episode.id}
+              className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all group"
+            >
+              <div className="flex items-start gap-4">
+                <button className="w-8 h-8 bg-[#1A2744] border border-[#1D1B35] rounded-md flex items-center justify-center hover:bg-[#C89E3E] hover:border-[#C89E3E] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C89E3E]">
+                  <Play className="w-4 h-4 text-[#BCC5D0] ml-0.5" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <h4 className="text-[#EEFCF1] text-sm leading-tight">
+                      {episode.title}
+                    </h4>
+                    <span
+                      className={`text-xs px-2 py-1 rounded border whitespace-nowrap flex-shrink-0 ${
+                        episode.status === 'published'
+                          ? 'text-[#D4A94E] bg-[#1A2744] border-[#1D1B35]'
+                          : episode.status === 'scheduled'
+                          ? 'text-[#E8C97A] bg-[#1A2744] border-[#1D1B35]'
+                          : 'text-[#E57373] bg-[#1A2744] border-[#1D1B35]'
+                      }`}
+                    >
+                      {episode.status === 'published'
+                        ? 'SYNCED'
+                        : episode.status === 'scheduled'
+                        ? 'PENDING'
+                        : 'NEEDS ATTN'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#8A94A6] mb-2 line-clamp-1">
+                    {episode.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-[#8A94A6]">
+                    <span>
+                      {episode.publishDate
+                        ? new Date(episode.publishDate).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        : 'TBD'}
+                    </span>
+                    <span>{episode.duration}</span>
+                    <span>{episode.listens.toLocaleString()} listens</span>
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg text-sm text-[#8A94A6]">
-              No podcasts yet. Create your first show to populate this feed.
             </div>
-          )}
+          ))}
         </div>
-        <Link
-          to="/account/episodes"
-          className="block w-full text-center text-xs text-[#8A94A6] hover:text-[#D4A94E] mt-4 py-2 transition-colors"
-          style={{ fontFamily: 'monospace' }}
-        >
-          VIEW PODCAST LIBRARY →
-        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
           <div className="flex items-center gap-3 mb-6">
             <MessageSquare className="w-5 h-5 text-[#C89E3E]" />
-            <h3 className="text-lg text-[#EEFCF1]">Listener Feedback</h3>
+            <h3 className="text-lg text-[#EEFCF1]">Recent Submissions</h3>
           </div>
           <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-            {recentComments.map((comment) => (
+            {recentSubmissions.map((submission) => (
               <div
-                key={comment.id}
+                key={submission.id}
                 className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-[#1A2744] border border-[#1D1B35] overflow-hidden flex-shrink-0">
-                    <img
-                      src={comment.userAvatar}
-                      alt={comment.userName}
-                      className="w-full h-full object-cover"
-                    />
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <p className="text-[#EEFCF1] text-sm">{submission.title}</p>
+                    <p className="text-xs text-[#8A94A6] line-clamp-1">
+                      {submission.summary}
+                    </p>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-[#EEFCF1] text-sm">{comment.userName}</p>
-                        <p className="text-xs text-[#8A94A6]">{comment.episodeTitle}</p>
-                      </div>
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star
-                            key={index}
-                            className={`w-3 h-3 ${
-                              index < comment.rating ? 'text-[#C89E3E]' : 'text-[#1D1B35]'
-                            }`}
-                            fill={index < comment.rating ? '#C89E3E' : 'none'}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <span
+                    className={`text-xs px-2 py-1 rounded border ${
+                      submission.status === 'synced'
+                        ? 'text-[#D4A94E] border-[#C89E3E]'
+                        : submission.status === 'pending'
+                        ? 'text-[#E8C97A] border-[#E8C97A]'
+                        : submission.status === 'failed'
+                        ? 'text-[#E57373] border-[#E57373]'
+                        : 'text-[#8A94A6] border-[#8A94A6]'
+                    }`}
+                  >
+                    {submission.status.toUpperCase()}
+                  </span>
                 </div>
-                <p className="text-sm text-[#BCC5D0] leading-relaxed mb-2">
-                  {comment.comment}
-                </p>
                 <p className="text-xs text-[#8A94A6]">
-                  {new Date(comment.timestamp).toLocaleDateString('en-US', {
+                  Submitted{' '}
+                  {new Date(submission.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     hour: 'numeric',
@@ -337,65 +303,24 @@ export const Overview = () => {
         <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
           <div className="flex items-center gap-3 mb-6">
             <TrendingUp className="w-5 h-5 text-[#C89E3E]" />
-            <h3 className="text-lg text-[#EEFCF1]">Global Rankings</h3>
-          </div>
-
-          <div className="bg-[#070B1A] border-2 border-[#1D1B35] p-6 rounded-sm mb-6">
-            <p className="text-xs text-[#8A94A6] mb-2 tracking-widest">
-              CURRENT RANK • TECHNOLOGY
-            </p>
-            <div className="flex items-center gap-3">
-              <span className="text-4xl text-[#D4A94E] font-bold">
-                #{globalRankings[0]?.rank ?? 0}
-              </span>
-              <div className="flex items-center gap-1 text-[#C89E3E]">
-                <TrendingUpIcon className="w-4 h-4" />
-                <span className="text-sm">
-                  +{globalRankings[0]?.change ?? 0} from last month
-                </span>
-              </div>
-            </div>
+            <h3 className="text-lg text-[#EEFCF1]">Status Breakdown</h3>
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-sm text-[#8A94A6] tracking-widest">MONTHLY HISTORY</h4>
-            {globalRankings.map((ranking) => (
+            {analyticsData.statusBreakdown.map((status) => (
               <div
-                key={ranking.month}
+                key={status.label}
                 className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-sm"
               >
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[#D4A94E] font-bold">#{ranking.rank}</span>
+                    <span className="text-[#D4A94E] font-bold">{status.label}</span>
                     <span className="text-xs text-[#8A94A6] ml-2">
-                      {ranking.month}
+                      {status.count} podcasts
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {ranking.change > 0 ? (
-                      <TrendingUpIcon className="w-3 h-3 text-[#C89E3E]" />
-                    ) : ranking.change < 0 ? (
-                      <TrendingDown className="w-3 h-3 text-[#E57373]" />
-                    ) : (
-                      <Minus className="w-3 h-3 text-[#8A94A6]" />
-                    )}
-                    <span
-                      className={`text-xs ${
-                        ranking.change > 0
-                          ? 'text-[#C89E3E]'
-                          : ranking.change < 0
-                          ? 'text-[#E57373]'
-                          : 'text-[#8A94A6]'
-                      }`}
-                    >
-                      {ranking.change > 0 ? '+' : ''}
-                      {ranking.change}
-                    </span>
-                  </div>
+                  <div className="text-xs text-[#8A94A6]">{status.percentage}%</div>
                 </div>
-                <p className="text-xs text-[#8A94A6]">
-                  {ranking.listens.toLocaleString()} listens
-                </p>
               </div>
             ))}
           </div>

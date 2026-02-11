@@ -2042,7 +2042,6 @@ npm run build
 **Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
 **Notes:** Dashboard routes live under /account; mock data is ready for live API wiring.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dashboard
-
 ---
 
 ## AU-C01-20260211-009 — Wire ElectraCast dashboard data + create podcast route
@@ -2077,3 +2076,38 @@ npm run build (success)
 **Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
 **Notes:** Build initially failed due to missing Vite; resolved with npm install. Analytics and comments remain mock until API support exists.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dashboard
+
+---
+
+## AU-C01-20260211-010 — Wire dashboard data + create podcast flow
+
+**Type:** Feature  
+**Context:** User requested that the podcaster dashboard show real data and include a Create Podcast menu item.  
+**Change summary:**
+- Added Create Podcast dashboard page and navigation entry at `/account/create-podcast`.
+- Wired Create Podcast form to the ElectraCast podcast API with live list updates.
+- Reworked dashboard analytics/overview to derive counts, status breakdowns, and activity from real podcast data.
+- Updated dashboard mock data shape and Project Overview inventory for new dashboard files.
+
+**Rationale / tradeoffs:** Leverage existing account/podcast endpoints to populate the UI now; analytics are derived from metadata until richer stats are available.  
+**Files touched:**
+- `electracast/src/App.tsx`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/dashboard/DashboardDataContext.tsx`
+- `electracast/src/dashboard/data/mockData.ts`
+- `electracast/src/dashboard/components/CreatePodcast.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/dashboard/components/Overview.tsx`
+- `electracast/src/dashboard/components/Analytics.tsx`
+- `docs/master_log/Electracast_Log.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+npm install
+npm run build
+```
+
+**Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
+**Notes:** Derived analytics are based on podcast metadata; Create Podcast submits to `/api/v1/electracast/podcasts`.  
+**Concepts:** @concept:electracast @concept:frontend @concept:dashboard @concept:api

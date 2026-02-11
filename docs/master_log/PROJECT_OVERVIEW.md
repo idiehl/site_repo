@@ -379,9 +379,10 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `assets/main.css` | Global styles, Tailwind imports |
 | `assets/dashboard-logo.png` | Dashboard header logo asset |
 | `components/*` | Site layout, hero, and section components |
-| `dashboard/*` | Podcaster dashboard layout components, create-podcast flow, and data mapping |
+| `dashboard/*` | Podcaster dashboard layout components, analytics, and create-podcast flow |
+| `dashboard/components/CreatePodcast.tsx` | Create Podcast form inside dashboard |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
-| `pages/MyAccount.tsx` | Podcaster dashboard login gate + data provider |
+| `pages/MyAccount.tsx` | Podcaster dashboard login gate + data provider + submit actions |
 | `data/podcasts.ts` | Featured podcast list and directory slugs |
 | `data/networks.ts` | Network directory metadata and legacy links |
 | `data/*` | Structured content data modules |

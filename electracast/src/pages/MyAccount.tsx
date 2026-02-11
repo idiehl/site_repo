@@ -2,7 +2,12 @@ import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } fro
 import { useNavigate } from 'react-router-dom'
 import { DashboardLayout } from '../dashboard/components/DashboardLayout'
 import { DashboardDataProvider } from '../dashboard/DashboardDataContext'
-import { dashboardDefaults, Episode, Podcaster } from '../dashboard/data/mockData'
+import {
+  dashboardDefaults,
+  Episode,
+  Podcaster,
+  Submission,
+} from '../dashboard/data/mockData'
 import {
   clearStoredAuth,
   ElectraCastAccount,
@@ -19,14 +24,141 @@ type StatusMessage = {
   message: string
 }
 
-const statusToEpisode = (status: string): Episode['status'] => {
+const normalizePodcastStatus = (status: string): Submission['status'] => {
   if (status === 'synced' || status === 'imported') {
-    return 'published'
+    return 'synced'
   }
   if (status === 'pending') {
+    return 'pending'
+  }
+  if (status === 'failed') {
+    return 'failed'
+  }
+  return 'draft'
+}
+
+const statusToEpisode = (status: string): Episode['status'] => {
+  const normalized = normalizePodcastStatus(status)
+  if (normalized === 'synced') {
+    return 'published'
+  }
+  if (normalized === 'pending') {
     return 'scheduled'
   }
   return 'draft'
+}
+
+const buildWeeklyActivity = (podcasts: ElectraCastPodcast[]) => {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const data = days.map((day) => ({ day, submitted: 0, synced: 0 }))
+
+  podcasts.forEach((podcast) => {
+    const date = new Date(podcast.created_at)
+    if (Number.isNaN(date.getTime())) {
+      return
+    }
+    const index = (date.getDay() + 6) % 7
+    data[index].submitted += 1
+    if (normalizePodcastStatus(podcast.status) === 'synced') {
+      data[index].synced += 1
+    }
+  })
+
+  return data
+}
+
+const buildMonthlySubmissions = (podcasts: ElectraCastPodcast[], months = 6) => {
+  const now = new Date()
+  const counts = new Map<string, number>()
+
+  podcasts.forEach((podcast) => {
+    const date = new Date(podcast.created_at)
+    if (Number.isNaN(date.getTime())) {
+      return
+    }
+    const key = `${date.getFullYear()}-${date.getMonth()}`
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  })
+
+  return Array.from({ length: months }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (months - 1 - index), 1)
+    const key = `${date.getFullYear()}-${date.getMonth()}`
+    return {
+      month: date.toLocaleString('en-US', { month: 'short' }),
+      submissions: counts.get(key) ?? 0,
+    }
+  })
+}
+
+const buildStatusBreakdown = (podcasts: ElectraCastPodcast[]) => {
+  const counts = podcasts.reduce(
+    (acc, podcast) => {
+      const normalized = normalizePodcastStatus(podcast.status)
+      acc[normalized] += 1
+      return acc
+    },
+    { synced: 0, pending: 0, failed: 0, draft: 0 }
+  )
+
+  const total = podcasts.length || 1
+  return [
+    {
+      label: 'Synced',
+      count: counts.synced,
+      percentage: Math.round((counts.synced / total) * 100),
+    },
+    {
+      label: 'Pending',
+      count: counts.pending,
+      percentage: Math.round((counts.pending / total) * 100),
+    },
+    {
+      label: 'Failed',
+      count: counts.failed,
+      percentage: Math.round((counts.failed / total) * 100),
+    },
+    {
+      label: 'Draft',
+      count: counts.draft,
+      percentage: Math.round((counts.draft / total) * 100),
+    },
+  ]
+}
+
+const buildTopCategories = (podcasts: ElectraCastPodcast[]) => {
+  const counts = new Map<string, number>()
+  podcasts.forEach((podcast) => {
+    podcast.itunes_categories.forEach((category) => {
+      const key = category.trim()
+      if (!key) {
+        return
+      }
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+    })
+  })
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([category, count]) => ({ category, count }))
+}
+
+const buildHourlySubmissions = (podcasts: ElectraCastPodcast[]) => {
+  const buckets = Array.from({ length: 8 }, (_, index) => ({
+    hour: `${String(index * 3).padStart(2, '0')}:00`,
+    submissions: 0,
+  }))
+
+  podcasts.forEach((podcast) => {
+    const date = new Date(podcast.created_at)
+    if (Number.isNaN(date.getTime())) {
+      return
+    }
+    const bucket = Math.floor(date.getHours() / 3)
+    buckets[bucket].submissions += 1
+  })
+
+  return buckets
 }
 
 const MyAccount = () => {
@@ -97,6 +229,31 @@ const MyAccount = () => {
   }
 
   const dashboardData = useMemo(() => {
+    const analyticsData =
+      podcasts.length > 0
+        ? {
+            weeklyActivity: buildWeeklyActivity(podcasts),
+            monthlySubmissions: buildMonthlySubmissions(podcasts),
+            statusBreakdown: buildStatusBreakdown(podcasts),
+            topCategories: buildTopCategories(podcasts),
+            hourlySubmissions: buildHourlySubmissions(podcasts),
+          }
+        : dashboardDefaults.analyticsData
+
+    const recentSubmissions: Submission[] =
+      podcasts.length > 0
+        ? [...podcasts]
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            .slice(0, 5)
+            .map((podcast) => ({
+              id: podcast.id,
+              title: podcast.title,
+              summary: podcast.summary,
+              status: normalizePodcastStatus(podcast.status),
+              createdAt: podcast.created_at,
+            }))
+        : dashboardDefaults.recentSubmissions
+
     const podcaster: Podcaster = {
       ...dashboardDefaults.podcaster,
       name:
@@ -127,6 +284,8 @@ const MyAccount = () => {
       ...dashboardDefaults,
       podcaster,
       episodes: mappedEpisodes,
+      analyticsData,
+      recentSubmissions,
       account,
       podcasts,
       authToken: auth?.access_token ?? null,

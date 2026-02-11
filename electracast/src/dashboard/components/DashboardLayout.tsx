@@ -1,5 +1,14 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { BarChart3, Mic, Upload, Radio, Settings, Home, LogOut, Plus } from 'lucide-react'
+import {
+  BarChart3,
+  Mic,
+  Upload,
+  Radio,
+  Settings,
+  Home,
+  LogOut,
+  PlusCircle,
+} from 'lucide-react'
 import { useDashboardData } from '../DashboardDataContext'
 import logo from '../../assets/dashboard-logo.png'
 
@@ -15,7 +24,12 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
   const navItems = [
     { path: basePath, label: 'OVERVIEW', icon: Home, group: 'show' },
     { path: `${basePath}/episodes`, label: 'PODCASTS', icon: Radio, group: 'show' },
-    { path: `${basePath}/create`, label: 'CREATE PODCAST', icon: Plus, group: 'show' },
+    {
+      path: `${basePath}/create-podcast`,
+      label: 'CREATE PODCAST',
+      icon: PlusCircle,
+      group: 'show',
+    },
     { path: `${basePath}/analytics`, label: 'ANALYTICS', icon: BarChart3, group: 'tools' },
     { path: `${basePath}/upload`, label: 'UPLOAD', icon: Upload, group: 'tools' },
     { path: `${basePath}/recording`, label: 'RECORD', icon: Mic, group: 'tools' },

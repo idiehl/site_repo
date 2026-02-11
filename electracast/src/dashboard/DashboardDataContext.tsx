@@ -1,12 +1,6 @@
 import { ReactNode, createContext, useContext } from 'react'
 import type { ElectraCastAccount, ElectraCastPodcast } from '../lib/api'
-import {
-  dashboardDefaults,
-  Episode,
-  Podcaster,
-  Comment,
-  Ranking,
-} from './data/mockData'
+import { dashboardDefaults, Episode, Podcaster, Submission } from './data/mockData'
 
 type AnalyticsData = typeof dashboardDefaults.analyticsData
 
@@ -14,8 +8,7 @@ export type DashboardData = {
   podcaster: Podcaster
   episodes: Episode[]
   analyticsData: AnalyticsData
-  recentComments: Comment[]
-  globalRankings: Ranking[]
+  recentSubmissions: Submission[]
   account: ElectraCastAccount | null
   podcasts: ElectraCastPodcast[]
   authToken: string | null

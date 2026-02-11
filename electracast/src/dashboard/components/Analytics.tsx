@@ -1,4 +1,4 @@
-import { TrendingUp, Users, Globe, Clock } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, Radio } from 'lucide-react'
 import {
   LineChart,
   Line,
@@ -18,24 +18,22 @@ import { useDashboardData } from '../DashboardDataContext'
 
 export const Analytics = () => {
   const { analyticsData } = useDashboardData()
-  const topCountries = [
-    { country: 'United States', listens: 234567, percentage: 42 },
-    { country: 'United Kingdom', listens: 98234, percentage: 18 },
-    { country: 'Canada', listens: 76543, percentage: 14 },
-    { country: 'Australia', listens: 54321, percentage: 10 },
-    { country: 'Germany', listens: 43210, percentage: 8 },
-  ]
-
-  const listeningTime = [
-    { hour: '00:00', listens: 234 },
-    { hour: '03:00', listens: 156 },
-    { hour: '06:00', listens: 789 },
-    { hour: '09:00', listens: 1234 },
-    { hour: '12:00', listens: 2345 },
-    { hour: '15:00', listens: 2890 },
-    { hour: '18:00', listens: 3456 },
-    { hour: '21:00', listens: 2123 },
-  ]
+  const statusCounts = analyticsData.statusBreakdown.reduce(
+    (acc, status) => {
+      const key = status.label.toLowerCase()
+      acc.total += status.count
+      acc[key] = status.count
+      return acc
+    },
+    {
+      total: 0,
+      synced: 0,
+      pending: 0,
+      failed: 0,
+      draft: 0,
+    } as Record<string, number>
+  )
+  const needsAttention = statusCounts.failed + statusCounts.draft
 
   const colors = ['#C89E3E', '#1A2744', '#A8782F', '#D4A94E', '#8A94A6']
 
@@ -45,15 +43,35 @@ export const Analytics = () => {
         className="text-3xl text-[#D4A94E] tracking-wider"
         style={{ fontFamily: 'monospace' }}
       >
-        ANALYTICS DASHBOARD
+        PODCAST ANALYTICS
       </h2>
 
       <div className="grid grid-cols-4 gap-6">
         {[
-          { label: 'AVG. LISTEN TIME', value: '34:52', icon: Clock, change: '+2.4 min' },
-          { label: 'COMPLETION RATE', value: '76.4%', icon: TrendingUp, change: '+5.2%' },
-          { label: 'NEW SUBSCRIBERS', value: '1,234', icon: Users, change: '+18.3%' },
-          { label: 'REACH', value: '47 countries', icon: Globe, change: '+3' },
+          {
+            label: 'TOTAL PODCASTS',
+            value: statusCounts.total.toLocaleString(),
+            icon: Radio,
+            change: `${statusCounts.synced} synced`,
+          },
+          {
+            label: 'SYNCED',
+            value: statusCounts.synced.toLocaleString(),
+            icon: CheckCircle,
+            change: `${statusCounts.pending} pending`,
+          },
+          {
+            label: 'PENDING',
+            value: statusCounts.pending.toLocaleString(),
+            icon: Clock,
+            change: `${statusCounts.failed} failed`,
+          },
+          {
+            label: 'NEEDS ATTENTION',
+            value: needsAttention.toLocaleString(),
+            icon: AlertTriangle,
+            change: `${statusCounts.draft} drafts`,
+          },
         ].map((metric) => {
           const Icon = metric.icon
           return (
@@ -72,7 +90,7 @@ export const Analytics = () => {
                 {metric.value}
               </p>
               <p className="text-xs text-[#D4A94E]" style={{ fontFamily: 'monospace' }}>
-                {metric.change} THIS WEEK
+                {metric.change}
               </p>
             </div>
           )
@@ -84,10 +102,10 @@ export const Analytics = () => {
           className="text-xl text-[#D4A94E] mb-6 tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
-          SUBSCRIBER GROWTH
+          SUBMISSION VOLUME
         </h3>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={analyticsData.monthlyGrowth}>
+          <LineChart data={analyticsData.monthlySubmissions}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1D1B35" />
             <XAxis
               dataKey="month"
@@ -108,7 +126,7 @@ export const Analytics = () => {
             />
             <Line
               type="monotone"
-              dataKey="subscribers"
+              dataKey="submissions"
               stroke="#C89E3E"
               strokeWidth={3}
               dot={{ fill: '#C89E3E', r: 5 }}
@@ -123,21 +141,21 @@ export const Analytics = () => {
             className="text-xl text-[#D4A94E] mb-6 tracking-wider"
             style={{ fontFamily: 'monospace' }}
           >
-            LISTENER DEMOGRAPHICS
+            STATUS BREAKDOWN
           </h3>
           <div className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={analyticsData.demographics}
-                  dataKey="percentage"
-                  nameKey="age"
+                  data={analyticsData.statusBreakdown}
+                  dataKey="count"
+                  nameKey="label"
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label={(entry) => `${entry.age}`}
+                  label={(entry) => `${entry.label}`}
                 >
-                  {analyticsData.demographics.map((entry, index) => (
+                  {analyticsData.statusBreakdown.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
                 </Pie>
@@ -159,13 +177,13 @@ export const Analytics = () => {
             className="text-xl text-[#D4A94E] mb-6 tracking-wider"
             style={{ fontFamily: 'monospace' }}
           >
-            TOP COUNTRIES
+            TOP CATEGORIES
           </h3>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={topCountries}>
+            <BarChart data={analyticsData.topCategories}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1D1B35" />
               <XAxis
-                dataKey="country"
+                dataKey="category"
                 stroke="#8A94A6"
                 style={{ fontFamily: 'monospace', fontSize: '12px' }}
               />
@@ -181,7 +199,7 @@ export const Analytics = () => {
                   fontSize: '12px',
                 }}
               />
-              <Bar dataKey="listens" fill="#C89E3E" />
+              <Bar dataKey="count" fill="#C89E3E" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -192,10 +210,10 @@ export const Analytics = () => {
           className="text-xl text-[#D4A94E] mb-6 tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
-          LISTENING TIMES
+          SUBMISSIONS BY HOUR
         </h3>
         <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={listeningTime}>
+          <LineChart data={analyticsData.hourlySubmissions}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1D1B35" />
             <XAxis
               dataKey="hour"
@@ -217,7 +235,7 @@ export const Analytics = () => {
             <Legend />
             <Line
               type="monotone"
-              dataKey="listens"
+              dataKey="submissions"
               stroke="#C89E3E"
               strokeWidth={3}
               dot={{ fill: '#C89E3E', r: 5 }}
