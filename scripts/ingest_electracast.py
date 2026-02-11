@@ -189,9 +189,9 @@ async def ingest_podcasts(session: AsyncSession, user: User, podcast_to_network:
                 language="en",
                 status="imported",
                 itunes_categories=["Arts"], # Default
-                owner_email=user.email,
-                owner_name=user.full_name or "ElectraCast",
-                network_id=network_id,
+            owner_email=user.email,
+            owner_name="ElectraCast",
+            network_id=network_id,
                 cover_image_url=image_url
             )
             session.add(podcast)
