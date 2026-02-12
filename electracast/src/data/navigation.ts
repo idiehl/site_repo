@@ -10,5 +10,5 @@ export const navLinks: NavLink[] = [
   { label: 'Music', href: '/music' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
-  { label: 'My ElectraCast Account', href: '/account' },
+  { label: 'Profile', href: '/account' },
 ]

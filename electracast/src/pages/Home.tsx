@@ -60,7 +60,7 @@ const Home = () => {
 
       <section id="account" className="section">
         <SectionHeader
-          title="My ElectraCast Account"
+          title="Profile"
           description="Access your personalized dashboard and subscriptions."
         />
         <AccountCard />

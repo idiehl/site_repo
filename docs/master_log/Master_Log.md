@@ -2195,3 +2195,29 @@ git diff --cached --stat
 **Verification:** Manual smoke checks on https://electracast.atlasuniversalis.com (home + register) and /account login after deploy.  
 **Notes:** set_dev_status PENDING during deploy, READY after.  
 **Concepts:** @concept:electracast @concept:frontend @concept:branding
+---
+
+## AU-C01-20260212-004 — ElectraCast: Rename Account to Profile and add SiteHeader to dashboard
+
+**Type:** Feature  
+**Context:** Improve ElectraCast dashboard UX by renaming 'My ElectraCast Account' to 'Profile' and adding the public SiteHeader navigation bar to the authenticated dashboard page for consistent navigation.  
+**Change summary:**
+- Renamed 'My ElectraCast Account' section/label to 'Profile' in navigation
+- Added public SiteHeader to authenticated dashboard page
+
+**Rationale / tradeoffs:** Profile is clearer and shorter; SiteHeader provides consistent navigation across public and authenticated views.  
+**Files touched:**
+- `electracast/src/data/navigation.ts`
+- `electracast/src/pages/Home.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+
+**Commands run:**
+```bash
+git status -sb
+git add <files>
+git diff --cached --stat
+```
+
+**Verification:** Manual check on https://electracast.atlasuniversalis.com (home section label) and https://electracast.atlasuniversalis.com/account (nav header present) after deploy.  
+**Notes:** Dev status set to PENDING during deploy, READY after.  
+**Concepts:** @concept:frontend @concept:electracast

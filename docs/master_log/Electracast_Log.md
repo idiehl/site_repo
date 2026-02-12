@@ -76,3 +76,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Standardized UI palette to brand gold/black across public site and dashboard
 - Added ElectraCast logo to public SiteHeader, dashboard header, and login screen header (MyAccount)
 - Updated palette in Analytics, CreatePodcast, Episodes, Overview, Recording, Settings, Upload components
+- Renamed 'My ElectraCast Account' to 'Profile' in navigation
+- Added public SiteHeader to authenticated dashboard page (electracast.atlasuniversalis.com/account)
+- Files: navigation.ts, Home.tsx, DashboardLayout.tsx
