@@ -210,6 +210,8 @@ Versioned LLM prompt templates.
 | `versions/20260208_0014_add_electracast_profiles.py` | ElectraCast profile table |
 | `versions/20260208_0015_add_password_reset_fields.py` | Password reset token fields |
 | `versions/20260210_0016_add_electracast_podcasts.py` | ElectraCast podcasts table |
+| `versions/20260211_0017_add_electracast_networks.py` | ElectraCast networks table + podcast network relation |
+| `versions/20260212_0018_add_electracast_podcast_slug.py` | Add public-facing slug to ElectraCast podcasts |
 
 ---
 
@@ -383,13 +385,22 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `dashboard/components/CreatePodcast.tsx` | Create Podcast form inside dashboard |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
 | `pages/MyAccount.tsx` | Podcaster dashboard login gate + data provider + submit actions |
-| `data/podcasts.ts` | Featured podcast list and directory slugs |
+| `pages/PodcastDetail.tsx` | Public podcast detail page (`/podcast/:slug`) |
+| `data/podcasts.ts` | Featured podcasts + directory items derived from the catalog bundle |
+| `data/catalog/podcasts.json` | Tracked podcasts metadata bundle (generated from scraper output) |
+| `data/catalog/podcastsCatalog.ts` | Typed loader for the podcasts catalog JSON |
 | `data/networks.ts` | Network directory metadata and legacy links |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |
 | `lib/api.ts` | ElectraCast API client helpers |
 | `vite-env.d.ts` | Vite environment typing |
+
+#### Public Assets: `electracast/public/`
+
+| Path | Purpose |
+|------|---------|
+| `podcasts/*` | Podcast cover images served at `/podcasts/<slug>.<ext>` |
 
 ---
 
@@ -489,8 +500,9 @@ Nginx configurations and deployment utilities.
 | `test_templates.py` | Template testing utility |
 | `build_master_log.ps1` | Windows script to build Master_Log.pdf |
 | `build_master_log.sh` | Linux/Mac script to build Master_Log.pdf |
-| `scrape_electracast_entries.py` | Scrape ElectraCast podcasts/networks into internal snapshots |
+| `scrape_electracast_entries.py` | Scrape ElectraCast podcasts/networks into internal snapshots (supports `--skip-assets`) |
 | `normalize_electracast_dirs.py` | Normalize ElectraCast scrape folder names |
+| `export_electracast_podcasts_bundle.py` | Export scraped podcasts into tracked catalog JSON + cover images for the ElectraCast SPA |
 
 ---
 

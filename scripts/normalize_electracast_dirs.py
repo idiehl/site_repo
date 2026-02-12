@@ -51,7 +51,10 @@ def cleanup_directory(root: Path) -> None:
 def main() -> None:
     base = Path("internal/Electracast_Codebase")
     for subdir in ("electracast_podcasts", "electracast_networks"):
-        cleanup_directory(base / subdir)
+        target = base / subdir
+        if not target.exists():
+            continue
+        cleanup_directory(target)
 
 
 if __name__ == "__main__":

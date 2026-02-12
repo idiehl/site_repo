@@ -18,3 +18,7 @@ This log tracks changes for Atlas Meridian (upcoming application).
 - Added collaboration groundwork (workspace IDs, revision change log).
 - Added an auto-arrange action (grid layout) as a baseline for AI layout.
 - Added node content rendering for images and file text previews, with open file/URL actions.
+
+## 2026-02-10
+- Added meridian-map-generator Cursor skill for prompt-driven .atlas map creation in the Maps directory.
+- Updated Cursor rules/skill paths and build notes for the Atlas_Meridian folder rename.

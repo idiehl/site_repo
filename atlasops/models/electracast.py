@@ -65,6 +65,8 @@ class ElectraCastPodcast(Base):
         index=True,
     )
 
+    # Public-facing identifier used by the directory/detail pages.
+    slug: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     title: Mapped[str] = mapped_column(String(255))
     summary: Mapped[str] = mapped_column(Text)
     subtitle: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

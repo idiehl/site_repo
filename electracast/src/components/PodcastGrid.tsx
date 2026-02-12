@@ -1,4 +1,5 @@
 import { Podcast, featuredPodcasts } from '../data/podcasts'
+import { Link } from 'react-router-dom'
 
 type PodcastGridProps = {
   items?: Podcast[]
@@ -8,7 +9,7 @@ const PodcastGrid = ({ items = featuredPodcasts }: PodcastGridProps) => {
   return (
     <div className="podcast-grid">
       {items.map((podcast) => (
-        <article key={podcast.title} className="podcast-card">
+        <article key={podcast.to ?? podcast.href ?? podcast.title} className="podcast-card">
           {podcast.image ? (
             <img
               className="podcast-image"
@@ -19,7 +20,11 @@ const PodcastGrid = ({ items = featuredPodcasts }: PodcastGridProps) => {
           ) : null}
           <h3>{podcast.title}</h3>
           <p>{podcast.label}</p>
-          {podcast.href ? (
+          {podcast.to ? (
+            <Link className="btn ghost" to={podcast.to}>
+              View show
+            </Link>
+          ) : podcast.href ? (
             <a className="btn ghost" href={podcast.href} target="_blank" rel="noreferrer">
               View show
             </a>

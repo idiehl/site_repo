@@ -68,10 +68,24 @@ class ElectraCastPodcastResponse(ElectraCastPodcastBase):
 
     id: UUID
     user_id: UUID
+    slug: str
     status: str
+    cover_image_url: Optional[str] = None
+    network_id: Optional[UUID] = None
     megaphone_podcast_id: Optional[str] = None
     sync_error: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ElectraCastPublicPodcast(BaseModel):
+    """Public directory podcast payload (no auth)."""
+
+    slug: str
+    title: str
+    summary: str
+    cover_image_url: Optional[str] = None
+    legacy_url: Optional[str] = None
+

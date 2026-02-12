@@ -12,6 +12,8 @@ venv/
 
 # Cursor MCP config (local secrets)
 .cursor/mcp.json
+# Local-only rule files (may contain credentials)
+.cursor/rules/OVERVIEW.mdc
 
 # OS junk
 .DS_Store

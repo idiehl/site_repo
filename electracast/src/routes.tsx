@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Music from './pages/Music'
 import Networks from './pages/Networks'
 import Podcasts from './pages/Podcasts'
+import PodcastDetail from './pages/PodcastDetail'
 import Register from './pages/Register'
 
 export type AppRoute = {
@@ -20,6 +21,7 @@ export const defaultTitle = 'ElectraCast | Hear The Culture'
 export const routes: AppRoute[] = [
   { path: '/', element: <Home />, title: defaultTitle },
   { path: '/podcasts', element: <Podcasts />, title: 'Podcasts | ElectraCast' },
+  { path: '/podcast/:slug', element: <PodcastDetail />, title: 'Podcast | ElectraCast' },
   { path: '/networks', element: <Networks />, title: 'Networks | ElectraCast' },
   {
     path: '/custom-branded-podcasts',

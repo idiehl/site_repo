@@ -197,6 +197,7 @@ def process_entry(
     base_dir: Path,
     delay: float,
     overwrite: bool,
+    download_assets: bool,
 ) -> None:
     response = client.get(url, timeout=30)
     response.raise_for_status()
@@ -237,15 +238,23 @@ def process_entry(
             except Exception:
                 pass
 
-    asset_urls = gather_asset_urls(soup, url)
-    used_names: set[str] = set()
-    for asset_url in sorted(asset_urls):
-        save_asset(client, asset_url, assets_dir, used_names)
+    if download_assets:
+        asset_urls = gather_asset_urls(soup, url)
+        used_names: set[str] = set()
+        for asset_url in sorted(asset_urls):
+            save_asset(client, asset_url, assets_dir, used_names)
 
     time.sleep(delay)
 
 
-def scrape(kind: str, output_dir: Path, delay: float, overwrite: bool, limit: int | None) -> None:
+def scrape(
+    kind: str,
+    output_dir: Path,
+    delay: float,
+    overwrite: bool,
+    limit: int | None,
+    download_assets: bool,
+) -> None:
     listing_url = PODCASTS_URL if kind == "podcasts" else NETWORKS_URL
     target_dir = output_dir / f"electracast_{kind}"
     ensure_dir(target_dir)
@@ -271,6 +280,7 @@ def scrape(kind: str, output_dir: Path, delay: float, overwrite: bool, limit: in
                 target_dir,
                 delay=delay,
                 overwrite=overwrite,
+                download_assets=download_assets,
             )
 
 
@@ -281,6 +291,11 @@ def main() -> None:
     parser.add_argument("--delay", type=float, default=0.2, help="Delay between entries")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files")
     parser.add_argument("--limit", type=int, default=None, help="Limit entries per type")
+    parser.add_argument(
+        "--skip-assets",
+        action="store_true",
+        help="Skip downloading per-page assets (CSS/JS/images). Faster; still saves HTML, summary, and cover art.",
+    )
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -288,7 +303,14 @@ def main() -> None:
 
     kinds: Iterable[str] = ["podcasts", "networks"] if args.type == "all" else [args.type]
     for kind in kinds:
-        scrape(kind, output_dir, delay=args.delay, overwrite=args.overwrite, limit=args.limit)
+        scrape(
+            kind,
+            output_dir,
+            delay=args.delay,
+            overwrite=args.overwrite,
+            limit=args.limit,
+            download_assets=not args.skip_assets,
+        )
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 """ElectraCast account, profile, and podcast endpoints."""
 
+import re
+
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
@@ -18,6 +20,27 @@ from atlasops.services.megaphone import MegaphoneClient, MegaphoneError
 
 router = APIRouter()
 settings = get_settings()
+
+
+def normalize_slug(text: str) -> str:
+    text = text.replace("_", "-").lower()
+    text = re.sub(r"[^a-z0-9\-]+", "", text)
+    text = re.sub(r"\-+", "-", text).strip("-")
+    return text
+
+
+async def generate_unique_podcast_slug(db: DbSession, title: str) -> str:
+    base = normalize_slug(title) or "podcast"
+    slug = base
+    suffix = 2
+    while True:
+        existing = await db.execute(
+            select(ElectraCastPodcast.id).where(ElectraCastPodcast.slug == slug)
+        )
+        if existing.scalar_one_or_none() is None:
+            return slug
+        slug = f"{base}-{suffix}"
+        suffix += 1
 
 
 async def get_or_create_profile(
@@ -136,8 +159,10 @@ async def create_podcast(
     if not subtitle:
         subtitle = summary
 
+    slug = await generate_unique_podcast_slug(db, title)
     podcast = ElectraCastPodcast(
         user_id=current_user.id,
+        slug=slug,
         title=title,
         summary=summary,
         subtitle=subtitle,

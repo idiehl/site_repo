@@ -1,6 +1,6 @@
 {
   "status": "READY",
-  "message": "Deploy complete: ElectraCast API client cleanup.",
-  "updated_at": "2026-02-11T07:53:15.153271+00:00",
-  "updated_by": "cursor"
+  "message": "ElectraCast deploy complete: removed duplicate logo/logout on dashboard header",
+  "updated_at": "2026-02-12T19:03:55.501653+00:00",
+  "updated_by": "codex"
 }

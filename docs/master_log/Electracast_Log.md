@@ -88,3 +88,8 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Remove duplicate dashboard logo and logout: hide SiteHeader auth actions on dashboard, remove lower header logo; keep only lower Sign out and Profile label
 - Files: SiteHeader.tsx, DashboardLayout.tsx, navigation.ts, Home.tsx
 - Verification: manual check at https://electracast.atlasuniversalis.com/account for single logo and single Sign out
+- Mirrored podcast directory and detail pages: /podcasts from catalog JSON, /podcast/:slug for detail view
+- Added exporter script export_electracast_podcasts_bundle.py (podcasts.json + 90 cover images to electracast/public/podcasts/)
+- Scraper --skip-assets flag for metadata-only runs; normalize script skips missing networks dir
+- Backend slug support + migration 0018; public API /api/v1/electracast-public/podcasts and /podcasts/{slug}
+- PodcastDetail page shows cover, summary, and links out to legacy page

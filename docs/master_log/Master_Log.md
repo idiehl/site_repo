@@ -2293,3 +2293,50 @@ git add <files>
 **Verification:** Manual check on https://electracast.atlasuniversalis.com/account after deploy to confirm single logo and single Sign out.  
 **Notes:** set_dev_status PENDING during deploy, READY after.  
 **Concepts:** @concept:electracast @concept:frontend @concept:ux
+---
+
+## AU-C01-20260212-008 — ElectraCast: Mirror podcasts directory and detail pages
+
+**Type:** Feature  
+**Context:** Mirror ElectraCast podcast directory/detail pages on electracast.atlasuniversalis.com. Export scraped podcast summaries + cover art into tracked assets, add public API endpoints, and update frontend routes/pages to use internal /podcast/:slug.  
+**Change summary:**
+- Added exporter script export_electracast_podcasts_bundle.py to generate electracast/src/data/catalog/podcasts.json and copy 90 cover images into electracast/public/podcasts/
+- Updated scraper scrape_electracast_entries.py with --skip-assets flag for faster metadata-only scraping
+- Updated normalize_electracast_dirs.py to skip missing networks dir
+- Added backend slug support for ElectraCastPodcast + alembic migration 0018
+- Added no-auth public endpoints /api/v1/electracast-public/podcasts and /api/v1/electracast-public/podcasts/{slug}
+- /podcasts page now renders from catalog JSON and links internally; new /podcast/:slug detail page shows cover + summary and links out to legacy page
+
+**Rationale / tradeoffs:** Enable internal podcast browsing and SEO while preserving legacy page links.  
+**Files touched:**
+- `scripts/export_electracast_podcasts_bundle.py`
+- `scripts/scrape_electracast_entries.py`
+- `scripts/normalize_electracast_dirs.py`
+- `electracast/src/data/catalog/podcasts.json`
+- `electracast/src/data/catalog/podcastsCatalog.ts`
+- `electracast/public/podcasts/*`
+- `electracast/src/data/podcasts.ts`
+- `electracast/src/components/PodcastGrid.tsx`
+- `electracast/src/pages/Podcasts.tsx`
+- `electracast/src/pages/PodcastDetail.tsx`
+- `electracast/src/routes.tsx`
+- `atlasops/models/electracast.py`
+- `atlasops/schemas/electracast.py`
+- `atlasops/api/v1/electracast.py`
+- `atlasops/api/v1/electracast_public.py`
+- `atlasops/api/v1/router.py`
+- `alembic/versions/20260212_0018_add_electracast_podcast_slug.py`
+
+**Commands run:**
+```bash
+python scripts/scrape_electracast_entries.py --type podcasts --output internal/Electracast_Codebase --limit 2 --delay 0.1
+python scripts/scrape_electracast_entries.py --type podcasts --output internal/Electracast_Codebase --delay 0 --skip-assets
+python scripts/normalize_electracast_dirs.py
+python scripts/export_electracast_podcasts_bundle.py --overwrite --clean-images
+npm run build (in electracast/)
+python -m compileall atlasops scripts
+```
+
+**Verification:** ElectraCast frontend build succeeded via npm run build. Python compileall succeeded.  
+**Notes:** set_dev_status PENDING during deploy, READY after.  
+**Concepts:** electracast frontend backend api migration

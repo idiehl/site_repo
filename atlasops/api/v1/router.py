@@ -9,6 +9,7 @@ from atlasops.api.v1 import (
     billing,
     dev,
     electracast,
+    electracast_public,
     jobs,
     meridian,
     playground,
@@ -22,6 +23,9 @@ router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
 router.include_router(profile.router, prefix="/profile", tags=["profile"])
 router.include_router(applications.router, prefix="/applications", tags=["applications"])
 router.include_router(electracast.router, prefix="/electracast", tags=["electracast"])
+router.include_router(
+    electracast_public.router, prefix="/electracast-public", tags=["electracast-public"]
+)
 router.include_router(billing.router, prefix="/billing", tags=["billing"])
 router.include_router(admin.router, prefix="/admin", tags=["admin"])
 router.include_router(dev.router)
