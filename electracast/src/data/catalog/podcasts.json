@@ -2,7 +2,7 @@
   "count": 90,
   "podcasts": [
     {
-      "cover_image": "/podcasts/50-years-of-music-w-50-year-old-white-guys.jpeg",
+      "cover_image": "/podcast-covers/50-years-of-music-w-50-year-old-white-guys.jpeg",
       "legacy_url": "https://electracast.com/podcast/50-years-of-music-w-50-year-old-white-guys/",
       "slug": "50-years-of-music-w-50-year-old-white-guys",
       "source_dir": "50_Years_of_Music_w_50_Year_Old_White_Guys",
@@ -10,7 +10,7 @@
       "title": "50 Years of Music w/ 50 Year Old White Guys"
     },
     {
-      "cover_image": "/podcasts/abracadabra-create-what-you-speak.png",
+      "cover_image": "/podcast-covers/abracadabra-create-what-you-speak.png",
       "legacy_url": "https://electracast.com/podcast/abracadabra-create-what-you-speak/",
       "slug": "abracadabra-create-what-you-speak",
       "source_dir": "Abracadabra_Create_What_You_Speak",
@@ -18,7 +18,7 @@
       "title": "Abracadabra: Create What You Speak"
     },
     {
-      "cover_image": "/podcasts/abundance-blueprint-with-kimberly.png",
+      "cover_image": "/podcast-covers/abundance-blueprint-with-kimberly.png",
       "legacy_url": "https://electracast.com/podcast/abundance-blueprint-with-kimberly/",
       "slug": "abundance-blueprint-with-kimberly",
       "source_dir": "Abundance_Blueprint_With_Kimberly",
@@ -26,7 +26,7 @@
       "title": "Abundance Blueprint With Kimberly"
     },
     {
-      "cover_image": "/podcasts/adventures-to-wisdom.png",
+      "cover_image": "/podcast-covers/adventures-to-wisdom.png",
       "legacy_url": "https://electracast.com/podcast/adventures-to-wisdom/",
       "slug": "adventures-to-wisdom",
       "source_dir": "Adventures_To_Wisdom",
@@ -34,7 +34,7 @@
       "title": "Adventures To Wisdom"
     },
     {
-      "cover_image": "/podcasts/airquote-law-pod.png",
+      "cover_image": "/podcast-covers/airquote-law-pod.png",
       "legacy_url": "https://electracast.com/podcast/airquote-law-pod/",
       "slug": "airquote-law-pod",
       "source_dir": "Airquote_Law_Pod",
@@ -42,7 +42,7 @@
       "title": "Airquote Law Pod"
     },
     {
-      "cover_image": "/podcasts/all-things-creepy.jpeg",
+      "cover_image": "/podcast-covers/all-things-creepy.jpeg",
       "legacy_url": "https://electracast.com/podcast/all-things-creepy/",
       "slug": "all-things-creepy",
       "source_dir": "All_Things_Creepy",
@@ -50,7 +50,7 @@
       "title": "All Things Creepy"
     },
     {
-      "cover_image": "/podcasts/asked-and-answered-by-soul.jpeg",
+      "cover_image": "/podcast-covers/asked-and-answered-by-soul.jpeg",
       "legacy_url": "https://electracast.com/podcast/asked-and-answered-by-soul/",
       "slug": "asked-and-answered-by-soul",
       "source_dir": "Asked_and_Answered_by_Soul",
@@ -58,7 +58,7 @@
       "title": "Asked and Answered by Soul"
     },
     {
-      "cover_image": "/podcasts/athletic-obscura.png",
+      "cover_image": "/podcast-covers/athletic-obscura.png",
       "legacy_url": "https://electracast.com/podcast/athletic-obscura/",
       "slug": "athletic-obscura",
       "source_dir": "Athletic_Obscura",
@@ -66,7 +66,7 @@
       "title": "Athletic Obscura"
     },
     {
-      "cover_image": "/podcasts/avhd.jpeg",
+      "cover_image": "/podcast-covers/avhd.jpeg",
       "legacy_url": "https://electracast.com/podcast/avhd/",
       "slug": "avhd",
       "source_dir": "AVHD",
@@ -74,7 +74,7 @@
       "title": "AVHD"
     },
     {
-      "cover_image": "/podcasts/behind-the-rock-with-dc.jpeg",
+      "cover_image": "/podcast-covers/behind-the-rock-with-dc.jpeg",
       "legacy_url": "https://electracast.com/podcast/behind-the-rock-with-dc/",
       "slug": "behind-the-rock-with-dc",
       "source_dir": "Behind_the_Rock_with_DC",
@@ -82,7 +82,7 @@
       "title": "Behind the Rock with DC"
     },
     {
-      "cover_image": "/podcasts/being-your-own-superstar.jpeg",
+      "cover_image": "/podcast-covers/being-your-own-superstar.jpeg",
       "legacy_url": "https://electracast.com/podcast/being-your-own-superstar/",
       "slug": "being-your-own-superstar",
       "source_dir": "Being_Your_Own_Superstar",
@@ -90,7 +90,7 @@
       "title": "Being Your Own Superstar"
     },
     {
-      "cover_image": "/podcasts/big-truth-encouragement.png",
+      "cover_image": "/podcast-covers/big-truth-encouragement.png",
       "legacy_url": "https://electracast.com/podcast/big-truth-encouragement/",
       "slug": "big-truth-encouragement",
       "source_dir": "Big_Truth_Encouragement",
@@ -98,7 +98,7 @@
       "title": "Big Truth Encouragement"
     },
     {
-      "cover_image": "/podcasts/bodacious-minds.jpeg",
+      "cover_image": "/podcast-covers/bodacious-minds.jpeg",
       "legacy_url": "https://electracast.com/podcast/bodacious-minds/",
       "slug": "bodacious-minds",
       "source_dir": "Bodacious_Minds",
@@ -106,7 +106,7 @@
       "title": "Bodacious Minds"
     },
     {
-      "cover_image": "/podcasts/brain-arcade.png",
+      "cover_image": "/podcast-covers/brain-arcade.png",
       "legacy_url": "https://electracast.com/podcast/brain-arcade/",
       "slug": "brain-arcade",
       "source_dir": "Brain_Arcade",
@@ -114,7 +114,7 @@
       "title": "Brain Arcade"
     },
     {
-      "cover_image": "/podcasts/brilliant-marketing-with-mary.jpg",
+      "cover_image": "/podcast-covers/brilliant-marketing-with-mary.jpg",
       "legacy_url": "https://electracast.com/podcast/brilliant-marketing-with-mary/",
       "slug": "brilliant-marketing-with-mary",
       "source_dir": "Brilliant_Marketing_With_Mary",
@@ -122,7 +122,7 @@
       "title": "Brilliant Marketing With Mary"
     },
     {
-      "cover_image": "/podcasts/business-kare-with-kerstin.jpeg",
+      "cover_image": "/podcast-covers/business-kare-with-kerstin.jpeg",
       "legacy_url": "https://electracast.com/podcast/business-kare-with-kerstin/",
       "slug": "business-kare-with-kerstin",
       "source_dir": "Business_Kare_With_Kerstin",
@@ -130,7 +130,7 @@
       "title": "Business Kare With Kerstin"
     },
     {
-      "cover_image": "/podcasts/career-advancement-with-craig-ancel.png",
+      "cover_image": "/podcast-covers/career-advancement-with-craig-ancel.png",
       "legacy_url": "https://electracast.com/podcast/career-advancement-with-craig-ancel/",
       "slug": "career-advancement-with-craig-ancel",
       "source_dir": "Career_Advancement_with_Craig_Ancel",
@@ -138,7 +138,7 @@
       "title": "Career Advancement with Craig Ancel"
     },
     {
-      "cover_image": "/podcasts/cinematic-revelations.png",
+      "cover_image": "/podcast-covers/cinematic-revelations.png",
       "legacy_url": "https://electracast.com/podcast/cinematic-revelations/",
       "slug": "cinematic-revelations",
       "source_dir": "Cinematic_Revelations",
@@ -146,7 +146,7 @@
       "title": "Cinematic Revelations"
     },
     {
-      "cover_image": "/podcasts/congressional-record-daily-digest.png",
+      "cover_image": "/podcast-covers/congressional-record-daily-digest.png",
       "legacy_url": "https://electracast.com/podcast/congressional-record-daily-digest/",
       "slug": "congressional-record-daily-digest",
       "source_dir": "Congressional_Record_Daily_Digest",
@@ -154,7 +154,7 @@
       "title": "Congressional Record Daily Digest"
     },
     {
-      "cover_image": "/podcasts/cosmic-love-antenna.jpeg",
+      "cover_image": "/podcast-covers/cosmic-love-antenna.jpeg",
       "legacy_url": "https://electracast.com/podcast/cosmic-love-antenna/",
       "slug": "cosmic-love-antenna",
       "source_dir": "Cosmic_Love_Antenna",
@@ -162,7 +162,7 @@
       "title": "Cosmic Love Antenna"
     },
     {
-      "cover_image": "/podcasts/creators-getting-paid.png",
+      "cover_image": "/podcast-covers/creators-getting-paid.png",
       "legacy_url": "https://electracast.com/podcast/creators-getting-paid/",
       "slug": "creators-getting-paid",
       "source_dir": "Creators_Getting_Paid",
@@ -170,7 +170,7 @@
       "title": "Creators Getting Paid"
     },
     {
-      "cover_image": "/podcasts/crypto-with-kamal.png",
+      "cover_image": "/podcast-covers/crypto-with-kamal.png",
       "legacy_url": "https://electracast.com/podcast/crypto-with-kamal/",
       "slug": "crypto-with-kamal",
       "source_dir": "Crypto_with_Kamal",
@@ -178,7 +178,7 @@
       "title": "Crypto with Kamal"
     },
     {
-      "cover_image": "/podcasts/deep-leadership.jpeg",
+      "cover_image": "/podcast-covers/deep-leadership.jpeg",
       "legacy_url": "https://electracast.com/podcast/deep-leadership/",
       "slug": "deep-leadership",
       "source_dir": "Deep_Leadership",
@@ -186,7 +186,7 @@
       "title": "Deep Leadership"
     },
     {
-      "cover_image": "/podcasts/dollar-betz.png",
+      "cover_image": "/podcast-covers/dollar-betz.png",
       "legacy_url": "https://electracast.com/podcast/dollar-betz/",
       "slug": "dollar-betz",
       "source_dir": "dOllar_betZ",
@@ -194,7 +194,7 @@
       "title": "dOllar betZ"
     },
     {
-      "cover_image": "/podcasts/eazy-does-it-podcast.png",
+      "cover_image": "/podcast-covers/eazy-does-it-podcast.png",
       "legacy_url": "https://electracast.com/podcast/eazy-does-it-podcast/",
       "slug": "eazy-does-it-podcast",
       "source_dir": "Eazy_Does_It_Podcast",
@@ -202,7 +202,7 @@
       "title": "Eazy Does It Podcast"
     },
     {
-      "cover_image": "/podcasts/electracast-behind-the-scenes.png",
+      "cover_image": "/podcast-covers/electracast-behind-the-scenes.png",
       "legacy_url": "https://electracast.com/podcast/electracast-behind-the-scenes/",
       "slug": "electracast-behind-the-scenes",
       "source_dir": "ElectraCast_Behind_the_Scenes",
@@ -210,7 +210,7 @@
       "title": "ElectraCast Behind the Scenes"
     },
     {
-      "cover_image": "/podcasts/entrepreneurs-exposed.jpeg",
+      "cover_image": "/podcast-covers/entrepreneurs-exposed.jpeg",
       "legacy_url": "https://electracast.com/podcast/entrepreneurs-exposed/",
       "slug": "entrepreneurs-exposed",
       "source_dir": "Entrepreneurs_Exposed",
@@ -218,7 +218,7 @@
       "title": "Entrepreneurs Exposed"
     },
     {
-      "cover_image": "/podcasts/eye-am-everything.png",
+      "cover_image": "/podcast-covers/eye-am-everything.png",
       "legacy_url": "https://electracast.com/podcast/eye-am-everything/",
       "slug": "eye-am-everything",
       "source_dir": "Eye_Am_Everything",
@@ -226,7 +226,7 @@
       "title": "Eye Am Everything"
     },
     {
-      "cover_image": "/podcasts/film-generations.jpg",
+      "cover_image": "/podcast-covers/film-generations.jpg",
       "legacy_url": "https://electracast.com/podcast/film-generations/",
       "slug": "film-generations",
       "source_dir": "Film_Generations",
@@ -234,7 +234,7 @@
       "title": "Film Generations"
     },
     {
-      "cover_image": "/podcasts/get-real-with-dr-ronaye.jpeg",
+      "cover_image": "/podcast-covers/get-real-with-dr-ronaye.jpeg",
       "legacy_url": "https://electracast.com/podcast/get-real-with-dr-ronaye/",
       "slug": "get-real-with-dr-ronaye",
       "source_dir": "GET_REAL_with_Dr_Ronaye",
@@ -242,7 +242,7 @@
       "title": "GET REAL with Dr Ronaye"
     },
     {
-      "cover_image": "/podcasts/ghost-hampton.jpg",
+      "cover_image": "/podcast-covers/ghost-hampton.jpg",
       "legacy_url": "https://electracast.com/podcast/ghost-hampton/",
       "slug": "ghost-hampton",
       "source_dir": "Ghost_Hampton",
@@ -250,7 +250,7 @@
       "title": "Ghost Hampton"
     },
     {
-      "cover_image": "/podcasts/healthy-delicious-lifestyle-with-claudine.jpg",
+      "cover_image": "/podcast-covers/healthy-delicious-lifestyle-with-claudine.jpg",
       "legacy_url": "https://electracast.com/podcast/healthy-delicious-lifestyle-with-claudine/",
       "slug": "healthy-delicious-lifestyle-with-claudine",
       "source_dir": "Healthy_Delicious_Lifestyle_With_Claudine",
@@ -258,7 +258,7 @@
       "title": "Healthy Delicious Lifestyle With Claudine"
     },
     {
-      "cover_image": "/podcasts/her-extraordinary-life-by-design.png",
+      "cover_image": "/podcast-covers/her-extraordinary-life-by-design.png",
       "legacy_url": "https://electracast.com/podcast/her-extraordinary-life-by-design/",
       "slug": "her-extraordinary-life-by-design",
       "source_dir": "HER_Extraordinary_LIFE_By_Design",
@@ -266,7 +266,7 @@
       "title": "HER Extraordinary LIFE By Design"
     },
     {
-      "cover_image": "/podcasts/how-to-sell-show.jpeg",
+      "cover_image": "/podcast-covers/how-to-sell-show.jpeg",
       "legacy_url": "https://electracast.com/podcast/how-to-sell-show/",
       "slug": "how-to-sell-show",
       "source_dir": "How_To_Sell_Show",
@@ -274,7 +274,7 @@
       "title": "How To Sell Show"
     },
     {
-      "cover_image": "/podcasts/humanized-with-blue-telusma.jpeg",
+      "cover_image": "/podcast-covers/humanized-with-blue-telusma.jpeg",
       "legacy_url": "https://electracast.com/podcast/humanized-with-blue-telusma/",
       "slug": "humanized-with-blue-telusma",
       "source_dir": "Humanized_with_Blue_Telusma",
@@ -282,7 +282,7 @@
       "title": "Humanized with Blue Telusma"
     },
     {
-      "cover_image": "/podcasts/infuse-compassion-podcast.jpg",
+      "cover_image": "/podcast-covers/infuse-compassion-podcast.jpg",
       "legacy_url": "https://electracast.com/podcast/infuse-compassion-podcast/",
       "slug": "infuse-compassion-podcast",
       "source_dir": "Infuse_Compassion_Podcast",
@@ -290,7 +290,7 @@
       "title": "Infuse Compassion Podcast"
     },
     {
-      "cover_image": "/podcasts/lessons-from-the-fast-lane-with-peter-rafelson.jpeg",
+      "cover_image": "/podcast-covers/lessons-from-the-fast-lane-with-peter-rafelson.jpeg",
       "legacy_url": "https://electracast.com/podcast/lessons-from-the-fast-lane-with-peter-rafelson/",
       "slug": "lessons-from-the-fast-lane-with-peter-rafelson",
       "source_dir": "LESSONS_FROM_THE_FAST_LANE_with_Peter_Rafelson",
@@ -298,7 +298,7 @@
       "title": "LESSONS FROM THE FAST LANE with Peter Rafelson"
     },
     {
-      "cover_image": "/podcasts/let-s-talk-soul.png",
+      "cover_image": "/podcast-covers/let-s-talk-soul.png",
       "legacy_url": "https://electracast.com/podcast/let-s-talk-soul/",
       "slug": "let-s-talk-soul",
       "source_dir": "Let_s_Talk_Soul",
@@ -306,7 +306,7 @@
       "title": "Let\u2019s Talk Soul"
     },
     {
-      "cover_image": "/podcasts/medicine-in-america.jpg",
+      "cover_image": "/podcast-covers/medicine-in-america.jpg",
       "legacy_url": "https://electracast.com/podcast/medicine-in-america/",
       "slug": "medicine-in-america",
       "source_dir": "Medicine_in_America",
@@ -314,7 +314,7 @@
       "title": "Medicine in America"
     },
     {
-      "cover_image": "/podcasts/missing-the-point.png",
+      "cover_image": "/podcast-covers/missing-the-point.png",
       "legacy_url": "https://electracast.com/podcast/missing-the-point/",
       "slug": "missing-the-point",
       "source_dir": "Missing_the_Point",
@@ -322,7 +322,7 @@
       "title": "Missing the Point"
     },
     {
-      "cover_image": "/podcasts/music-medicine.jpg",
+      "cover_image": "/podcast-covers/music-medicine.jpg",
       "legacy_url": "https://electracast.com/podcast/music-medicine/",
       "slug": "music-medicine",
       "source_dir": "Music_Medicine",
@@ -330,7 +330,7 @@
       "title": "Music & Medicine"
     },
     {
-      "cover_image": "/podcasts/nasa-daily.png",
+      "cover_image": "/podcast-covers/nasa-daily.png",
       "legacy_url": "https://electracast.com/podcast/nasa-daily/",
       "slug": "nasa-daily",
       "source_dir": "NASA_Daily",
@@ -338,7 +338,7 @@
       "title": "NASA Daily"
     },
     {
-      "cover_image": "/podcasts/nightmare-road-stories.jpeg",
+      "cover_image": "/podcast-covers/nightmare-road-stories.jpeg",
       "legacy_url": "https://electracast.com/podcast/nightmare-road-stories/",
       "slug": "nightmare-road-stories",
       "source_dir": "Nightmare_Road_Stories",
@@ -346,7 +346,7 @@
       "title": "Nightmare Road Stories"
     },
     {
-      "cover_image": "/podcasts/no-judgement-podcast.jpeg",
+      "cover_image": "/podcast-covers/no-judgement-podcast.jpeg",
       "legacy_url": "https://electracast.com/podcast/no-judgement-podcast/",
       "slug": "no-judgement-podcast",
       "source_dir": "No_Judgement_Podcast",
@@ -354,7 +354,7 @@
       "title": "No Judgement Podcast"
     },
     {
-      "cover_image": "/podcasts/or-whatever-movies.png",
+      "cover_image": "/podcast-covers/or-whatever-movies.png",
       "legacy_url": "https://electracast.com/podcast/or-whatever-movies/",
       "slug": "or-whatever-movies",
       "source_dir": "Or_Whatever_Movies",
@@ -362,7 +362,7 @@
       "title": "Or Whatever Movies"
     },
     {
-      "cover_image": "/podcasts/page-turner-s-studio-with-cori.jpg",
+      "cover_image": "/podcast-covers/page-turner-s-studio-with-cori.jpg",
       "legacy_url": "https://electracast.com/podcast/page-turner-s-studio-with-cori/",
       "slug": "page-turner-s-studio-with-cori",
       "source_dir": "Page_Turner_s_Studio_With_Cori",
@@ -370,7 +370,7 @@
       "title": "Page-Turner\u2019s Studio With Cori"
     },
     {
-      "cover_image": "/podcasts/permission-to-live.png",
+      "cover_image": "/podcast-covers/permission-to-live.png",
       "legacy_url": "https://electracast.com/podcast/permission-to-live/",
       "slug": "permission-to-live",
       "source_dir": "Permission_to_Live",
@@ -378,7 +378,7 @@
       "title": "Permission to Live"
     },
     {
-      "cover_image": "/podcasts/poetics-of-place.jpg",
+      "cover_image": "/podcast-covers/poetics-of-place.jpg",
       "legacy_url": "https://electracast.com/podcast/poetics-of-place/",
       "slug": "poetics-of-place",
       "source_dir": "Poetics_of_Place",
@@ -386,7 +386,7 @@
       "title": "Poetics of Place"
     },
     {
-      "cover_image": "/podcasts/polly-campbell-simply-said.png",
+      "cover_image": "/podcast-covers/polly-campbell-simply-said.png",
       "legacy_url": "https://electracast.com/podcast/polly-campbell-simply-said/",
       "slug": "polly-campbell-simply-said",
       "source_dir": "Polly_Campbell_Simply_Said",
@@ -394,7 +394,7 @@
       "title": "Polly Campbell, Simply Said"
     },
     {
-      "cover_image": "/podcasts/power-suits-pillow-talk.jpeg",
+      "cover_image": "/podcast-covers/power-suits-pillow-talk.jpeg",
       "legacy_url": "https://electracast.com/podcast/power-suits-pillow-talk/",
       "slug": "power-suits-pillow-talk",
       "source_dir": "Power_Suits_Pillow_Talk",
@@ -402,7 +402,7 @@
       "title": "Power Suits & Pillow Talk"
     },
     {
-      "cover_image": "/podcasts/psychic-visions-podcast.jpg",
+      "cover_image": "/podcast-covers/psychic-visions-podcast.jpg",
       "legacy_url": "https://electracast.com/podcast/psychic-visions-podcast/",
       "slug": "psychic-visions-podcast",
       "source_dir": "Psychic_Visions_Podcast",
@@ -410,7 +410,7 @@
       "title": "Psychic Visions Podcast"
     },
     {
-      "cover_image": "/podcasts/pure-truth.jpeg",
+      "cover_image": "/podcast-covers/pure-truth.jpeg",
       "legacy_url": "https://electracast.com/podcast/pure-truth/",
       "slug": "pure-truth",
       "source_dir": "Pure_Truth",
@@ -418,7 +418,7 @@
       "title": "Pure Truth"
     },
     {
-      "cover_image": "/podcasts/red-white-and-buddha.jpeg",
+      "cover_image": "/podcast-covers/red-white-and-buddha.jpeg",
       "legacy_url": "https://electracast.com/podcast/red-white-and-buddha/",
       "slug": "red-white-and-buddha",
       "source_dir": "Red_White_and_Buddha",
@@ -426,7 +426,7 @@
       "title": "Red White and Buddha"
     },
     {
-      "cover_image": "/podcasts/ringside-with-ray-prince.png",
+      "cover_image": "/podcast-covers/ringside-with-ray-prince.png",
       "legacy_url": "https://electracast.com/podcast/ringside-with-ray-prince/",
       "slug": "ringside-with-ray-prince",
       "source_dir": "Ringside_with_Ray_Prince",
@@ -434,7 +434,7 @@
       "title": "Ringside with Ray & Prince"
     },
     {
-      "cover_image": "/podcasts/sales-is-easy.png",
+      "cover_image": "/podcast-covers/sales-is-easy.png",
       "legacy_url": "https://electracast.com/podcast/sales-is-easy/",
       "slug": "sales-is-easy",
       "source_dir": "Sales_is_Easy",
@@ -442,7 +442,7 @@
       "title": "Sales is Easy!"
     },
     {
-      "cover_image": "/podcasts/sideline-sports.jpeg",
+      "cover_image": "/podcast-covers/sideline-sports.jpeg",
       "legacy_url": "https://electracast.com/podcast/sideline-sports/",
       "slug": "sideline-sports",
       "source_dir": "Sideline_Sports",
@@ -450,7 +450,7 @@
       "title": "Sideline Sports"
     },
     {
-      "cover_image": "/podcasts/simply-write-w-polly.png",
+      "cover_image": "/podcast-covers/simply-write-w-polly.png",
       "legacy_url": "https://electracast.com/podcast/simply-write-w-polly/",
       "slug": "simply-write-w-polly",
       "source_dir": "Simply_Write_w_Polly",
@@ -458,7 +458,7 @@
       "title": "Simply Write w/Polly"
     },
     {
-      "cover_image": "/podcasts/spiritually-restored.png",
+      "cover_image": "/podcast-covers/spiritually-restored.png",
       "legacy_url": "https://electracast.com/podcast/spiritually-restored/",
       "slug": "spiritually-restored",
       "source_dir": "Spiritually_Restored",
@@ -466,7 +466,7 @@
       "title": "Spiritually Restored"
     },
     {
-      "cover_image": "/podcasts/starfleet-leadership-academy.png",
+      "cover_image": "/podcast-covers/starfleet-leadership-academy.png",
       "legacy_url": "https://electracast.com/podcast/starfleet-leadership-academy/",
       "slug": "starfleet-leadership-academy",
       "source_dir": "Starfleet_Leadership_Academy",
@@ -474,7 +474,7 @@
       "title": "Starfleet Leadership Academy"
     },
     {
-      "cover_image": "/podcasts/steps-to-feel-good-daily-with-lona.jpg",
+      "cover_image": "/podcast-covers/steps-to-feel-good-daily-with-lona.jpg",
       "legacy_url": "https://electracast.com/podcast/steps-to-feel-good-daily-with-lona/",
       "slug": "steps-to-feel-good-daily-with-lona",
       "source_dir": "Steps_To_Feel_Good_Daily_With_Lona",
@@ -482,7 +482,7 @@
       "title": "Steps To Feel Good Daily With Lona"
     },
     {
-      "cover_image": "/podcasts/swe-spotlight-with-joie.jpeg",
+      "cover_image": "/podcast-covers/swe-spotlight-with-joie.jpeg",
       "legacy_url": "https://electracast.com/podcast/swe-spotlight-with-joie/",
       "slug": "swe-spotlight-with-joie",
       "source_dir": "SWE_Spotlight_With_Joie",
@@ -490,7 +490,7 @@
       "title": "SWE Spotlight With Joie"
     },
     {
-      "cover_image": "/podcasts/synclove.jpeg",
+      "cover_image": "/podcast-covers/synclove.jpeg",
       "legacy_url": "https://electracast.com/podcast/synclove/",
       "slug": "synclove",
       "source_dir": "SyncLove",
@@ -498,7 +498,7 @@
       "title": "SyncLove"
     },
     {
-      "cover_image": "/podcasts/techtalk-revolution.png",
+      "cover_image": "/podcast-covers/techtalk-revolution.png",
       "legacy_url": "https://electracast.com/podcast/techtalk-revolution/",
       "slug": "techtalk-revolution",
       "source_dir": "TechTalk_Revolution",
@@ -506,7 +506,7 @@
       "title": "TechTalk Revolution"
     },
     {
-      "cover_image": "/podcasts/terra-nova.jpeg",
+      "cover_image": "/podcast-covers/terra-nova.jpeg",
       "legacy_url": "https://electracast.com/podcast/terra-nova/",
       "slug": "terra-nova",
       "source_dir": "Terra_Nova",
@@ -514,7 +514,7 @@
       "title": "Terra Nova"
     },
     {
-      "cover_image": "/podcasts/the-barry-bonkers-show.jpeg",
+      "cover_image": "/podcast-covers/the-barry-bonkers-show.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-barry-bonkers-show/",
       "slug": "the-barry-bonkers-show",
       "source_dir": "The_Barry_Bonkers_Show",
@@ -522,7 +522,7 @@
       "title": "The Barry Bonkers Show"
     },
     {
-      "cover_image": "/podcasts/the-box-god-dare-to-believe.png",
+      "cover_image": "/podcast-covers/the-box-god-dare-to-believe.png",
       "legacy_url": "https://electracast.com/podcast/the-box-god-dare-to-believe/",
       "slug": "the-box-god-dare-to-believe",
       "source_dir": "The_Box_God_Dare_to_Believe",
@@ -530,7 +530,7 @@
       "title": "The Box God: Dare to Believe"
     },
     {
-      "cover_image": "/podcasts/the-c-word.png",
+      "cover_image": "/podcast-covers/the-c-word.png",
       "legacy_url": "https://electracast.com/podcast/the-c-word/",
       "slug": "the-c-word",
       "source_dir": "The_C_Word",
@@ -538,7 +538,7 @@
       "title": "The C Word"
     },
     {
-      "cover_image": "/podcasts/the-candlepower-hour.jpg",
+      "cover_image": "/podcast-covers/the-candlepower-hour.jpg",
       "legacy_url": "https://electracast.com/podcast/the-candlepower-hour/",
       "slug": "the-candlepower-hour",
       "source_dir": "The_Candlepower_Hour",
@@ -546,7 +546,7 @@
       "title": "The Candlepower Hour"
     },
     {
-      "cover_image": "/podcasts/the-curse-of-the-lake-house.jpeg",
+      "cover_image": "/podcast-covers/the-curse-of-the-lake-house.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-curse-of-the-lake-house/",
       "slug": "the-curse-of-the-lake-house",
       "source_dir": "The_Curse_of_The_Lake_House",
@@ -554,7 +554,7 @@
       "title": "The Curse of The Lake House"
     },
     {
-      "cover_image": "/podcasts/the-ethical-evolution-podcast.jpg",
+      "cover_image": "/podcast-covers/the-ethical-evolution-podcast.jpg",
       "legacy_url": "https://electracast.com/podcast/the-ethical-evolution-podcast/",
       "slug": "the-ethical-evolution-podcast",
       "source_dir": "The_Ethical_Evolution_Podcast",
@@ -562,7 +562,7 @@
       "title": "The Ethical Evolution Podcast"
     },
     {
-      "cover_image": "/podcasts/the-geo-godfather-wars.jpg",
+      "cover_image": "/podcast-covers/the-geo-godfather-wars.jpg",
       "legacy_url": "https://electracast.com/podcast/the-geo-godfather-wars/",
       "slug": "the-geo-godfather-wars",
       "source_dir": "The_Geo_Godfather_Wars",
@@ -570,7 +570,7 @@
       "title": "The Geo-Godfather Wars"
     },
     {
-      "cover_image": "/podcasts/the-last-saturday-night.jpeg",
+      "cover_image": "/podcast-covers/the-last-saturday-night.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-last-saturday-night/",
       "slug": "the-last-saturday-night",
       "source_dir": "The_Last_Saturday_Night",
@@ -578,7 +578,7 @@
       "title": "The Last Saturday Night"
     },
     {
-      "cover_image": "/podcasts/the-lawrence-ross-show.png",
+      "cover_image": "/podcast-covers/the-lawrence-ross-show.png",
       "legacy_url": "https://electracast.com/podcast/the-lawrence-ross-show/",
       "slug": "the-lawrence-ross-show",
       "source_dir": "The_Lawrence_Ross_Show",
@@ -586,7 +586,7 @@
       "title": "The Lawrence Ross Show"
     },
     {
-      "cover_image": "/podcasts/the-marketing-mirror.png",
+      "cover_image": "/podcast-covers/the-marketing-mirror.png",
       "legacy_url": "https://electracast.com/podcast/the-marketing-mirror/",
       "slug": "the-marketing-mirror",
       "source_dir": "The_Marketing_Mirror",
@@ -594,7 +594,7 @@
       "title": "The Marketing Mirror"
     },
     {
-      "cover_image": "/podcasts/the-naturebacked-podcast.png",
+      "cover_image": "/podcast-covers/the-naturebacked-podcast.png",
       "legacy_url": "https://electracast.com/podcast/the-naturebacked-podcast/",
       "slug": "the-naturebacked-podcast",
       "source_dir": "The_NatureBacked_Podcast",
@@ -602,7 +602,7 @@
       "title": "The NatureBacked Podcast"
     },
     {
-      "cover_image": "/podcasts/the-neighborhood-podcast.jpeg",
+      "cover_image": "/podcast-covers/the-neighborhood-podcast.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-neighborhood-podcast/",
       "slug": "the-neighborhood-podcast",
       "source_dir": "The_Neighborhood_Podcast",
@@ -610,7 +610,7 @@
       "title": "The Neighborhood Podcast"
     },
     {
-      "cover_image": "/podcasts/the-new-feminist.png",
+      "cover_image": "/podcast-covers/the-new-feminist.png",
       "legacy_url": "https://electracast.com/podcast/the-new-feminist/",
       "slug": "the-new-feminist",
       "source_dir": "The_New_Feminist",
@@ -618,7 +618,7 @@
       "title": "The New Feminist"
     },
     {
-      "cover_image": "/podcasts/the-patrick-bass-show.png",
+      "cover_image": "/podcast-covers/the-patrick-bass-show.png",
       "legacy_url": "https://electracast.com/podcast/the-patrick-bass-show/",
       "slug": "the-patrick-bass-show",
       "source_dir": "The_Patrick_Bass_Show",
@@ -626,7 +626,7 @@
       "title": "The Patrick Bass Show"
     },
     {
-      "cover_image": "/podcasts/the-purpose-effect.jpg",
+      "cover_image": "/podcast-covers/the-purpose-effect.jpg",
       "legacy_url": "https://electracast.com/podcast/the-purpose-effect/",
       "slug": "the-purpose-effect",
       "source_dir": "The_Purpose_Effect",
@@ -634,7 +634,7 @@
       "title": "The Purpose Effect"
     },
     {
-      "cover_image": "/podcasts/the-responsible-leadership-podcast.png",
+      "cover_image": "/podcast-covers/the-responsible-leadership-podcast.png",
       "legacy_url": "https://electracast.com/podcast/the-responsible-leadership-podcast/",
       "slug": "the-responsible-leadership-podcast",
       "source_dir": "The_Responsible_Leadership_Podcast",
@@ -642,7 +642,7 @@
       "title": "The Responsible Leadership Podcast"
     },
     {
-      "cover_image": "/podcasts/the-social-psychic-radio-show.jpeg",
+      "cover_image": "/podcast-covers/the-social-psychic-radio-show.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-social-psychic-radio-show/",
       "slug": "the-social-psychic-radio-show",
       "source_dir": "The_Social_Psychic_Radio_Show",
@@ -650,7 +650,7 @@
       "title": "The Social Psychic Radio Show"
     },
     {
-      "cover_image": "/podcasts/the-toekenz-podcast.jpeg",
+      "cover_image": "/podcast-covers/the-toekenz-podcast.jpeg",
       "legacy_url": "https://electracast.com/podcast/the-toekenz-podcast/",
       "slug": "the-toekenz-podcast",
       "source_dir": "The_Toekenz_Podcast",
@@ -658,7 +658,7 @@
       "title": "The Toekenz Podcast"
     },
     {
-      "cover_image": "/podcasts/think-business-with-tyler.png",
+      "cover_image": "/podcast-covers/think-business-with-tyler.png",
       "legacy_url": "https://electracast.com/podcast/think-business-with-tyler/",
       "slug": "think-business-with-tyler",
       "source_dir": "Think_Business_with_Tyler",
@@ -666,7 +666,7 @@
       "title": "Think Business with Tyler"
     },
     {
-      "cover_image": "/podcasts/transforming-45.jpeg",
+      "cover_image": "/podcast-covers/transforming-45.jpeg",
       "legacy_url": "https://electracast.com/podcast/transforming-45/",
       "slug": "transforming-45",
       "source_dir": "Transforming_45",
@@ -674,7 +674,7 @@
       "title": "Transforming 45"
     },
     {
-      "cover_image": "/podcasts/tru-talks-about-theater.jpeg",
+      "cover_image": "/podcast-covers/tru-talks-about-theater.jpeg",
       "legacy_url": "https://electracast.com/podcast/tru-talks-about-theater/",
       "slug": "tru-talks-about-theater",
       "source_dir": "TRU_Talks_About_Theater",
@@ -682,7 +682,7 @@
       "title": "TRU Talks About Theater"
     },
     {
-      "cover_image": "/podcasts/tune-into-sound-wellbeing.jpg",
+      "cover_image": "/podcast-covers/tune-into-sound-wellbeing.jpg",
       "legacy_url": "https://electracast.com/podcast/tune-into-sound-wellbeing/",
       "slug": "tune-into-sound-wellbeing",
       "source_dir": "Tune_Into_Sound_Wellbeing",
@@ -690,7 +690,7 @@
       "title": "Tune Into Sound Wellbeing"
     },
     {
-      "cover_image": "/podcasts/unapologetically-fab.png",
+      "cover_image": "/podcast-covers/unapologetically-fab.png",
       "legacy_url": "https://electracast.com/podcast/unapologetically-fab/",
       "slug": "unapologetically-fab",
       "source_dir": "Unapologetically_Fab",
@@ -698,7 +698,7 @@
       "title": "Unapologetically Fab"
     },
     {
-      "cover_image": "/podcasts/who-the-f-is-roger-smith.png",
+      "cover_image": "/podcast-covers/who-the-f-is-roger-smith.png",
       "legacy_url": "https://electracast.com/podcast/who-the-f-is-roger-smith/",
       "slug": "who-the-f-is-roger-smith",
       "source_dir": "Who_The_F_Is_Roger_Smith",
@@ -706,7 +706,7 @@
       "title": "Who The F*** Is Roger Smith?!?"
     },
     {
-      "cover_image": "/podcasts/wine-wisdom.png",
+      "cover_image": "/podcast-covers/wine-wisdom.png",
       "legacy_url": "https://electracast.com/podcast/wine-wisdom/",
       "slug": "wine-wisdom",
       "source_dir": "Wine_Wisdom",
@@ -714,7 +714,7 @@
       "title": "Wine & Wisdom"
     },
     {
-      "cover_image": "/podcasts/won-a-bet.jpeg",
+      "cover_image": "/podcast-covers/won-a-bet.jpeg",
       "legacy_url": "https://electracast.com/podcast/won-a-bet/",
       "slug": "won-a-bet",
       "source_dir": "Won_A_Bet",

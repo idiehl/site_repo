@@ -2340,3 +2340,31 @@ python -m compileall atlasops scripts
 **Verification:** ElectraCast frontend build succeeded via npm run build. Python compileall succeeded.  
 **Notes:** set_dev_status PENDING during deploy, READY after.  
 **Concepts:** electracast frontend backend api migration
+---
+
+## AU-C01-20260212-009 — ElectraCast: Avoid /podcasts route conflict with cover assets
+
+**Type:** Fix  
+**Context:** Direct navigation to /podcasts returned 403 because cover images were served from /podcasts/*, conflicting with the SPA route.  
+**Change summary:**
+- Moved exported cover images from electracast/public/podcasts to electracast/public/podcast-covers
+- Updated podcasts catalog export to emit cover_image paths under /podcast-covers/*
+- Regenerated podcasts.json and cover files via exporter; removed old /podcasts cover directory
+
+**Rationale / tradeoffs:** Prevent nginx from treating /podcasts as a filesystem directory and returning 403, while keeping /podcasts as the directory page route.  
+**Files touched:**
+- `scripts/export_electracast_podcasts_bundle.py`
+- `electracast/src/data/catalog/podcasts.json`
+- `electracast/public/podcast-covers/*`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+git rm -r electracast/public/podcasts
+python scripts/export_electracast_podcasts_bundle.py --overwrite --clean-images
+npm run build (in electracast/)
+```
+
+**Verification:** Local ElectraCast build succeeded; post-deploy smoke test will confirm /podcasts direct load returns 200.  
+**Notes:** None  
+**Concepts:** electracast frontend deployment

@@ -119,7 +119,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--output-images",
-        default="electracast/public/podcasts",
+        default="electracast/public/podcast-covers",
         help="Output cover images directory (tracked).",
     )
     parser.add_argument(
@@ -174,7 +174,8 @@ def main() -> None:
             dest = output_images / f"{slug}{ext}"
             if args.overwrite or not dest.exists():
                 dest.write_bytes(cover.read_bytes())
-            cover_public_path = f"/podcasts/{dest.name}"
+            # Use a path that does NOT conflict with the SPA route `/podcasts`.
+            cover_public_path = f"/podcast-covers/{dest.name}"
 
         legacy_url = f"https://electracast.com/podcast/{slug}/"
 

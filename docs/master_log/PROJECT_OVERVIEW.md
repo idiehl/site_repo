@@ -400,7 +400,7 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 
 | Path | Purpose |
 |------|---------|
-| `podcasts/*` | Podcast cover images served at `/podcasts/<slug>.<ext>` |
+| `podcast-covers/*` | Podcast cover images served at `/podcast-covers/<slug>.<ext>` |
 
 ---
 

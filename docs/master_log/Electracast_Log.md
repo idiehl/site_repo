@@ -93,3 +93,5 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Scraper --skip-assets flag for metadata-only runs; normalize script skips missing networks dir
 - Backend slug support + migration 0018; public API /api/v1/electracast-public/podcasts and /podcasts/{slug}
 - PodcastDetail page shows cover, summary, and links out to legacy page
+- Fixed 403 on direct /podcasts loads by moving cover assets to /podcast-covers/* (avoids route/static directory conflict)
+- Regenerated podcasts.json + 90 covers via exporter and rebuilt ElectraCast
