@@ -2368,3 +2368,32 @@ npm run build (in electracast/)
 **Verification:** Local ElectraCast build succeeded; post-deploy smoke test will confirm /podcasts direct load returns 200.  
 **Notes:** None  
 **Concepts:** electracast frontend deployment
+---
+
+## AU-C01-20260212-010 — Deploy: ElectraCast podcasts mirror + deep-link fix
+
+**Type:** Ops  
+**Context:** Deployed ElectraCast podcasts directory/detail mirror work to production and verified deep-linking and static cover serving.  
+**Change summary:**
+- Pushed and deployed AU-C01-20260212-008 and AU-C01-20260212-009 to production droplet
+- Ran alembic upgrade to apply ElectraCastPodcast slug migration (0018)
+- Rebuilt ElectraCast frontend and reloaded nginx
+
+**Rationale / tradeoffs:** Not provided  
+**Files touched:**
+- `docs/master_log/dev_status.json (status updates only)`
+
+**Commands run:**
+```bash
+git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull origin master"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && ./.venv/bin/python -m alembic upgrade head"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm install && npm run build"
+ssh root@167.71.179.90 "nginx -t && systemctl reload nginx"
+curl -I https://electracast.atlasuniversalis.com/podcasts
+curl -I https://electracast.atlasuniversalis.com/podcast-covers/techtalk-revolution.png
+```
+
+**Verification:** Confirmed /podcasts returns 200 on direct navigation and sample cover assets under /podcast-covers/* return 200. Alembic reports DB at 0018 head on droplet.  
+**Notes:** The initial /podcasts 403 was caused by serving covers under /podcasts/*; moved to /podcast-covers/* to avoid route/static path collision.  
+**Concepts:** deployment electracast nginx
