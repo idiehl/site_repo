@@ -23,23 +23,23 @@ export const Episodes = () => {
   const displayEpisodes = podcasts.length ? filteredEpisodes : []
 
   const statusColors = {
-    published: 'text-[#D4A94E] border-[#C89E3E]',
-    draft: 'text-[#8A94A6] border-[#8A94A6]',
-    scheduled: 'text-[#E8C97A] border-[#E8C97A]',
+    published: 'text-[#C9C16C] border-[#C9C16C]',
+    draft: 'text-[#b0b0b0] border-[#b0b0b0]',
+    scheduled: 'text-[#A89D4C] border-[#A89D4C]',
   }
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2
-          className="text-3xl text-[#D4A94E] tracking-wider"
+          className="text-3xl text-[#C9C16C] tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
           PODCAST LIBRARY
         </h2>
         <Link
           to="/account/create"
-          className="px-6 py-3 bg-[#C89E3E] text-[#070B1A] border-2 border-[#D4A94E] hover:bg-[#D4A94E] transition-all tracking-wider"
+          className="px-6 py-3 bg-[#C9C16C] text-[#000000] border-2 border-[#A89D4C] hover:bg-[#A89D4C] transition-all tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
           + NEW PODCAST
@@ -53,8 +53,8 @@ export const Episodes = () => {
             onClick={() => setFilter(status)}
             className={`px-4 py-2 border-2 rounded-sm tracking-wider text-sm transition-all ${
               filter === status
-                ? 'bg-[#C89E3E] border-[#D4A94E] text-[#070B1A]'
-                : 'bg-[#0B1226] border-[#1D1B35] text-[#8A94A6] hover:border-[#C89E3E]'
+                ? 'bg-[#C9C16C] border-[#A89D4C] text-[#000000]'
+                : 'bg-[#0f0f0f] border-[#2a2a2a] text-[#b0b0b0] hover:border-[#C9C16C]'
             }`}
             style={{ fontFamily: 'monospace' }}
           >
@@ -68,26 +68,26 @@ export const Episodes = () => {
           displayEpisodes.map((episode) => (
             <div
               key={episode.id}
-              className="bg-[#0B1226] border-2 border-[#1D1B35] p-6 rounded-sm hover:border-[#C89E3E] transition-all"
+              className="bg-[#0f0f0f] border-2 border-[#2a2a2a] p-6 rounded-sm hover:border-[#C9C16C] transition-all"
             >
               <div className="flex gap-6">
                 <button
                   onClick={() =>
                     setPlayingId(playingId === episode.id ? null : episode.id)
                   }
-                  className="w-16 h-16 bg-[#C89E3E] border-2 border-[#D4A94E] rounded-sm flex items-center justify-center hover:bg-[#D4A94E] transition-all flex-shrink-0"
+                  className="w-16 h-16 bg-[#C9C16C] border-2 border-[#A89D4C] rounded-sm flex items-center justify-center hover:bg-[#A89D4C] transition-all flex-shrink-0"
                   disabled={episode.status === 'draft'}
                 >
                   {playingId === episode.id ? (
-                    <Pause className="w-8 h-8 text-[#070B1A]" />
+                    <Pause className="w-8 h-8 text-[#000000]" />
                   ) : (
-                    <Play className="w-8 h-8 text-[#070B1A] ml-1" />
+                    <Play className="w-8 h-8 text-[#000000] ml-1" />
                   )}
                 </button>
 
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl text-[#EEFCF1] tracking-wide">
+                    <h3 className="text-xl text-[#ffffff] tracking-wide">
                       {episode.title}
                     </h3>
                     <span
@@ -99,8 +99,8 @@ export const Episodes = () => {
                       {episode.status.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-[#8A94A6] mb-4">{episode.description}</p>
-                  <div className="flex items-center gap-6 text-sm text-[#8A94A6]">
+                  <p className="text-[#b0b0b0] mb-4">{episode.description}</p>
+                  <div className="flex items-center gap-6 text-sm text-[#b0b0b0]">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       {episode.publishDate
@@ -119,10 +119,10 @@ export const Episodes = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button className="p-2 text-[#8A94A6] hover:text-[#C89E3E] transition-colors">
+                  <button className="p-2 text-[#b0b0b0] hover:text-[#C9C16C] transition-colors">
                     <Edit className="w-5 h-5" />
                   </button>
-                  <button className="p-2 text-[#8A94A6] hover:text-[#E57373] transition-colors">
+                  <button className="p-2 text-[#b0b0b0] hover:text-[#E57373] transition-colors">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
@@ -130,7 +130,7 @@ export const Episodes = () => {
             </div>
           ))
         ) : (
-          <div className="bg-[#0B1226] border-2 border-[#1D1B35] p-6 rounded-sm text-sm text-[#8A94A6]">
+          <div className="bg-[#0f0f0f] border-2 border-[#2a2a2a] p-6 rounded-sm text-sm text-[#b0b0b0]">
             No podcasts yet. Use the Create Podcast menu item to submit your first show.
           </div>
         )}

@@ -10,7 +10,8 @@ import {
   PlusCircle,
 } from 'lucide-react'
 import { useDashboardData } from '../DashboardDataContext'
-import logo from '../../assets/dashboard-logo.png'
+const logoUrl =
+  'https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png'
 
 type DashboardLayoutProps = {
   onLogout?: () => void
@@ -44,13 +45,13 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B1A] text-[#BCC5D0]">
-      <header className="bg-[#0B1226] border-b-4 border-[#C89E3E] shadow-lg">
+    <div className="min-h-screen bg-[#000000] text-[#ffffff]">
+      <header className="bg-[#0f0f0f] border-b-4 border-[#C9C16C] shadow-lg">
         <div className="px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src={logo} alt="ElectraCast" className="h-16" />
+            <img src={logoUrl} alt="ElectraCast" className="h-12" />
             <div>
-              <p className="text-xs text-[#8A94A6] tracking-widest">
+              <p className="text-xs text-[#b0b0b0] tracking-widest">
                 BROADCAST NETWORK
               </p>
             </div>
@@ -58,12 +59,12 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
 
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <p className="text-sm text-[#E8C97A] tracking-wide">
+              <p className="text-sm text-[#C9C16C] tracking-wide">
                 {podcaster.name.toUpperCase()}
               </p>
-              <p className="text-xs text-[#8A94A6]">{podcaster.podcastName}</p>
+              <p className="text-xs text-[#b0b0b0]">{podcaster.podcastName}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#1A2744] border-2 border-[#C89E3E] overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-[#1a1a1a] border-2 border-[#C9C16C] overflow-hidden">
               {podcaster.avatar ? (
                 <img
                   src={podcaster.avatar}
@@ -71,14 +72,14 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[#1A2744]" />
+                <div className="w-full h-full bg-[#1a1a1a]" />
               )}
             </div>
             {onLogout ? (
               <button
                 type="button"
                 onClick={onLogout}
-                className="text-xs text-[#8A94A6] hover:text-[#D4A94E] flex items-center gap-2"
+                className="text-xs text-[#b0b0b0] hover:text-[#C9C16C] flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 Sign out
@@ -89,10 +90,10 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
       </header>
 
       <div className="flex">
-        <nav className="w-64 bg-[#0B1226] border-r border-[#1D1B35] min-h-[calc(100vh-88px)]">
+        <nav className="w-64 bg-[#0f0f0f] border-r border-[#2a2a2a] min-h-[calc(100vh-88px)]">
           <div className="p-4 space-y-1">
             <p
-              className="text-xs text-[#8A94A6] tracking-widest px-3 py-2"
+              className="text-xs text-[#b0b0b0] tracking-widest px-3 py-2"
               style={{ fontFamily: 'monospace' }}
             >
               MY SHOW
@@ -109,8 +110,8 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
                     to={item.path}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
                       active
-                        ? 'bg-[#1A2744] text-[#D4A94E]'
-                        : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
+                      ? 'bg-[#1a1a1a] text-[#C9C16C]'
+                      : 'text-[#b0b0b0] hover:bg-[#1a1a1a] hover:text-[#C9C16C]'
                     }`}
                     style={{ fontFamily: 'system-ui' }}
                   >
@@ -121,7 +122,7 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
               })}
 
             <p
-              className="text-xs text-[#8A94A6] tracking-widest px-3 py-2 pt-4"
+              className="text-xs text-[#b0b0b0] tracking-widest px-3 py-2 pt-4"
               style={{ fontFamily: 'monospace' }}
             >
               SESSION TOOLS
@@ -138,8 +139,8 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
                     to={item.path}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all text-sm ${
                       active
-                        ? 'bg-[#1A2744] text-[#D4A94E]'
-                        : 'text-[#BCC5D0] hover:bg-[#1A2744] hover:text-[#D4A94E]'
+                      ? 'bg-[#1a1a1a] text-[#C9C16C]'
+                      : 'text-[#b0b0b0] hover:bg-[#1a1a1a] hover:text-[#C9C16C]'
                     }`}
                     style={{ fontFamily: 'system-ui' }}
                   >

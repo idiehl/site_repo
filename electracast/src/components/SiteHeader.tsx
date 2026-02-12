@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { navLinks } from '../data/navigation'
 import { clearStoredAuth, getStoredAuth } from '../lib/api'
 
+const logoUrl =
+  'https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png'
+
 const SiteHeader = () => {
   const navigate = useNavigate()
   const [hasAuth, setHasAuth] = useState(() => Boolean(getStoredAuth()))
@@ -26,7 +29,10 @@ const SiteHeader = () => {
 
   return (
     <header className="site-header">
-      <div className="logo">ElectraCast</div>
+      <Link className="logo" to="/">
+        <img src={logoUrl} alt="ElectraCast" />
+        <span className="logo-text">ElectraCast</span>
+      </Link>
       <nav className="nav" aria-label="Primary">
         {navLinks.map((link) => (
           <Link key={link.label} to={link.href}>

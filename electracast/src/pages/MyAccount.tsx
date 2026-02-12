@@ -161,6 +161,9 @@ const buildHourlySubmissions = (podcasts: ElectraCastPodcast[]) => {
   return buckets
 }
 
+const logoUrl =
+  'https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png'
+
 const MyAccount = () => {
   const navigate = useNavigate()
   const [auth, setAuth] = useState(() => getStoredAuth())
@@ -295,42 +298,46 @@ const MyAccount = () => {
 
   if (!auth) {
     return (
-      <div className="min-h-screen bg-[#070B1A] text-[#BCC5D0] flex items-center justify-center p-6">
-        <div className="w-full max-w-lg bg-[#0B1226] border-4 border-[#C89E3E] p-10 rounded-sm">
+      <div className="min-h-screen bg-[#000000] text-[#ffffff] flex items-center justify-center p-6">
+        <div className="w-full max-w-lg bg-[#0f0f0f] border-4 border-[#C9C16C] p-10 rounded-sm">
+          <header className="flex items-center gap-3 mb-6">
+            <img src={logoUrl} alt="ElectraCast" className="h-10" />
+            <span className="text-xs text-[#b0b0b0] tracking-widest">ACCOUNT PORTAL</span>
+          </header>
           <h1
-            className="text-3xl text-[#D4A94E] tracking-wider mb-4"
+            className="text-3xl text-[#C9C16C] tracking-wider mb-4"
             style={{ fontFamily: 'monospace' }}
           >
             ELECTRACAST DASHBOARD
           </h1>
-          <p className="text-[#8A94A6] mb-8">
+          <p className="text-[#b0b0b0] mb-8">
             Sign in to access your podcaster profile, episodes, and analytics.
           </p>
           <form className="space-y-4" onSubmit={handleLogin}>
             <label className="block">
-              <span className="block text-sm text-[#8A94A6] mb-2">Email</span>
+              <span className="block text-sm text-[#b0b0b0] mb-2">Email</span>
               <input
                 type="email"
                 name="email"
                 value={loginForm.email}
                 onChange={handleLoginChange}
                 required
-                className="w-full bg-[#070B1A] border-2 border-[#1D1B35] text-[#EEFCF1] px-4 py-3 rounded-sm focus:border-[#C89E3E] outline-none"
+                className="w-full bg-[#000000] border-2 border-[#2a2a2a] text-[#ffffff] px-4 py-3 rounded-sm focus:border-[#C9C16C] outline-none"
               />
             </label>
             <label className="block">
-              <span className="block text-sm text-[#8A94A6] mb-2">Password</span>
+              <span className="block text-sm text-[#b0b0b0] mb-2">Password</span>
               <input
                 type="password"
                 name="password"
                 value={loginForm.password}
                 onChange={handleLoginChange}
                 required
-                className="w-full bg-[#070B1A] border-2 border-[#1D1B35] text-[#EEFCF1] px-4 py-3 rounded-sm focus:border-[#C89E3E] outline-none"
+                className="w-full bg-[#000000] border-2 border-[#2a2a2a] text-[#ffffff] px-4 py-3 rounded-sm focus:border-[#C9C16C] outline-none"
               />
             </label>
             <button
-              className="w-full px-6 py-3 bg-[#C89E3E] text-[#070B1A] border-2 border-[#D4A94E] hover:bg-[#D4A94E] transition-all tracking-wider"
+              className="w-full px-6 py-3 bg-[#C9C16C] text-[#000000] border-2 border-[#A89D4C] hover:bg-[#A89D4C] transition-all tracking-wider"
               style={{ fontFamily: 'monospace' }}
               disabled={loading}
               type="submit"
@@ -338,9 +345,9 @@ const MyAccount = () => {
               {loading ? 'SIGNING IN...' : 'SIGN IN'}
             </button>
           </form>
-          <div className="mt-6 text-sm text-[#8A94A6]">
+          <div className="mt-6 text-sm text-[#b0b0b0]">
             New here?{' '}
-            <a className="text-[#D4A94E] hover:underline" href="/register">
+            <a className="text-[#C9C16C] hover:underline" href="/register">
               Create an account
             </a>
             .

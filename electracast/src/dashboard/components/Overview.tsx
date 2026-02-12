@@ -68,9 +68,9 @@ export const Overview = () => {
 
   return (
     <div className="space-y-8">
-      <div className="bg-[#0B1226] border-4 border-[#C89E3E] p-8 rounded-sm shadow-2xl">
+      <div className="bg-[#0f0f0f] border-4 border-[#C9C16C] p-8 rounded-sm shadow-2xl">
         <div className="flex items-start gap-6">
-          <div className="w-24 h-24 rounded-sm bg-[#1A2744] border-4 border-[#C89E3E] overflow-hidden flex-shrink-0">
+          <div className="w-24 h-24 rounded-sm bg-[#1a1a1a] border-4 border-[#C9C16C] overflow-hidden flex-shrink-0">
             {podcaster.avatar ? (
               <img
                 src={podcaster.avatar}
@@ -78,25 +78,25 @@ export const Overview = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-[#1A2744]" />
+              <div className="w-full h-full bg-[#1a1a1a]" />
             )}
           </div>
           <div className="flex-1">
             <h2
-              className="text-3xl text-[#D4A94E] tracking-wider mb-2"
+              className="text-3xl text-[#C9C16C] tracking-wider mb-2"
               style={{ fontFamily: 'monospace' }}
             >
               {podcaster.podcastName.toUpperCase()}
             </h2>
             <p
-              className="text-sm text-[#8A94A6] mb-4 tracking-wide"
+              className="text-sm text-[#b0b0b0] mb-4 tracking-wide"
               style={{ fontFamily: 'monospace' }}
             >
               HOSTED BY: {podcaster.name.toUpperCase()}
             </p>
-            <p className="text-[#BCC5D0] leading-relaxed mb-4">{podcaster.bio}</p>
+            <p className="text-[#ffffff] leading-relaxed mb-4">{podcaster.bio}</p>
             <p
-              className="text-xs text-[#8A94A6] tracking-wide"
+              className="text-xs text-[#b0b0b0] tracking-wide"
               style={{ fontFamily: 'monospace' }}
             >
               MEMBER SINCE:{' '}
@@ -118,25 +118,25 @@ export const Overview = () => {
           return (
             <div
               key={stat.label}
-              className="bg-[#0B1226] border-2 border-[#1D1B35] p-6 rounded-sm hover:border-[#C89E3E] transition-all"
+              className="bg-[#0f0f0f] border-2 border-[#2a2a2a] p-6 rounded-sm hover:border-[#C9C16C] transition-all"
             >
               <div className="flex items-start justify-between mb-4">
-                <Icon className="w-8 h-8 text-[#C89E3E]" />
+                <Icon className="w-8 h-8 text-[#C9C16C]" />
                 <span
-                  className="text-xs text-[#D4A94E] bg-[#070B1A] px-2 py-1 rounded-sm border border-[#1D1B35]"
+                  className="text-xs text-[#C9C16C] bg-[#000000] px-2 py-1 rounded-sm border border-[#2a2a2a]"
                   style={{ fontFamily: 'monospace' }}
                 >
                   {stat.trend}
                 </span>
               </div>
               <p
-                className="text-xs text-[#8A94A6] mb-2 tracking-widest"
+                className="text-xs text-[#b0b0b0] mb-2 tracking-widest"
                 style={{ fontFamily: 'monospace' }}
               >
                 {stat.label}
               </p>
               <p
-                className="text-3xl text-[#EEFCF1] tracking-wider"
+                className="text-3xl text-[#ffffff] tracking-wider"
                 style={{ fontFamily: 'monospace' }}
               >
                 {stat.value}
@@ -146,57 +146,57 @@ export const Overview = () => {
         })}
       </div>
 
-      <div className="bg-[#0B1226] border-4 border-[#C89E3E] p-6 rounded-sm">
+      <div className="bg-[#0f0f0f] border-4 border-[#C9C16C] p-6 rounded-sm">
         <h3
-          className="text-xl text-[#D4A94E] mb-6 tracking-wider"
+          className="text-xl text-[#C9C16C] mb-6 tracking-wider"
           style={{ fontFamily: 'monospace' }}
         >
           WEEKLY SUBMISSIONS
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={analyticsData.weeklyActivity}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1D1B35" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
             <XAxis
               dataKey="day"
-              stroke="#8A94A6"
+              stroke="#b0b0b0"
               style={{ fontFamily: 'monospace', fontSize: '12px' }}
             />
             <YAxis
-              stroke="#8A94A6"
+              stroke="#b0b0b0"
               style={{ fontFamily: 'monospace', fontSize: '12px' }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#070B1A',
-                border: '2px solid #C89E3E',
+                backgroundColor: '#000000',
+                border: '2px solid #C9C16C',
                 fontFamily: 'monospace',
                 fontSize: '12px',
               }}
             />
-            <Bar dataKey="submitted" fill="#C89E3E" />
-            <Bar dataKey="synced" fill="#1A2744" />
+            <Bar dataKey="submitted" fill="#C9C16C" />
+            <Bar dataKey="synced" fill="#A89D4C" />
           </BarChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-8 mt-4">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-[#C89E3E] border border-[#A8782F]" />
-            <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
+            <div className="w-4 h-4 bg-[#C9C16C] border border-[#A89D4C]" />
+            <span className="text-xs text-[#b0b0b0]" style={{ fontFamily: 'monospace' }}>
               SUBMISSIONS
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-[#1A2744] border border-[#1D1B35]" />
-            <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
+            <div className="w-4 h-4 bg-[#1a1a1a] border border-[#2a2a2a]" />
+            <span className="text-xs text-[#b0b0b0]" style={{ fontFamily: 'monospace' }}>
               SYNCED
             </span>
           </div>
         </div>
       </div>
 
-      <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
+      <div className="bg-[#0f0f0f] border border-[#2a2a2a] p-6 rounded-lg">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg text-[#EEFCF1]">Episode Pipeline</h3>
-          <span className="text-xs text-[#8A94A6]" style={{ fontFamily: 'monospace' }}>
+          <h3 className="text-lg text-[#ffffff]">Episode Pipeline</h3>
+          <span className="text-xs text-[#b0b0b0]" style={{ fontFamily: 'monospace' }}>
             {publishedCount} SYNCED • {scheduledCount} PENDING
           </span>
         </div>
@@ -204,24 +204,24 @@ export const Overview = () => {
           {recentEpisodes.map((episode) => (
             <div
               key={episode.id}
-              className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all group"
+              className="bg-[#000000] border border-[#2a2a2a] p-4 rounded-lg hover:border-[#C9C16C] transition-all group"
             >
               <div className="flex items-start gap-4">
-                <button className="w-8 h-8 bg-[#1A2744] border border-[#1D1B35] rounded-md flex items-center justify-center hover:bg-[#C89E3E] hover:border-[#C89E3E] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C89E3E]">
-                  <Play className="w-4 h-4 text-[#BCC5D0] ml-0.5" />
+                <button className="w-8 h-8 bg-[#1a1a1a] border border-[#2a2a2a] rounded-md flex items-center justify-center hover:bg-[#C9C16C] hover:border-[#C9C16C] transition-all flex-shrink-0 mt-0.5 group-hover:border-[#C9C16C]">
+                  <Play className="w-4 h-4 text-[#ffffff] ml-0.5" />
                 </button>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3 mb-1">
-                    <h4 className="text-[#EEFCF1] text-sm leading-tight">
+                    <h4 className="text-[#ffffff] text-sm leading-tight">
                       {episode.title}
                     </h4>
                     <span
                       className={`text-xs px-2 py-1 rounded border whitespace-nowrap flex-shrink-0 ${
                         episode.status === 'published'
-                          ? 'text-[#D4A94E] bg-[#1A2744] border-[#1D1B35]'
+                          ? 'text-[#C9C16C] bg-[#1a1a1a] border-[#2a2a2a]'
                           : episode.status === 'scheduled'
-                          ? 'text-[#E8C97A] bg-[#1A2744] border-[#1D1B35]'
-                          : 'text-[#E57373] bg-[#1A2744] border-[#1D1B35]'
+                          ? 'text-[#A89D4C] bg-[#1a1a1a] border-[#2a2a2a]'
+                          : 'text-[#E57373] bg-[#1a1a1a] border-[#2a2a2a]'
                       }`}
                     >
                       {episode.status === 'published'
@@ -231,10 +231,10 @@ export const Overview = () => {
                         : 'NEEDS ATTN'}
                     </span>
                   </div>
-                  <p className="text-xs text-[#8A94A6] mb-2 line-clamp-1">
+                  <p className="text-xs text-[#b0b0b0] mb-2 line-clamp-1">
                     {episode.description}
                   </p>
-                  <div className="flex items-center gap-4 text-xs text-[#8A94A6]">
+                  <div className="flex items-center gap-4 text-xs text-[#b0b0b0]">
                     <span>
                       {episode.publishDate
                         ? new Date(episode.publishDate).toLocaleDateString('en-US', {
@@ -254,39 +254,39 @@ export const Overview = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
+        <div className="bg-[#0f0f0f] border border-[#2a2a2a] p-6 rounded-lg">
           <div className="flex items-center gap-3 mb-6">
-            <MessageSquare className="w-5 h-5 text-[#C89E3E]" />
-            <h3 className="text-lg text-[#EEFCF1]">Recent Submissions</h3>
+            <MessageSquare className="w-5 h-5 text-[#C9C16C]" />
+            <h3 className="text-lg text-[#ffffff]">Recent Submissions</h3>
           </div>
           <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
             {recentSubmissions.map((submission) => (
               <div
                 key={submission.id}
-                className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-lg hover:border-[#C89E3E] transition-all"
+                className="bg-[#000000] border border-[#2a2a2a] p-4 rounded-lg hover:border-[#C9C16C] transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div>
-                    <p className="text-[#EEFCF1] text-sm">{submission.title}</p>
-                    <p className="text-xs text-[#8A94A6] line-clamp-1">
+                    <p className="text-[#ffffff] text-sm">{submission.title}</p>
+                    <p className="text-xs text-[#b0b0b0] line-clamp-1">
                       {submission.summary}
                     </p>
                   </div>
                   <span
                     className={`text-xs px-2 py-1 rounded border ${
                       submission.status === 'synced'
-                        ? 'text-[#D4A94E] border-[#C89E3E]'
+                        ? 'text-[#C9C16C] border-[#C9C16C]'
                         : submission.status === 'pending'
-                        ? 'text-[#E8C97A] border-[#E8C97A]'
+                        ? 'text-[#A89D4C] border-[#A89D4C]'
                         : submission.status === 'failed'
                         ? 'text-[#E57373] border-[#E57373]'
-                        : 'text-[#8A94A6] border-[#8A94A6]'
+                        : 'text-[#b0b0b0] border-[#b0b0b0]'
                     }`}
                   >
                     {submission.status.toUpperCase()}
                   </span>
                 </div>
-                <p className="text-xs text-[#8A94A6]">
+                <p className="text-xs text-[#b0b0b0]">
                   Submitted{' '}
                   {new Date(submission.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
@@ -300,26 +300,26 @@ export const Overview = () => {
           </div>
         </div>
 
-        <div className="bg-[#0B1226] border border-[#1D1B35] p-6 rounded-lg">
+        <div className="bg-[#0f0f0f] border border-[#2a2a2a] p-6 rounded-lg">
           <div className="flex items-center gap-3 mb-6">
-            <TrendingUp className="w-5 h-5 text-[#C89E3E]" />
-            <h3 className="text-lg text-[#EEFCF1]">Status Breakdown</h3>
+            <TrendingUp className="w-5 h-5 text-[#C9C16C]" />
+            <h3 className="text-lg text-[#ffffff]">Status Breakdown</h3>
           </div>
 
           <div className="space-y-4">
             {analyticsData.statusBreakdown.map((status) => (
               <div
                 key={status.label}
-                className="bg-[#070B1A] border border-[#1D1B35] p-4 rounded-sm"
+                className="bg-[#000000] border border-[#2a2a2a] p-4 rounded-sm"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[#D4A94E] font-bold">{status.label}</span>
-                    <span className="text-xs text-[#8A94A6] ml-2">
+                    <span className="text-[#C9C16C] font-bold">{status.label}</span>
+                    <span className="text-xs text-[#b0b0b0] ml-2">
                       {status.count} podcasts
                     </span>
                   </div>
-                  <div className="text-xs text-[#8A94A6]">{status.percentage}%</div>
+                  <div className="text-xs text-[#b0b0b0]">{status.percentage}%</div>
                 </div>
               </div>
             ))}

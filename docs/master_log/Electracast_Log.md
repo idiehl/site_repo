@@ -67,6 +67,12 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Added dashboard components (Overview, Analytics, Episodes, Recording, Upload, Settings) plus dashboard data context mapped to account/podcast API.
 - Added dashboard-logo.png asset and lucide-react/recharts dependencies.
 - Updated PROJECT_OVERVIEW inventory for ElectraCast dashboard structure.
-- Added Create Podcast dashboard page and navigation item for new show submissions.
+- Added Create Podcast dashboard route and navigation item for new show submissions.
 - Wired Create Podcast form to the ElectraCast podcast API with live list updates.
-- Derived dashboard stats/analytics from real podcast statuses, categories, and activity.
+- Extended dashboard data context to expose account/podcast data for Overview and Podcasts views.
+- Derived dashboard stats, analytics, and pipeline lists from real podcast statuses, categories, and activity.
+
+## 2026-02-12
+- Standardized UI palette to brand gold/black across public site and dashboard
+- Added ElectraCast logo to public SiteHeader, dashboard header, and login screen header (MyAccount)
+- Updated palette in Analytics, CreatePodcast, Episodes, Overview, Recording, Settings, Upload components

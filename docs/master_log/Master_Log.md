@@ -2155,3 +2155,43 @@ git status -sb
 **Verification:** git status -sb — internal paths staged for removal, as expected.  
 **Notes:** None  
 **Concepts:** @concept:git @concept:gitignore @concept:internal @concept:untrack
+---
+
+## AU-C01-20260212-003 — ElectraCast UI: Brand gold/black palette + logo in headers
+
+**Type:** Fix  
+**Context:** Standardized ElectraCast UI to brand gold/black across public site and dashboard; added ElectraCast logo to public header, dashboard header, and login screen header.  
+**Change summary:**
+- Standardized CSS palette to brand gold/black across public site and dashboard
+- Added ElectraCast logo to public SiteHeader
+- Added ElectraCast logo to dashboard header (DashboardLayout)
+- Added ElectraCast logo to login screen header (MyAccount)
+- Applied palette updates to Analytics, CreatePodcast, Episodes, Overview, Recording, Settings, Upload components
+
+**Rationale / tradeoffs:** Unified branding and clearer identity across all ElectraCast surfaces.  
+**Files touched:**
+- `electracast/styles.css`
+- `electracast/src/components/SiteHeader.tsx`
+- `electracast/src/pages/MyAccount.tsx`
+- `electracast/src/dashboard/components/Analytics.tsx`
+- `electracast/src/dashboard/components/CreatePodcast.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/dashboard/components/Episodes.tsx`
+- `electracast/src/dashboard/components/Overview.tsx`
+- `electracast/src/dashboard/components/Recording.tsx`
+- `electracast/src/dashboard/components/Settings.tsx`
+- `electracast/src/dashboard/components/Upload.tsx`
+
+**Commands run:**
+```bash
+git status -sb
+git diff -- docs/master_log/Electracast_Log.md
+git diff -- docs/master_log/dev_status.json
+git diff -- docs/master_log/Meridian_Log.md
+git add <files>
+git diff --cached --stat
+```
+
+**Verification:** Manual smoke checks on https://electracast.atlasuniversalis.com (home + register) and /account login after deploy.  
+**Notes:** set_dev_status PENDING during deploy, READY after.  
+**Concepts:** @concept:electracast @concept:frontend @concept:branding
