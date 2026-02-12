@@ -2076,7 +2076,6 @@ npm run build (success)
 **Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
 **Notes:** Build initially failed due to missing Vite; resolved with npm install. Analytics and comments remain mock until API support exists.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dashboard
-
 ---
 
 ## AU-C01-20260211-010 — Wire dashboard data + create podcast flow
@@ -2111,3 +2110,48 @@ npm run build
 **Verification:** npm run build (ElectraCast) succeeded; chunk-size warning noted.  
 **Notes:** Derived analytics are based on podcast metadata; Create Podcast submits to `/api/v1/electracast/podcasts`.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dashboard @concept:api
+---
+
+## AU-C01-20260212-001 — Add /internal/ to .gitignore
+
+**Type:** Ops  
+**Context:** Exclude internal scratch content from Git and Cursor change tracking.  
+**Change summary:**
+- Added /internal/ to .gitignore so internal scratch content is ignored by Git and Cursor.
+
+**Rationale / tradeoffs:** Keeps repo clean and avoids internal work appearing in diffs.  
+**Files touched:**
+- `.gitignore`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** Not run  
+**Notes:** Repo-wide config; no app-specific changes.  
+**Concepts:** @concept:gitignore @concept:internal
+---
+
+## AU-C01-20260212-002 — Untrack internal directory from Git index
+
+**Type:** Ops  
+**Context:** Repo-wide config: /internal/ was previously tracked. Needed to stop Git from tracking it without deleting local files.  
+**Change summary:**
+- Removed internal/ from the Git index via `git rm -r --cached internal`.
+- Confirmed /internal/ is ignored in .gitignore for future changes.
+
+**Rationale / tradeoffs:** Internal docs, Electracast codebase, and other sensitive/internal assets should not be in version control.  
+**Files touched:**
+- `internal/ (index removal)`
+- `.gitignore`
+
+**Commands run:**
+```bash
+git rm -r --cached internal
+git status -sb
+```
+
+**Verification:** git status -sb — internal paths staged for removal, as expected.  
+**Notes:** None  
+**Concepts:** @concept:git @concept:gitignore @concept:internal @concept:untrack

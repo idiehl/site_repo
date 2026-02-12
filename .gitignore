@@ -29,6 +29,9 @@ atlasops/uploads/
 # Internal archives
 internal/Electracast_Codebase.zip
 
+# Internal scratch space
+/internal/
+
 # Logs
 *.log
 npm-debug.log*
