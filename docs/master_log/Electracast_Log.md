@@ -82,3 +82,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Fix deploy build: added missing d3-color dependency (required by d3-interpolate)
 - Updated package.json and package-lock.json; npm install succeeds locally
 - Pending redeploy verification; set dev status READY after successful deploy
+- Fix: Added cookie dependency for react-router compatibility
+- Files: package.json, package-lock.json updated
+- Verification: npm install passed locally; redeploy pending

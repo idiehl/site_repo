@@ -2244,3 +2244,26 @@ npm install d3-color
 **Verification:** npm install succeeded locally; redeploy build will verify.  
 **Notes:** Dev status stays PENDING until redeploy succeeds; set to READY after successful redeploy.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dependencies
+---
+
+## AU-C01-20260212-006 — Fix ElectraCast deploy build — add cookie dependency
+
+**Type:** Fix  
+**Context:** ElectraCast deploy build was failing due to a missing dependency required by react-router. The cookie package was not installed.  
+**Change summary:**
+- Added cookie dependency to electracast/package.json
+- Regenerated electracast/package-lock.json via npm install cookie
+
+**Rationale / tradeoffs:** react-router depends on cookie; the build failed without it.  
+**Files touched:**
+- `electracast/package.json`
+- `electracast/package-lock.json`
+
+**Commands run:**
+```bash
+npm install cookie
+```
+
+**Verification:** npm install succeeded locally; redeploy build will confirm.  
+**Notes:** Dev status stays PENDING until redeploy succeeds; set READY after successful redeploy.  
+**Concepts:** @concept:electracast @concept:frontend @concept:dependencies
