@@ -2267,3 +2267,29 @@ npm install cookie
 **Verification:** npm install succeeded locally; redeploy build will confirm.  
 **Notes:** Dev status stays PENDING until redeploy succeeds; set READY after successful redeploy.  
 **Concepts:** @concept:electracast @concept:frontend @concept:dependencies
+---
+
+## AU-C01-20260212-007 — Remove duplicate dashboard logo and logout (ElectraCast)
+
+**Type:** Fix  
+**Context:** ElectraCast dashboard had duplicate logo and duplicate Sign out in header areas. UX cleanup to keep a single logo and single Sign out while retaining Profile label.  
+**Change summary:**
+- Hide SiteHeader auth actions on dashboard routes
+- Remove lower header logo; keep only lower Sign out
+- Keep Profile label in dashboard header
+
+**Rationale / tradeoffs:** Simplify redundant UI and improve dashboard clarity.  
+**Files touched:**
+- `electracast/src/components/SiteHeader.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/data/navigation.ts`
+- `electracast/src/pages/Home.tsx`
+
+**Commands run:**
+```bash
+git add <files>
+```
+
+**Verification:** Manual check on https://electracast.atlasuniversalis.com/account after deploy to confirm single logo and single Sign out.  
+**Notes:** set_dev_status PENDING during deploy, READY after.  
+**Concepts:** @concept:electracast @concept:frontend @concept:ux

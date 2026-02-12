@@ -3,10 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { navLinks } from '../data/navigation'
 import { clearStoredAuth, getStoredAuth } from '../lib/api'
 
+type SiteHeaderProps = {
+  showAuthActions?: boolean
+}
+
 const logoUrl =
   'https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png'
 
-const SiteHeader = () => {
+const SiteHeader = ({ showAuthActions = true }: SiteHeaderProps) => {
   const navigate = useNavigate()
   const [hasAuth, setHasAuth] = useState(() => Boolean(getStoredAuth()))
 
@@ -40,15 +44,17 @@ const SiteHeader = () => {
           </Link>
         ))}
       </nav>
-      {hasAuth ? (
-        <button className="btn ghost" type="button" onClick={handleLogout}>
-          Log out
-        </button>
-      ) : (
-        <Link className="btn ghost" to="/account">
-          Log in
-        </Link>
-      )}
+      {showAuthActions ? (
+        hasAuth ? (
+          <button className="btn ghost" type="button" onClick={handleLogout}>
+            Log out
+          </button>
+        ) : (
+          <Link className="btn ghost" to="/account">
+            Log in
+          </Link>
+        )
+      ) : null}
     </header>
   )
 }

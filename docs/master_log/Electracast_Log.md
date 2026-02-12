@@ -85,3 +85,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Fix: Added cookie dependency for react-router compatibility
 - Files: package.json, package-lock.json updated
 - Verification: npm install passed locally; redeploy pending
+- Remove duplicate dashboard logo and logout: hide SiteHeader auth actions on dashboard, remove lower header logo; keep only lower Sign out and Profile label
+- Files: SiteHeader.tsx, DashboardLayout.tsx, navigation.ts, Home.tsx
+- Verification: manual check at https://electracast.atlasuniversalis.com/account for single logo and single Sign out

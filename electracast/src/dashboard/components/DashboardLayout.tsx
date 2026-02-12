@@ -11,8 +11,6 @@ import {
 } from 'lucide-react'
 import { useDashboardData } from '../DashboardDataContext'
 import SiteHeader from '../../components/SiteHeader'
-const logoUrl =
-  'https://electracast.com/wp-content/uploads/2022/02/cropped-ECTEXTLOGOGWLRG%EF%B9%96format1500w-1.png'
 
 type DashboardLayoutProps = {
   onLogout?: () => void
@@ -47,12 +45,11 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader showAuthActions={false} />
       <div className="min-h-screen bg-[#000000] text-[#ffffff]">
         <header className="bg-[#0f0f0f] border-b-4 border-[#C9C16C] shadow-lg">
           <div className="px-8 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <img src={logoUrl} alt="ElectraCast" className="h-12" />
               <div>
                 <p className="text-xs text-[#b0b0b0] tracking-widest">
                   BROADCAST NETWORK
