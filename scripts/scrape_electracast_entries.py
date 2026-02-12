@@ -92,13 +92,15 @@ def extract_summary(soup: BeautifulSoup, kind: str) -> str | None:
         candidates = soup.select(".netdesc p")
     for candidate in candidates:
         text = candidate.get_text(strip=True)
-        if len(text) > 40:
+        min_len = 40 if kind == "podcasts" else 10
+        if len(text) > min_len:
             return text
     content = soup.select_one(".entry-content-podcast") or soup.select_one(".entry-content")
     if content:
         for paragraph in content.find_all("p"):
             text = paragraph.get_text(strip=True)
-            if len(text) > 40:
+            min_len = 40 if kind == "podcasts" else 10
+            if len(text) > min_len:
                 return text
     return None
 
@@ -199,8 +201,19 @@ def process_entry(
     overwrite: bool,
     download_assets: bool,
 ) -> None:
-    response = client.get(url, timeout=30)
-    response.raise_for_status()
+    response = None
+    last_error: Exception | None = None
+    for _attempt in range(3):
+        try:
+            response = client.get(url, timeout=30)
+            response.raise_for_status()
+            last_error = None
+            break
+        except Exception as exc:
+            last_error = exc
+            time.sleep(max(delay, 0.2))
+    if response is None or last_error is not None:
+        raise last_error or RuntimeError(f"Failed to fetch {url}")
     html = response.text
     soup = BeautifulSoup(html, "html.parser")
 
@@ -272,16 +285,20 @@ def scrape(
 
         for index, (title, href) in enumerate(entries, start=1):
             print(f"[{kind}] ({index}/{len(entries)}) {title or href}")
-            process_entry(
-                client,
-                kind,
-                title,
-                href,
-                target_dir,
-                delay=delay,
-                overwrite=overwrite,
-                download_assets=download_assets,
-            )
+            try:
+                process_entry(
+                    client,
+                    kind,
+                    title,
+                    href,
+                    target_dir,
+                    delay=delay,
+                    overwrite=overwrite,
+                    download_assets=download_assets,
+                )
+            except Exception as exc:
+                print(f"[{kind}] Skipping {href}: {exc}")
+                continue
 
 
 def main() -> None:

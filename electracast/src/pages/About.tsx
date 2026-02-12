@@ -1,4 +1,3 @@
-import FeatureGrid from '../components/FeatureGrid'
 import SectionHeader from '../components/SectionHeader'
 
 type Bio = {
@@ -60,24 +59,33 @@ const About = () => {
   return (
     <section className="section">
       <SectionHeader
-        title="About ElectraCast"
+        title="About"
         description="We inspire and connect people through compelling entertainment and story."
       />
-      <div className="account-card">
-        <h3>We inspire and connect people through compelling entertainment and story.</h3>
-        <p>
-          ElectraCast is a new 360-degree content company focused on inspiring and
-          connecting people, creating a better world through compelling
-          entertainment and storytelling. ElectraCast develops content along
-          multiple verticals and mediums, spinning off hit podcasts into film and
-          television adaptations, promoting new and emerging recording artists
-          through ElectraCast Music, and creating engaging narratives that unite
-          entertainment partnerships with social impact goals. Our mission is to
-          become the go-to partner for creatives in any medium to tell compelling
-          stories in a daring new way.
-        </p>
+      <div className="resource-grid resource-grid--two-col">
+        <div className="account-card">
+          <h3>We inspire and connect people through compelling entertainment and story.</h3>
+          <p>
+            ElectraCast is a new 360-degree content company focused on inspiring and
+            connecting people, creating a better world through compelling
+            entertainment and storytelling. ElectraCast develops content along
+            multiple verticals and mediums, spinning off hit podcasts into film and
+            television adaptations, promoting new and emerging recording artists
+            through ElectraCast Music, and creating engaging narratives that unite
+            entertainment partnerships with social impact goals. Our mission is to
+            become the go-to partner for creatives in any medium to tell compelling
+            stories in a daring new way.
+          </p>
+        </div>
+        <div className="account-card">
+          <img
+            className="advertising-banner"
+            src="https://electracast.com/wp-content/uploads/2022/02/TLSNcoverNEW22021-07-21.jpeg"
+            alt="The Last Saturday Night cover"
+            loading="lazy"
+          />
+        </div>
       </div>
-      <FeatureGrid />
       <div className="resource-grid">
         <div className="account-card">
           <h3>ElectraCast Team</h3>

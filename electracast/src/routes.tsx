@@ -6,6 +6,7 @@ import CustomBranded from './pages/CustomBranded'
 import Home from './pages/Home'
 import Music from './pages/Music'
 import Networks from './pages/Networks'
+import NetworkDetail from './pages/NetworkDetail'
 import Podcasts from './pages/Podcasts'
 import PodcastDetail from './pages/PodcastDetail'
 import Register from './pages/Register'
@@ -23,6 +24,7 @@ export const routes: AppRoute[] = [
   { path: '/podcasts', element: <Podcasts />, title: 'Podcasts | ElectraCast' },
   { path: '/podcast/:slug', element: <PodcastDetail />, title: 'Podcast | ElectraCast' },
   { path: '/networks', element: <Networks />, title: 'Networks | ElectraCast' },
+  { path: '/network/:slug', element: <NetworkDetail />, title: 'Network | ElectraCast' },
   {
     path: '/custom-branded-podcasts',
     element: <CustomBranded />,
@@ -32,5 +34,6 @@ export const routes: AppRoute[] = [
   { path: '/about', element: <About />, title: 'About | ElectraCast' },
   { path: '/contact', element: <Contact />, title: 'Contact | ElectraCast' },
   { path: '/advertising', element: <Advertising />, title: 'Advertising | ElectraCast' },
+  { path: '/advertise', element: <Advertising />, title: 'Advertise | ElectraCast' },
   { path: '/register', element: <Register />, title: 'Register | ElectraCast' },
 ]

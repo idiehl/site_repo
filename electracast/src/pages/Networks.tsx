@@ -1,6 +1,6 @@
-import NetworkPills from '../components/NetworkPills'
 import SectionHeader from '../components/SectionHeader'
 import { networkDirectory } from '../data/networks'
+import { Link } from 'react-router-dom'
 
 const Networks = () => {
   return (
@@ -12,8 +12,8 @@ const Networks = () => {
       <div className="account-card">
         <h3>Network Directory</h3>
         <p>
-          These curated network categories mirror the legacy ElectraCast site.
-          Full network pages are being migrated next.
+          Browse ElectraCast networks. Each network page includes its description and
+          a list of shows in that network.
         </p>
         <div className="network-grid">
           {networkDirectory.map((network) => (
@@ -22,24 +22,23 @@ const Networks = () => {
                 <img
                   className="network-image"
                   src={network.image}
-                  alt={`${network.name} artwork`}
+                  alt={`${network.title} artwork`}
                   loading="lazy"
                 />
               ) : null}
-              <h4>{network.name}</h4>
-              <a
-                className="btn ghost"
-                href={network.href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                View legacy page
-              </a>
+              <h4>{network.title}</h4>
+              <div className="account-actions">
+                <Link className="btn ghost" to={network.to}>
+                  View network
+                </Link>
+                <a className="btn ghost" href={network.legacyUrl} target="_blank" rel="noreferrer">
+                  Legacy site
+                </a>
+              </div>
             </article>
           ))}
         </div>
       </div>
-      <NetworkPills />
     </section>
   )
 }

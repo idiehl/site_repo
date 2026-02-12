@@ -337,6 +337,17 @@ main {
   gap: 20px;
 }
 
+.resource-grid--two-col {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 860px) {
+  .resource-grid--two-col {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
 .network-grid {
   margin-top: 16px;
   display: grid;

@@ -2397,3 +2397,43 @@ curl -I https://electracast.atlasuniversalis.com/podcast-covers/techtalk-revolut
 **Verification:** Confirmed /podcasts returns 200 on direct navigation and sample cover assets under /podcast-covers/* return 200. Alembic reports DB at 0018 head on droplet.  
 **Notes:** The initial /podcasts 403 was caused by serving covers under /podcasts/*; moved to /podcast-covers/* to avoid route/static path collision.  
 **Concepts:** deployment electracast nginx
+---
+
+## AU-C01-20260212-011 — ElectraCast: About page alignment, nav/routes, networks catalog and /network/:slug
+
+**Type:** Feature  
+**Context:** Align ElectraCast /about page with electracast.com; add nav links and routes for /register and /advertise; build out /networks directory with tracked catalog and /network/:slug detail pages.  
+**Change summary:**
+- About: removed FeatureGrid, added two-column intro and poster image
+- Navigation: Register + Advertise links in top nav
+- Routing: /advertise alias (advertising), /network/:slug route
+- Networks: tracked catalog (networks.json, network-covers/*), NetworkDetail page with podcasts listing
+- Scripts: export_electracast_networks_bundle.py; scraper retry/skip on transient errors; improved summary extraction
+
+**Rationale / tradeoffs:** Match electracast.com structure; expose register/advertise; provide network directory with cover assets and podcast mapping.  
+**Files touched:**
+- `electracast/src/pages/About.tsx`
+- `electracast/styles.css`
+- `electracast/src/data/navigation.ts`
+- `electracast/src/routes.tsx`
+- `electracast/src/pages/Networks.tsx`
+- `electracast/src/pages/NetworkDetail.tsx`
+- `electracast/src/data/networks.ts`
+- `electracast/src/data/catalog/networks.json`
+- `electracast/src/data/catalog/networksCatalog.ts`
+- `electracast/public/network-covers/*`
+- `scripts/scrape_electracast_entries.py`
+- `scripts/export_electracast_networks_bundle.py`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+python scripts/scrape_electracast_entries.py --type networks --skip-assets --overwrite
+python scripts/normalize_electracast_dirs.py
+python scripts/export_electracast_networks_bundle.py --overwrite --clean-images
+npm run build (in electracast/)
+```
+
+**Verification:** ElectraCast build succeeded (npm run build).  
+**Notes:** set_dev_status PENDING during deploy, READY after.  
+**Concepts:** electracast frontend networks catalog navigation routing

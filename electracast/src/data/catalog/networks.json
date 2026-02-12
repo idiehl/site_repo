@@ -1,0 +1,297 @@
+{
+  "count": 19,
+  "networks": [
+    {
+      "cover_image": "/network-covers/alternative-network.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/alternative-network/",
+      "podcast_slugs": [
+        "avhd",
+        "bodacious-minds"
+      ],
+      "slug": "alternative-network",
+      "source_dir": "Alternative_Network",
+      "title": "Alternative Network"
+    },
+    {
+      "cover_image": "/network-covers/arts-culture.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/arts-culture/",
+      "podcast_slugs": [
+        "50-years-of-music-w-50-year-old-white-guys",
+        "poetics-of-place"
+      ],
+      "slug": "arts-culture",
+      "source_dir": "Arts_Culture",
+      "title": "Arts & Culture"
+    },
+    {
+      "cover_image": "/network-covers/best-business-network.png",
+      "description": "The Best Business Network is a collection of voices that have been in the trenches building businesses, taking on the risks, and reaping the rewards of entrepreneurship.",
+      "legacy_url": "https://electracast.com/network/best-business-network/",
+      "podcast_slugs": [
+        "airquote-law-pod",
+        "career-advancement-with-craig-ancel",
+        "creators-getting-paid",
+        "crypto-with-kamal",
+        "deep-leadership",
+        "e2-entrepreneurs-exposed",
+        "how-to-sell-show",
+        "medicine-in-america",
+        "no-judgement-podcast",
+        "polly-campbell-simply-said",
+        "sales-is-easy",
+        "starfleet-leadership-academy",
+        "the-marketing-mirror",
+        "the-naturebacked-podcast",
+        "the-responsible-leadership-podcast",
+        "the-toekenz-podcast",
+        "think-business-with-tyler"
+      ],
+      "slug": "best-business-network",
+      "source_dir": "Best_Business_Network",
+      "title": "Best Business Network"
+    },
+    {
+      "cover_image": "/network-covers/best-storyteller-network.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/best-storyteller-network/",
+      "podcast_slugs": [
+        "ghost-hampton",
+        "the-curse-of-the-lake-house",
+        "the-last-saturday-night"
+      ],
+      "slug": "best-storyteller-network",
+      "source_dir": "Best_Storyteller_Network",
+      "title": "Best Storyteller Network"
+    },
+    {
+      "cover_image": "/network-covers/changemakers.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/changemakers/",
+      "podcast_slugs": [
+        "infuse-compassion-podcast",
+        "permission-to-live",
+        "the-ethical-evolution-podcast",
+        "tune-into-sound-wellbeing"
+      ],
+      "slug": "changemakers",
+      "source_dir": "Changemakers",
+      "title": "Changemakers"
+    },
+    {
+      "cover_image": "/network-covers/comedy.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/comedy/",
+      "podcast_slugs": [
+        "nightmare-road-stories",
+        "the-barry-bonkers-show"
+      ],
+      "slug": "comedy",
+      "source_dir": "Comedy",
+      "title": "Comedy"
+    },
+    {
+      "cover_image": "/network-covers/conscious-soul.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/conscious-soul/",
+      "podcast_slugs": [
+        "abracadabra-create-what-you-speak",
+        "adventures-to-wisdom",
+        "get-real-with-dr-ronaye",
+        "music-medicine",
+        "red-white-and-buddha",
+        "wine-wisdom"
+      ],
+      "slug": "conscious-soul",
+      "source_dir": "Conscious_Soul",
+      "title": "Conscious Soul"
+    },
+    {
+      "cover_image": "/network-covers/creators.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/creators/",
+      "podcast_slugs": [
+        "electracast-behind-the-scenes",
+        "poetics-of-place",
+        "simply-write-w-polly",
+        "the-candlepower-hour",
+        "tru-talks-about-theater",
+        "who-the-f-is-roger-smith"
+      ],
+      "slug": "creators",
+      "source_dir": "Creators",
+      "title": "Creators"
+    },
+    {
+      "cover_image": "/network-covers/crime.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/crime/",
+      "podcast_slugs": [],
+      "slug": "crime",
+      "source_dir": "Crime",
+      "title": "Crime"
+    },
+    {
+      "cover_image": "/network-covers/ecm-originals.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/ecm-originals/",
+      "podcast_slugs": [
+        "bodacious-minds",
+        "congresssional-record-daily-digest",
+        "electracast-behind-the-scenes",
+        "generation-film",
+        "lessons-from-the-fast-lane-with-peter-rafelson",
+        "nasa-daily",
+        "nightmare-road-stories",
+        "poetics-of-place",
+        "psychic-visions-podcast",
+        "synclove",
+        "techtalk-revolution",
+        "the-barry-bonkers-show",
+        "the-last-saturday-night",
+        "unapologetically-fab"
+      ],
+      "slug": "ecm-originals",
+      "source_dir": "ECM_Originals",
+      "title": "ECM Originals"
+    },
+    {
+      "cover_image": "/network-covers/ez-network.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/ez-network/",
+      "podcast_slugs": [
+        "eazy-does-it-podcast",
+        "terra-nova"
+      ],
+      "slug": "ez-network",
+      "source_dir": "EZ_Network",
+      "title": "EZ Network"
+    },
+    {
+      "cover_image": "/network-covers/geopolitical-network.jpg",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/geopolitical-network/",
+      "podcast_slugs": [
+        "congresssional-record-daily-digest",
+        "the-geo-godfather-wars"
+      ],
+      "slug": "geopolitical-network",
+      "source_dir": "GeoPolitical_Network",
+      "title": "GeoPolitical Network"
+    },
+    {
+      "cover_image": "/network-covers/kids-family.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/kids-family/",
+      "podcast_slugs": [],
+      "slug": "kids-family",
+      "source_dir": "Kids_Family",
+      "title": "Kids & Family"
+    },
+    {
+      "cover_image": "/network-covers/paranormal-universe.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/paranormal-universe/",
+      "podcast_slugs": [
+        "all-things-creepy",
+        "cosmic-love-antenna",
+        "lets-talk-soul",
+        "psychic-visions-podcast",
+        "the-social-psychic-radio-show"
+      ],
+      "slug": "paranormal-universe",
+      "source_dir": "Paranormal_Universe",
+      "title": "Paranormal Universe"
+    },
+    {
+      "cover_image": "/network-covers/ruby-network.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/ruby-network/",
+      "podcast_slugs": [
+        "asked-and-answered-by-soul",
+        "being-your-own-superstar",
+        "eye-am-everything",
+        "her-extraordinary-life-by-design",
+        "humanized-with-blue-telusma",
+        "power-suits-pillow-talk",
+        "the-new-feminist",
+        "transforming-45",
+        "unapologetically-fab"
+      ],
+      "slug": "ruby-network",
+      "source_dir": "Ruby_Network",
+      "title": "Ruby Network"
+    },
+    {
+      "cover_image": "/network-covers/society-13.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/society-13/",
+      "podcast_slugs": [
+        "50-years-of-music-w-50-year-old-white-guys",
+        "behind-the-rock-with-dc",
+        "brain-arcade",
+        "cinematic-revelations",
+        "generation-film",
+        "lessons-from-the-fast-lane-with-peter-rafelson",
+        "or-whatever-movies",
+        "page-turners-studio-with-cori",
+        "the-candlepower-hour",
+        "the-lawrence-ross-show",
+        "the-patrick-bass-show"
+      ],
+      "slug": "society-13",
+      "source_dir": "Society_13",
+      "title": "Society 13"
+    },
+    {
+      "cover_image": "/network-covers/superstar-women-entrepreneurs.jpg",
+      "description": "It is your birthright as a women entrepreneur to empower yourself by sharing your gifts and talents with the world and grow a thriving business.",
+      "legacy_url": "https://electracast.com/network/superstar-women-entrepreneurs/",
+      "podcast_slugs": [
+        "abundance-blueprint-with-kimberly",
+        "brilliant-marketing-with-mary",
+        "business-kare-with-kerstin",
+        "healthy-delicious-lifestyle-with-claudine",
+        "page-turners-studio-with-cori",
+        "steps-to-feel-good-daily-with-lona",
+        "swe-spotlight-with-joie"
+      ],
+      "slug": "superstar-women-entrepreneurs",
+      "source_dir": "Superstar_Women_Entrepreneurs",
+      "title": "Superstar Women Entrepreneurs"
+    },
+    {
+      "cover_image": "/network-covers/voices-of-faith.png",
+      "description": null,
+      "legacy_url": "https://electracast.com/network/voices-of-faith/",
+      "podcast_slugs": [
+        "big-truth-encouragement",
+        "pure-truth",
+        "spiritually-restored",
+        "the-c-word",
+        "the-purpose-effect"
+      ],
+      "slug": "voices-of-faith",
+      "source_dir": "Voices_of_Faith",
+      "title": "Voices of Faith"
+    },
+    {
+      "cover_image": "/network-covers/winners-edge.png",
+      "description": "You\u2019ve found the network that spans the world of sports and gaming. Winners Edge covers the major sports, pro, and college to poker, fantasy sports, and the sports that don\u2019t get enough attention.",
+      "legacy_url": "https://electracast.com/network/winners-edge/",
+      "podcast_slugs": [
+        "athletic-obscura",
+        "dollar-betz",
+        "missing-the-point",
+        "ringside-with-ray-prince",
+        "sideline-sports",
+        "the-neighborhood-podcast",
+        "won-a-bet"
+      ],
+      "slug": "winners-edge",
+      "source_dir": "Winner_s_Edge",
+      "title": "Winner's Edge"
+    }
+  ]
+}

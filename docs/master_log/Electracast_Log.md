@@ -95,3 +95,8 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - PodcastDetail page shows cover, summary, and links out to legacy page
 - Fixed 403 on direct /podcasts loads by moving cover assets to /podcast-covers/* (avoids route/static directory conflict)
 - Regenerated podcasts.json + 90 covers via exporter and rebuilt ElectraCast
+- About page: removed FeatureGrid, added two-column intro with poster image to align with electracast.com
+- Nav: added Register and Advertise to top nav
+- Routes: /advertise (alias for advertising), /network/:slug for network detail pages
+- Networks directory: implemented tracked catalog (networks.json, network-covers/*); NetworkDetail page lists podcasts per network
+- Scripts: export_electracast_networks_bundle.py; scraper retry/skip on transient errors; improved summary extraction

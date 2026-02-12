@@ -386,10 +386,13 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
 | `pages/MyAccount.tsx` | Podcaster dashboard login gate + data provider + submit actions |
 | `pages/PodcastDetail.tsx` | Public podcast detail page (`/podcast/:slug`) |
+| `pages/NetworkDetail.tsx` | Public network detail page (`/network/:slug`) |
 | `data/podcasts.ts` | Featured podcasts + directory items derived from the catalog bundle |
 | `data/catalog/podcasts.json` | Tracked podcasts metadata bundle (generated from scraper output) |
 | `data/catalog/podcastsCatalog.ts` | Typed loader for the podcasts catalog JSON |
 | `data/networks.ts` | Network directory metadata and legacy links |
+| `data/catalog/networks.json` | Tracked networks metadata bundle (generated from scraper output) |
+| `data/catalog/networksCatalog.ts` | Typed loader for the networks catalog JSON |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |
@@ -401,6 +404,7 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | Path | Purpose |
 |------|---------|
 | `podcast-covers/*` | Podcast cover images served at `/podcast-covers/<slug>.<ext>` |
+| `network-covers/*` | Network cover images served at `/network-covers/<slug>.<ext>` |
 
 ---
 
@@ -503,6 +507,7 @@ Nginx configurations and deployment utilities.
 | `scrape_electracast_entries.py` | Scrape ElectraCast podcasts/networks into internal snapshots (supports `--skip-assets`) |
 | `normalize_electracast_dirs.py` | Normalize ElectraCast scrape folder names |
 | `export_electracast_podcasts_bundle.py` | Export scraped podcasts into tracked catalog JSON + cover images for the ElectraCast SPA |
+| `export_electracast_networks_bundle.py` | Export scraped networks into tracked catalog JSON + cover images for the ElectraCast SPA |
 
 ---
 
