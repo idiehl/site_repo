@@ -2221,3 +2221,26 @@ git diff --cached --stat
 **Verification:** Manual check on https://electracast.atlasuniversalis.com (home section label) and https://electracast.atlasuniversalis.com/account (nav header present) after deploy.  
 **Notes:** Dev status set to PENDING during deploy, READY after.  
 **Concepts:** @concept:frontend @concept:electracast
+---
+
+## AU-C01-20260212-005 — Fix ElectraCast deploy build — add d3-color dependency
+
+**Type:** Fix  
+**Context:** ElectraCast deploy build failed due to missing d3-color peer dependency required by d3-interpolate.  
+**Change summary:**
+- Added d3-color to electracast/package.json
+- Regenerated electracast/package-lock.json via npm install
+
+**Rationale / tradeoffs:** d3-interpolate depends on d3-color; without an explicit dependency, installs can fail or behave inconsistently.  
+**Files touched:**
+- `electracast/package.json`
+- `electracast/package-lock.json`
+
+**Commands run:**
+```bash
+npm install d3-color
+```
+
+**Verification:** npm install succeeded locally; redeploy build will verify.  
+**Notes:** Dev status stays PENDING until redeploy succeeds; set to READY after successful redeploy.  
+**Concepts:** @concept:electracast @concept:frontend @concept:dependencies

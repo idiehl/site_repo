@@ -79,3 +79,6 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Renamed 'My ElectraCast Account' to 'Profile' in navigation
 - Added public SiteHeader to authenticated dashboard page (electracast.atlasuniversalis.com/account)
 - Files: navigation.ts, Home.tsx, DashboardLayout.tsx
+- Fix deploy build: added missing d3-color dependency (required by d3-interpolate)
+- Updated package.json and package-lock.json; npm install succeeds locally
+- Pending redeploy verification; set dev status READY after successful deploy
