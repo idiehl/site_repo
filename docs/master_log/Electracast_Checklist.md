@@ -1,10 +1,22 @@
 # ElectraCast — Checklist
 
-**Last Updated:** 2026-02-10
+**Last Updated:** 2026-02-13
 
 **Purpose:** Rapid capture of medium-term objectives, then refine into a step-by-step path.
 
 ## Rapid Capture (Objectives)
+- [ ] (Very low) Live podcasts with realtime chat interaction
+- [ ] (Low) Events page + community meetups
+- [ ] (Low) Video recording option alongside audio
+- [ ] (Low) Forum/messaging system for podcaster-community feedback/collaboration
+- [ ] Dashboard: move Podcaster Helpful Links into a new Help tab + build in-app help directory (Getting Started, New User Guide, walkthroughs, AI help agent later)
+- [ ] Advertising page: replace advertiser mega-banner with styled left/right logo rails (dark-mode friendly assets)
+- [ ] Music page: playlist player for Pod Till You Drop catalog
+- [ ] Add ElectraCast social links (header/footer)
+- [ ] Add site-wide keyword search (header input + /search results) over podcasts + networks + key pages
+- [ ] Megaphone episodes: add public API + embed playlist player on /podcast/:slug
+- [ ] Wire all public forms to shared n8n intake (email to jacob.diehl@electracast.com): Custom Branded, Contact, Register, Advertising, Network contact, ECM submission
+- [ ] Fix /account dashboard top nav alignment (center like public pages)
 - [x] Wire Megaphone podcast creation on submission
 - [x] Add podcast creation dashboard + API scaffolding (pre-Megaphone)
 - [x] Convert static homepage prototype into React components

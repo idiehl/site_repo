@@ -64,6 +64,15 @@ class MegaphoneClient:
             "Accept": content_type,
         }
 
+    async def _get_with_retry(self, client: httpx.AsyncClient, url: str) -> httpx.Response:
+        response = await client.get(url, headers=self._headers())
+        if response.status_code in {400, 415, 422}:
+            response = await client.get(url, headers=self._headers(json_api=True))
+        if response.status_code in {429, 503}:
+            await asyncio.sleep(1)
+            response = await client.get(url, headers=self._headers())
+        return response
+
     async def _post_with_retry(
         self, client: httpx.AsyncClient, url: str, payload: dict[str, Any]
     ) -> httpx.Response:
@@ -129,3 +138,45 @@ class MegaphoneClient:
         if last_error:
             raise last_error
         raise MegaphoneError("Megaphone endpoint not found.")
+
+    async def list_episodes(self, podcast_id: str) -> list[dict[str, Any]]:
+        """List episodes for a podcast/show. Endpoint varies by Megaphone version."""
+
+        candidates = [
+            f"{self.api_base}/podcasts/{podcast_id}/episodes",
+            f"{self.api_base}/shows/{podcast_id}/episodes",
+            f"{self.api_base}/podcasts/{podcast_id}/episodes?per_page=100",
+            f"{self.api_base}/shows/{podcast_id}/episodes?per_page=100",
+        ]
+
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            last_error: Optional[MegaphoneError] = None
+            for url in candidates:
+                resp = await self._get_with_retry(client, url)
+                if resp.status_code == 404:
+                    continue
+                if resp.status_code >= 400:
+                    last_error = MegaphoneError(
+                        "Megaphone API error.",
+                        status_code=resp.status_code,
+                        response_body=resp.text,
+                    )
+                    continue
+                try:
+                    data = resp.json()
+                except ValueError:
+                    data = {}
+
+                # Normalize possible response shapes.
+                if isinstance(data, list):
+                    return data
+                if isinstance(data, dict):
+                    for key in ("episodes", "data", "items"):
+                        value = data.get(key)
+                        if isinstance(value, list):
+                            return value
+                return []
+
+            if last_error:
+                raise last_error
+            return []

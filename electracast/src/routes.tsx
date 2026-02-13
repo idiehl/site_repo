@@ -10,6 +10,7 @@ import NetworkDetail from './pages/NetworkDetail'
 import Podcasts from './pages/Podcasts'
 import PodcastDetail from './pages/PodcastDetail'
 import Register from './pages/Register'
+import Search from './pages/Search'
 
 export type AppRoute = {
   path: string
@@ -21,6 +22,7 @@ export const defaultTitle = 'ElectraCast | Hear The Culture'
 
 export const routes: AppRoute[] = [
   { path: '/', element: <Home />, title: defaultTitle },
+  { path: '/search', element: <Search />, title: 'Search | ElectraCast' },
   { path: '/podcasts', element: <Podcasts />, title: 'Podcasts | ElectraCast' },
   { path: '/podcast/:slug', element: <PodcastDetail />, title: 'Podcast | ElectraCast' },
   { path: '/networks', element: <Networks />, title: 'Networks | ElectraCast' },

@@ -2437,3 +2437,53 @@ npm run build (in electracast/)
 **Verification:** ElectraCast build succeeded (npm run build).  
 **Notes:** set_dev_status PENDING during deploy, READY after.  
 **Concepts:** electracast frontend networks catalog navigation routing
+---
+
+## AU-C01-20260212-012 — ElectraCast: intake forms + episodes playlist + search + dashboard Help
+
+**Type:** Feature  
+**Context:** Implement the ElectraCast next-priorities plan: fix account header alignment, wire public forms to a shared intake pipeline, add Megaphone-backed playlist playback, add site-wide search, social links, music embed, advertising logo rails, and a dashboard Help tab scaffold.  
+**Change summary:**
+- Centered SiteHeader nav when auth actions hidden; added header search -> /search results.
+- Added ElectraCast public intake endpoint that forwards submissions to n8n webhook (env-configured) and wired Contact/Custom Branded/Advertising/Network contact + register notifications + dashboard create-podcast notifications.
+- Extended Megaphone client to list episodes; added public endpoint for episodes by podcast slug; embedded playlist player on /podcast/:slug.
+- Added social links config and rendered in SiteFooter; embedded Spotify album player on /music; replaced advertising banner with left/right logo rails placeholder layout; added dashboard Help tab + route.
+- Updated ElectraCast checklist and project overview inventory for new files/endpoints.
+
+**Rationale / tradeoffs:** Provide a consistent, centralized pipeline (n8n) for all form submissions and fill major UX gaps (navigation/search/help) while keeping integrations server-side (Megaphone token, webhook secret) and minimizing exposed URLs.  
+**Files touched:**
+- `electracast/src/components/SiteHeader.tsx`
+- `electracast/src/pages/Search.tsx`
+- `electracast/src/routes.tsx`
+- `electracast/styles.css`
+- `electracast/src/components/SiteFooter.tsx`
+- `electracast/src/data/social.ts`
+- `electracast/src/pages/Music.tsx`
+- `electracast/src/pages/Advertising.tsx`
+- `electracast/src/data/advertisers.ts`
+- `electracast/src/pages/Contact.tsx`
+- `electracast/src/pages/CustomBranded.tsx`
+- `electracast/src/pages/NetworkDetail.tsx`
+- `electracast/src/pages/Register.tsx`
+- `electracast/src/pages/PodcastDetail.tsx`
+- `electracast/src/App.tsx`
+- `electracast/src/dashboard/components/DashboardLayout.tsx`
+- `electracast/src/dashboard/components/Help.tsx`
+- `electracast/src/lib/api.ts`
+- `atlasops/config.py`
+- `atlasops/schemas/electracast.py`
+- `atlasops/api/v1/electracast_public.py`
+- `atlasops/api/v1/electracast.py`
+- `atlasops/services/megaphone.py`
+- `docs/master_log/Electracast_Checklist.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+
+**Commands run:**
+```bash
+python -m compileall atlasops
+cd electracast && npm run build
+```
+
+**Verification:** Local backend compileall succeeded; ElectraCast Vite build succeeded.  
+**Notes:** To make form submissions fully live, set `ELECTRACAST_INTAKE_WEBHOOK_URL` (and optional `ELECTRACAST_INTAKE_WEBHOOK_SECRET`) in the backend environment; n8n should validate `X-Webhook-Secret` if used. Advertising rails currently use placeholder logo names until tracked assets are curated.  
+**Concepts:** @concept:electracast @concept:frontend @concept:api @concept:megaphone @concept:search @concept:forms @concept:n8n

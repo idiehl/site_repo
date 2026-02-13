@@ -5,6 +5,7 @@ import {
   loginUser,
   registerUser,
   setStoredAuth,
+  submitElectraCastIntake,
   updateElectraCastProfile,
 } from '../lib/api'
 
@@ -50,6 +51,18 @@ const Register = () => {
           display_name: displayName || undefined,
           handle: handle || undefined,
         })
+      }
+
+      // Best-effort: notify ElectraCast team of new signup (routes to n8n intake).
+      try {
+        await submitElectraCastIntake({
+          form: 'register',
+          name: displayName || undefined,
+          email: form.email.trim(),
+          message: 'New ElectraCast account registration.',
+        })
+      } catch (error) {
+        // Ignore intake failures; registration should still succeed.
       }
 
       setStatus({ type: 'success', message: 'Account created. Redirecting to your dashboard.' })

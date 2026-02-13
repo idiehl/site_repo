@@ -1,6 +1,6 @@
 {
   "status": "READY",
-  "message": "ElectraCast deploy complete: removed duplicate logo/logout on dashboard header",
-  "updated_at": "2026-02-12T19:03:55.501653+00:00",
+  "message": "ElectraCast smoke test passed for About/Register/Advertise/Networks + podcast pages",
+  "updated_at": "2026-02-13T01:25:38.850069+00:00",
   "updated_by": "codex"
 }

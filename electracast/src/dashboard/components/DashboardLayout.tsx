@@ -8,6 +8,7 @@ import {
   Home,
   LogOut,
   PlusCircle,
+  LifeBuoy,
 } from 'lucide-react'
 import { useDashboardData } from '../DashboardDataContext'
 import SiteHeader from '../../components/SiteHeader'
@@ -34,6 +35,7 @@ export const DashboardLayout = ({ onLogout }: DashboardLayoutProps) => {
     { path: `${basePath}/upload`, label: 'UPLOAD', icon: Upload, group: 'tools' },
     { path: `${basePath}/recording`, label: 'RECORD', icon: Mic, group: 'tools' },
     { path: `${basePath}/settings`, label: 'SETTINGS', icon: Settings, group: 'tools' },
+    { path: `${basePath}/help`, label: 'HELP', icon: LifeBuoy, group: 'tools' },
   ]
 
   const isActive = (path: string) => {

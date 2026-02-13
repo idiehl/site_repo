@@ -1,8 +1,10 @@
 """ElectraCast account, profile, and podcast endpoints."""
 
+import asyncio
 import re
 
 from fastapi import APIRouter, HTTPException, status
+import httpx
 from sqlalchemy import select
 
 from atlasops.api.deps import CurrentUser, DbSession
@@ -41,6 +43,28 @@ async def generate_unique_podcast_slug(db: DbSession, title: str) -> str:
             return slug
         slug = f"{base}-{suffix}"
         suffix += 1
+
+
+async def notify_electracast_intake(form: str, message: str, *, metadata: dict | None = None) -> None:
+    """Best-effort notify intake webhook (non-blocking)."""
+
+    webhook_url = (settings.electracast_intake_webhook_url or "").strip()
+    if not webhook_url:
+        return
+    headers: dict[str, str] = {}
+    if settings.electracast_intake_webhook_secret:
+        headers["X-Webhook-Secret"] = settings.electracast_intake_webhook_secret
+    payload = {
+        "form": form,
+        "message": message,
+        "metadata": metadata or {},
+        "recipient": "jacob.diehl@electracast.com",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(webhook_url, json=payload, headers=headers)
+    except Exception:
+        return
 
 
 async def get_or_create_profile(
@@ -178,6 +202,20 @@ async def create_podcast(
     await db.commit()
     await db.refresh(podcast)
 
+    # Best-effort: notify team about the submission immediately.
+    asyncio.create_task(
+        notify_electracast_intake(
+            "dashboard-create-podcast",
+            "New podcast submission created.",
+            metadata={
+                "podcast_id": str(podcast.id),
+                "podcast_slug": podcast.slug,
+                "podcast_title": podcast.title,
+                "status": podcast.status,
+            },
+        )
+    )
+
     if not settings.megaphone_api_token or not settings.megaphone_network_id:
         podcast.status = "failed"
         podcast.sync_error = "Megaphone API is not configured."
@@ -221,4 +259,20 @@ async def create_podcast(
 
     await db.commit()
     await db.refresh(podcast)
+
+    # Best-effort: follow-up status after Megaphone sync attempt.
+    asyncio.create_task(
+        notify_electracast_intake(
+            "dashboard-create-podcast",
+            "Podcast submission sync update.",
+            metadata={
+                "podcast_id": str(podcast.id),
+                "podcast_slug": podcast.slug,
+                "podcast_title": podcast.title,
+                "status": podcast.status,
+                "megaphone_podcast_id": podcast.megaphone_podcast_id,
+                "sync_error": podcast.sync_error,
+            },
+        )
+    )
     return podcast

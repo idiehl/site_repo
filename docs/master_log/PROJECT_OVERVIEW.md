@@ -113,6 +113,7 @@ Core Atlas Apply/AtlasOps backend application.
 | `api/v1/applications.py` | Application tracking endpoints (status updates, follow-ups) |
 | `api/v1/profile.py` | User profile endpoints (resume upload, profile enhancement) |
 | `api/v1/electracast.py` | ElectraCast account + profile endpoints |
+| `api/v1/electracast_public.py` | Public ElectraCast endpoints (podcast directory, intake, playlist episodes) |
 | `api/v1/admin.py` | Admin dashboard endpoints (user management, analytics) |
 | `api/v1/billing.py` | Subscription/billing endpoints |
 
@@ -138,7 +139,7 @@ Pydantic models for request/response validation.
 |------|---------|
 | `schemas/__init__.py` | Schema exports |
 | `schemas/user.py` | User-related schemas (registration, profile, auth) |
-| `schemas/electracast.py` | ElectraCast profile schemas |
+| `schemas/electracast.py` | ElectraCast schemas (profile, public catalog, intake, episodes) |
 | `schemas/job.py` | Job posting schemas (ingest request, job detail response) |
 | `schemas/application.py` | Application schemas (status updates, events) |
 | `schemas/resume.py` | Resume schemas (generation request, content structure) |
@@ -155,7 +156,7 @@ Business logic layer.
 | `services/resume_generator.py` | Resume generation service (template rendering, PDF) |
 | `services/resume_parser.py` | Resume parsing service (extract structure from uploaded resume) |
 | `services/entitlements.py` | Subscription/entitlement checking |
-| `services/megaphone.py` | Megaphone API client for ElectraCast podcast sync |
+| `services/megaphone.py` | Megaphone API client for ElectraCast podcast sync + episode listing |
 
 #### Prompts: `atlasops/prompts/`
 
@@ -383,16 +384,20 @@ React + Vite SPA for the ElectraCast site (served at `electracast.atlasuniversal
 | `components/*` | Site layout, hero, and section components |
 | `dashboard/*` | Podcaster dashboard layout components, analytics, and create-podcast flow |
 | `dashboard/components/CreatePodcast.tsx` | Create Podcast form inside dashboard |
+| `dashboard/components/Help.tsx` | Dashboard Help tab and in-app help directory scaffold |
 | `pages/*` | Route views (home, podcasts, networks, etc.) |
 | `pages/MyAccount.tsx` | Podcaster dashboard login gate + data provider + submit actions |
 | `pages/PodcastDetail.tsx` | Public podcast detail page (`/podcast/:slug`) |
 | `pages/NetworkDetail.tsx` | Public network detail page (`/network/:slug`) |
+| `pages/Search.tsx` | Search results page (`/search?q=`) over podcasts + networks + key pages |
 | `data/podcasts.ts` | Featured podcasts + directory items derived from the catalog bundle |
 | `data/catalog/podcasts.json` | Tracked podcasts metadata bundle (generated from scraper output) |
 | `data/catalog/podcastsCatalog.ts` | Typed loader for the podcasts catalog JSON |
 | `data/networks.ts` | Network directory metadata and legacy links |
 | `data/catalog/networks.json` | Tracked networks metadata bundle (generated from scraper output) |
 | `data/catalog/networksCatalog.ts` | Typed loader for the networks catalog JSON |
+| `data/social.ts` | Centralized ElectraCast social media links |
+| `data/advertisers.ts` | Advertising page placeholder logo rails data (to be replaced with tracked assets) |
 | `data/*` | Structured content data modules |
 | `hooks/usePageTitle.ts` | Route-aware document title logic |
 | `lib/assets.ts` | Asset base URL helper |

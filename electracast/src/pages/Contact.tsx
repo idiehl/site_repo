@@ -1,7 +1,45 @@
+import { FormEvent, useState } from 'react'
 import ContactCard from '../components/ContactCard'
 import SectionHeader from '../components/SectionHeader'
+import { submitElectraCastIntake } from '../lib/api'
 
 const Contact = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null
+  )
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setStatus(null)
+    setIsSubmitting(true)
+
+    const form = new FormData(event.currentTarget)
+    const firstName = String(form.get('firstName') ?? '').trim()
+    const lastName = String(form.get('lastName') ?? '').trim()
+    const email = String(form.get('email') ?? '').trim()
+    const message = String(form.get('message') ?? '').trim()
+    const website = String(form.get('website') ?? '').trim()
+
+    try {
+      const name = `${firstName} ${lastName}`.trim()
+      const response = await submitElectraCastIntake({
+        form: 'contact',
+        name: name || undefined,
+        email: email || undefined,
+        message,
+        website: website || undefined,
+      })
+      setStatus({ type: 'success', message: response.message })
+      event.currentTarget.reset()
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Submission failed.'
+      setStatus({ type: 'error', message: msg })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <section className="section">
       <SectionHeader
@@ -13,8 +51,10 @@ const Contact = () => {
         <p>
           Share your project details below and the ElectraCast team will follow up.
         </p>
-        <form className="contact-form" onSubmit={(event) => event.preventDefault()}>
+        <form className="contact-form" onSubmit={handleSubmit}>
           <div className="form-grid">
+            {/* Honeypot */}
+            <input name="website" tabIndex={-1} autoComplete="off" style={{ display: 'none' }} />
             <label className="form-field" htmlFor="contact-first-name">
               First Name
               <input id="contact-first-name" name="firstName" type="text" />
@@ -33,13 +73,14 @@ const Contact = () => {
             </label>
           </div>
           <div className="form-actions">
-            <button className="btn primary" type="button" disabled>
-              Submit (coming soon)
+            <button className="btn primary" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
-            <span className="form-note">
-              Submission is being wired to the intake pipeline.
-            </span>
+            <span className="form-note">Submissions go to jacob.diehl@electracast.com.</span>
           </div>
+          {status ? (
+            <p className={`status-message ${status.type}`}>{status.message}</p>
+          ) : null}
         </form>
       </div>
       <ContactCard />

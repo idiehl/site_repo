@@ -72,6 +72,10 @@ class Settings(BaseSettings):
     megaphone_network_id: str = ""
     megaphone_auth_scheme: str = "Token"
 
+    # ElectraCast intake (public forms -> n8n webhook)
+    electracast_intake_webhook_url: str = ""
+    electracast_intake_webhook_secret: str = ""
+
     # Application
     debug: bool = False
     environment: str = "development"

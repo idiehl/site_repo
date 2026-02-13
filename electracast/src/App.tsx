@@ -11,6 +11,7 @@ import { Upload } from './dashboard/components/Upload'
 import { Recording } from './dashboard/components/Recording'
 import { Settings } from './dashboard/components/Settings'
 import { CreatePodcast } from './dashboard/components/CreatePodcast'
+import { Help } from './dashboard/components/Help'
 
 const App = () => {
   usePageTitle()
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="upload" element={<Upload />} />
           <Route path="recording" element={<Recording />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="help" element={<Help />} />
         </Route>
         <Route element={<SiteLayout />}>
           {routes.map((route) => (

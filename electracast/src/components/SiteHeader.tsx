@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { navLinks } from '../data/navigation'
 import { clearStoredAuth, getStoredAuth } from '../lib/api'
@@ -13,6 +13,7 @@ const logoUrl =
 const SiteHeader = ({ showAuthActions = true }: SiteHeaderProps) => {
   const navigate = useNavigate()
   const [hasAuth, setHasAuth] = useState(() => Boolean(getStoredAuth()))
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     const refresh = () => setHasAuth(Boolean(getStoredAuth()))
@@ -31,8 +32,17 @@ const SiteHeader = ({ showAuthActions = true }: SiteHeaderProps) => {
     navigate('/account')
   }
 
+  const handleSearchSubmit = (event: FormEvent) => {
+    event.preventDefault()
+    const next = query.trim()
+    if (!next) {
+      return
+    }
+    navigate(`/search?q=${encodeURIComponent(next)}`)
+  }
+
   return (
-    <header className="site-header">
+    <header className={`site-header ${showAuthActions ? '' : 'site-header--center-nav'}`}>
       <Link className="logo" to="/">
         <img src={logoUrl} alt="ElectraCast" />
         <span className="logo-text">ElectraCast</span>
@@ -44,6 +54,17 @@ const SiteHeader = ({ showAuthActions = true }: SiteHeaderProps) => {
           </Link>
         ))}
       </nav>
+      <form className="site-search" role="search" onSubmit={handleSearchSubmit}>
+        <input
+          type="search"
+          placeholder="Search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search ElectraCast"
+        />
+      </form>
+      {/* When auth actions are hidden, keep a spacer so the nav stays centered. */}
+      {!showAuthActions ? <div className="site-header-spacer" aria-hidden="true" /> : null}
       {showAuthActions ? (
         hasAuth ? (
           <button className="btn ghost" type="button" onClick={handleLogout}>

@@ -238,3 +238,31 @@ export const createElectraCastPodcast = async (
     body: JSON.stringify(payload),
   })
 }
+
+export type ElectraCastIntakePayload = {
+  form: string
+  message: string
+  name?: string
+  email?: string
+  phone?: string
+  subject?: string
+  metadata?: Record<string, unknown>
+  website?: string
+}
+
+export type ElectraCastIntakeResponse = {
+  ok: boolean
+  message: string
+}
+
+export const submitElectraCastIntake = async (
+  payload: ElectraCastIntakePayload
+): Promise<ElectraCastIntakeResponse> => {
+  return requestJson<ElectraCastIntakeResponse>('/api/v1/electracast-public/intake', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+}

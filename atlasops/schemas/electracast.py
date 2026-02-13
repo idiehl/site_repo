@@ -89,3 +89,34 @@ class ElectraCastPublicPodcast(BaseModel):
     cover_image_url: Optional[str] = None
     legacy_url: Optional[str] = None
 
+
+class ElectraCastIntakeRequest(BaseModel):
+    """Public intake payload for ElectraCast marketing + dashboard submissions."""
+
+    form: str
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    subject: Optional[str] = None
+    message: str
+    metadata: Optional[Dict[str, Any]] = None
+
+    # Basic honeypot: should remain empty.
+    website: Optional[str] = None
+
+
+class ElectraCastIntakeResponse(BaseModel):
+    ok: bool
+    message: str
+
+
+class ElectraCastPublicEpisode(BaseModel):
+    """Public episode payload for playlist rendering."""
+
+    id: str
+    title: str
+    description: Optional[str] = None
+    published_at: Optional[str] = None
+    audio_url: Optional[str] = None
+    duration_seconds: Optional[int] = None
+

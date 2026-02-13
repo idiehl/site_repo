@@ -1,13 +1,19 @@
+import { FormEvent, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import SectionHeader from '../components/SectionHeader'
 import PodcastGrid from '../components/PodcastGrid'
 import { podcastsCatalog } from '../data/catalog/podcastsCatalog'
 import { networksCatalog } from '../data/catalog/networksCatalog'
 import type { Podcast } from '../data/podcasts'
+import { submitElectraCastIntake } from '../lib/api'
 
 const NetworkDetail = () => {
   const { slug } = useParams()
   const network = networksCatalog.find((n) => n.slug === slug)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null
+  )
 
   if (!slug || !network) {
     return (
@@ -36,6 +42,42 @@ const NetworkDetail = () => {
       image: p.cover_image ?? undefined,
       summary: p.summary ?? undefined,
     }))
+
+  const handleContactSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setStatus(null)
+    setIsSubmitting(true)
+
+    const form = new FormData(event.currentTarget)
+    const name = String(form.get('name') ?? '').trim()
+    const email = String(form.get('email') ?? '').trim()
+    const subject = String(form.get('subject') ?? '').trim()
+    const message = String(form.get('message') ?? '').trim()
+    const website = String(form.get('website') ?? '').trim()
+
+    try {
+      const response = await submitElectraCastIntake({
+        form: 'network-contact',
+        name: name || undefined,
+        email: email || undefined,
+        subject: subject || `Network contact: ${network.title}`,
+        message,
+        metadata: {
+          network_slug: network.slug,
+          network_title: network.title,
+          legacy_url: legacyUrl,
+        },
+        website: website || undefined,
+      })
+      setStatus({ type: 'success', message: response.message })
+      event.currentTarget.reset()
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Submission failed.'
+      setStatus({ type: 'error', message: msg })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <section className="section">
@@ -72,6 +114,42 @@ const NetworkDetail = () => {
         ) : (
           <p>Podcast list coming soon.</p>
         )}
+      </div>
+
+      <div className="account-card" style={{ marginTop: 20 }}>
+        <h3>Contact {network.title}</h3>
+        <p>Interested in being a guest or partnering with this network? Reach out below.</p>
+        <form className="contact-form" onSubmit={handleContactSubmit}>
+          <div className="form-grid">
+            {/* Honeypot */}
+            <input name="website" tabIndex={-1} autoComplete="off" style={{ display: 'none' }} />
+            <label className="form-field">
+              <span>Name</span>
+              <input name="name" type="text" />
+            </label>
+            <label className="form-field">
+              <span>Email</span>
+              <input name="email" type="email" />
+            </label>
+            <label className="form-field full">
+              <span>Subject</span>
+              <input name="subject" type="text" placeholder={`Contact ${network.title}`} />
+            </label>
+            <label className="form-field full">
+              <span>Message</span>
+              <textarea name="message" rows={6} required />
+            </label>
+          </div>
+          <div className="form-actions">
+            <button className="btn primary" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
+            <span className="form-note">Submissions go to jacob.diehl@electracast.com.</span>
+          </div>
+          {status ? (
+            <p className={`status-message ${status.type}`}>{status.message}</p>
+          ) : null}
+        </form>
       </div>
     </section>
   )

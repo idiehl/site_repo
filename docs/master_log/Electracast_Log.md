@@ -100,3 +100,10 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Routes: /advertise (alias for advertising), /network/:slug for network detail pages
 - Networks directory: implemented tracked catalog (networks.json, network-covers/*); NetworkDetail page lists podcasts per network
 - Scripts: export_electracast_networks_bundle.py; scraper retry/skip on transient errors; improved summary extraction
+
+## 2026-02-13
+- Centered top nav on /account dashboard header via SiteHeader spacer variant.
+- Added shared public intake endpoint -> n8n webhook and wired Contact/Custom Branded/Advertising/Network contact + register + dashboard create-podcast notifications.
+- Added Megaphone-backed episodes endpoint and embedded playlist player on /podcast/:slug.
+- Added header search + /search results page; added footer social links config; embedded Spotify player on /music.
+- Replaced advertising banner with left/right logo rails layout placeholder; added dashboard Help tab scaffold.
