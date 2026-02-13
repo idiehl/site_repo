@@ -101,6 +101,9 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Networks directory: implemented tracked catalog (networks.json, network-covers/*); NetworkDetail page lists podcasts per network
 - Scripts: export_electracast_networks_bundle.py; scraper retry/skip on transient errors; improved summary extraction
 
+- Deployed `Cherry on Top` to production: pushed to GitHub, pulled fast-forward on droplet, restarted backend service, rebuilt ElectraCast, reloaded nginx.
+- Smoke test passed for key ElectraCast routes (home/podcasts/networks/detail/contact/advertising/music/search/account login).
+- Note: some directory grids still show placeholder covers while detail pages render covers correctly (investigate cover path consistency if needed).
 ## 2026-02-13
 - Centered top nav on /account dashboard header via SiteHeader spacer variant.
 - Added shared public intake endpoint -> n8n webhook and wired Contact/Custom Branded/Advertising/Network contact + register + dashboard create-podcast notifications.

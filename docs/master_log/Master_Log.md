@@ -2487,3 +2487,31 @@ cd electracast && npm run build
 **Verification:** Local backend compileall succeeded; ElectraCast Vite build succeeded.  
 **Notes:** To make form submissions fully live, set `ELECTRACAST_INTAKE_WEBHOOK_URL` (and optional `ELECTRACAST_INTAKE_WEBHOOK_SECRET`) in the backend environment; n8n should validate `X-Webhook-Secret` if used. Advertising rails currently use placeholder logo names until tracked assets are curated.  
 **Concepts:** @concept:electracast @concept:frontend @concept:api @concept:megaphone @concept:search @concept:forms @concept:n8n
+---
+
+## AU-C01-20260212-013 — Deploy Cherry on Top to production (ElectraCast updates)
+
+**Type:** Ops  
+**Context:** User requested immediate publish of all pending ElectraCast changes to GitHub + live site to avoid unknown pipeline drift.  
+**Change summary:**
+- Pushed `Cherry on Top` commit to GitHub (origin/master).
+- Pulled fast-forward on droplet, restarted `atlasuniversalis`, rebuilt ElectraCast, and reloaded nginx.
+- Ran production smoke test across ElectraCast routes (home, podcasts, networks, detail pages, contact, advertising, music, search, account login).
+
+**Rationale / tradeoffs:** Not provided  
+**Files touched:**
+- `docs/master_log/dev_status.json`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git pull --ff-only origin master"
+ssh root@167.71.179.90 "sudo systemctl restart atlasuniversalis"
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com/electracast && npm install && npm run build"
+ssh root@167.71.179.90 "sudo nginx -t && sudo systemctl reload nginx"
+```
+
+**Verification:** Smoke test passed for key ElectraCast pages; no obvious console errors. Noted: some directory grid covers show placeholders while detail pages show covers.  
+**Notes:** If directory-grid covers are still inconsistent, likely due to missing/placeholder catalog cover paths or mixed image extensions; detail pages confirming cover URLs suggests data exists but grid rendering may be using a different field/path.  
+**Concepts:** @concept:deployment @concept:electracast @concept:nginx
