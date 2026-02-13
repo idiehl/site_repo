@@ -104,6 +104,8 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Deployed `Cherry on Top` to production: pushed to GitHub, pulled fast-forward on droplet, restarted backend service, rebuilt ElectraCast, reloaded nginx.
 - Smoke test passed for key ElectraCast routes (home/podcasts/networks/detail/contact/advertising/music/search/account login).
 - Note: some directory grids still show placeholder covers while detail pages render covers correctly (investigate cover path consistency if needed).
+- Set up droplet-hosted n8n (behind nginx basic auth) to handle ElectraCast public intake webhooks.
+- Imported/activated the ElectraCast intake webhook workflow and pointed AtlasOps intake forwarding to the local n8n webhook with shared secret.
 ## 2026-02-13
 - Centered top nav on /account dashboard header via SiteHeader spacer variant.
 - Added shared public intake endpoint -> n8n webhook and wired Contact/Custom Branded/Advertising/Network contact + register + dashboard create-podcast notifications.

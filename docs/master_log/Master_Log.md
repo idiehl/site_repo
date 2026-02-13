@@ -2541,3 +2541,34 @@ git push
 **Verification:** Confirmed `MASTER.mdc` no longer contains plaintext passwords; repo shows only the intended rule file changes pending.  
 **Notes:** If you still want the convenience of one-click logins, keep the actual credentials only in your password manager and/or local untracked overrides, never in git.  
 **Concepts:** @concept:docs @concept:cursor-rules @concept:secrets
+---
+
+## AU-C01-20260212-015 — Set up droplet-hosted n8n for ElectraCast intake (n8n.atlasuniversalis.com)
+
+**Type:** Ops  
+**Context:** User chose to run n8n on the production droplet to handle ElectraCast public form intake; backend needs a reachable webhook target and shared-secret validation.  
+**Change summary:**
+- Installed Docker on the droplet and launched an n8n container bound to 127.0.0.1:5678 with persistent volume under /var/lib/n8n.
+- Added nginx site for n8n with basic-auth protection on the UI, while allowing /webhook/* and /webhook-test/* unauthenticated for inbound automation.
+- Imported and activated the ElectraCast intake workflow in droplet n8n (POST /webhook/electracast-intake).
+- Configured AtlasOps backend env vars to forward intake submissions to the local n8n webhook URL with a shared secret, then restarted services.
+
+**Rationale / tradeoffs:** Keep the intake webhook reachable from production without exposing webhook URLs to browsers, and centralize form delivery/persistence in n8n behind nginx auth.  
+**Files touched:**
+- `/etc/n8n/n8n.env (droplet)`
+- `/etc/nginx/sites-available/n8n.atlasuniversalis.com (droplet)`
+- `/etc/nginx/.htpasswd_n8n (droplet)`
+- `/var/www/atlasuniversalis.com/.env (droplet)`
+
+**Commands run:**
+```bash
+apt-get install docker.io
+docker run n8nio/n8n (bound to 127.0.0.1:5678)
+nginx -t && systemctl reload nginx
+docker exec n8n n8n import:workflow
+systemctl restart atlasuniversalis
+```
+
+**Verification:** Confirmed n8n responds on 127.0.0.1:5678; nginx returns 401 for UI paths and does not require auth for /webhook/*; intake endpoint returns 200 OK from AtlasOps and triggers the n8n webhook.  
+**Notes:** DNS for n8n.atlasuniversalis.com was NXDOMAIN at setup time; after DNS is added, run certbot for TLS. Do not store the basic-auth password or webhook secret in git; keep them on-server and/or in a password manager.  
+**Concepts:** @concept:deployment @concept:n8n @concept:electracast @concept:nginx @concept:secrets
