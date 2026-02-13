@@ -2515,3 +2515,29 @@ ssh root@167.71.179.90 "sudo nginx -t && sudo systemctl reload nginx"
 **Verification:** Smoke test passed for key ElectraCast pages; no obvious console errors. Noted: some directory grid covers show placeholders while detail pages show covers.  
 **Notes:** If directory-grid covers are still inconsistent, likely due to missing/placeholder catalog cover paths or mixed image extensions; detail pages confirming cover URLs suggests data exists but grid rendering may be using a different field/path.  
 **Concepts:** @concept:deployment @concept:electracast @concept:nginx
+---
+
+## AU-C01-20260212-014 — Keep MASTER Cursor ruleset (redacted) alongside atlas-universalis rules
+
+**Type:** Docs  
+**Context:** User wanted to keep both Cursor rulesets and commit MASTER as the primary backup. MASTER contained plaintext credentials and needed sanitization before committing.  
+**Change summary:**
+- Added `.cursor/rules/MASTER.mdc` as a committed ruleset, but redacted credential values and replaced with password-manager placeholders.
+- Restored `.cursor/rules/atlas-universalis.mdc` frontmatter description and table formatting after unintended drift.
+
+**Rationale / tradeoffs:** Keep a durable, shareable primary ruleset in git without leaking secrets; preserve both rule files for local workflow while maintaining security hygiene.  
+**Files touched:**
+- `.cursor/rules/MASTER.mdc`
+- `.cursor/rules/atlas-universalis.mdc`
+- `docs/master_log/Master_Log.md`
+
+**Commands run:**
+```bash
+git add .cursor/rules/MASTER.mdc .cursor/rules/atlas-universalis.mdc
+git commit
+git push
+```
+
+**Verification:** Confirmed `MASTER.mdc` no longer contains plaintext passwords; repo shows only the intended rule file changes pending.  
+**Notes:** If you still want the convenience of one-click logins, keep the actual credentials only in your password manager and/or local untracked overrides, never in git.  
+**Concepts:** @concept:docs @concept:cursor-rules @concept:secrets

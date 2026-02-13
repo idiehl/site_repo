@@ -1,0 +1,82 @@
+---
+description: Master Cursor ruleset (sanitized for git)
+alwaysApply: true
+---
+
+# Atlas Universalis — Optimized User Ruleset
+
+## 0) Dev Landscape
+- If `C:\Users\ihigg\Git\github\site_repo` is missing **and** SSH to `root@167.71.179.90` fails, ignore all remaining rules. Create `internal/` at project root and maintain log/overview/checklist locally.
+- Primary repo: `C:\Users\ihigg\Git\github\site_repo`
+- Production host: DigitalOcean droplet (Ubuntu), SSH `root@167.71.179.90`
+- Dev portal: `https://atlasuniversalis.com/dev`
+- Branding assets: `C:\Users\ihigg\Git\github\site_repo\internal\Logo_Icon`
+- Repo: `github.com/idiehl/site-repo`
+
+## 0.1) Logins (use as needed)
+- Never commit credentials or secrets in this repo.
+- Store credentials in a password manager and reference them here as placeholders only.
+- `https://atlasuniversalis.com/dev` — `<stored in password manager>`
+- `https://electracast.com/staging/4803/wp-login.php` — `<stored in password manager>`
+- `https://cms.megaphone.fm/users/sign_in` — `<stored in password manager>`
+
+## 1) Software & Tools
+- Windows PC + WSL + Ubuntu VM available
+- Docker running; MCP servers available
+- Cursor IDE primary; other IDEs permitted when it improves speed/quality
+- Use MCP/subagents/skills whenever they reduce manual overhead
+
+## 2) Access
+- Network access allowed for search and web ops
+- Full local + droplet access permitted
+
+## 3) MCP, Subagents, Skills
+- **Always prefer MCP tools** when available.
+- If a task suits a new MCP server or workflow, say:  
+  **“I think we should set up (n8n/MCP) for this.”**
+- Use subagents for parallelism (doc ops, deploy, testing)
+- Create skills when a repeatable pattern emerges
+
+## 4) Documentation (MCP‑First + Tiered)
+**Primary mechanism:** Use **atlasops-dashboard MCP** tools for log/overview/checklist/status updates (no manual edits unless MCP is down).
+
+**Always required (per task):**
+- Master Log entry (MCP)
+- App Log entry if task affects a specific app
+
+**Conditional only (if changed):**
+- Project Overview (architecture / file inventory / scope)
+- Checklist / To‑Do (task added/finished/removed)
+- STATUS (only when deploy starts/finishes or when blocked)
+
+**Tiered doc policy:**
+- **Fast Path:** Master Log only
+- **Standard Path:** Master Log + App Log; checklist/overview if needed
+- **Full Path:** Master Log + App Log + checklist/overview + STATUS
+
+**Batching allowed:** Overview/checklist can be batched per session/day as long as logs stay accurate.
+
+**Fallback:** If MCP is unavailable, do manual edits and note MCP outage in Master Log.
+
+## 5) Task Completion & Deploy
+**Classification first:**
+- **Fast Path:** small UI/copy/local tweak → no deploy unless requested
+- **Standard Path:** typical feature/bug → deploy if public‑facing
+- **Full Path:** infra/backend/schema changes → always deploy + verify
+
+**Deploy steps only when needed:**
+1) Check `/dev` status (must be READY)  
+2) Make code changes locally  
+3) Test relevant surfaces  
+4) MCP logs / status updates  
+5) Commit + push  
+6) Set STATUS → PENDING  
+7) Pull + deploy on droplet  
+8) Set STATUS → READY
+
+## 6) Efficiency & Token Use
+- Use the smallest acceptable workflow tier
+- Prefer MCP + subagents to avoid repeated manual steps
+- Avoid redundant dev portal checks during a single session
+
+---
