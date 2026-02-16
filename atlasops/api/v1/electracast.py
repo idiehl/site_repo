@@ -245,11 +245,31 @@ async def create_podcast(
         network_id=settings.megaphone_network_id,
         auth_scheme=settings.megaphone_auth_scheme,
     )
+    invite_error: str | None = None
+    invite_id: str | None = None
     try:
         result = await client.create_podcast(megaphone_payload)
         podcast.megaphone_podcast_id = result.podcast_id
         podcast.status = "synced"
         podcast.sync_error = None
+
+        if (
+            settings.megaphone_auto_invite_enabled
+            and podcast.megaphone_podcast_id
+            and podcast.owner_email
+        ):
+            try:
+                invite_result = await client.invite_podcast_user(
+                    podcast_id=podcast.megaphone_podcast_id,
+                    email=podcast.owner_email,
+                    name=podcast.owner_name,
+                    role=settings.megaphone_invite_role,
+                )
+                invite_id = invite_result.invite_id
+            except MegaphoneError as exc:
+                invite_error = str(exc)
+            except Exception:
+                invite_error = "Megaphone invite failed."
     except MegaphoneError as exc:
         podcast.status = "failed"
         podcast.sync_error = str(exc)
@@ -272,6 +292,10 @@ async def create_podcast(
                 "status": podcast.status,
                 "megaphone_podcast_id": podcast.megaphone_podcast_id,
                 "sync_error": podcast.sync_error,
+                "megaphone_auto_invite_enabled": settings.megaphone_auto_invite_enabled,
+                "megaphone_invite_role": settings.megaphone_invite_role,
+                "megaphone_invite_id": invite_id,
+                "megaphone_invite_error": invite_error,
             },
         )
     )

@@ -1,6 +1,6 @@
 {
-  "status": "READY",
-  "message": "Deployed Cherry on Top (forms intake + episodes playlist + search + help). Smoke test passed on key ElectraCast routes.",
-  "updated_at": "2026-02-13T02:25:33.603065+00:00",
+  "status": "PENDING",
+  "message": "Deploying Megaphone API-first auto-invite flow for ElectraCast",
+  "updated_at": "2026-02-16T22:17:33.516255+00:00",
   "updated_by": "codex"
 }

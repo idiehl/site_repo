@@ -2572,3 +2572,28 @@ systemctl restart atlasuniversalis
 **Verification:** Confirmed n8n responds on 127.0.0.1:5678; nginx returns 401 for UI paths and does not require auth for /webhook/*; intake endpoint returns 200 OK from AtlasOps and triggers the n8n webhook.  
 **Notes:** DNS for n8n.atlasuniversalis.com was NXDOMAIN at setup time; after DNS is added, run certbot for TLS. Do not store the basic-auth password or webhook secret in git; keep them on-server and/or in a password manager.  
 **Concepts:** @concept:deployment @concept:n8n @concept:electracast @concept:nginx @concept:secrets
+---
+
+## AU-C01-20260216-001 — Megaphone API-first auto-invite flow for ElectraCast podcast creation
+
+**Type:** Feature  
+**Context:** User asked to explore API-first automation for creating/inviting Megaphone users instead of manual onboarding.  
+**Change summary:**
+- Added Megaphone client support for inviting podcast users with endpoint/payload fallbacks across API variants.
+- Added backend feature flags for auto-invite (`megaphone_auto_invite_enabled`, `megaphone_invite_role`).
+- Wired invite attempt into ElectraCast podcast creation after successful Megaphone sync; invite failures are non-blocking and included in intake metadata for visibility.
+
+**Rationale / tradeoffs:** Enable progressive automation safely: keep podcast creation stable while attempting invite through Megaphone APIs that may vary by tenant/version.  
+**Files touched:**
+- `atlasops/services/megaphone.py`
+- `atlasops/config.py`
+- `atlasops/api/v1/electracast.py`
+
+**Commands run:**
+```bash
+python -m compileall atlasops
+```
+
+**Verification:** Compile check passed; no lints in updated backend files.  
+**Notes:** Auto-invite is OFF by default; enable via env var when ready. If invite endpoints are unsupported by tenant/token, submission still succeeds and logs invite error metadata.  
+**Concepts:** @concept:api @concept:megaphone @concept:electracast @concept:automation

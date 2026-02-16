@@ -112,3 +112,7 @@ This log tracks changes specific to the ElectraCast mirror/rebuild.
 - Added Megaphone-backed episodes endpoint and embedded playlist player on /podcast/:slug.
 - Added header search + /search results page; added footer social links config; embedded Spotify player on /music.
 - Replaced advertising banner with left/right logo rails layout placeholder; added dashboard Help tab scaffold.
+
+## 2026-02-16
+- Implemented API-first Megaphone auto-invite path (feature-flagged) after successful podcast sync.
+- Invite attempts are non-blocking and include invite outcome metadata in intake notifications for operations visibility.

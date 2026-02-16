@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     megaphone_api_token: str = ""
     megaphone_network_id: str = ""
     megaphone_auth_scheme: str = "Token"
+    megaphone_auto_invite_enabled: bool = False
+    megaphone_invite_role: str = "editor"
 
     # ElectraCast intake (public forms -> n8n webhook)
     electracast_intake_webhook_url: str = ""
