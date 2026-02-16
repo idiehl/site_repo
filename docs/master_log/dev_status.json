@@ -1,6 +1,6 @@
 {
-  "status": "PENDING",
-  "message": "Deploying Megaphone API-first auto-invite flow for ElectraCast",
-  "updated_at": "2026-02-16T22:17:33.516255+00:00",
+  "status": "READY",
+  "message": "Megaphone API-first auto-invite flow deployed (feature-flag enabled on backend)",
+  "updated_at": "2026-02-16T22:18:59.701081+00:00",
   "updated_by": "codex"
 }
