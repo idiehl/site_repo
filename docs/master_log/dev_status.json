@@ -1,6 +1,6 @@
 {
-  "status": "READY",
-  "message": "Megaphone API-first auto-invite flow deployed (feature-flag enabled on backend)",
-  "updated_at": "2026-02-16T22:18:59.701081+00:00",
+  "status": "PENDING",
+  "message": "Deploying atlasuniversalis.com profile update (Megaphone embed)",
+  "updated_at": "2026-02-16T23:08:58.362231+00:00",
   "updated_by": "codex"
 }

@@ -137,6 +137,23 @@ const socialLinks = [
                   </svg>
                 </a>
               </div>
+
+              <!-- Megaphone Podcast Player -->
+              <div class="mt-6">
+                <h4 class="text-sm font-semibold text-atlas-400 uppercase tracking-wider mb-3">
+                  Latest Podcast
+                </h4>
+                <div class="rounded-xl overflow-hidden border border-night-700 bg-night-900/60">
+                  <iframe
+                    frameborder="0"
+                    src="https://playlist.megaphone.fm?p=ECM6782973876"
+                    width="100%"
+                    height="482"
+                    title="Megaphone Podcast Player"
+                    loading="lazy"
+                  ></iframe>
+                </div>
+              </div>
             </div>
           </div>
         </div>

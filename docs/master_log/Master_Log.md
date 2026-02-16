@@ -2597,3 +2597,25 @@ python -m compileall atlasops
 **Verification:** Compile check passed; no lints in updated backend files.  
 **Notes:** Auto-invite is OFF by default; enable via env var when ready. If invite endpoints are unsupported by tenant/token, submission still succeeds and logs invite error metadata.  
 **Concepts:** @concept:api @concept:megaphone @concept:electracast @concept:automation
+---
+
+## AU-C01-20260216-002 — Add Megaphone embed player to main-site profile section
+
+**Type:** Feature  
+**Context:** User requested embedding their Megaphone podcast player in the profile section alongside social links/projects/bio on atlasuniversalis.com.  
+**Change summary:**
+- Inserted iframe player (`https://playlist.megaphone.fm?p=ECM6782973876`) into `AboutSection.vue` beneath social links in the profile card.
+- Kept embed styled within existing card aesthetic using rounded container and subtle border.
+
+**Rationale / tradeoffs:** Place podcast content where visitors already view bio + socials for higher discoverability and consistent profile storytelling.  
+**Files touched:**
+- `frontend-main/src/components/AboutSection.vue`
+
+**Commands run:**
+```bash
+cd frontend-main && npm run build
+```
+
+**Verification:** `frontend-main` production build succeeds and no lints are reported for updated component.  
+**Notes:** None  
+**Concepts:** @concept:frontend @concept:profile @concept:embed
