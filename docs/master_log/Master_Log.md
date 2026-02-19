@@ -2736,3 +2736,31 @@ npm run build  # frontend-main (fails locally without vite in PATH / missing loc
 **Verification:** Python compile check passed for `dev.py`; no lints reported on modified frontend/backend files; generated inventory docs verified present for all five apps; build command in `frontend-main` failed due missing local `vite` dependency resolution in current shell.  
 **Notes:** Existing unrelated working-tree changes were preserved.  
 **Concepts:** @concept:dev-portal @concept:inventory @concept:atlas-meridian @concept:documentation
+
+---
+
+## AU-C01-20260218-002 — Fix /dev inventory table column clipping
+
+**Type:** Fix  
+**Context:** User reported the far-right column in `https://atlasuniversalis.com/dev/apps/atlas-meridian/inventory` was clipped and unreadable.  
+**Change summary:**
+- Updated `DevAppInventoryView.vue` so rendered inventory tables can wrap long values and avoid right-edge clipping.
+- Switched inventory doc container overflow from hidden to horizontal auto, and added table/cell wrapping rules (`table-layout: fixed`, `overflow-wrap`, code wrapping).
+- Installed local frontend dependencies so `vite` build tooling works after workspace path migration.
+
+**Rationale / tradeoffs:** Prefer readable wrapped table content over clipped columns; keep horizontal scroll available as fallback for exceptionally wide cells.  
+**Files touched:**
+- `frontend-main/src/views/DevAppInventoryView.vue`
+
+**Commands run:**
+```bash
+npm install  # frontend-main
+npm run build  # frontend-main
+git push origin HEAD:master
+ssh root@167.71.179.90 "... git pull ... npm ci && npm run build ..."
+curl -I https://atlasuniversalis.com/dev/apps/atlas-meridian/inventory
+```
+
+**Verification:** Local `frontend-main` build succeeded; deploy pull/build/restart completed on droplet; live `/dev` route responds 200 and inventory endpoint remains auth-protected.  
+**Notes:** `gh` CLI unavailable in local shell, so deployment was executed and verified directly via SSH/curl.  
+**Concepts:** @concept:frontend @concept:dev-portal @concept:inventory @concept:deployment

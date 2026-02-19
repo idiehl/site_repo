@@ -157,7 +157,7 @@ onMounted(fetchInventory)
         {{ error }}
       </div>
 
-      <div v-else-if="docData" class="bg-night-900 border border-night-800 rounded-xl overflow-hidden">
+      <div v-else-if="docData" class="bg-night-900 border border-night-800 rounded-xl overflow-x-auto">
         <!-- Rendered HTML view -->
         <div
           v-if="viewMode === 'html'"
@@ -221,6 +221,8 @@ onMounted(fetchInventory)
 
 .prose-atlas table {
   width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .prose-atlas th {
@@ -233,6 +235,20 @@ onMounted(fetchInventory)
 .prose-atlas td {
   border: 1px solid theme('colors.night.700');
   padding: 0.5rem 0.75rem;
+}
+
+.prose-atlas th,
+.prose-atlas td {
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.prose-atlas td code,
+.prose-atlas th code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .prose-atlas tr:nth-child(even) {

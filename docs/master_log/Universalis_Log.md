@@ -23,3 +23,4 @@ This log tracks changes specific to the main Atlas Universalis site.
 - Added a new Inventory document type to the `/dev` portal app pages (backend API endpoint + frontend route/view + tab navigation).
 - Added inventory dashboard links for all app cards and updated Atlas Meridian app descriptor text.
 - Added cross-app inventory docs in `docs/master_log/*_Inventory.md` and updated project overview references.
+- Fixed inventory table readability in `/dev/apps/atlas-meridian/inventory` by updating wrapping/overflow behavior in `DevAppInventoryView.vue`.
