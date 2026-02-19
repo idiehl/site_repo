@@ -6,11 +6,11 @@ alwaysApply: true
 # Atlas Universalis — Optimized User Ruleset
 
 ## 0) Dev Landscape
-- If `C:\Users\ihigg\Git\github\site_repo` is missing **and** SSH to `root@167.71.179.90` fails, ignore all remaining rules. Create `internal/` at project root and maintain log/overview/checklist locally.
-- Primary repo: `C:\Users\ihigg\Git\github\site_repo`
+- If `D:\www\atlasuniversalis` is missing **and** SSH to `root@167.71.179.90` fails, ignore all remaining rules. Create `internal/` at project root and maintain log/overview/checklist locally.
+- Primary repo: `D:\www\atlasuniversalis`
 - Production host: DigitalOcean droplet (Ubuntu), SSH `root@167.71.179.90`
 - Dev portal: `https://atlasuniversalis.com/dev`
-- Branding assets: `C:\Users\ihigg\Git\github\site_repo\internal\Logo_Icon`
+- Branding assets: `D:\www\atlasuniversalis\internal\Logo_Icon`
 - Repo: `github.com/idiehl/site-repo`
 
 ## 0.1) Logins (use as needed)
@@ -38,7 +38,7 @@ alwaysApply: true
 - Create skills when a repeatable pattern emerges
 
 ## 4) Documentation (MCP‑First + Tiered)
-**Primary mechanism:** Use **atlasops-dashboard MCP** tools for log/overview/checklist/status updates (no manual edits unless MCP is down).
+**Primary mechanism:** Use **atlasops-dashboard MCP** tools for log/overview/checklist/inventory/status updates (no manual edits unless MCP is down).
 
 **Always required (per task):**
 - Master Log entry (MCP)
@@ -46,15 +46,18 @@ alwaysApply: true
 
 **Conditional only (if changed):**
 - Project Overview (architecture / file inventory / scope)
+- App Inventories (code files/symbols per app)
 - Checklist / To‑Do (task added/finished/removed)
 - STATUS (only when deploy starts/finishes or when blocked)
 
 **Tiered doc policy:**
-- **Fast Path:** Master Log only
-- **Standard Path:** Master Log + App Log; checklist/overview if needed
-- **Full Path:** Master Log + App Log + checklist/overview + STATUS
+- **Fast Path:** Master Log only — for tiny non-code changes (copy tweaks, typo fixes)
+- **Standard Path:** Master Log + App Log; include **Inventory** when code files/symbols change
+- **Full Path:** Master Log + App Log + inventory + checklist/overview + STATUS
 
-**Batching allowed:** Overview/checklist can be batched per session/day as long as logs stay accurate.
+**Inventory files (per app):** `Forge_Inventory.md`, `Apply_Inventory.md`, `Universalis_Inventory.md`, `Electracast_Inventory.md`, `Meridian_Inventory.md` — update when that app’s code structure or behavior changes.
+
+**Batching allowed:** Overview/checklist/inventory can be batched per session/day as long as logs stay accurate.
 
 **Fallback:** If MCP is unavailable, do manual edits and note MCP outage in Master Log.
 

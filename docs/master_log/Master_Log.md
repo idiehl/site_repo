@@ -2619,3 +2619,120 @@ cd frontend-main && npm run build
 **Verification:** `frontend-main` production build succeeds and no lints are reported for updated component.  
 **Notes:** None  
 **Concepts:** @concept:frontend @concept:profile @concept:embed
+---
+
+## AU-C01-20260217-001 — Migrated local repos to D:\ dev drive, updated paths and deps
+
+**Type:** Ops  
+**Context:** Relocated Atlas Universalis and related repos from C:\Users\ihigg\Git\github to the D:\ dev drive, reorganized into D:\www\atlasuniversalis, D:\local, and D:\idiehl; updated hard-coded paths in the atlasuniversalis repo and rebuilt Python/npm dependencies.  
+**Change summary:**
+- Robocopied site_repo → D:\www\atlasuniversalis; Atlas_Meridian → D:\local\Atlas_Meridian; HYPERDESK → D:\local\HYPERDESK; github_portfolio_projects → D:\idiehl
+- Updated hard-coded paths in .cursor/mcp.json, MASTER.mdc, meridian-map-generator SKILL, mcp config example, and mcp README
+- Rebuilt .venv and mcp/.venv and reinstalled pip deps; ran npm install in frontend, frontend-main, atlasforge, electracast
+- Build artifacts (meridian obj/, atlasforge .astro/types.d.ts) intentionally not copied to avoid stale path embedding
+
+**Rationale / tradeoffs:** Not provided  
+**Files touched:**
+- `.cursor/mcp.json`
+- `.cursor/rules/MASTER.mdc`
+- `.cursor/skills/meridian-map-generator/SKILL.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `mcp/cursor-mcp-config.example.json`
+- `mcp/README.md`
+- `atlasforge/package-lock.json`
+- `atlasforge/.astro/types.d.ts (removed)`
+- `meridian/Atlas.Meridian.App/obj/* (removed)`
+- `meridian/Atlas.Meridian.Core/obj/* (removed)`
+
+**Commands run:**
+```bash
+New-Item -ItemType Directory -Path "D:\www","D:\local","D:\idiehl"
+New-Item -ItemType Directory -Path "D:\www\atlasuniversalis"
+New-Item -ItemType Directory -Path "D:\local\Atlas_Meridian","D:\local\HYPERDESK"
+robocopy "C:\Users\ihigg\Git\github\site_repo" "D:\www\atlasuniversalis" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\Atlas_Apps\Atlas_Meridian" "D:\local\Atlas_Meridian" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\Atlas_Apps\HYPERDESK" "D:\local\HYPERDESK" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\github_portfolio_projects" "D:\idiehl" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+python -m venv "D:\www\atlasuniversalis\.venv"
+D:\www\atlasuniversalis\.venv\Scripts\python.exe -m pip install -r D:\www\atlasuniversalis\requirements.txt
+python -m venv "D:\www\atlasuniversalis\mcp\.venv"
+D:\www\atlasuniversalis\mcp\.venv\Scripts\python.exe -m pip install -r D:\www\atlasuniversalis\mcp\requirements.txt
+npm install (frontend, frontend-main, atlasforge, electracast)
+git status -sb
+git remote -v
+D:\www\atlasuniversalis\mcp\.venv\Scripts\python.exe -c "import mcp, sqlalchemy, psycopg2"
+```
+
+**Verification:** git status -sb and git remote -v in D:\www\atlasuniversalis; MCP venv import check; pip/npm installs completed successfully  
+**Notes:** Build artifacts (meridian obj, atlasforge .astro) were intentionally not copied to avoid stale path embedding.  
+**Concepts:** None
+
+---
+
+## AU-C01-20260217-002 — Verify directory migration pipeline
+
+**Type:** Ops  
+**Context:** Project directory migrated from C:\Users\ihigg\Git\github\site_repo to D:\www\atlasuniversalis; needed to confirm CI/CD pipeline works from new location  
+**Change summary:** Ran 5-point migration verification: (1) git push from new directory, (2) GitHub Actions deploy triggered, (3) droplet received commit, (4) live site reflected change, (5) old directory confirmed stale. All tests passed.  
+**Rationale / tradeoffs:** End-to-end verification ensures no broken workflow references to old path  
+**Files touched:**
+- `frontend-main/index.html` (temporary marker added then removed)
+
+**Commands run:**
+```bash
+git add frontend-main/index.html && git commit && git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git log -3 --oneline"
+```
+
+**Verification:** All 5 tests passed — push succeeded, Actions ran (success), droplet has commit 4f1160a, live site showed marker, old dir stuck at ad57fd7  
+**Notes:** Old directory C:\Users\ihigg\Git\github\site_repo can be safely archived or deleted  
+**Concepts:** @concept:deployment @concept:migration
+
+---
+
+## AU-C01-20260218-001 — Add per-app Inventory docs and Meridian dev refresh
+
+**Type:** Docs  
+**Context:** Requested update to Atlas Meridian `/dev` documentation (Overview + To-Do) and creation of a new `/dev` Inventory page class for Meridian plus all Atlas apps.  
+**Change summary:**
+- Added Inventory support to dev portal backend/frontend (`/api/v1/dev/apps/{app_id}/inventory`, new `DevAppInventoryView`, inventory tab links, dashboard links).
+- Created app inventory docs: `Forge_Inventory.md`, `Apply_Inventory.md`, `Universalis_Inventory.md`, `Electracast_Inventory.md`, `Meridian_Inventory.md`.
+- Refreshed `Meridian_Overview.md` and replaced `Meridian_Checklist.md` with phased implementation tracks aligned to Meridian concept PDFs/notes.
+- Updated Cursor rules/skills so doc workflows now explicitly include Inventory updates when code files/symbols change.
+- Added `scripts/generate_inventory_docs.py` to regenerate inventory pages from code scans (including external `D:\local\Atlas_Meridian` source path).
+
+**Rationale / tradeoffs:** Inventory generation is partially automated to keep cross-app file/symbol coverage current with less manual drift; symbol descriptions remain heuristic and should be refined during focused module work.  
+**Files touched:**
+- `atlasops/api/v1/dev.py`
+- `frontend-main/src/router/index.js`
+- `frontend-main/src/views/DevDashboardView.vue`
+- `frontend-main/src/views/DevAppLogView.vue`
+- `frontend-main/src/views/DevAppOverviewView.vue`
+- `frontend-main/src/views/DevAppChecklistView.vue`
+- `frontend-main/src/views/DevAppInventoryView.vue`
+- `docs/master_log/Meridian_Overview.md`
+- `docs/master_log/Meridian_Checklist.md`
+- `docs/master_log/Forge_Inventory.md`
+- `docs/master_log/Apply_Inventory.md`
+- `docs/master_log/Universalis_Inventory.md`
+- `docs/master_log/Electracast_Inventory.md`
+- `docs/master_log/Meridian_Inventory.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `.cursor/rules/MASTER.mdc`
+- `.cursor/rules/version-logging.mdc`
+- `.cursor/skills/doc-ops/SKILL.md`
+- `.cursor/skills/subagent-doc-ops/SKILL.md`
+- `.cursor/skills/version-logger/SKILL.md`
+- `scripts/generate_inventory_docs.py`
+
+**Commands run:**
+```bash
+python --version
+python scripts/generate_inventory_docs.py
+python -m py_compile atlasops/api/v1/dev.py
+npm run build  # frontend-main (fails locally without vite in PATH / missing local deps)
+```
+
+**Verification:** Python compile check passed for `dev.py`; no lints reported on modified frontend/backend files; generated inventory docs verified present for all five apps; build command in `frontend-main` failed due missing local `vite` dependency resolution in current shell.  
+**Notes:** Existing unrelated working-tree changes were preserved.  
+**Concepts:** @concept:dev-portal @concept:inventory @concept:atlas-meridian @concept:documentation

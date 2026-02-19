@@ -7,7 +7,7 @@ description: Generate Atlas Meridian map files (.atlas) from a topic prompt and 
 
 ## Quick Start
 When the user provides a topic, create a new `.atlas` file using the Atlas Meridian JSON format and save it to:
-`C:\Users\ihigg\Git\github\Atlas_Apps\Atlas_Meridian\Maps`.
+`D:\local\Atlas_Meridian\Maps`.
 
 ## Output Requirements
 - Use the topic as the map title (`Title` field) and as the base for the filename.

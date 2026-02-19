@@ -29,6 +29,7 @@ A primary agent MUST invoke this skill after:
 | README | `README.md` | Public project documentation |
 | Master Log | `docs/master_log/Master_Log.md` | Chronological change history |
 | Project Overview | `docs/master_log/PROJECT_OVERVIEW.md` | File inventory with descriptions |
+| App Inventories | `docs/master_log/Forge_Inventory.md`, `Apply_Inventory.md`, `Universalis_Inventory.md`, `Electracast_Inventory.md`, `Meridian_Inventory.md` | Per-app code file/symbol inventory |
 | PDF Stylesheet | `docs/master_log/pdf.css` | PDF rendering styles |
 
 ### Dev Portal Endpoints
@@ -51,9 +52,10 @@ Version Logger Workflow:
 - [ ] Step 2: Generate Log ID
 - [ ] Step 3: Create Master Log entry
 - [ ] Step 4: Update PROJECT_OVERVIEW.md (if files changed)
-- [ ] Step 5: Update README.md (if public-facing changes)
-- [ ] Step 6: Verify dev pages will reflect updates
-- [ ] Step 7: Report completion to primary agent
+- [ ] Step 5: Update App Inventories (if code files/symbols changed) — Forge_Inventory.md, Apply_Inventory.md, Universalis_Inventory.md, Electracast_Inventory.md, Meridian_Inventory.md per app affected
+- [ ] Step 6: Update README.md (if public-facing changes)
+- [ ] Step 7: Verify dev pages will reflect updates
+- [ ] Step 8: Report completion to primary agent
 ```
 
 ---
@@ -176,7 +178,24 @@ Update `docs/master_log/PROJECT_OVERVIEW.md` when:
 
 ---
 
-## Step 5: Update README.md
+## Step 5: Update App Inventories
+
+Update app inventory files when code files or symbols are added, modified, or removed.
+
+| App | Inventory File |
+|-----|----------------|
+| Atlas Forge | `docs/master_log/Forge_Inventory.md` |
+| Atlas Apply | `docs/master_log/Apply_Inventory.md` |
+| Universalis (main site) | `docs/master_log/Universalis_Inventory.md` |
+| ElectraCast | `docs/master_log/Electracast_Inventory.md` |
+| Atlas Meridian | `docs/master_log/Meridian_Inventory.md` |
+
+**When:** Standard/full doc path; code structure or behavior changed for that app.
+**Process:** Add new files/symbols, remove deleted ones, update descriptions for modified code.
+
+---
+
+## Step 6: Update README.md
 
 Update `README.md` when changes affect public-facing documentation.
 
@@ -244,7 +263,7 @@ Update `README.md` when changes affect public-facing documentation.
 
 ---
 
-## Step 6: Verify Dev Pages
+## Step 7: Verify Dev Pages
 
 The dev pages (`/dev/log` and `/dev/overview`) read from disk on each request. After updating the markdown files:
 
@@ -254,7 +273,7 @@ The dev pages (`/dev/log` and `/dev/overview`) read from disk on each request. A
 
 ---
 
-## Step 7: Report Completion
+## Step 8: Report Completion
 
 Return this summary to the primary agent:
 
@@ -265,6 +284,7 @@ Version Logger Complete:
 - Files updated:
   - docs/master_log/Master_Log.md ✓
   - docs/master_log/PROJECT_OVERVIEW.md [✓ if updated | — if unchanged]
+  - docs/master_log/*_Inventory.md [✓ if updated | — if unchanged]
   - README.md [✓ if updated | — if unchanged]
 - Dev pages will auto-refresh on next load
 ```

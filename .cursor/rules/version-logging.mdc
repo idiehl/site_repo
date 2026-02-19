@@ -23,6 +23,7 @@ Invoke `.cursor/skills/version-logger/SKILL.md` after:
 3. Follow the workflow to update:
    - `docs/master_log/Master_Log.md` (always)
    - `docs/master_log/PROJECT_OVERVIEW.md` (if files changed)
+   - App Inventories (if code files/symbols changed): `Forge_Inventory.md`, `Apply_Inventory.md`, `Universalis_Inventory.md`, `Electracast_Inventory.md`, `Meridian_Inventory.md`
    - `README.md` (if public-facing changes)
 
 ## Quick Invocation
@@ -37,6 +38,7 @@ Invoke version-logger:
 - Files: [List of files touched]
 - Commands: [Commands run]
 - Verification: [How verified]
+- Apps affected: [forge|apply|universalis|electracast|meridian] (for Inventory updates)
 ```
 
 ## Do NOT Skip

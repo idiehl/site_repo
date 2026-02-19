@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { FolderOpenIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
+import { ArchiveBoxIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 import DevStatusBanner from '../components/DevStatusBanner.vue'
 
 const router = useRouter()
@@ -28,7 +28,7 @@ const overviewPath = computed(() => `/dev/apps/${appId.value}/overview`)
 const checklistPath = computed(() => `/dev/apps/${appId.value}/checklist`)
 const inventoryPath = computed(() => `/dev/apps/${appId.value}/inventory`)
 
-async function fetchOverview() {
+async function fetchInventory() {
   if (!accessToken.value) {
     router.push('/dev')
     return
@@ -39,37 +39,37 @@ async function fetchOverview() {
     loading.value = false
     return
   }
-  
+
   loading.value = true
   error.value = ''
-  
+
   try {
-    const response = await fetch(`https://apply.atlasuniversalis.com/api/v1/dev/apps/${appId.value}/overview`, {
+    const response = await fetch(`https://apply.atlasuniversalis.com/api/v1/dev/apps/${appId.value}/inventory`, {
       headers: {
         Authorization: `Bearer ${accessToken.value}`
       }
     })
-    
+
     if (response.status === 401 || response.status === 403) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       router.push('/dev')
       return
     }
-    
+
     if (!response.ok) {
-      throw new Error('Failed to fetch overview')
+      throw new Error('Failed to fetch inventory')
     }
-    
+
     docData.value = await response.json()
   } catch (err) {
-    error.value = err.message || 'Failed to load overview'
+    error.value = err.message || 'Failed to load inventory'
   } finally {
     loading.value = false
   }
 }
 
-onMounted(fetchOverview)
+onMounted(fetchInventory)
 </script>
 
 <template>
@@ -83,8 +83,8 @@ onMounted(fetchOverview)
             Back
           </router-link>
           <div class="flex items-center gap-2">
-            <FolderOpenIcon class="w-6 h-6 text-atlas-400" />
-            <h1 class="text-xl font-bold text-white">{{ appName }} — Overview</h1>
+            <ArchiveBoxIcon class="w-6 h-6 text-atlas-400" />
+            <h1 class="text-xl font-bold text-white">{{ appName }} — Inventory</h1>
           </div>
         </div>
         <div class="flex items-center gap-4">
@@ -97,7 +97,7 @@ onMounted(fetchOverview)
             </router-link>
             <router-link
               :to="overviewPath"
-              class="px-3 py-1 text-sm rounded-md transition-colors bg-atlas-600 text-white"
+              class="px-3 py-1 text-sm rounded-md transition-colors text-night-400 hover:text-white"
             >
               Overview
             </router-link>
@@ -109,7 +109,7 @@ onMounted(fetchOverview)
             </router-link>
             <router-link
               :to="inventoryPath"
-              class="px-3 py-1 text-sm rounded-md transition-colors text-night-400 hover:text-white"
+              class="px-3 py-1 text-sm rounded-md transition-colors bg-atlas-600 text-white"
             >
               Inventory
             </router-link>
@@ -135,7 +135,7 @@ onMounted(fetchOverview)
             </button>
           </div>
           <button
-            @click="fetchOverview"
+            @click="fetchInventory"
             class="px-4 py-2 text-sm bg-night-800 text-night-300 hover:text-white rounded-lg transition-colors flex items-center gap-2"
           >
             <ArrowPathIcon class="w-4 h-4" />
@@ -146,17 +146,17 @@ onMounted(fetchOverview)
     </header>
 
     <DevStatusBanner />
-    
+
     <!-- Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div v-if="loading" class="flex items-center justify-center py-20">
         <div class="text-night-400">Loading...</div>
       </div>
-      
+
       <div v-else-if="error" class="p-6 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
         {{ error }}
       </div>
-      
+
       <div v-else-if="docData" class="bg-night-900 border border-night-800 rounded-xl overflow-hidden">
         <!-- Rendered HTML view -->
         <div
@@ -164,7 +164,7 @@ onMounted(fetchOverview)
           class="prose prose-invert prose-atlas max-w-none p-8"
           v-html="docData.content_html"
         />
-        
+
         <!-- Raw Markdown view -->
         <pre
           v-else

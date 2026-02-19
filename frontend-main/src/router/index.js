@@ -47,6 +47,11 @@ const routes = [
     name: 'dev-app-checklist',
     component: () => import('../views/DevAppChecklistView.vue'),
   },
+  {
+    path: '/dev/apps/:appId/inventory',
+    name: 'dev-app-inventory',
+    component: () => import('../views/DevAppInventoryView.vue'),
+  },
 ]
 
 const router = createRouter({
