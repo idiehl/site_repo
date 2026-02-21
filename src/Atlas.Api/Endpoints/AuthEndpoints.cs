@@ -1,14 +1,22 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using Atlas.Api.Authentication;
 using Atlas.Api.Authentication.OAuth;
 using Atlas.Contracts.Auth;
+using Atlas.Contracts.Configuration;
 using Atlas.Core.Entities;
 using Atlas.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Atlas.Api.Endpoints;
 
 public static class AuthEndpoints
 {
+    private const int FreeResumeGenerationLimit = 3;
+    private const int PaidResumeGenerationLimit = 50;
+
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v2/auth");
@@ -27,35 +35,182 @@ public static class AuthEndpoints
         return app;
     }
 
-    private static IResult Register(UserCreateRequest request)
+    private static async Task<IResult> Register(
+        UserCreateRequest request,
+        AtlasDbContext db,
+        IJwtTokenFactory jwtTokenFactory,
+        CancellationToken cancellationToken)
     {
-        return Results.Ok();
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Results.Json(
+                new { detail = "Email and password are required" },
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var existingUser = await db.Users
+            .AnyAsync(u => u.Email == request.Email, cancellationToken);
+
+        if (existingUser)
+        {
+            return Results.Json(
+                new { detail = "Email already registered" },
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var now = DateTime.UtcNow;
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = request.Email,
+            HashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            SubscriptionTier = "free",
+            SubscriptionStatus = "free",
+            ResumeGenerationsUsed = 0,
+            CreatedAt = now,
+            UpdatedAt = now,
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync(cancellationToken);
+
+        var profile = new UserProfile
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            CompletenessScore = 0,
+            CreatedAt = now,
+            UpdatedAt = now,
+        };
+        db.UserProfiles.Add(profile);
+        await db.SaveChangesAsync(cancellationToken);
+
+        return Results.Json(
+            new UserResponse(user.Id, user.Email, user.CreatedAt, user.SubscriptionTier, user.IsAdmin),
+            statusCode: StatusCodes.Status201Created);
     }
 
-    private static IResult Login(HttpContext context)
+    private static async Task<IResult> Login(
+        LoginRequest request,
+        AtlasDbContext db,
+        IJwtTokenFactory jwtTokenFactory,
+        CancellationToken cancellationToken)
     {
-        return Results.Ok();
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Results.Json(
+                new { detail = "Incorrect email or password" },
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        var user = await db.Users
+            .SingleOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+
+        if (user is null
+            || string.IsNullOrWhiteSpace(user.HashedPassword)
+            || !BCrypt.Net.BCrypt.Verify(request.Password, user.HashedPassword))
+        {
+            return Results.Json(
+                new { detail = "Incorrect email or password" },
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        var tokens = jwtTokenFactory.CreateTokenPair(user.Id);
+        return Results.Ok(new
+        {
+            access_token = tokens.AccessToken,
+            refresh_token = tokens.RefreshToken,
+            token_type = tokens.TokenType,
+        });
     }
 
     private static IResult GetCurrentUser(HttpContext context)
     {
-        return Results.Ok();
+        if (context.Items[AtlasApiHttpContextItems.CurrentUser] is not User user)
+        {
+            return Results.Json(
+                new { detail = "Could not validate credentials" },
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        var isPremium = CanAccessPremiumFeatures(user);
+        var limit = isPremium ? PaidResumeGenerationLimit : FreeResumeGenerationLimit;
+
+        return Results.Ok(new CurrentUserResponse(
+            user.Id,
+            user.Email,
+            user.CreatedAt,
+            user.SubscriptionTier,
+            user.IsAdmin,
+            limit,
+            isPremium));
     }
 
     private static IResult Logout()
     {
-        return Results.Ok();
+        return Results.Ok(new { message = "Successfully logged out" });
     }
 
-    private static IResult RequestPasswordReset(PasswordResetRequest request)
+    private static async Task<IResult> RequestPasswordReset(
+        PasswordResetRequest request,
+        AtlasDbContext db,
+        IOptions<JwtSettings> jwtOptions,
+        CancellationToken cancellationToken)
     {
-        return Results.Ok();
+        var user = await db.Users
+            .SingleOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+
+        if (user is not null)
+        {
+            var resetToken = GeneratePasswordResetToken();
+            user.PasswordResetTokenHash = HashResetToken(resetToken, jwtOptions.Value.SecretKey);
+            user.PasswordResetRequestedAt = DateTime.UtcNow;
+            user.PasswordResetExpiresAt = DateTime.UtcNow.AddHours(2);
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        return Results.Ok(new
+        {
+            message = "If an account exists for that email, a reset link will be sent shortly.",
+        });
     }
 
-    private static IResult ConfirmPasswordReset(PasswordResetConfirm request)
+    private static async Task<IResult> ConfirmPasswordReset(
+        PasswordResetConfirm request,
+        AtlasDbContext db,
+        IOptions<JwtSettings> jwtOptions,
+        CancellationToken cancellationToken)
     {
-        return Results.Ok();
+        if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NewPassword))
+        {
+            return Results.Json(
+                new { detail = "Invalid or expired reset token" },
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var tokenHash = HashResetToken(request.Token, jwtOptions.Value.SecretKey);
+        var user = await db.Users
+            .SingleOrDefaultAsync(u => u.PasswordResetTokenHash == tokenHash, cancellationToken);
+
+        if (user is null
+            || user.PasswordResetExpiresAt is null
+            || user.PasswordResetExpiresAt < DateTime.UtcNow)
+        {
+            return Results.Json(
+                new { detail = "Invalid or expired reset token" },
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        user.PasswordResetTokenHash = null;
+        user.PasswordResetRequestedAt = null;
+        user.PasswordResetExpiresAt = null;
+        user.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(cancellationToken);
+
+        return Results.Ok(new { message = "Password updated successfully." });
     }
+
+    // --- OAuth endpoints (already implemented in 63656e8) ---
 
     private static IResult LinkedInAuthorize(
         IOAuthStateStore stateStore,
@@ -158,6 +313,8 @@ public static class AuthEndpoints
             jwtTokenFactory,
             cancellationToken);
     }
+
+    // --- Shared helpers ---
 
     private static async Task<IResult> HandleOAuthCallbackAsync(
         string code,
@@ -316,6 +473,32 @@ public static class AuthEndpoints
         }
 
         await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private static bool CanAccessPremiumFeatures(User user)
+    {
+        if (user.IsAdmin)
+            return true;
+
+        return user.SubscriptionTier == "paid"
+               && user.SubscriptionStatus is "active" or "trialing" or "past_due";
+    }
+
+    private static string GeneratePasswordResetToken()
+    {
+        var bytes = new byte[32];
+        RandomNumberGenerator.Fill(bytes);
+        return Convert.ToBase64String(bytes)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .TrimEnd('=');
+    }
+
+    private static string HashResetToken(string token, string secretKey)
+    {
+        var salted = $"{token}{secretKey}";
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(salted));
+        return Convert.ToHexStringLower(hashBytes);
     }
 
     private static string ResolveDisplayName(OAuthUserInfo userInfo)
