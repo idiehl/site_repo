@@ -1,27 +1,22 @@
 <Project>
-
   <ItemGroup>
     <!-- ASP.NET / Blazor -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Server" Version="10.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
-
     <!-- SkiaSharp -->
     <PackageVersion Include="SkiaSharp" Version="2.88.9" />
     <PackageVersion Include="SkiaSharp.Views.Blazor" Version="2.88.9" />
-
     <!-- Entity Framework Core -->
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
-
     <!-- External services -->
     <PackageVersion Include="Stripe.net" Version="47.2.0" />
     <PackageVersion Include="OpenAI" Version="2.2.0" />
-
     <!-- Annotations -->
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
-
     <!-- Testing -->
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
@@ -29,23 +24,18 @@
     <PackageVersion Include="FluentAssertions" Version="8.0.1" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.3.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-
     <!-- Security -->
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
-
     <!-- Markdown -->
     <PackageVersion Include="Markdig" Version="0.38.0" />
-
     <!-- Logging -->
     <PackageVersion Include="Serilog" Version="4.2.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
-
     <!-- Caching & Hosting -->
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="System.Threading.Channels" Version="9.0.1" />
-
     <!-- Avalonia (Meridian Desktop) -->
     <PackageVersion Include="Avalonia" Version="11.3.11" />
     <PackageVersion Include="Avalonia.Desktop" Version="11.3.11" />
@@ -53,5 +43,4 @@
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.11" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.11" />
   </ItemGroup>
-
 </Project>

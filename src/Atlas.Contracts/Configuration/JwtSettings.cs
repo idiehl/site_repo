@@ -2,7 +2,7 @@ namespace Atlas.Contracts.Configuration;
 
 public sealed class JwtSettings
 {
-    public string SecretKey { get; set; } = "";
+    public string SecretKey { get; set; } = "CHANGE-ME-IN-PRODUCTION";
     public string Algorithm { get; set; } = "HS256";
     public int AccessTokenExpireMinutes { get; set; } = 30;
     public int RefreshTokenExpireDays { get; set; } = 7;
