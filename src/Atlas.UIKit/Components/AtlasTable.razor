@@ -1,0 +1,82 @@
+@typeparam TItem
+
+<div class="atlas-table-wrapper @CssClass">
+    @if (Items is null || Items.Count == 0)
+    {
+        <div class="atlas-table__empty">@EmptyMessage</div>
+    }
+    else
+    {
+        <div class="atlas-table__scroll">
+            <table class="atlas-table">
+                <thead class="atlas-table__head">
+                    @HeaderContent
+                </thead>
+                <tbody class="atlas-table__body">
+                    @if (RowTemplate is not null)
+                    {
+                        @foreach (var item in PagedItems)
+                        {
+                            @RowTemplate(item)
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (TotalPages > 1)
+        {
+            <div class="atlas-table__pagination">
+                <button class="atlas-table__page-btn"
+                        disabled="@(CurrentPage <= 1)"
+                        @onclick="PreviousPage">
+                    &laquo; Prev
+                </button>
+                <span class="atlas-table__page-info">
+                    Page @CurrentPage of @TotalPages
+                </span>
+                <button class="atlas-table__page-btn"
+                        disabled="@(CurrentPage >= TotalPages)"
+                        @onclick="NextPage">
+                    Next &raquo;
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<TItem>? Items { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
+    [Parameter] public int PageSize { get; set; } = 10;
+    [Parameter] public string EmptyMessage { get; set; } = "No data available";
+    [Parameter] public string? CssClass { get; set; }
+
+    private int CurrentPage { get; set; } = 1;
+
+    private int TotalPages => Items is null || Items.Count == 0
+        ? 1
+        : (int)Math.Ceiling((double)Items.Count / PageSize);
+
+    private IEnumerable<TItem> PagedItems => Items is null
+        ? Enumerable.Empty<TItem>()
+        : Items.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentPage > TotalPages)
+            CurrentPage = TotalPages;
+        if (CurrentPage < 1)
+            CurrentPage = 1;
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= TotalPages)
+            CurrentPage = page;
+    }
+
+    private void NextPage() => GoToPage(CurrentPage + 1);
+    private void PreviousPage() => GoToPage(CurrentPage - 1);
+}

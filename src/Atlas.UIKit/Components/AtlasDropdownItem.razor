@@ -1,0 +1,25 @@
+@namespace Atlas.UIKit.Components
+
+<div class="atlas-dropdown-item @(IsSelected ? "atlas-dropdown-item--selected" : "")"
+     role="option"
+     aria-selected="@IsSelected"
+     @onclick="HandleClick">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] public AtlasDropdown? Parent { get; set; }
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool IsSelected => Parent?.CurrentValue == Value;
+
+    private async Task HandleClick()
+    {
+        if (Parent is not null)
+        {
+            var display = Value;
+            await Parent.SelectItem(Value, display);
+        }
+    }
+}

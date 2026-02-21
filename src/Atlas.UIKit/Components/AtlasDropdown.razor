@@ -1,0 +1,55 @@
+@namespace Atlas.UIKit.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="atlas-dropdown @(_isOpen ? "atlas-dropdown--open" : "")" @attributes="AdditionalAttributes">
+    <button class="atlas-dropdown__trigger" type="button"
+            @onclick="Toggle"
+            @onkeydown="HandleKeyDown"
+            aria-haspopup="listbox"
+            aria-expanded="@_isOpen">
+        <span class="atlas-dropdown__value">
+            @(SelectedDisplay ?? Placeholder)
+        </span>
+        <svg class="atlas-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="atlas-dropdown__panel" role="listbox">
+            <CascadingValue Value="this" IsFixed="false">
+                @ChildContent
+            </CascadingValue>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Placeholder { get; set; } = "Select...";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool _isOpen;
+    internal string? SelectedDisplay { get; private set; }
+
+    internal string? CurrentValue => Value;
+
+    internal async Task SelectItem(string value, string display)
+    {
+        Value = value;
+        SelectedDisplay = display;
+        _isOpen = false;
+        await ValueChanged.InvokeAsync(value);
+    }
+
+    private void Toggle() => _isOpen = !_isOpen;
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+            _isOpen = false;
+    }
+}

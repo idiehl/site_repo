@@ -1,0 +1,66 @@
+@namespace Atlas.UIKit.Components
+
+@if (_visible)
+{
+    <div class="atlas-alert @TypeClass" role="alert" @attributes="AdditionalAttributes">
+        <div class="atlas-alert__icon" aria-hidden="true">
+            @((MarkupString)IconSvg)
+        </div>
+        <div class="atlas-alert__body">
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <div class="atlas-alert__title">@Title</div>
+            }
+            @if (ChildContent is not null)
+            {
+                <div class="atlas-alert__message">@ChildContent</div>
+            }
+            else if (!string.IsNullOrWhiteSpace(Message))
+            {
+                <div class="atlas-alert__message">@Message</div>
+            }
+        </div>
+        @if (Dismissible)
+        {
+            <button class="atlas-alert__dismiss" @onclick="Dismiss" type="button" aria-label="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Type { get; set; } = "info";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public bool Dismissible { get; set; }
+    [Parameter] public EventCallback OnDismiss { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool _visible = true;
+
+    private string TypeClass => Type switch
+    {
+        "success" => "atlas-alert--success",
+        "warning" => "atlas-alert--warning",
+        "error" => "atlas-alert--error",
+        _ => "atlas-alert--info"
+    };
+
+    private string IconSvg => Type switch
+    {
+        "success" => """<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 9L8 11.5L12.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>""",
+        "warning" => """<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5L16.5 15H1.5L9 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.75" r="0.75" fill="currentColor"/></svg>""",
+        "error" => """<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6 6L12 12M12 6L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>""",
+        _ => """<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 8V12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="5.75" r="0.75" fill="currentColor"/></svg>"""
+    };
+
+    private async Task Dismiss()
+    {
+        _visible = false;
+        await OnDismiss.InvokeAsync();
+    }
+}

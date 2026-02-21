@@ -1,0 +1,49 @@
+.atlas-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: var(--atlas-radius-sm, 2px);
+    border: 1px solid;
+    line-height: 1.4;
+    font-family: var(--atlas-font-sans);
+    white-space: nowrap;
+}
+
+.atlas-tag--standard {
+    background: rgba(188, 197, 208, 0.1);
+    border-color: rgba(188, 197, 208, 0.25);
+    color: var(--atlas-silver-steel, #BCC5D0);
+}
+
+.atlas-tag--gold {
+    background: rgba(200, 150, 62, 0.12);
+    border-color: rgba(200, 150, 62, 0.35);
+    color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-tag__label {
+    line-height: 1;
+}
+
+.atlas-tag__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.125rem;
+    border-radius: var(--atlas-radius-sm, 2px);
+    opacity: 0.6;
+    transition: opacity var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-tag__remove:hover {
+    opacity: 1;
+}

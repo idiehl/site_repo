@@ -1,0 +1,46 @@
+@using System.Linq.Expressions
+
+<div class="atlas-field-validation">
+    @if (_editContext is not null && _fieldIdentifier.HasValue)
+    {
+        @foreach (var message in _editContext.GetValidationMessages(_fieldIdentifier.Value))
+        {
+            <p class="atlas-field-validation__message">@message</p>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter] private EditContext? _editContext { get; set; }
+
+    [Parameter] public Expression<Func<object>>? For { get; set; }
+
+    private FieldIdentifier? _fieldIdentifier;
+
+    protected override void OnParametersSet()
+    {
+        if (For is not null)
+        {
+            _fieldIdentifier = FieldIdentifier.Create(For);
+        }
+
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationStateChanged -= OnValidationStateChanged;
+            _editContext.OnValidationStateChanged += OnValidationStateChanged;
+        }
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationStateChanged -= OnValidationStateChanged;
+        }
+    }
+}

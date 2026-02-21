@@ -1,0 +1,61 @@
+.atlas-footer {
+    width: 100%;
+    background: var(--atlas-deep-abyss, #070D1A);
+    font-family: var(--atlas-font-sans);
+}
+
+.atlas-footer__accent {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--atlas-antique-gold, #C8963E) 20%,
+        var(--atlas-antique-gold, #C8963E) 80%,
+        transparent
+    );
+    opacity: 0.5;
+}
+
+.atlas-footer__content {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.atlas-footer__brand {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--atlas-cloud-white, #E8ECF1);
+}
+
+.atlas-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.atlas-footer__link {
+    font-size: 0.75rem;
+    color: var(--atlas-mist-gray, #8A94A6);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color var(--atlas-transition-fast, 150ms ease);
+}
+
+a.atlas-footer__link:hover {
+    color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-footer__copyright {
+    font-size: 0.6875rem;
+    color: var(--atlas-mist-gray, #8A94A6);
+    opacity: 0.6;
+}

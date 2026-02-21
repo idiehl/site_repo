@@ -1,0 +1,50 @@
+.atlas-status-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-family: var(--atlas-font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.atlas-status-banner--info {
+    background: var(--atlas-info, #6b7cdb);
+    color: var(--atlas-pure-white, #FFFFFF);
+}
+
+.atlas-status-banner--success {
+    background: var(--atlas-success, #22c55e);
+    color: var(--atlas-pure-white, #FFFFFF);
+}
+
+.atlas-status-banner--warning {
+    background: var(--atlas-warning, #f59e0b);
+    color: var(--atlas-deep-abyss, #070D1A);
+}
+
+.atlas-status-banner--error {
+    background: var(--atlas-error, #ef4444);
+    color: var(--atlas-pure-white, #FFFFFF);
+}
+
+.atlas-status-banner__message {
+    text-align: center;
+}
+
+.atlas-status-banner__dismiss {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.25rem;
+    opacity: 0.8;
+    transition: opacity var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-status-banner__dismiss:hover {
+    opacity: 1;
+}

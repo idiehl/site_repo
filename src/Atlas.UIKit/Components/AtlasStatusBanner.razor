@@ -1,0 +1,40 @@
+@namespace Atlas.UIKit.Components
+
+@if (_visible)
+{
+    <div class="atlas-status-banner @TypeClass" role="status" @attributes="AdditionalAttributes">
+        <span class="atlas-status-banner__message">@Message</span>
+        @if (Dismissible)
+        {
+            <button class="atlas-status-banner__dismiss" @onclick="Dismiss" type="button" aria-label="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Type { get; set; } = "info";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public bool Dismissible { get; set; }
+    [Parameter] public EventCallback OnDismiss { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool _visible = true;
+
+    private string TypeClass => Type switch
+    {
+        "success" => "atlas-status-banner--success",
+        "warning" => "atlas-status-banner--warning",
+        "error" => "atlas-status-banner--error",
+        _ => "atlas-status-banner--info"
+    };
+
+    private async Task Dismiss()
+    {
+        _visible = false;
+        await OnDismiss.InvokeAsync();
+    }
+}

@@ -1,0 +1,35 @@
+@page "/"
+@namespace Atlas.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas Universalis</title>
+    <base href="~/" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Atlas UIKit Design System -->
+    <link href="_content/Atlas.UIKit/atlas-uikit.css" rel="stylesheet" />
+
+    <!-- Blazor CSS Isolation -->
+    <link href="Atlas.Web.styles.css" rel="stylesheet" />
+</head>
+<body style="margin: 0; background-color: #0B1226; color: #BCC5D0; font-family: 'Inter', system-ui, sans-serif;">
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <div id="blazor-error-ui" style="display: none; position: fixed; bottom: 0; width: 100%; z-index: 1000; padding: 0.5rem; text-align: center; font-weight: 500; font-size: 0.85rem; color: #E8C97A; background-color: #1A2744;">
+        An unhandled error has occurred.
+        <a href="" style="color: #C8963E;">Reload</a>
+        <a class="dismiss" style="cursor: pointer; margin-left: 1rem; color: #8A94A6;">Dismiss</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

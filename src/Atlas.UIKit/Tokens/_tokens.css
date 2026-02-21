@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Atlas UIKit — Design Tokens
+   Source-of-truth for the Atlas Universalis design system.
+   ========================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------
+     Foundation Blues
+     ------------------------------------------------------------------ */
+  --atlas-midnight-navy: #0B1226;
+  --atlas-deep-abyss: #070D1A;
+  --atlas-blue: #101B35;
+  --atlas-celestial-navy: #1A2744;
+
+  /* ------------------------------------------------------------------
+     Heritage Golds
+     ------------------------------------------------------------------ */
+  --atlas-antique-gold: #C8963E;
+  --atlas-burnished-gold: #A87B2F;
+  --atlas-amber-glow: #D4A94E;
+  --atlas-pale-gold: #E8C97A;
+
+  /* ------------------------------------------------------------------
+     Atlas Silvers
+     ------------------------------------------------------------------ */
+  --atlas-silver-steel: #BCC5D0;
+  --atlas-mist-gray: #8A94A6;
+  --atlas-cloud-white: #E8ECF1;
+  --atlas-pure-white: #FFFFFF;
+
+  /* ------------------------------------------------------------------
+     Semantic Aliases
+     ------------------------------------------------------------------ */
+  --atlas-bg-primary: var(--atlas-midnight-navy);
+  --atlas-bg-surface: var(--atlas-blue);
+  --atlas-bg-elevated: var(--atlas-celestial-navy);
+
+  --atlas-text-primary: var(--atlas-silver-steel);
+  --atlas-text-secondary: var(--atlas-mist-gray);
+  --atlas-text-heading: var(--atlas-cloud-white);
+
+  --atlas-accent: var(--atlas-antique-gold);
+  --atlas-accent-hover: var(--atlas-amber-glow);
+  --atlas-accent-deep: var(--atlas-burnished-gold);
+
+  --atlas-border: rgba(138, 148, 166, 0.15);
+  --atlas-border-gold: rgba(200, 150, 62, 0.3);
+
+  /* ------------------------------------------------------------------
+     Status Colors
+     ------------------------------------------------------------------ */
+  --atlas-success: #22c55e;
+  --atlas-warning: #f59e0b;
+  --atlas-error: #ef4444;
+  --atlas-info: #6b7cdb;
+
+  /* ------------------------------------------------------------------
+     Spacing Scale (4px base)
+     ------------------------------------------------------------------ */
+  --atlas-space-1: 0.25rem;
+  --atlas-space-2: 0.5rem;
+  --atlas-space-3: 0.75rem;
+  --atlas-space-4: 1rem;
+  --atlas-space-5: 1.25rem;
+  --atlas-space-6: 1.5rem;
+  --atlas-space-7: 1.75rem;
+  --atlas-space-8: 2rem;
+  --atlas-space-9: 2.25rem;
+  --atlas-space-10: 2.5rem;
+  --atlas-space-11: 2.75rem;
+  --atlas-space-12: 3rem;
+  --atlas-space-13: 3.25rem;
+  --atlas-space-14: 3.5rem;
+  --atlas-space-15: 3.75rem;
+  --atlas-space-16: 4rem;
+
+  /* ------------------------------------------------------------------
+     Border Radii
+     ------------------------------------------------------------------ */
+  --atlas-radius-sm: 2px;
+  --atlas-radius-md: 4px;
+  --atlas-radius-lg: 6px;
+  --atlas-radius-xl: 12px;
+  --atlas-radius-full: 9999px;
+
+  /* ------------------------------------------------------------------
+     Shadows
+     ------------------------------------------------------------------ */
+  --atlas-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --atlas-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --atlas-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --atlas-glow-gold: 0 0 20px rgba(201, 168, 76, 0.1);
+  --atlas-glow-celestial: 0 0 20px rgba(100, 120, 200, 0.08);
+
+  /* ------------------------------------------------------------------
+     Transitions
+     ------------------------------------------------------------------ */
+  --atlas-transition-fast: 150ms ease;
+  --atlas-transition-normal: 300ms ease;
+  --atlas-transition-slow: 500ms ease;
+}

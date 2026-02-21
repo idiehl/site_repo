@@ -1,0 +1,45 @@
+@namespace Atlas.UIKit.Components
+
+<div class="atlas-avatar @VariantClass"
+     style="width: @(Size)px; height: @(Size)px; font-size: @(Size * 0.4)px;"
+     title="@Name"
+     @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Src))
+    {
+        <img class="atlas-avatar__img" src="@Src" alt="@(Name ?? "Avatar")" />
+    }
+    else
+    {
+        <span class="atlas-avatar__initials">@Initials</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public int Size { get; set; } = 40;
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string VariantClass => Variant switch
+    {
+        "gold" => "atlas-avatar--gold",
+        "celestial" => "atlas-avatar--celestial",
+        _ => "atlas-avatar--standard"
+    };
+
+    private string Initials
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Name)) return "?";
+            var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length switch
+            {
+                0 => "?",
+                1 => parts[0][..1].ToUpperInvariant(),
+                _ => $"{parts[0][..1]}{parts[^1][..1]}".ToUpperInvariant()
+            };
+        }
+    }
+}

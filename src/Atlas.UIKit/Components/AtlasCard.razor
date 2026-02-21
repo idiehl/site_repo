@@ -1,0 +1,27 @@
+<div class="atlas-card atlas-card--@Variant" @attributes="AdditionalAttributes">
+    @if (Variant == "bordered")
+    {
+        <div class="atlas-card__corner atlas-card__corner--tl"></div>
+        <div class="atlas-card__corner atlas-card__corner--tr"></div>
+        <div class="atlas-card__corner atlas-card__corner--bl"></div>
+        <div class="atlas-card__corner atlas-card__corner--br"></div>
+    }
+    @if (HeaderContent is not null)
+    {
+        <div class="atlas-card__header">@HeaderContent</div>
+    }
+    <div class="atlas-card__body">@ChildContent</div>
+    @if (FooterContent is not null)
+    {
+        <div class="atlas-card__footer">@FooterContent</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

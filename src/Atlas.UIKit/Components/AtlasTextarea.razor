@@ -1,0 +1,37 @@
+<div class="atlas-textarea-wrapper atlas-textarea--@Variant">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="atlas-textarea__label">@Label</label>
+    }
+    <div class="atlas-textarea__field-wrapper">
+        @if (Variant == "bordered")
+        {
+            <div class="atlas-textarea__corner atlas-textarea__corner--tl"></div>
+            <div class="atlas-textarea__corner atlas-textarea__corner--tr"></div>
+            <div class="atlas-textarea__corner atlas-textarea__corner--bl"></div>
+            <div class="atlas-textarea__corner atlas-textarea__corner--br"></div>
+        }
+        <textarea class="atlas-textarea__field"
+                  placeholder="@Placeholder"
+                  rows="@Rows"
+                  @oninput="OnInput"
+                  @attributes="AdditionalAttributes">@Value</textarea>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Enter text...";
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public int Rows { get; set; } = 4;
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

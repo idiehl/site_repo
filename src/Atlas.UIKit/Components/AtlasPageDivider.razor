@@ -1,0 +1,34 @@
+@namespace Atlas.UIKit.Components
+
+<div class="atlas-divider @VariantClass" role="separator" @attributes="AdditionalAttributes">
+    @if (Variant == "compass")
+    {
+        <div class="atlas-divider__line"></div>
+        <div class="atlas-divider__compass">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1"/>
+                <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
+                <path d="M10 2L10 7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M10 13L10 18" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M2 10L7 10" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M13 10L18 10" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M5.76 5.76L8.23 8.23" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/>
+                <path d="M11.77 11.77L14.24 14.24" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/>
+                <path d="M5.76 14.24L8.23 11.77" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/>
+                <path d="M11.77 8.23L14.24 5.76" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="atlas-divider__line"></div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Variant { get; set; } = "line";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string VariantClass => Variant switch
+    {
+        "compass" => "atlas-divider--compass",
+        _ => "atlas-divider--line"
+    };
+}

@@ -1,0 +1,40 @@
+.atlas-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid;
+    flex-shrink: 0;
+    font-family: var(--atlas-font-sans);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--atlas-celestial-navy, #1A2744);
+}
+
+.atlas-avatar--standard {
+    border-color: var(--atlas-silver-steel, #BCC5D0);
+    color: var(--atlas-silver-steel, #BCC5D0);
+}
+
+.atlas-avatar--gold {
+    border-color: var(--atlas-antique-gold, #C8963E);
+    color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-avatar--celestial {
+    border-color: var(--atlas-info, #6b7cdb);
+    color: var(--atlas-info, #6b7cdb);
+}
+
+.atlas-avatar__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.atlas-avatar__initials {
+    line-height: 1;
+    user-select: none;
+}

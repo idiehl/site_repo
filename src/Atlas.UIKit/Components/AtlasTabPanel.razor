@@ -1,0 +1,32 @@
+@namespace Atlas.UIKit.Components
+@implements IDisposable
+
+<div class="atlas-tabpanel @(IsActive ? "" : "atlas-tabpanel--hidden")"
+     role="tabpanel"
+     id="atlas-tabpanel-@Parent?.TabsId-@Index"
+     aria-labelledby="atlas-tab-@Parent?.TabsId-@Index"
+     tabindex="0">
+    @if (IsActive)
+    {
+        @ChildContent
+    }
+</div>
+
+@code {
+    [CascadingParameter] public AtlasTabs? Parent { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private int Index => Parent?.GetPanelIndex(this) ?? -1;
+    private bool IsActive => Parent?.CurrentIndex == Index;
+
+    protected override void OnInitialized()
+    {
+        Parent?.RegisterPanel(this);
+    }
+
+    public void Dispose()
+    {
+        Parent?.UnregisterPanel(this);
+    }
+}

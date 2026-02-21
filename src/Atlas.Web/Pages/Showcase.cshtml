@@ -1,0 +1,1039 @@
+@page
+@model Atlas.Web.Pages.ShowcaseModel
+@{
+    ViewData["Title"] = "Atlas UIKit Showcase";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        :root {
+            --atlas-midnight-navy: #0B1226;
+            --atlas-deep-abyss: #070D1A;
+            --atlas-blue: #101B35;
+            --atlas-celestial-navy: #1A2744;
+            --atlas-antique-gold: #C8963E;
+            --atlas-burnished-gold: #A87B2F;
+            --atlas-amber-glow: #D4A94E;
+            --atlas-pale-gold: #E8C97A;
+            --atlas-silver-steel: #BCC5D0;
+            --atlas-mist-gray: #8A94A6;
+            --atlas-cloud-white: #E8ECF1;
+            --atlas-pure-white: #FFFFFF;
+            --atlas-success: #22c55e;
+            --atlas-warning: #f59e0b;
+            --atlas-error: #ef4444;
+            --atlas-info: #6b7cdb;
+            --atlas-radius-sm: 2px;
+            --atlas-radius-md: 4px;
+            --atlas-radius-lg: 6px;
+            --atlas-transition-fast: 150ms ease;
+            --atlas-transition-normal: 300ms ease;
+            --atlas-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --atlas-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --atlas-font-serif: 'Playfair Display', 'Georgia', serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--atlas-font-sans);
+            background: var(--atlas-midnight-navy);
+            color: var(--atlas-silver-steel);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .showcase { max-width: 72rem; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .showcase-header {
+            text-align: center;
+            padding: 4rem 0 3rem;
+        }
+        .showcase-header h1 {
+            font-family: var(--atlas-font-serif);
+            font-size: 2.5rem;
+            color: var(--atlas-cloud-white);
+            margin-bottom: 0.5rem;
+        }
+        .showcase-header p {
+            color: var(--atlas-mist-gray);
+            font-size: 1rem;
+        }
+
+        .section {
+            margin-bottom: 3.5rem;
+        }
+        .section__title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--atlas-antique-gold);
+            margin-bottom: 0.5rem;
+        }
+        .section__divider {
+            height: 1px;
+            background: rgba(200, 150, 62, 0.2);
+            margin-bottom: 2rem;
+        }
+        .section__desc {
+            font-size: 0.8125rem;
+            color: var(--atlas-mist-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem; }
+        .row--center { align-items: center; }
+        .col { flex: 1; min-width: 200px; }
+        .stack { display: flex; flex-direction: column; gap: 1rem; }
+        .inline { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+        .card-demo {
+            background: var(--atlas-blue);
+            border: 1px solid rgba(188, 197, 208, 0.1);
+            border-radius: var(--atlas-radius-md);
+            padding: 1.5rem;
+        }
+        .card-demo--gold {
+            border-color: rgba(200, 150, 62, 0.25);
+        }
+        .card-demo--celestial {
+            border-color: rgba(107, 124, 219, 0.2);
+            background: var(--atlas-celestial-navy);
+        }
+
+        /* Typography */
+        .type-display { font-family: var(--atlas-font-serif); font-size: 3rem; font-weight: 700; color: var(--atlas-cloud-white); line-height: 1.15; }
+        .type-h1 { font-size: 2rem; font-weight: 700; color: var(--atlas-cloud-white); letter-spacing: -0.01em; }
+        .type-h2 { font-size: 1.5rem; font-weight: 700; color: var(--atlas-cloud-white); }
+        .type-h3 { font-size: 1.125rem; font-weight: 600; color: var(--atlas-cloud-white); }
+        .type-h4 { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--atlas-cloud-white); }
+        .type-body { font-size: 0.875rem; color: var(--atlas-silver-steel); }
+        .type-caption { font-size: 0.75rem; color: var(--atlas-mist-gray); text-transform: uppercase; letter-spacing: 0.1em; }
+        .type-mono { font-family: var(--atlas-font-mono); font-size: 0.8125rem; color: var(--atlas-antique-gold); }
+        .type-label { display: block; font-size: 0.625rem; color: var(--atlas-mist-gray); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.25rem; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            border-radius: var(--atlas-radius-sm);
+            font-family: var(--atlas-font-sans);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all var(--atlas-transition-fast);
+            text-decoration: none;
+        }
+        .btn--sm { padding: 0.375rem 0.75rem; font-size: 0.625rem; }
+        .btn--md { padding: 0.5rem 1.25rem; font-size: 0.6875rem; }
+        .btn--lg { padding: 0.625rem 1.75rem; font-size: 0.75rem; }
+
+        .btn--primary { background: var(--atlas-antique-gold); color: var(--atlas-deep-abyss); border-color: var(--atlas-antique-gold); }
+        .btn--primary:hover { background: var(--atlas-amber-glow); border-color: var(--atlas-amber-glow); }
+        .btn--secondary { background: transparent; color: var(--atlas-antique-gold); border-color: var(--atlas-antique-gold); }
+        .btn--secondary:hover { background: rgba(200, 150, 62, 0.1); }
+        .btn--ghost { background: transparent; color: var(--atlas-silver-steel); border-color: rgba(188, 197, 208, 0.2); }
+        .btn--ghost:hover { border-color: rgba(188, 197, 208, 0.4); color: var(--atlas-cloud-white); }
+        .btn--danger { background: var(--atlas-error); color: var(--atlas-pure-white); border-color: var(--atlas-error); }
+        .btn--danger:hover { background: #dc2626; }
+        .btn--celestial { background: rgba(107, 124, 219, 0.15); color: var(--atlas-info); border-color: rgba(107, 124, 219, 0.3); }
+        .btn--celestial:hover { background: rgba(107, 124, 219, 0.25); }
+        .btn--monument { background: transparent; color: var(--atlas-antique-gold); border-color: transparent; border-bottom: 2px solid var(--atlas-antique-gold); border-radius: 0; }
+        .btn--link { background: transparent; color: var(--atlas-antique-gold); border: none; text-decoration: underline; text-underline-offset: 3px; padding-left: 0; padding-right: 0; }
+
+        /* Inputs */
+        .input {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--atlas-deep-abyss);
+            border: 1px solid rgba(188, 197, 208, 0.15);
+            border-radius: var(--atlas-radius-md);
+            color: var(--atlas-silver-steel);
+            font-family: var(--atlas-font-sans);
+            font-size: 0.8125rem;
+            transition: border-color var(--atlas-transition-fast);
+        }
+        .input:focus { outline: none; border-color: var(--atlas-antique-gold); }
+        .input::placeholder { color: var(--atlas-mist-gray); opacity: 0.6; }
+        .input--error { border-color: var(--atlas-error); }
+        .textarea { min-height: 6rem; resize: vertical; }
+
+        .input-label {
+            display: block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--atlas-mist-gray);
+            margin-bottom: 0.375rem;
+        }
+
+        /* Badges (static versions) */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: var(--atlas-radius-sm);
+            border: 1px solid;
+        }
+        .badge--standard { background: rgba(188, 197, 208, 0.12); border-color: rgba(188, 197, 208, 0.3); color: var(--atlas-silver-steel); }
+        .badge--gold { background: rgba(200, 150, 62, 0.15); border-color: rgba(200, 150, 62, 0.4); color: var(--atlas-antique-gold); }
+        .badge--celestial { background: rgba(26, 39, 68, 0.5); border-color: rgba(107, 124, 219, 0.3); color: var(--atlas-info); }
+        .badge--outline { background: transparent; border-color: var(--atlas-antique-gold); color: var(--atlas-antique-gold); }
+
+        /* Tags (static versions) */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: var(--atlas-radius-sm);
+            border: 1px solid;
+        }
+        .tag--standard { background: rgba(188, 197, 208, 0.1); border-color: rgba(188, 197, 208, 0.25); color: var(--atlas-silver-steel); }
+        .tag--gold { background: rgba(200, 150, 62, 0.12); border-color: rgba(200, 150, 62, 0.35); color: var(--atlas-antique-gold); }
+        .tag__remove {
+            background: none; border: none; color: inherit; cursor: pointer;
+            padding: 0.125rem; opacity: 0.6; display: inline-flex;
+        }
+
+        /* Avatar (static versions) */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid;
+            background: var(--atlas-celestial-navy);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            overflow: hidden;
+        }
+        .avatar--standard { border-color: var(--atlas-silver-steel); color: var(--atlas-silver-steel); }
+        .avatar--gold { border-color: var(--atlas-antique-gold); color: var(--atlas-antique-gold); }
+        .avatar--celestial { border-color: var(--atlas-info); color: var(--atlas-info); }
+
+        /* Alerts (static versions) */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            border-radius: var(--atlas-radius-md);
+            border-left: 3px solid;
+            background: var(--atlas-blue);
+        }
+        .alert--info { border-left-color: var(--atlas-info); }
+        .alert--success { border-left-color: var(--atlas-success); }
+        .alert--warning { border-left-color: var(--atlas-warning); }
+        .alert--error { border-left-color: var(--atlas-error); }
+        .alert__icon { flex-shrink: 0; }
+        .alert__icon--info { color: var(--atlas-info); }
+        .alert__icon--success { color: var(--atlas-success); }
+        .alert__icon--warning { color: var(--atlas-warning); }
+        .alert__icon--error { color: var(--atlas-error); }
+        .alert__title { font-size: 0.8125rem; font-weight: 700; color: var(--atlas-cloud-white); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .alert__message { font-size: 0.8125rem; color: var(--atlas-mist-gray); }
+        .alert__dismiss { flex-shrink: 0; background: none; border: none; color: var(--atlas-mist-gray); cursor: pointer; padding: 0.125rem; opacity: 0.6; margin-left: auto; }
+
+        /* Progress (static versions) */
+        .progress { width: 100%; }
+        .progress__header { display: flex; justify-content: space-between; margin-bottom: 0.375rem; }
+        .progress__label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--atlas-silver-steel); }
+        .progress__value { font-size: 0.75rem; font-weight: 600; font-family: var(--atlas-font-mono); color: var(--atlas-mist-gray); }
+        .progress__track { width: 100%; height: 4px; background: rgba(188, 197, 208, 0.1); border-radius: var(--atlas-radius-sm); overflow: hidden; }
+        .progress__fill { height: 100%; border-radius: var(--atlas-radius-sm); }
+        .progress__fill--standard { background: var(--atlas-silver-steel); box-shadow: 0 0 6px rgba(188, 197, 208, 0.3); }
+        .progress__fill--gold { background: var(--atlas-antique-gold); box-shadow: 0 0 6px rgba(200, 150, 62, 0.4); }
+        .progress__fill--celestial { background: var(--atlas-info); box-shadow: 0 0 6px rgba(107, 124, 219, 0.4); }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+        .table th {
+            text-align: left;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--atlas-mist-gray);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(188, 197, 208, 0.12);
+        }
+        .table td {
+            padding: 0.75rem 1rem;
+            color: var(--atlas-silver-steel);
+            border-bottom: 1px solid rgba(188, 197, 208, 0.06);
+        }
+        .table tbody tr:hover {
+            background: rgba(200, 150, 62, 0.04);
+        }
+
+        /* Navbar demo */
+        .navbar-demo {
+            border: 1px solid rgba(188, 197, 208, 0.1);
+            border-radius: var(--atlas-radius-md);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .navbar-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.25rem;
+            height: 3.25rem;
+        }
+        .navbar-preview__brand { display: flex; align-items: center; gap: 0.5rem; }
+        .navbar-preview__logo { color: var(--atlas-antique-gold); }
+        .navbar-preview__name { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--atlas-cloud-white); }
+        .navbar-preview__links { display: flex; gap: 0.25rem; }
+        .navbar-preview__link { font-size: 0.625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--atlas-mist-gray); padding: 0.375rem 0.625rem; text-decoration: none; }
+        .navbar-preview__link--active { color: var(--atlas-antique-gold); }
+
+        .navbar--standard-demo { background: rgba(10, 14, 26, 0.85); border-bottom: 1px solid rgba(200, 150, 62, 0.25); }
+        .navbar--monument-demo { background: var(--atlas-midnight-navy); border-top: 4px solid var(--atlas-antique-gold); }
+        .navbar--celestial-demo { background: rgba(10, 14, 26, 0.7); border-bottom: 1px solid rgba(107, 124, 219, 0.25); }
+        .navbar--minimal-demo { background: transparent; }
+
+        /* Dividers */
+        .divider-line {
+            height: 1px;
+            background: rgba(200, 150, 62, 0.25);
+            margin: 1rem 0;
+        }
+        .divider-compass {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .divider-compass__line { flex: 1; height: 1px; background: rgba(200, 150, 62, 0.25); }
+        .divider-compass__icon { color: var(--atlas-antique-gold); opacity: 0.6; }
+
+        /* Hero demo */
+        .hero-demo {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-radius: var(--atlas-radius-md);
+        }
+        .hero-demo--standard { background: var(--atlas-midnight-navy); border: 1px solid rgba(188, 197, 208, 0.08); }
+        .hero-demo--gradient { background: linear-gradient(180deg, var(--atlas-midnight-navy) 0%, var(--atlas-deep-abyss) 100%); border: 1px solid rgba(188, 197, 208, 0.08); }
+        .hero-demo h2 { font-family: var(--atlas-font-serif); font-size: 2rem; color: var(--atlas-cloud-white); margin-bottom: 0.75rem; }
+        .hero-demo p { color: var(--atlas-mist-gray); font-size: 1rem; max-width: 32rem; margin: 0 auto; }
+
+        /* Footer demo */
+        .footer-demo {
+            background: var(--atlas-deep-abyss);
+            border-radius: var(--atlas-radius-md);
+            overflow: hidden;
+        }
+        .footer-demo__accent { height: 1px; background: linear-gradient(90deg, transparent, var(--atlas-antique-gold) 20%, var(--atlas-antique-gold) 80%, transparent); opacity: 0.5; }
+        .footer-demo__content { padding: 2rem 1.5rem; text-align: center; }
+        .footer-demo__brand { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; color: var(--atlas-cloud-white); margin-bottom: 0.75rem; }
+        .footer-demo__links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; }
+        .footer-demo__link { font-size: 0.75rem; color: var(--atlas-mist-gray); text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em; }
+        .footer-demo__copyright { font-size: 0.6875rem; color: var(--atlas-mist-gray); opacity: 0.6; }
+
+        /* Status banner demo */
+        .banner-demo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            border-radius: var(--atlas-radius-md);
+            margin-bottom: 0.75rem;
+        }
+        .banner--info { background: var(--atlas-info); color: var(--atlas-pure-white); }
+        .banner--success { background: var(--atlas-success); color: var(--atlas-pure-white); }
+        .banner--warning { background: var(--atlas-warning); color: var(--atlas-deep-abyss); }
+        .banner--error { background: var(--atlas-error); color: var(--atlas-pure-white); }
+
+        /* Interactive note */
+        .interactive-note {
+            background: rgba(107, 124, 219, 0.08);
+            border: 1px solid rgba(107, 124, 219, 0.2);
+            border-radius: var(--atlas-radius-md);
+            padding: 1.25rem 1.5rem;
+            font-size: 0.8125rem;
+            color: var(--atlas-mist-gray);
+        }
+        .interactive-note strong { color: var(--atlas-info); }
+
+        /* Tabs demo */
+        .tabs-demo__bar {
+            display: flex;
+            border-bottom: 1px solid rgba(188, 197, 208, 0.12);
+        }
+        .tabs-demo__tab {
+            font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--atlas-mist-gray); padding: 0.75rem 1.25rem;
+            border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer;
+            margin-bottom: -1px;
+        }
+        .tabs-demo__tab--active { color: var(--atlas-antique-gold); border-bottom-color: var(--atlas-antique-gold); }
+        .tabs-demo__panel { padding: 1.25rem 0; }
+
+        /* Modal demo */
+        .modal-demo {
+            background: var(--atlas-blue);
+            border: 1px solid rgba(200, 150, 62, 0.2);
+            border-radius: var(--atlas-radius-lg);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+            max-width: 28rem;
+        }
+        .modal-demo__header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(188, 197, 208, 0.1);
+        }
+        .modal-demo__title { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--atlas-antique-gold); }
+        .modal-demo__close { background: none; border: none; color: var(--atlas-mist-gray); cursor: pointer; }
+        .modal-demo__body { padding: 1.5rem; color: var(--atlas-silver-steel); font-size: 0.875rem; }
+        .modal-demo__footer {
+            display: flex; justify-content: flex-end; gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(188, 197, 208, 0.1);
+        }
+
+        /* Dropdown demo */
+        .dropdown-demo { min-width: 12rem; }
+        .dropdown-demo__trigger {
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--atlas-deep-abyss);
+            border: 1px solid var(--atlas-antique-gold);
+            border-radius: var(--atlas-radius-md);
+            color: var(--atlas-silver-steel); font-size: 0.8125rem; cursor: pointer;
+        }
+        .dropdown-demo__panel {
+            background: var(--atlas-blue);
+            border: 1px solid rgba(200, 150, 62, 0.2);
+            border-radius: var(--atlas-radius-md);
+            margin-top: 0.25rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .dropdown-demo__item { padding: 0.5rem 0.75rem; font-size: 0.8125rem; color: var(--atlas-silver-steel); }
+        .dropdown-demo__item--selected { color: var(--atlas-antique-gold); background: rgba(200, 150, 62, 0.08); }
+
+        /* Tooltip demo */
+        .tooltip-demo {
+            position: relative;
+            display: inline-flex;
+        }
+        .tooltip-demo__tip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.375rem 0.625rem;
+            background: rgba(10, 14, 26, 0.95);
+            border: 1px solid rgba(200, 150, 62, 0.4);
+            border-radius: var(--atlas-radius-sm);
+            color: var(--atlas-silver-steel);
+            font-size: 0.6875rem;
+            white-space: nowrap;
+        }
+        .tooltip-demo__tip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(200, 150, 62, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="showcase">
+    <header class="showcase-header">
+        <h1>Atlas UIKit Showcase</h1>
+        <p>A complete design system for Atlas Universalis &mdash; dark, nautical, cartographic.</p>
+    </header>
+
+    <!-- 1. Typography -->
+    <section class="section">
+        <h2 class="section__title">Typography</h2>
+        <div class="section__divider"></div>
+        <div class="stack">
+            <div>
+                <span class="type-label">Display</span>
+                <div class="type-display">Charting Unknown Waters</div>
+            </div>
+            <div>
+                <span class="type-label">Heading 1</span>
+                <div class="type-h1">The Atlas Compendium</div>
+            </div>
+            <div>
+                <span class="type-label">Heading 2</span>
+                <div class="type-h2">Navigational Reference</div>
+            </div>
+            <div>
+                <span class="type-label">Heading 3</span>
+                <div class="type-h3">Coordinate Systems</div>
+            </div>
+            <div>
+                <span class="type-label">Heading 4</span>
+                <div class="type-h4">Sector Classification</div>
+            </div>
+            <div>
+                <span class="type-label">Body</span>
+                <div class="type-body">The cartographer's instruments lay spread across the mahogany desk, each one calibrated to the celestial meridians. Every measurement contributed to the grand atlas, a living document of explored territories.</div>
+            </div>
+            <div>
+                <span class="type-label">Caption</span>
+                <div class="type-caption">Coordinates verified &bull; Sector Alpha-7</div>
+            </div>
+            <div>
+                <span class="type-label">Monospace</span>
+                <div class="type-mono">const atlas = new Atlas({ projection: 'mercator' });</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Buttons -->
+    <section class="section">
+        <h2 class="section__title">Buttons</h2>
+        <div class="section__divider"></div>
+        <p class="section__desc">Seven variants across three sizes. Primary gold, outlined secondary, ghost, danger, celestial, monument, and text link.</p>
+
+        <div class="stack">
+            <div>
+                <span class="type-label">Primary</span>
+                <div class="inline">
+                    <button class="btn btn--primary btn--sm">Small</button>
+                    <button class="btn btn--primary btn--md">Medium</button>
+                    <button class="btn btn--primary btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Secondary</span>
+                <div class="inline">
+                    <button class="btn btn--secondary btn--sm">Small</button>
+                    <button class="btn btn--secondary btn--md">Medium</button>
+                    <button class="btn btn--secondary btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Ghost</span>
+                <div class="inline">
+                    <button class="btn btn--ghost btn--sm">Small</button>
+                    <button class="btn btn--ghost btn--md">Medium</button>
+                    <button class="btn btn--ghost btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Danger</span>
+                <div class="inline">
+                    <button class="btn btn--danger btn--sm">Small</button>
+                    <button class="btn btn--danger btn--md">Medium</button>
+                    <button class="btn btn--danger btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Celestial</span>
+                <div class="inline">
+                    <button class="btn btn--celestial btn--sm">Small</button>
+                    <button class="btn btn--celestial btn--md">Medium</button>
+                    <button class="btn btn--celestial btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Monument</span>
+                <div class="inline">
+                    <button class="btn btn--monument btn--sm">Small</button>
+                    <button class="btn btn--monument btn--md">Medium</button>
+                    <button class="btn btn--monument btn--lg">Large</button>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Link</span>
+                <div class="inline">
+                    <button class="btn btn--link btn--sm">Small</button>
+                    <button class="btn btn--link btn--md">Medium</button>
+                    <button class="btn btn--link btn--lg">Large</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Cards -->
+    <section class="section">
+        <h2 class="section__title">Cards</h2>
+        <div class="section__divider"></div>
+        <div class="row">
+            <div class="col">
+                <div class="card-demo">
+                    <div class="type-h4" style="margin-bottom: 0.75rem;">Standard Card</div>
+                    <div class="type-body">Default surface with subtle border. Used for general content containers and data display panels.</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card-demo card-demo--gold">
+                    <div class="type-h4" style="color: var(--atlas-antique-gold); margin-bottom: 0.75rem;">Gold Card</div>
+                    <div class="type-body">Elevated importance with gold accent border. Suitable for featured content and highlighted sections.</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card-demo card-demo--celestial">
+                    <div class="type-h4" style="color: var(--atlas-info); margin-bottom: 0.75rem;">Celestial Card</div>
+                    <div class="type-body">Celestial navy background with blue accent. Used for informational panels and navigation waypoints.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Inputs & Textarea -->
+    <section class="section">
+        <h2 class="section__title">Inputs &amp; Textarea</h2>
+        <div class="section__divider"></div>
+        <div class="row">
+            <div class="col">
+                <label class="input-label" for="demo-input">Standard Input</label>
+                <input class="input" type="text" id="demo-input" placeholder="Enter coordinates..." />
+            </div>
+            <div class="col">
+                <label class="input-label" for="demo-input-err">Error State</label>
+                <input class="input input--error" type="text" id="demo-input-err" value="Invalid coordinate" />
+            </div>
+            <div class="col">
+                <label class="input-label" for="demo-input-dis">Disabled</label>
+                <input class="input" type="text" id="demo-input-dis" value="Locked sector" disabled style="opacity: 0.5;" />
+            </div>
+        </div>
+        <div style="max-width: 32rem; margin-top: 1rem;">
+            <label class="input-label" for="demo-textarea">Textarea</label>
+            <textarea class="input textarea" id="demo-textarea" placeholder="Log entry..."></textarea>
+        </div>
+    </section>
+
+    <!-- 5. Badges & Tags -->
+    <section class="section">
+        <h2 class="section__title">Badges &amp; Tags</h2>
+        <div class="section__divider"></div>
+        <div class="stack">
+            <div>
+                <span class="type-label">Badges</span>
+                <div class="inline">
+                    <span class="badge badge--standard">Standard</span>
+                    <span class="badge badge--gold">Gold</span>
+                    <span class="badge badge--celestial">Celestial</span>
+                    <span class="badge badge--outline">Outline</span>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Tags (standard)</span>
+                <div class="inline">
+                    <span class="tag tag--standard">Navigation<button class="tag__remove" aria-label="Remove">&times;</button></span>
+                    <span class="tag tag--standard">Cartography</span>
+                    <span class="tag tag--standard">Meridian</span>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Tags (gold)</span>
+                <div class="inline">
+                    <span class="tag tag--gold">Priority<button class="tag__remove" aria-label="Remove">&times;</button></span>
+                    <span class="tag tag--gold">Featured</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Avatar -->
+    <section class="section">
+        <h2 class="section__title">Avatar</h2>
+        <div class="section__divider"></div>
+        <div class="inline" style="gap: 1rem;">
+            <div style="text-align: center;">
+                <div class="avatar avatar--standard" style="width: 40px; height: 40px; font-size: 16px;">AU</div>
+                <div class="type-label" style="margin-top: 0.5rem;">Standard</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="avatar avatar--gold" style="width: 40px; height: 40px; font-size: 16px;">JD</div>
+                <div class="type-label" style="margin-top: 0.5rem;">Gold</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="avatar avatar--celestial" style="width: 40px; height: 40px; font-size: 16px;">MK</div>
+                <div class="type-label" style="margin-top: 0.5rem;">Celestial</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="avatar avatar--standard" style="width: 32px; height: 32px; font-size: 12px;">S</div>
+                <div class="type-label" style="margin-top: 0.5rem;">Small</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="avatar avatar--gold" style="width: 56px; height: 56px; font-size: 22px;">LG</div>
+                <div class="type-label" style="margin-top: 0.5rem;">Large</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Alerts -->
+    <section class="section">
+        <h2 class="section__title">Alerts</h2>
+        <div class="section__divider"></div>
+        <div class="stack">
+            <div class="alert alert--info">
+                <div class="alert__icon alert__icon--info">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 8V12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="5.75" r="0.75" fill="currentColor"/></svg>
+                </div>
+                <div>
+                    <div class="alert__title">Information</div>
+                    <div class="alert__message">New cartographic data available for the northern sectors. Review recommended.</div>
+                </div>
+            </div>
+            <div class="alert alert--success">
+                <div class="alert__icon alert__icon--success">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 9L8 11.5L12.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                    <div class="alert__title">Success</div>
+                    <div class="alert__message">Coordinates verified and atlas updated successfully.</div>
+                </div>
+            </div>
+            <div class="alert alert--warning">
+                <div class="alert__icon alert__icon--warning">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5L16.5 15H1.5L9 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.75" r="0.75" fill="currentColor"/></svg>
+                </div>
+                <div>
+                    <div class="alert__title">Warning</div>
+                    <div class="alert__message">Approaching uncharted territory. Navigation instruments require calibration.</div>
+                </div>
+                <button class="alert__dismiss" aria-label="Dismiss">&times;</button>
+            </div>
+            <div class="alert alert--error">
+                <div class="alert__icon alert__icon--error">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6 6L12 12M12 6L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+                <div>
+                    <div class="alert__title">Error</div>
+                    <div class="alert__message">Failed to synchronize with celestial navigation beacon. Connection lost.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Progress -->
+    <section class="section">
+        <h2 class="section__title">Progress</h2>
+        <div class="section__divider"></div>
+        <div class="stack" style="max-width: 28rem;">
+            <div class="progress">
+                <div class="progress__header">
+                    <span class="progress__label">Standard</span>
+                    <span class="progress__value">65%</span>
+                </div>
+                <div class="progress__track">
+                    <div class="progress__fill progress__fill--standard" style="width: 65%;"></div>
+                </div>
+            </div>
+            <div class="progress">
+                <div class="progress__header">
+                    <span class="progress__label">Gold</span>
+                    <span class="progress__value">42%</span>
+                </div>
+                <div class="progress__track">
+                    <div class="progress__fill progress__fill--gold" style="width: 42%;"></div>
+                </div>
+            </div>
+            <div class="progress">
+                <div class="progress__header">
+                    <span class="progress__label">Celestial</span>
+                    <span class="progress__value">88%</span>
+                </div>
+                <div class="progress__track">
+                    <div class="progress__fill progress__fill--celestial" style="width: 88%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Table -->
+    <section class="section">
+        <h2 class="section__title">Table</h2>
+        <div class="section__divider"></div>
+        <div class="card-demo" style="padding: 0; overflow: hidden;">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th>Status</th>
+                            <th>Coordinates</th>
+                            <th>Surveyor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alpha-7</td>
+                            <td><span class="badge badge--gold">Charted</span></td>
+                            <td style="font-family: var(--atlas-font-mono); font-size: 0.75rem;">41.4025&deg; N, 2.1743&deg; W</td>
+                            <td>Dr. Helena Voss</td>
+                        </tr>
+                        <tr>
+                            <td>Beta-12</td>
+                            <td><span class="badge badge--celestial">In Progress</span></td>
+                            <td style="font-family: var(--atlas-font-mono); font-size: 0.75rem;">33.8688&deg; S, 151.2093&deg; E</td>
+                            <td>Cmdr. James Okafor</td>
+                        </tr>
+                        <tr>
+                            <td>Gamma-3</td>
+                            <td><span class="badge badge--standard">Pending</span></td>
+                            <td style="font-family: var(--atlas-font-mono); font-size: 0.75rem;">51.5074&deg; N, 0.1278&deg; W</td>
+                            <td>Lt. Sarah Chen</td>
+                        </tr>
+                        <tr>
+                            <td>Delta-9</td>
+                            <td><span class="badge badge--outline">Restricted</span></td>
+                            <td style="font-family: var(--atlas-font-mono); font-size: 0.75rem;">35.6762&deg; N, 139.6503&deg; E</td>
+                            <td>Prof. Marcus Wei</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Navigation -->
+    <section class="section">
+        <h2 class="section__title">Navigation</h2>
+        <div class="section__divider"></div>
+        <p class="section__desc">Four navbar variants: standard, monument, celestial, and minimal.</p>
+        <div class="stack">
+            <div>
+                <span class="type-label">Standard</span>
+                <div class="navbar-demo">
+                    <div class="navbar-preview navbar--standard-demo">
+                        <div class="navbar-preview__brand">
+                            <svg class="navbar-preview__logo" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M7 16H17" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="10" r="2" fill="currentColor"/></svg>
+                            <span class="navbar-preview__name">Atlas Universalis</span>
+                        </div>
+                        <div class="navbar-preview__links">
+                            <span class="navbar-preview__link navbar-preview__link--active" style="border-bottom: 2px solid var(--atlas-antique-gold);">Dashboard</span>
+                            <span class="navbar-preview__link">Charts</span>
+                            <span class="navbar-preview__link">Sectors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Monument</span>
+                <div class="navbar-demo">
+                    <div class="navbar-preview navbar--monument-demo">
+                        <div class="navbar-preview__brand">
+                            <svg class="navbar-preview__logo" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M7 16H17" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="10" r="2" fill="currentColor"/></svg>
+                            <span class="navbar-preview__name">Atlas Universalis</span>
+                        </div>
+                        <div class="navbar-preview__links">
+                            <span class="navbar-preview__link navbar-preview__link--active">Dashboard</span>
+                            <span style="width: 1px; height: 1rem; background: rgba(200, 150, 62, 0.3);"></span>
+                            <span class="navbar-preview__link">Charts</span>
+                            <span style="width: 1px; height: 1rem; background: rgba(200, 150, 62, 0.3);"></span>
+                            <span class="navbar-preview__link">Sectors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Celestial</span>
+                <div class="navbar-demo">
+                    <div class="navbar-preview navbar--celestial-demo">
+                        <div class="navbar-preview__brand">
+                            <svg class="navbar-preview__logo" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 2V22M2 12H22" stroke="currentColor" stroke-width="1"/></svg>
+                            <span class="navbar-preview__name">Atlas Universalis</span>
+                        </div>
+                        <div class="navbar-preview__links">
+                            <span class="navbar-preview__link navbar-preview__link--active" style="display: flex; flex-direction: column; align-items: center;">Dashboard<span style="display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--atlas-antique-gold); margin-top: 2px;"></span></span>
+                            <span class="navbar-preview__link">Charts</span>
+                            <span class="navbar-preview__link">Sectors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="type-label">Minimal</span>
+                <div class="navbar-demo">
+                    <div class="navbar-preview navbar--minimal-demo">
+                        <div class="navbar-preview__brand">
+                            <span style="font-size: 0.875rem; font-weight: 700; color: var(--atlas-antique-gold); letter-spacing: 0.15em;">AU</span>
+                            <span class="navbar-preview__name">Atlas Universalis</span>
+                        </div>
+                        <div class="navbar-preview__links">
+                            <span class="navbar-preview__link navbar-preview__link--active">Dashboard</span>
+                            <span class="navbar-preview__link">Charts</span>
+                            <span class="navbar-preview__link">Sectors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <span class="type-label">Footer</span>
+            <div class="footer-demo">
+                <div class="footer-demo__accent"></div>
+                <div class="footer-demo__content">
+                    <div class="footer-demo__brand">Atlas Universalis</div>
+                    <div class="footer-demo__links">
+                        <span class="footer-demo__link">Documentation</span>
+                        <span class="footer-demo__link">API</span>
+                        <span class="footer-demo__link">Status</span>
+                        <span class="footer-demo__link">Contact</span>
+                    </div>
+                    <div class="footer-demo__copyright">&copy; @DateTime.Now.Year Atlas Universalis. All rights reserved.</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <span class="type-label">Dividers</span>
+            <p class="type-body" style="margin-bottom: 0.5rem;">Line variant:</p>
+            <div class="divider-line"></div>
+            <p class="type-body" style="margin-bottom: 0.5rem; margin-top: 1rem;">Compass variant:</p>
+            <div class="divider-compass">
+                <div class="divider-compass__line"></div>
+                <div class="divider-compass__icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
+                        <path d="M10 2L10 7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M10 13L10 18" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M2 10L7 10" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M13 10L18 10" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="divider-compass__line"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <span class="type-label">Hero Sections</span>
+            <div class="stack" style="margin-top: 0.5rem;">
+                <div class="hero-demo hero-demo--standard">
+                    <h2>Standard Hero</h2>
+                    <p>Full-width section with midnight navy background and centered content.</p>
+                </div>
+                <div class="hero-demo hero-demo--gradient">
+                    <h2>Gradient Hero</h2>
+                    <p>Smooth gradient from midnight navy to deep abyss for visual depth.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <span class="type-label">Status Banners</span>
+            <div class="stack" style="margin-top: 0.5rem;">
+                <div class="banner-demo banner--info">System maintenance scheduled for 02:00 UTC</div>
+                <div class="banner-demo banner--success">All navigation beacons operational</div>
+                <div class="banner-demo banner--warning">Solar interference detected in Sector Delta</div>
+                <div class="banner-demo banner--error">Critical: Atlas synchronization failure</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Interactive Components -->
+    <section class="section">
+        <h2 class="section__title">Interactive Components</h2>
+        <div class="section__divider"></div>
+        <div class="interactive-note" style="margin-bottom: 2rem;">
+            <strong>Note:</strong> The components below are Blazor Server components. The previews shown are static representations. For full interactivity (state changes, event handling, keyboard navigation), these components require the Blazor Server runtime.
+        </div>
+
+        <div class="stack" style="gap: 2.5rem;">
+            <!-- Tabs -->
+            <div>
+                <span class="type-label">Tabs</span>
+                <div class="card-demo" style="margin-top: 0.5rem;">
+                    <div class="tabs-demo__bar">
+                        <button class="tabs-demo__tab tabs-demo__tab--active">Overview</button>
+                        <button class="tabs-demo__tab">Coordinates</button>
+                        <button class="tabs-demo__tab">History</button>
+                    </div>
+                    <div class="tabs-demo__panel">
+                        <div class="type-body">Tab panel content appears here. The active tab has a gold underline indicator. Tab labels use uppercase tracking for the Atlas design language.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div>
+                <span class="type-label">Modal</span>
+                <div style="margin-top: 0.5rem;">
+                    <div class="modal-demo">
+                        <div class="modal-demo__header">
+                            <span class="modal-demo__title">Confirm Navigation</span>
+                            <button class="modal-demo__close" aria-label="Close">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            </button>
+                        </div>
+                        <div class="modal-demo__body">
+                            Are you sure you want to navigate to uncharted territory? This action cannot be undone.
+                        </div>
+                        <div class="modal-demo__footer">
+                            <button class="btn btn--ghost btn--sm">Cancel</button>
+                            <button class="btn btn--primary btn--sm">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dropdown -->
+            <div>
+                <span class="type-label">Dropdown</span>
+                <div style="margin-top: 0.5rem;">
+                    <div class="dropdown-demo">
+                        <div class="dropdown-demo__trigger">
+                            <span>Select sector...</span>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="dropdown-demo__panel">
+                            <div class="dropdown-demo__item dropdown-demo__item--selected">Alpha-7</div>
+                            <div class="dropdown-demo__item">Beta-12</div>
+                            <div class="dropdown-demo__item">Gamma-3</div>
+                            <div class="dropdown-demo__item">Delta-9</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tooltip -->
+            <div>
+                <span class="type-label">Tooltip</span>
+                <div class="inline" style="margin-top: 0.5rem; gap: 2rem;">
+                    <div class="tooltip-demo">
+                        <div class="tooltip-demo__tip">Sector coordinates</div>
+                        <button class="btn btn--secondary btn--sm">Hover target</button>
+                    </div>
+                    <div class="type-body" style="color: var(--atlas-mist-gray);">CSS-only hover tooltip with gold border and directional arrow. Supports top and bottom positioning.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

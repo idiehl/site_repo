@@ -1,0 +1,77 @@
+.atlas-dropdown {
+    position: relative;
+    display: inline-block;
+    font-family: var(--atlas-font-sans);
+    min-width: 12rem;
+}
+
+.atlas-dropdown__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--atlas-deep-abyss, #070D1A);
+    border: 1px solid rgba(188, 197, 208, 0.15);
+    border-radius: var(--atlas-radius-md, 4px);
+    color: var(--atlas-silver-steel, #BCC5D0);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: border-color var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-dropdown__trigger:hover,
+.atlas-dropdown--open .atlas-dropdown__trigger {
+    border-color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-dropdown__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.atlas-dropdown__chevron {
+    flex-shrink: 0;
+    color: var(--atlas-mist-gray, #8A94A6);
+    transition: transform var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-dropdown--open .atlas-dropdown__chevron {
+    transform: rotate(180deg);
+}
+
+.atlas-dropdown__panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--atlas-blue, #101B35);
+    border: 1px solid rgba(200, 150, 62, 0.2);
+    border-radius: var(--atlas-radius-md, 4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 50;
+    max-height: 15rem;
+    overflow-y: auto;
+    padding: 0.25rem 0;
+}
+
+::deep .atlas-dropdown-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--atlas-silver-steel, #BCC5D0);
+    cursor: pointer;
+    transition: background var(--atlas-transition-fast, 150ms ease),
+                color var(--atlas-transition-fast, 150ms ease);
+}
+
+::deep .atlas-dropdown-item:hover {
+    background: rgba(200, 150, 62, 0.1);
+    color: var(--atlas-antique-gold, #C8963E);
+}
+
+::deep .atlas-dropdown-item--selected {
+    color: var(--atlas-antique-gold, #C8963E);
+    background: rgba(200, 150, 62, 0.08);
+}

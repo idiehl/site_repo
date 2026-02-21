@@ -1,0 +1,54 @@
+.atlas-tooltip {
+    position: relative;
+    display: inline-flex;
+}
+
+.atlas-tooltip__content {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.375rem 0.625rem;
+    background: rgba(10, 14, 26, 0.95);
+    border: 1px solid rgba(200, 150, 62, 0.4);
+    border-radius: var(--atlas-radius-sm, 2px);
+    color: var(--atlas-silver-steel, #BCC5D0);
+    font-family: var(--atlas-font-sans);
+    font-size: 0.6875rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--atlas-transition-fast, 150ms ease);
+    z-index: 1000;
+}
+
+.atlas-tooltip--top .atlas-tooltip__content {
+    bottom: calc(100% + 8px);
+}
+
+.atlas-tooltip--top .atlas-tooltip__content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(200, 150, 62, 0.4);
+}
+
+.atlas-tooltip--bottom .atlas-tooltip__content {
+    top: calc(100% + 8px);
+}
+
+.atlas-tooltip--bottom .atlas-tooltip__content::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: rgba(200, 150, 62, 0.4);
+}
+
+.atlas-tooltip:hover .atlas-tooltip__content {
+    opacity: 1;
+}

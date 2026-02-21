@@ -1,0 +1,61 @@
+@namespace Atlas.UIKit.Components
+
+<div class="atlas-tabs" @attributes="AdditionalAttributes">
+    <div class="atlas-tabs__bar" role="tablist">
+        @for (var i = 0; i < _panels.Count; i++)
+        {
+            var idx = i;
+            var panel = _panels[i];
+            <button class="atlas-tabs__tab @(ActiveIndex == idx ? "atlas-tabs__tab--active" : "")"
+                    role="tab"
+                    type="button"
+                    id="atlas-tab-@_id-@idx"
+                    aria-selected="@(ActiveIndex == idx)"
+                    aria-controls="atlas-tabpanel-@_id-@idx"
+                    @onclick="() => SetActive(idx)">
+                @panel.Title
+            </button>
+        }
+    </div>
+    <div class="atlas-tabs__panels">
+        <CascadingValue Value="this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int ActiveIndex { get; set; }
+    [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly string _id = Guid.NewGuid().ToString("N")[..8];
+    private readonly List<AtlasTabPanel> _panels = new();
+
+    internal string TabsId => _id;
+    internal int CurrentIndex => ActiveIndex;
+
+    internal void RegisterPanel(AtlasTabPanel panel)
+    {
+        if (!_panels.Contains(panel))
+        {
+            _panels.Add(panel);
+            StateHasChanged();
+        }
+    }
+
+    internal void UnregisterPanel(AtlasTabPanel panel)
+    {
+        _panels.Remove(panel);
+        StateHasChanged();
+    }
+
+    internal int GetPanelIndex(AtlasTabPanel panel) => _panels.IndexOf(panel);
+
+    private async Task SetActive(int index)
+    {
+        ActiveIndex = index;
+        await ActiveIndexChanged.InvokeAsync(index);
+    }
+}

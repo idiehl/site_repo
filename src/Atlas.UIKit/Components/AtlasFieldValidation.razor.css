@@ -1,0 +1,10 @@
+.atlas-field-validation {
+    font-family: var(--atlas-font-sans, 'Inter', system-ui, sans-serif);
+}
+
+.atlas-field-validation__message {
+    margin: var(--atlas-space-1, 0.25rem) 0 0 0;
+    font-size: 0.75rem;
+    color: var(--atlas-error, #ef4444);
+    line-height: 1.4;
+}

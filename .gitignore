@@ -24,6 +24,8 @@ node_modules/
 
 # Build output
 dist/
+bin/
+obj/
 
 # Runtime uploads
 atlasops/uploads/

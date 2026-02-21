@@ -1,0 +1,63 @@
+.atlas-hero {
+    width: 100%;
+    padding: 6rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--atlas-font-sans);
+}
+
+.atlas-hero--standard {
+    background: var(--atlas-midnight-navy, #0B1226);
+}
+
+.atlas-hero--gradient {
+    background: linear-gradient(
+        180deg,
+        var(--atlas-midnight-navy, #0B1226) 0%,
+        var(--atlas-deep-abyss, #070D1A) 100%
+    );
+}
+
+.atlas-hero__content {
+    max-width: 56rem;
+    text-align: center;
+}
+
+.atlas-hero__title {
+    font-family: var(--atlas-font-serif, var(--atlas-font-sans));
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--atlas-cloud-white, #E8ECF1);
+    margin: 0 0 1rem 0;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
+.atlas-hero__subtitle {
+    font-size: 1.125rem;
+    color: var(--atlas-mist-gray, #8A94A6);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+    max-width: 40rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.atlas-hero__body {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .atlas-hero {
+        padding: 4rem 1rem;
+    }
+
+    .atlas-hero__title {
+        font-size: 2rem;
+    }
+
+    .atlas-hero__subtitle {
+        font-size: 1rem;
+    }
+}

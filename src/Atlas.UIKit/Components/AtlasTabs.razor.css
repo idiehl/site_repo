@@ -1,0 +1,44 @@
+.atlas-tabs {
+    width: 100%;
+    font-family: var(--atlas-font-sans);
+}
+
+.atlas-tabs__bar {
+    display: flex;
+    border-bottom: 1px solid rgba(188, 197, 208, 0.12);
+    gap: 0;
+}
+
+.atlas-tabs__tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--atlas-mist-gray, #8A94A6);
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: color var(--atlas-transition-fast, 150ms ease),
+                border-color var(--atlas-transition-fast, 150ms ease);
+    margin-bottom: -1px;
+}
+
+.atlas-tabs__tab:hover {
+    color: var(--atlas-cloud-white, #E8ECF1);
+}
+
+.atlas-tabs__tab--active {
+    color: var(--atlas-antique-gold, #C8963E);
+    border-bottom-color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-tabs__panels {
+    padding: 1.25rem 0;
+}
+
+::deep .atlas-tabpanel--hidden {
+    display: none;
+}

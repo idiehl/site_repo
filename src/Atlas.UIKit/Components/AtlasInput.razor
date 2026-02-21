@@ -1,0 +1,45 @@
+<div class="atlas-input-wrapper atlas-input--@Variant @(Disabled ? "atlas-input--disabled" : "") @CssClass">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="atlas-input__label">@Label</label>
+    }
+    <div class="atlas-input__field-wrapper">
+        @if (Variant == "bordered")
+        {
+            <div class="atlas-input__corner atlas-input__corner--tl"></div>
+            <div class="atlas-input__corner atlas-input__corner--tr"></div>
+            <div class="atlas-input__corner atlas-input__corner--bl"></div>
+            <div class="atlas-input__corner atlas-input__corner--br"></div>
+        }
+        <input class="atlas-input__field"
+               type="@Type"
+               placeholder="@Placeholder"
+               value="@Value"
+               disabled="@Disabled"
+               @oninput="OnInput"
+               @attributes="AdditionalAttributes" />
+        @if (Variant == "underline")
+        {
+            <div class="atlas-input__underline"></div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Enter text...";
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Type { get; set; } = "text";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

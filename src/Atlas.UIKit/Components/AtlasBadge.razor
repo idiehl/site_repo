@@ -1,0 +1,19 @@
+@namespace Atlas.UIKit.Components
+
+<span class="atlas-badge @VariantClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string VariantClass => Variant switch
+    {
+        "gold" => "atlas-badge--gold",
+        "celestial" => "atlas-badge--celestial",
+        "outline" => "atlas-badge--outline",
+        _ => "atlas-badge--standard"
+    };
+}

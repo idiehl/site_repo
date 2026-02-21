@@ -1,0 +1,144 @@
+@namespace Atlas.UIKit.Components
+
+<nav class="atlas-navbar @VariantClass" role="navigation" aria-label="Main navigation" @attributes="AdditionalAttributes">
+    <div class="atlas-navbar__inner">
+        <div class="atlas-navbar__brand">
+            @if (ShowLogo)
+            {
+                @if (Variant == "celestial")
+                {
+                    <svg class="atlas-navbar__logo" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 2V22M2 12H22" stroke="currentColor" stroke-width="1"/>
+                        <path d="M12 2L14 12L12 22L10 12Z" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                }
+                else if (Variant == "minimal")
+                {
+                    <span class="atlas-navbar__logo-text">AU</span>
+                }
+                else
+                {
+                    <svg class="atlas-navbar__logo" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <path d="M7 16H17" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="12" cy="10" r="2" fill="currentColor"/>
+                    </svg>
+                }
+            }
+            <span class="atlas-navbar__brand-name">@BrandName</span>
+        </div>
+
+        <div class="atlas-navbar__links">
+            @if (Items is not null)
+            {
+                @for (var i = 0; i < Items.Count; i++)
+                {
+                    var item = Items[i];
+                    var isActive = _activeIndex == i;
+                    @if (!string.IsNullOrWhiteSpace(item.Href))
+                    {
+                        <a class="atlas-navbar__link @(isActive ? "atlas-navbar__link--active" : "")"
+                           href="@item.Href"
+                           @onclick="() => _activeIndex = i"
+                           @onclick:preventDefault="false">
+                            @item.Label
+                            @if (Variant == "celestial" && isActive)
+                            {
+                                <span class="atlas-navbar__dot"></span>
+                            }
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="atlas-navbar__link @(isActive ? "atlas-navbar__link--active" : "")"
+                                type="button"
+                                @onclick="() => _activeIndex = i">
+                            @item.Label
+                            @if (Variant == "celestial" && isActive)
+                            {
+                                <span class="atlas-navbar__dot"></span>
+                            }
+                        </button>
+                    }
+
+                    @if (Variant == "monument" && i < Items.Count - 1)
+                    {
+                        <span class="atlas-navbar__divider" aria-hidden="true"></span>
+                    }
+                }
+            }
+        </div>
+
+        <button class="atlas-navbar__hamburger" type="button"
+                aria-label="Toggle menu" aria-expanded="@_mobileOpen"
+                @onclick="ToggleMobile">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                @if (_mobileOpen)
+                {
+                    <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                }
+                else
+                {
+                    <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                }
+            </svg>
+        </button>
+    </div>
+
+    @if (_mobileOpen && Items is { Count: > 0 })
+    {
+        <div class="atlas-navbar__mobile">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                var idx = i;
+                var isActive = _activeIndex == i;
+                @if (!string.IsNullOrWhiteSpace(item.Href))
+                {
+                    <a class="atlas-navbar__mobile-link @(isActive ? "atlas-navbar__link--active" : "")"
+                       href="@item.Href"
+                       @onclick="() => { _activeIndex = idx; _mobileOpen = false; }"
+                       @onclick:preventDefault="false">
+                        @item.Label
+                    </a>
+                }
+                else
+                {
+                    <button class="atlas-navbar__mobile-link @(isActive ? "atlas-navbar__link--active" : "")"
+                            type="button"
+                            @onclick="() => { _activeIndex = idx; _mobileOpen = false; }">
+                        @item.Label
+                    </button>
+                }
+            }
+        </div>
+    }
+</nav>
+
+@code {
+    [Parameter] public List<NavItem>? Items { get; set; }
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public bool ShowLogo { get; set; } = true;
+    [Parameter] public string BrandName { get; set; } = "Atlas Universalis";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool _mobileOpen;
+    private int _activeIndex;
+
+    private string VariantClass => Variant switch
+    {
+        "monument" => "atlas-navbar--monument",
+        "celestial" => "atlas-navbar--celestial",
+        "minimal" => "atlas-navbar--minimal",
+        _ => "atlas-navbar--standard"
+    };
+
+    private void ToggleMobile() => _mobileOpen = !_mobileOpen;
+
+    public class NavItem
+    {
+        public string Label { get; set; } = "";
+        public string? Href { get; set; }
+    }
+}

@@ -1,0 +1,148 @@
+/* ==========================================================================
+   Atlas UIKit — Utilities
+   Layout helpers, spacing, visibility, scrollbar styling, and animations.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   Flexbox
+   ------------------------------------------------------------------ */
+
+.atlas-flex         { display: flex; }
+.atlas-flex-col     { display: flex; flex-direction: column; }
+.atlas-flex-center  { display: flex; align-items: center; justify-content: center; }
+.atlas-flex-between { display: flex; align-items: center; justify-content: space-between; }
+.atlas-flex-wrap    { flex-wrap: wrap; }
+
+.atlas-gap-1 { gap: var(--atlas-space-1); }
+.atlas-gap-2 { gap: var(--atlas-space-2); }
+.atlas-gap-3 { gap: var(--atlas-space-3); }
+.atlas-gap-4 { gap: var(--atlas-space-4); }
+.atlas-gap-5 { gap: var(--atlas-space-5); }
+.atlas-gap-6 { gap: var(--atlas-space-6); }
+.atlas-gap-7 { gap: var(--atlas-space-7); }
+.atlas-gap-8 { gap: var(--atlas-space-8); }
+
+/* ------------------------------------------------------------------
+   Grid
+   ------------------------------------------------------------------ */
+
+.atlas-grid        { display: grid; }
+.atlas-grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+.atlas-grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); }
+.atlas-grid-cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+/* ------------------------------------------------------------------
+   Text Alignment & Transform
+   ------------------------------------------------------------------ */
+
+.atlas-text-left      { text-align: left; }
+.atlas-text-center    { text-align: center; }
+.atlas-text-right     { text-align: right; }
+.atlas-text-uppercase { text-transform: uppercase; }
+
+/* ------------------------------------------------------------------
+   Spacing (padding & margin)
+   ------------------------------------------------------------------ */
+
+.atlas-p-1 { padding: var(--atlas-space-1); }
+.atlas-p-2 { padding: var(--atlas-space-2); }
+.atlas-p-3 { padding: var(--atlas-space-3); }
+.atlas-p-4 { padding: var(--atlas-space-4); }
+.atlas-p-5 { padding: var(--atlas-space-5); }
+.atlas-p-6 { padding: var(--atlas-space-6); }
+.atlas-p-7 { padding: var(--atlas-space-7); }
+.atlas-p-8 { padding: var(--atlas-space-8); }
+
+.atlas-m-1 { margin: var(--atlas-space-1); }
+.atlas-m-2 { margin: var(--atlas-space-2); }
+.atlas-m-3 { margin: var(--atlas-space-3); }
+.atlas-m-4 { margin: var(--atlas-space-4); }
+.atlas-m-5 { margin: var(--atlas-space-5); }
+.atlas-m-6 { margin: var(--atlas-space-6); }
+.atlas-m-7 { margin: var(--atlas-space-7); }
+.atlas-m-8 { margin: var(--atlas-space-8); }
+
+.atlas-mx-auto { margin-left: auto; margin-right: auto; }
+
+/* ------------------------------------------------------------------
+   Width Constraints
+   ------------------------------------------------------------------ */
+
+.atlas-w-full      { width: 100%; }
+.atlas-max-w-sm    { max-width: 24rem; }
+.atlas-max-w-md    { max-width: 28rem; }
+.atlas-max-w-lg    { max-width: 32rem; }
+.atlas-max-w-xl    { max-width: 36rem; }
+.atlas-max-w-2xl   { max-width: 42rem; }
+.atlas-max-w-6xl   { max-width: 72rem; }
+.atlas-max-w-7xl   { max-width: 80rem; }
+
+/* ------------------------------------------------------------------
+   Visibility
+   ------------------------------------------------------------------ */
+
+.atlas-hidden { display: none; }
+
+.atlas-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ------------------------------------------------------------------
+   Custom Scrollbar
+   ------------------------------------------------------------------ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--atlas-deep-abyss);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--atlas-celestial-navy);
+  border-radius: var(--atlas-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--atlas-mist-gray);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--atlas-celestial-navy) var(--atlas-deep-abyss);
+}
+
+/* ------------------------------------------------------------------
+   Animations
+   ------------------------------------------------------------------ */
+
+@keyframes atlas-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atlas-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes atlas-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

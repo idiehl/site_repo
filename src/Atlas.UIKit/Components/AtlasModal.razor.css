@@ -1,0 +1,99 @@
+.atlas-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+    animation: atlas-modal-fade-in var(--atlas-transition-fast, 150ms ease);
+}
+
+@keyframes atlas-modal-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.atlas-modal {
+    background: var(--atlas-blue, #101B35);
+    border: 1px solid rgba(200, 150, 62, 0.2);
+    border-radius: var(--atlas-radius-lg, 6px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    width: 100%;
+    font-family: var(--atlas-font-sans);
+    animation: atlas-modal-slide-up var(--atlas-transition-normal, 300ms ease);
+}
+
+@keyframes atlas-modal-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.atlas-modal--sm {
+    max-width: 24rem;
+}
+
+.atlas-modal--md {
+    max-width: 32rem;
+}
+
+.atlas-modal--lg {
+    max-width: 48rem;
+}
+
+.atlas-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(188, 197, 208, 0.1);
+}
+
+.atlas-modal__title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--atlas-antique-gold, #C8963E);
+    margin: 0;
+}
+
+.atlas-modal__close {
+    background: none;
+    border: none;
+    color: var(--atlas-mist-gray, #8A94A6);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-modal__close:hover {
+    color: var(--atlas-cloud-white, #E8ECF1);
+}
+
+.atlas-modal__body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    color: var(--atlas-silver-steel, #BCC5D0);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.atlas-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(188, 197, 208, 0.1);
+}

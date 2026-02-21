@@ -1,0 +1,38 @@
+.atlas-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: var(--atlas-radius-sm, 2px);
+    border: 1px solid;
+    line-height: 1.4;
+    font-family: var(--atlas-font-sans);
+    white-space: nowrap;
+}
+
+.atlas-badge--standard {
+    background: rgba(188, 197, 208, 0.12);
+    border-color: rgba(188, 197, 208, 0.3);
+    color: var(--atlas-silver-steel, #BCC5D0);
+}
+
+.atlas-badge--gold {
+    background: rgba(200, 150, 62, 0.15);
+    border-color: rgba(200, 150, 62, 0.4);
+    color: var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-badge--celestial {
+    background: rgba(26, 39, 68, 0.5);
+    border-color: rgba(107, 124, 219, 0.3);
+    color: var(--atlas-info, #6b7cdb);
+}
+
+.atlas-badge--outline {
+    background: transparent;
+    border-color: var(--atlas-antique-gold, #C8963E);
+    color: var(--atlas-antique-gold, #C8963E);
+}

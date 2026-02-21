@@ -1,0 +1,82 @@
+.atlas-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--atlas-radius-md, 4px);
+    border-left: 3px solid;
+    background: var(--atlas-blue, #101B35);
+    font-family: var(--atlas-font-sans);
+}
+
+.atlas-alert--info {
+    border-left-color: var(--atlas-info, #6b7cdb);
+}
+
+.atlas-alert--info .atlas-alert__icon {
+    color: var(--atlas-info, #6b7cdb);
+}
+
+.atlas-alert--success {
+    border-left-color: var(--atlas-success, #22c55e);
+}
+
+.atlas-alert--success .atlas-alert__icon {
+    color: var(--atlas-success, #22c55e);
+}
+
+.atlas-alert--warning {
+    border-left-color: var(--atlas-warning, #f59e0b);
+}
+
+.atlas-alert--warning .atlas-alert__icon {
+    color: var(--atlas-warning, #f59e0b);
+}
+
+.atlas-alert--error {
+    border-left-color: var(--atlas-error, #ef4444);
+}
+
+.atlas-alert--error .atlas-alert__icon {
+    color: var(--atlas-error, #ef4444);
+}
+
+.atlas-alert__icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.atlas-alert__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.atlas-alert__title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--atlas-cloud-white, #E8ECF1);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.atlas-alert__message {
+    font-size: 0.8125rem;
+    color: var(--atlas-mist-gray, #8A94A6);
+    line-height: 1.5;
+}
+
+.atlas-alert__dismiss {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--atlas-mist-gray, #8A94A6);
+    cursor: pointer;
+    padding: 0.125rem;
+    opacity: 0.6;
+    transition: opacity var(--atlas-transition-fast, 150ms ease);
+}
+
+.atlas-alert__dismiss:hover {
+    opacity: 1;
+}

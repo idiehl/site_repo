@@ -1,0 +1,82 @@
+.atlas-card {
+    position: relative;
+    border-radius: var(--atlas-radius-md, 4px);
+    padding: var(--atlas-space-6, 1.5rem);
+    font-family: var(--atlas-font-sans, 'Inter', system-ui, sans-serif);
+    color: var(--atlas-silver-steel, #BCC5D0);
+}
+
+/* ── Standard ── */
+
+.atlas-card--standard {
+    background: rgba(16, 27, 53, 0.6);
+    border: 1px solid rgba(200, 208, 220, 0.08);
+}
+
+/* ── Elevated ── */
+
+.atlas-card--elevated {
+    background: var(--atlas-celestial-navy, #1A2744);
+    border: 1px solid rgba(200, 208, 220, 0.08);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Bordered ── */
+
+.atlas-card--bordered {
+    background: rgba(16, 27, 53, 0.6);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+/* ── Corner decorations ── */
+
+.atlas-card__corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+}
+
+.atlas-card__corner--tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid var(--atlas-antique-gold, #C8963E);
+    border-left: 2px solid var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-card__corner--tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid var(--atlas-antique-gold, #C8963E);
+    border-right: 2px solid var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-card__corner--bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid var(--atlas-antique-gold, #C8963E);
+    border-left: 2px solid var(--atlas-antique-gold, #C8963E);
+}
+
+.atlas-card__corner--br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid var(--atlas-antique-gold, #C8963E);
+    border-right: 2px solid var(--atlas-antique-gold, #C8963E);
+}
+
+/* ── Header ── */
+
+.atlas-card__header {
+    padding-bottom: var(--atlas-space-4, 1rem);
+    margin-bottom: var(--atlas-space-4, 1rem);
+    border-bottom: 1px solid rgba(200, 208, 220, 0.1);
+}
+
+/* ── Footer ── */
+
+.atlas-card__footer {
+    padding-top: var(--atlas-space-4, 1rem);
+    margin-top: var(--atlas-space-4, 1rem);
+    border-top: 1px solid rgba(200, 208, 220, 0.1);
+}

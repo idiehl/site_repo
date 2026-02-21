@@ -1,0 +1,42 @@
+@namespace Atlas.UIKit.Components
+
+<footer class="atlas-footer" @attributes="AdditionalAttributes">
+    <div class="atlas-footer__accent"></div>
+    <div class="atlas-footer__content">
+        <div class="atlas-footer__brand">@BrandName</div>
+        @if (Links is { Count: > 0 })
+        {
+            <nav class="atlas-footer__links" aria-label="Footer navigation">
+                @foreach (var link in Links)
+                {
+                    @if (!string.IsNullOrWhiteSpace(link.Href))
+                    {
+                        <a class="atlas-footer__link" href="@link.Href">@link.Label</a>
+                    }
+                    else
+                    {
+                        <span class="atlas-footer__link">@link.Label</span>
+                    }
+                }
+            </nav>
+        }
+        <div class="atlas-footer__copyright">
+            &copy; @CopyrightText @BrandName. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+@code {
+    [Parameter] public List<NavItem>? Links { get; set; }
+    [Parameter] public string BrandName { get; set; } = "Atlas Universalis";
+    [Parameter] public string? Copyright { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CopyrightText => Copyright ?? DateTime.Now.Year.ToString();
+
+    public class NavItem
+    {
+        public string Label { get; set; } = "";
+        public string? Href { get; set; }
+    }
+}

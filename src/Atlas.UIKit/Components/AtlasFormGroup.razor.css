@@ -1,0 +1,22 @@
+.atlas-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--atlas-space-2, 0.5rem);
+    font-family: var(--atlas-font-sans, 'Inter', system-ui, sans-serif);
+}
+
+.atlas-form-group__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--atlas-mist-gray, #8A94A6);
+}
+
+.atlas-form-group__help {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--atlas-mist-gray, #8A94A6);
+    opacity: 0.7;
+    line-height: 1.4;
+}

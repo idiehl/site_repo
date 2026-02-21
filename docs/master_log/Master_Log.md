@@ -2778,3 +2778,52 @@ dotnet test AtlasUniversalis.sln   # All test projects discovered (no tests yet)
 **Verification:** Full solution builds with 0 warnings, 0 errors. All 17 projects compile. Test infrastructure works. Build time ~6s (incremental). Meridian projects successfully integrated from meridian/ subfolder into src/ with updated project references.
 **Notes:** No commits made. No production changes. Existing Python/Vue/Astro code untouched. Blocker resolutions recorded: B2=OpenAI .NET SDK, B3=IDistributedCache with Redis. Phase 1 (Design System) is next. Existing `meridian/` directory left in place (originals not deleted).
 **Concepts:** @concept:dotnet @concept:blazor @concept:deployment @concept:infrastructure @concept:api @concept:database
+
+---
+
+## AU-C01-20260221-002 — Phase 1: Atlas UIKit Design System (21 Blazor Components)
+
+**Type:** Feature
+**Context:** Phase 1 of the Atlas Hybrid Rebuild — building the complete Blazor component library and design system that all 3 web apps (Web, Apply, Forge) will share.
+**Change summary:** Built the Atlas UIKit design system from the Figma brand spec. Extracted 12-color palette (Foundation Blues, Heritage Golds, Atlas Silvers) into CSS custom properties with semantic aliases. Created 21 Blazor components ported from the React/Figma reference implementations, plus a comprehensive showcase page. Also committed all Phase 0 work.
+**Rationale / tradeoffs:** CSS custom properties + Blazor scoped CSS chosen over Tailwind (no PostCSS build step, native to Blazor). Design tokens follow the Figma brand spec (deep navies, antique golds, silver text) rather than the current Vue/Tailwind palette (purple-blues, bright golds) — this is an intentional brand refresh. Components support multiple variants matching the React originals.
+**Files touched:**
+- `src/Atlas.UIKit/Tokens/_tokens.css` — 12 colors, spacing scale, radii, shadows, transitions
+- `src/Atlas.UIKit/Tokens/_typography.css` — Type scale (Display→Caption), 3 font families, tracking patterns
+- `src/Atlas.UIKit/Tokens/_utilities.css` — Flexbox, grid, spacing, width, visibility, scrollbar, animations
+- `src/Atlas.UIKit/wwwroot/atlas-uikit.css` — Combined design system stylesheet (288 lines)
+- `src/Atlas.UIKit/wwwroot/icons/` — 5 logo SVGs copied from internal/UI/Logo/
+- `src/Atlas.UIKit/Components/AtlasIcon.razor` — SVG icon component with size/color params
+- `src/Atlas.UIKit/Components/AtlasButton.razor` — 7 variants (primary, secondary, ghost, outline, celestial, monument, compass)
+- `src/Atlas.UIKit/Components/AtlasCard.razor` — 3 variants (standard, elevated, bordered with gold corners)
+- `src/Atlas.UIKit/Components/AtlasInput.razor` — 4 variants (standard, underline, bordered, celestial) with @bind-Value
+- `src/Atlas.UIKit/Components/AtlasTextarea.razor` — 2 variants (standard, bordered)
+- `src/Atlas.UIKit/Components/AtlasTable.razor` — Generic typed with pagination and empty state
+- `src/Atlas.UIKit/Components/AtlasFormGroup.razor` — Label + validation wrapper
+- `src/Atlas.UIKit/Components/AtlasFieldValidation.razor` — EditContext integration
+- `src/Atlas.UIKit/Components/AtlasNavbar.razor` — 4 variants (standard, monument, celestial, minimal) responsive
+- `src/Atlas.UIKit/Components/AtlasFooter.razor` — Dark footer with gold accent
+- `src/Atlas.UIKit/Components/AtlasBadge.razor` — 4 variants (standard, gold, celestial, outline)
+- `src/Atlas.UIKit/Components/AtlasTag.razor` — Removable tag with variants
+- `src/Atlas.UIKit/Components/AtlasAvatar.razor` — Image or initials with variants
+- `src/Atlas.UIKit/Components/AtlasAlert.razor` — 4 types (info, success, warning, error)
+- `src/Atlas.UIKit/Components/AtlasTabs.razor` + `AtlasTabPanel.razor` — Tab navigation
+- `src/Atlas.UIKit/Components/AtlasProgress.razor` — 3 variants with label
+- `src/Atlas.UIKit/Components/AtlasModal.razor` — Focus trap, Escape close, aria attributes
+- `src/Atlas.UIKit/Components/AtlasDropdown.razor` + `AtlasDropdownItem.razor` — Select dropdown
+- `src/Atlas.UIKit/Components/AtlasTooltip.razor` — CSS-only hover tooltip
+- `src/Atlas.UIKit/Components/AtlasHero.razor` — Full-width hero section
+- `src/Atlas.UIKit/Components/AtlasPageDivider.razor` — Decorative compass divider
+- `src/Atlas.UIKit/Components/AtlasStatusBanner.razor` — System status banner
+- `src/Atlas.Web/Pages/_Host.cshtml` — Blazor Server bootstrap page
+- `src/Atlas.Web/App.razor` — Blazor router root component
+- `src/Atlas.Web/Pages/Showcase.cshtml` — Component showcase page (~990 lines)
+
+**Commands run:**
+```bash
+dotnet build AtlasUniversalis.sln  # 17 projects, 0 warnings, 0 errors
+```
+
+**Verification:** Full solution builds with 0 warnings, 0 errors across all 17 projects. All 21 components compile. 46 component files (21 .razor + 21 .razor.css + 4 companion components) created in Atlas.UIKit. Showcase page renders static previews of all components. Design tokens match Figma brand spec exactly (12 colors verified against color-palette.tsx).
+**Notes:** Phase 0 committed as `c070dde`. No production changes. Showcase is a static Razor Page — interactive Blazor components require running the server. _Host.cshtml created to fix the missing Blazor fallback page. Next phase: Phase 2 (Main Site + Dev Portal migration).
+**Concepts:** @concept:dotnet @concept:blazor @concept:frontend @concept:branding

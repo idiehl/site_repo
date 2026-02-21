@@ -1,0 +1,33 @@
+.atlas-divider {
+    width: 100%;
+    padding: 1.5rem 0;
+}
+
+.atlas-divider--line {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(200, 150, 62, 0.25);
+    padding: 0;
+    height: 0;
+    margin: 1.5rem 0;
+}
+
+.atlas-divider--compass {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.atlas-divider__line {
+    flex: 1;
+    height: 1px;
+    background: rgba(200, 150, 62, 0.25);
+}
+
+.atlas-divider__compass {
+    color: var(--atlas-antique-gold, #C8963E);
+    opacity: 0.6;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}

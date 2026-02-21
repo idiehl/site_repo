@@ -1,0 +1,26 @@
+@namespace Atlas.UIKit.Components
+
+<span class="atlas-tag @VariantClass" @attributes="AdditionalAttributes">
+    <span class="atlas-tag__label">@Label</span>
+    @if (OnRemove.HasDelegate)
+    {
+        <button class="atlas-tag__remove" @onclick="OnRemove" type="button" aria-label="Remove @Label">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        </button>
+    }
+</span>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string Variant { get; set; } = "standard";
+    [Parameter] public EventCallback OnRemove { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string VariantClass => Variant switch
+    {
+        "gold" => "atlas-tag--gold",
+        _ => "atlas-tag--standard"
+    };
+}
