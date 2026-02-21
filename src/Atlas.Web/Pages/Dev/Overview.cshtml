@@ -1,0 +1,79 @@
+@page "/dev/overview"
+@model Atlas.Web.Pages.Dev.OverviewModel
+@{
+    ViewData["Title"] = "Project Overview";
+    Layout = "_DevLayout";
+}
+
+<main style="min-height: 100vh; background: var(--atlas-deep-abyss);">
+
+    <!-- Sticky Header -->
+    <div style="position: sticky; top: 0; z-index: 10; background: var(--atlas-atlas-blue); border-bottom: 1px solid var(--atlas-border);">
+        <div style="max-width: 80rem; margin: 0 auto; padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a href="/dev/dashboard" style="color: var(--atlas-mist-gray); font-size: 0.875rem; text-decoration: none; transition: color 0.2s;">&larr; Dashboard</a>
+                <span style="color: var(--atlas-border);">|</span>
+                <svg style="width: 1.25rem; height: 1.25rem; color: var(--atlas-antique-gold);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                <h1 style="font-size: 1.125rem; font-weight: 600; color: var(--atlas-cloud-white);">Project Overview</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <button type="button" id="btn-html" onclick="toggleView('html')"
+                        style="padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; border-radius: 0.375rem; border: 1px solid var(--atlas-border); cursor: pointer; font-family: var(--atlas-font-sans); background: var(--atlas-antique-gold); color: var(--atlas-midnight-navy);">
+                    HTML
+                </button>
+                <button type="button" id="btn-md" onclick="toggleView('md')"
+                        style="padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; border-radius: 0.375rem; border: 1px solid var(--atlas-border); cursor: pointer; font-family: var(--atlas-font-sans); background: var(--atlas-navy-steel); color: var(--atlas-silver-steel);">
+                    Markdown
+                </button>
+                <a href="/dev/overview" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--atlas-silver-steel); background: var(--atlas-navy-steel); border: 1px solid var(--atlas-border); border-radius: 0.375rem; text-decoration: none;">
+                    Refresh
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Content -->
+    <div style="max-width: 80rem; margin: 0 auto; padding: 2rem 1.5rem;">
+        @if (!string.IsNullOrEmpty(Model.Document.LastModified))
+        {
+            <p style="font-size: 0.75rem; color: var(--atlas-mist-gray); margin-bottom: 1rem;">Last modified: @Model.Document.LastModified</p>
+        }
+
+        <div id="view-html" class="prose-atlas" style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 2rem;">
+            @Html.Raw(Model.Document.ContentHtml)
+        </div>
+
+        <div id="view-md" style="display: none; background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 2rem;">
+            <pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 0.875rem; font-family: var(--atlas-font-mono); color: var(--atlas-silver-steel); line-height: 1.7;">@Model.Document.ContentMd</pre>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+<script>
+    function toggleView(mode) {
+        var htmlView = document.getElementById('view-html');
+        var mdView = document.getElementById('view-md');
+        var btnHtml = document.getElementById('btn-html');
+        var btnMd = document.getElementById('btn-md');
+
+        if (mode === 'html') {
+            htmlView.style.display = '';
+            mdView.style.display = 'none';
+            btnHtml.style.background = 'var(--atlas-antique-gold)';
+            btnHtml.style.color = 'var(--atlas-midnight-navy)';
+            btnMd.style.background = 'var(--atlas-navy-steel)';
+            btnMd.style.color = 'var(--atlas-silver-steel)';
+        } else {
+            htmlView.style.display = 'none';
+            mdView.style.display = '';
+            btnMd.style.background = 'var(--atlas-antique-gold)';
+            btnMd.style.color = 'var(--atlas-midnight-navy)';
+            btnHtml.style.background = 'var(--atlas-navy-steel)';
+            btnHtml.style.color = 'var(--atlas-silver-steel)';
+        }
+    }
+</script>
+}

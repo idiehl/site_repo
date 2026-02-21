@@ -1,7 +1,19 @@
+using Atlas.Web.Services;
+using Atlas.Web.Filters;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+builder.Services.AddSingleton<IMarkdownService, MarkdownService>();
+builder.Services.AddSingleton<IDevDocService, DevDocService>();
+builder.Services.AddScoped<DevAuthFilter>();
+
+builder.Services.AddHttpClient("AtlasApplyApi", client =>
+{
+    client.BaseAddress = new Uri("https://apply.atlasuniversalis.com");
+});
 
 var app = builder.Build();
 
@@ -16,7 +28,6 @@ app.UseRouting();
 
 app.MapRazorPages();
 app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
 
 app.MapGet("/healthz", () => Results.Ok(new { status = "healthy" }));
 

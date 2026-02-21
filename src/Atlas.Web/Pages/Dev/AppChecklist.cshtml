@@ -1,0 +1,281 @@
+@page "/dev/apps/{appId}/checklist"
+@model Atlas.Web.Pages.Dev.AppChecklistModel
+@{
+    Layout = "/Pages/Dev/_DevLayout.cshtml";
+    ViewData["Title"] = $"{Model.AppName} — Checklist";
+}
+
+<style>
+    .app-doc-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--atlas-deep-abyss);
+        border-bottom: 1px solid var(--atlas-border);
+        padding: 1rem 1.5rem;
+    }
+    .app-doc-header-inner {
+        max-width: 64rem;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .app-doc-toprow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .app-doc-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--atlas-mist-gray);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--atlas-antique-gold); }
+    .app-doc-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--atlas-cloud-white);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .app-doc-title svg { width: 1.25rem; height: 1.25rem; color: var(--atlas-antique-gold); }
+    .app-doc-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .toggle-btn {
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--atlas-border);
+        background: transparent;
+        color: var(--atlas-mist-gray);
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .toggle-btn:hover { border-color: var(--atlas-antique-gold); color: var(--atlas-antique-gold); }
+    .toggle-btn.active {
+        background: var(--atlas-antique-gold);
+        color: var(--atlas-midnight-navy);
+        border-color: var(--atlas-antique-gold);
+        font-weight: 600;
+    }
+    .refresh-link {
+        color: var(--atlas-mist-gray);
+        text-decoration: none;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--atlas-border);
+        transition: all 0.2s;
+    }
+    .refresh-link:hover { border-color: var(--atlas-antique-gold); color: var(--atlas-antique-gold); }
+    .tab-nav {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+    }
+    .tab-link {
+        padding: 0.3rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        text-decoration: none;
+        color: var(--atlas-mist-gray);
+        background: transparent;
+        border: 1px solid var(--atlas-border);
+        transition: all 0.2s;
+    }
+    .tab-link:hover { border-color: var(--atlas-antique-gold); color: var(--atlas-antique-gold); }
+    .tab-link.active {
+        background: var(--atlas-antique-gold);
+        color: var(--atlas-midnight-navy);
+        border-color: var(--atlas-antique-gold);
+        font-weight: 600;
+    }
+    .doc-container {
+        max-width: 64rem;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+    }
+    .doc-card {
+        background: var(--atlas-atlas-blue);
+        border: 1px solid var(--atlas-border);
+        border-radius: 12px;
+        padding: 2rem;
+    }
+    .doc-meta {
+        font-size: 0.8rem;
+        color: var(--atlas-mist-gray);
+        margin-bottom: 1rem;
+    }
+    .task-form {
+        background: var(--atlas-navy-steel);
+        border: 1px solid var(--atlas-border);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .task-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.55rem 0.85rem;
+        border-radius: 6px;
+        border: 1px solid var(--atlas-border);
+        background: var(--atlas-deep-abyss);
+        color: var(--atlas-cloud-white);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .task-input::placeholder { color: var(--atlas-mist-gray); }
+    .task-input:focus { border-color: var(--atlas-antique-gold); }
+    .task-submit {
+        padding: 0.55rem 1.25rem;
+        border-radius: 6px;
+        border: none;
+        background: var(--atlas-antique-gold);
+        color: var(--atlas-midnight-navy);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .task-submit:hover { background: var(--atlas-amber-glow); }
+    .task-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .task-message {
+        width: 100%;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    .task-message.success { color: #4ade80; }
+    .task-message.error { color: #f87171; }
+    .prose-atlas {
+        color: var(--atlas-silver-steel);
+        line-height: 1.7;
+    }
+    .prose-atlas h1, .prose-atlas h2, .prose-atlas h3 { color: var(--atlas-cloud-white); margin-top: 1.5em; margin-bottom: 0.5em; }
+    .prose-atlas h1 { font-size: 1.5rem; }
+    .prose-atlas h2 { font-size: 1.25rem; }
+    .prose-atlas h3 { font-size: 1.1rem; }
+    .prose-atlas p { margin-bottom: 1em; }
+    .prose-atlas a { color: var(--atlas-antique-gold); }
+    .prose-atlas code { background: var(--atlas-navy-steel); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    .prose-atlas pre { background: var(--atlas-deep-abyss); border: 1px solid var(--atlas-border); border-radius: 8px; padding: 1rem; overflow-x: auto; }
+    .prose-atlas pre code { background: transparent; padding: 0; }
+    .prose-atlas ul, .prose-atlas ol { margin-bottom: 1em; padding-left: 1.5em; }
+    .prose-atlas li { margin-bottom: 0.25em; }
+    .prose-atlas table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+    .prose-atlas th, .prose-atlas td { padding: 0.5rem 0.75rem; border: 1px solid var(--atlas-border); text-align: left; }
+    .prose-atlas th { background: var(--atlas-navy-steel); color: var(--atlas-cloud-white); font-weight: 600; }
+    .raw-markdown {
+        display: none;
+        background: var(--atlas-deep-abyss);
+        border: 1px solid var(--atlas-border);
+        border-radius: 8px;
+        padding: 1rem;
+        color: var(--atlas-silver-steel);
+        font-family: 'Cascadia Code', 'Fira Code', monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-x: auto;
+        line-height: 1.6;
+    }
+</style>
+
+<div class="app-doc-header">
+    <div class="app-doc-header-inner">
+        <div class="app-doc-toprow">
+            <div class="app-doc-left">
+                <a asp-page="/Dev/Dashboard" class="back-link">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back
+                </a>
+                <span class="app-doc-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    @Model.AppName — Checklist
+                </span>
+            </div>
+            <div class="app-doc-actions">
+                <button type="button" class="toggle-btn active" id="btnHtml" onclick="showHtml()">HTML</button>
+                <button type="button" class="toggle-btn" id="btnMd" onclick="showMarkdown()">Markdown</button>
+                <a href="/dev/apps/@Model.AppId/checklist" class="refresh-link">Refresh</a>
+            </div>
+        </div>
+        <nav class="tab-nav">
+            <a asp-page="/Dev/AppLog" asp-route-appId="@Model.AppId" class="tab-link">Log</a>
+            <a asp-page="/Dev/AppOverview" asp-route-appId="@Model.AppId" class="tab-link">Overview</a>
+            <a asp-page="/Dev/AppChecklist" asp-route-appId="@Model.AppId" class="tab-link active">Checklist</a>
+            <a asp-page="/Dev/AppInventory" asp-route-appId="@Model.AppId" class="tab-link">Inventory</a>
+        </nav>
+    </div>
+</div>
+
+<div class="doc-container">
+    <div class="doc-card">
+        <form method="post" class="task-form" id="taskForm">
+            <input type="text" asp-for="NewTask" class="task-input"
+                   placeholder="Add a checklist item (saved under Rapid Capture)"
+                   id="taskInput" />
+            <button type="submit" class="task-submit" id="taskSubmit">Create task</button>
+            @if (!string.IsNullOrEmpty(Model.TaskMessage))
+            {
+                <div class="task-message @(Model.TaskMessage.Contains("success", StringComparison.OrdinalIgnoreCase) ? "success" : "error")">
+                    @Model.TaskMessage
+                </div>
+            }
+        </form>
+
+        @if (Model.Document?.LastModified != null)
+        {
+            <div class="doc-meta">Last modified: @Model.Document.LastModified</div>
+        }
+        <div id="htmlView" class="prose-atlas">
+            @Html.Raw(Model.Document?.ContentHtml ?? "")
+        </div>
+        <pre id="mdView" class="raw-markdown">@(Model.Document?.ContentMd ?? "")</pre>
+    </div>
+</div>
+
+<script>
+    function showHtml() {
+        document.getElementById('htmlView').style.display = '';
+        document.getElementById('mdView').style.display = 'none';
+        document.getElementById('btnHtml').classList.add('active');
+        document.getElementById('btnMd').classList.remove('active');
+    }
+    function showMarkdown() {
+        document.getElementById('htmlView').style.display = 'none';
+        document.getElementById('mdView').style.display = '';
+        document.getElementById('btnHtml').classList.remove('active');
+        document.getElementById('btnMd').classList.add('active');
+    }
+
+    (function () {
+        var input = document.getElementById('taskInput');
+        var btn = document.getElementById('taskSubmit');
+        function updateBtn() {
+            btn.disabled = !input.value.trim();
+        }
+        input.addEventListener('input', updateBtn);
+        updateBtn();
+    })();
+</script>

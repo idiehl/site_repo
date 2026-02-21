@@ -2827,3 +2827,51 @@ dotnet build AtlasUniversalis.sln  # 17 projects, 0 warnings, 0 errors
 **Verification:** Full solution builds with 0 warnings, 0 errors across all 17 projects. All 21 components compile. 46 component files (21 .razor + 21 .razor.css + 4 companion components) created in Atlas.UIKit. Showcase page renders static previews of all components. Design tokens match Figma brand spec exactly (12 colors verified against color-palette.tsx).
 **Notes:** Phase 0 committed as `c070dde`. No production changes. Showcase is a static Razor Page — interactive Blazor components require running the server. _Host.cshtml created to fix the missing Blazor fallback page. Next phase: Phase 2 (Main Site + Dev Portal migration).
 **Concepts:** @concept:dotnet @concept:blazor @concept:frontend @concept:branding
+
+---
+
+## AU-C01-20260221-003 — Phase 2: Main Site + Dev Portal Migration to Razor Pages
+
+**Type:** Feature
+**Context:** Phase 2 of the Atlas Hybrid Rebuild — porting all 10 frontend-main Vue 3 routes to ASP.NET Razor Pages with server-side rendering. This eliminates the SPA dependency and reads markdown docs directly from disk instead of calling the Python API.
+**Change summary:** Created shared infrastructure (layout, markdown service, dev doc service, auth filter, CSS) and all 10 Razor Pages covering the landing page, Meridian product page, dev portal login, dashboard, platform docs, and per-app doc viewers. Added Markdig NuGet package for markdown-to-HTML conversion. Dev portal uses cookie-based auth validated against the existing Python API.
+**Rationale / tradeoffs:** Server-side Razor Pages provide faster initial load, better SEO, and simpler deployment than the Vue SPA. Markdown files are read directly from disk (no API dependency) using Markdig with advanced extensions. Auth uses a simple cookie checked by an IPageFilter rather than JWT middleware to keep the implementation lightweight for a single-admin portal.
+**Files touched:**
+- `src/Atlas.Web/Pages/_Layout.cshtml` — Master layout with fonts, UIKit CSS, site/prose CSS
+- `src/Atlas.Web/Pages/_ViewStart.cshtml` — Default layout assignment
+- `src/Atlas.Web/Pages/_ViewImports.cshtml` — Updated with service/filter namespaces
+- `src/Atlas.Web/Services/IMarkdownService.cs` — Markdown-to-HTML interface
+- `src/Atlas.Web/Services/MarkdownService.cs` — Markdig implementation with advanced extensions
+- `src/Atlas.Web/Services/IDevDocService.cs` — Dev doc interface + records (DevDocResult, DevStatus, AppInfo)
+- `src/Atlas.Web/Services/DevDocService.cs` — File-based doc service reading from docs/master_log/
+- `src/Atlas.Web/Filters/DevAuthFilter.cs` — Cookie-based auth page filter
+- `src/Atlas.Web/Program.cs` — Registered services, HttpClient, removed Blazor fallback
+- `src/Atlas.Web/appsettings.json` — Added DevPortal config section
+- `src/Atlas.Web/wwwroot/css/site.css` — Global reset and body defaults
+- `src/Atlas.Web/wwwroot/css/prose.css` — Markdown rendering styles with Atlas design tokens
+- `src/Atlas.Web/Pages/Index.cshtml` + `.cs` — Full landing page (Hero, Apps, Projects, About, Footer)
+- `src/Atlas.Web/Pages/Meridian.cshtml` + `.cs` — Meridian product page
+- `src/Atlas.Web/Pages/Dev/Login.cshtml` + `.cs` — Dev portal login with API auth
+- `src/Atlas.Web/Pages/Dev/_DevLayout.cshtml` — Shared dev portal chrome
+- `src/Atlas.Web/Pages/Dev/Dashboard.cshtml` + `.cs` — Dev dashboard with status banner, app grid
+- `src/Atlas.Web/Pages/Dev/Log.cshtml` + `.cs` — Master Log viewer
+- `src/Atlas.Web/Pages/Dev/Overview.cshtml` + `.cs` — Project Overview viewer
+- `src/Atlas.Web/Pages/Dev/AppLog.cshtml` + `.cs` — Per-app log viewer
+- `src/Atlas.Web/Pages/Dev/AppOverview.cshtml` + `.cs` — Per-app overview viewer
+- `src/Atlas.Web/Pages/Dev/AppChecklist.cshtml` + `.cs` — Per-app checklist with task creation form
+- `src/Atlas.Web/Pages/Dev/AppInventory.cshtml` + `.cs` — Per-app inventory viewer (wide layout)
+- `src/Atlas.Web/Pages/Dev/Logout.cshtml` + `.cs` — Cookie-clearing logout
+- `src/Atlas.Web/Pages/_Host.cshtml` — Route changed from "/" to "/blazor" to avoid conflict
+- `src/Atlas.Web/wwwroot/images/atlas-universalis-wordmark.svg` — Copied from frontend-main
+- `src/Atlas.Web/wwwroot/images/atlas-meridian-wordmark.svg` — Copied from frontend-main
+- `src/Atlas.Web/wwwroot/images/atlas-icon.svg` — Copied from frontend-main
+
+**Commands run:**
+```bash
+dotnet add src/Atlas.Web/Atlas.Web.csproj package Markdig
+dotnet build AtlasUniversalis.sln  # 17 projects, 0 warnings, 0 errors
+```
+
+**Verification:** Full solution builds with 0 warnings, 0 errors across all 17 projects. All 10 routes confirmed via @page directives: / (landing), /meridian, /dev (login), /dev/dashboard, /dev/log, /dev/overview, /dev/apps/{appId}/log, /dev/apps/{appId}/overview, /dev/apps/{appId}/checklist, /dev/apps/{appId}/inventory. Plus /dev/logout bonus route. SEO meta tags present on landing and Meridian pages.
+**Notes:** No production deployment — code is local only. _Host.cshtml route changed to /blazor to avoid ambiguous match with Index.cshtml. DevAuthFilter uses simple cookie check (not JWT) for admin-only portal. Next phase: Phase 3 (Atlas Apply migration) or production deployment.
+**Concepts:** @concept:dotnet @concept:frontend @concept:auth @concept:master-log @concept:deployment

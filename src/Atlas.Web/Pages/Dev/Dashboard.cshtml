@@ -1,0 +1,158 @@
+@page "/dev/dashboard"
+@model Atlas.Web.Pages.Dev.DashboardModel
+@{
+    ViewData["Title"] = "Dev Dashboard";
+    Layout = "_DevLayout";
+}
+
+<main style="min-height: 100vh; background: var(--atlas-deep-abyss); padding: 2rem 1.5rem;">
+    <div style="max-width: 80rem; margin: 0 auto;">
+
+        <!-- Status Banner -->
+        <section style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <h2 style="font-size: 1rem; font-weight: 600; color: var(--atlas-cloud-white);">Platform Status</h2>
+                    @{
+                        var badgeBg = Model.Status.Status switch
+                        {
+                            "READY" => "rgba(34, 197, 94, 0.15)",
+                            "PENDING" => "rgba(234, 179, 8, 0.15)",
+                            "BLOCKED" => "rgba(239, 68, 68, 0.15)",
+                            _ => "rgba(138, 148, 166, 0.15)"
+                        };
+                        var badgeColor = Model.Status.Status switch
+                        {
+                            "READY" => "#22c55e",
+                            "PENDING" => "#eab308",
+                            "BLOCKED" => "#ef4444",
+                            _ => "#8A94A6"
+                        };
+                        var badgeBorder = Model.Status.Status switch
+                        {
+                            "READY" => "rgba(34, 197, 94, 0.3)",
+                            "PENDING" => "rgba(234, 179, 8, 0.3)",
+                            "BLOCKED" => "rgba(239, 68, 68, 0.3)",
+                            _ => "rgba(138, 148, 166, 0.3)"
+                        };
+                    }
+                    <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; background: @badgeBg; color: @badgeColor; border: 1px solid @badgeBorder;">
+                        @Model.Status.Status
+                    </span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Status.Message))
+                {
+                    <p style="color: var(--atlas-mist-gray); font-size: 0.875rem;">@Model.Status.Message</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.Status.UpdatedAt))
+                {
+                    <p style="color: var(--atlas-mist-gray); font-size: 0.75rem;">
+                        Updated: @Model.Status.UpdatedAt
+                        @if (!string.IsNullOrEmpty(Model.Status.UpdatedBy))
+                        {
+                            <text> by @Model.Status.UpdatedBy</text>
+                        }
+                    </p>
+                }
+            </div>
+
+            <!-- Status Update Form -->
+            <form method="post" asp-page-handler="UpdateStatus" style="margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <select asp-for="DraftStatus" style="background: var(--atlas-navy-steel); color: var(--atlas-cloud-white); border: 1px solid var(--atlas-border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; font-family: var(--atlas-font-sans);">
+                    <option value="READY">READY</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="BLOCKED">BLOCKED</option>
+                </select>
+                <input asp-for="DraftMessage" placeholder="Status message..."
+                       style="flex: 1; min-width: 200px; background: var(--atlas-navy-steel); color: var(--atlas-cloud-white); border: 1px solid var(--atlas-border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; font-family: var(--atlas-font-sans);" />
+                <button type="submit"
+                        style="background: var(--atlas-antique-gold); color: var(--atlas-midnight-navy); font-weight: 600; font-size: 0.875rem; padding: 0.5rem 1.25rem; border-radius: 0.5rem; border: none; cursor: pointer; font-family: var(--atlas-font-sans); transition: background 0.2s;">
+                    Update
+                </button>
+            </form>
+        </section>
+
+        <!-- Applications -->
+        <section style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--atlas-cloud-white); margin-bottom: 1rem;">Applications</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem;">
+                @foreach (var app in Model.Apps)
+                {
+                    <div style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 600; color: var(--atlas-antique-gold); margin-bottom: 0.25rem;">@app.Name</h3>
+                            <p style="font-size: 0.8125rem; color: var(--atlas-mist-gray); line-height: 1.5;">@app.Description</p>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;">
+                            <a href="/dev/apps/@app.Id/log"
+                               style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--atlas-silver-steel); background: var(--atlas-navy-steel); border: 1px solid var(--atlas-border); border-radius: 0.375rem; text-decoration: none; transition: border-color 0.2s;">
+                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Log
+                            </a>
+                            <a href="/dev/apps/@app.Id/overview"
+                               style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--atlas-silver-steel); background: var(--atlas-navy-steel); border: 1px solid var(--atlas-border); border-radius: 0.375rem; text-decoration: none; transition: border-color 0.2s;">
+                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                                Overview
+                            </a>
+                            <a href="/dev/apps/@app.Id/checklist"
+                               style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--atlas-silver-steel); background: var(--atlas-navy-steel); border: 1px solid var(--atlas-border); border-radius: 0.375rem; text-decoration: none; transition: border-color 0.2s;">
+                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                Checklist
+                            </a>
+                            <a href="/dev/apps/@app.Id/inventory"
+                               style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: var(--atlas-silver-steel); background: var(--atlas-navy-steel); border: 1px solid var(--atlas-border); border-radius: 0.375rem; text-decoration: none; transition: border-color 0.2s;">
+                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                Inventory
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Platform Docs -->
+        <section style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--atlas-cloud-white); margin-bottom: 1rem;">Platform Docs</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem;">
+                <a href="/dev/log" style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; text-decoration: none; transition: border-color 0.2s;">
+                    <svg style="width: 2rem; height: 2rem; color: var(--atlas-antique-gold); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 600; color: var(--atlas-cloud-white);">Master Log</h3>
+                        <p style="font-size: 0.8125rem; color: var(--atlas-mist-gray);">Chronological record of all changes</p>
+                    </div>
+                </a>
+                <a href="/dev/overview" style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; text-decoration: none; transition: border-color 0.2s;">
+                    <svg style="width: 2rem; height: 2rem; color: var(--atlas-antique-gold); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                    </svg>
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 600; color: var(--atlas-cloud-white);">Project Overview</h3>
+                        <p style="font-size: 0.8125rem; color: var(--atlas-mist-gray);">Architecture and project structure</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Quick Info -->
+        <section style="background: var(--atlas-atlas-blue); border: 1px solid var(--atlas-border); border-radius: 0.75rem; padding: 1.25rem;">
+            <h2 style="font-size: 1rem; font-weight: 600; color: var(--atlas-cloud-white); margin-bottom: 1rem;">Quick Info</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--atlas-mist-gray); text-transform: uppercase; letter-spacing: 0.05em;">Environment</span>
+                    <span style="font-size: 0.875rem; color: var(--atlas-cloud-white); font-weight: 500;">Production</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--atlas-mist-gray); text-transform: uppercase; letter-spacing: 0.05em;">API Endpoint</span>
+                    <span style="font-size: 0.875rem; color: var(--atlas-cloud-white); font-family: var(--atlas-font-mono);">apply.atlasuniversalis.com</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--atlas-mist-gray); text-transform: uppercase; letter-spacing: 0.05em;">Last Deploy</span>
+                    <span style="font-size: 0.875rem; color: var(--atlas-cloud-white);">@DateTime.UtcNow.ToString("yyyy-MM-dd")</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>

@@ -1,0 +1,152 @@
+@page "/dev"
+@model Atlas.Web.Pages.Dev.LoginModel
+@{
+    ViewData["Title"] = "Developer Access";
+    Layout = "_Layout";
+}
+
+@section Meta {
+    <meta name="description" content="Atlas Universalis Developer Portal — Admin sign-in." />
+    <meta name="robots" content="noindex, nofollow" />
+}
+
+<style>
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        background: var(--atlas-deep-abyss);
+        border: 1px solid var(--atlas-border);
+        border-radius: 16px;
+        padding: 2.5rem;
+    }
+
+    .login-heading {
+        font-family: var(--atlas-font-sans);
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--atlas-cloud-white);
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        font-family: var(--atlas-font-sans);
+        font-size: 0.9rem;
+        color: var(--atlas-mist-gray);
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        display: block;
+        font-family: var(--atlas-font-sans);
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--atlas-silver-steel);
+        margin-bottom: 0.4rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.7rem 0.9rem;
+        background: var(--atlas-midnight-navy);
+        border: 1px solid var(--atlas-border);
+        border-radius: 8px;
+        color: var(--atlas-cloud-white);
+        font-family: var(--atlas-font-sans);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-input::placeholder {
+        color: var(--atlas-mist-gray);
+        opacity: 0.6;
+    }
+
+    .form-input:focus {
+        border-color: var(--atlas-antique-gold);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, var(--atlas-antique-gold), var(--atlas-amber-glow));
+        color: var(--atlas-deep-abyss);
+        font-family: var(--atlas-font-sans);
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        margin-top: 0.5rem;
+    }
+
+    .login-btn:hover { opacity: 0.9; }
+
+    .login-error {
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.25rem;
+        font-family: var(--atlas-font-sans);
+        font-size: 0.85rem;
+        color: #f87171;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.5rem;
+        font-family: var(--atlas-font-sans);
+        font-size: 0.85rem;
+        color: var(--atlas-mist-gray);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .back-link:hover {
+        color: var(--atlas-cloud-white);
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h1 class="login-heading">Developer Access</h1>
+        <p class="login-subtitle">Sign in with your admin credentials</p>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="login-error">@Model.ErrorMessage</div>
+        }
+
+        <form method="post" asp-page="/Dev/Login">
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-input" type="email" id="email" asp-for="Email" placeholder="admin@atlasuniversalis.com" required />
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-input" type="password" id="password" asp-for="Password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+
+        <a href="/" class="back-link">← Back to main site</a>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Atlas Universalis</title>
+    <base href="~/" />
+
+    @RenderSection("Meta", required: false)
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Atlas UIKit Design System -->
+    <link href="_content/Atlas.UIKit/atlas-uikit.css" rel="stylesheet" />
+
+    <!-- Site Styles -->
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/css/prose.css" rel="stylesheet" />
+
+    <!-- Blazor CSS Isolation -->
+    <link href="Atlas.Web.styles.css" rel="stylesheet" />
+</head>
+<body>
+    @RenderBody()
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
