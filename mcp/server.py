@@ -50,30 +50,35 @@ APP_DOCS = {
         "log": "Forge_Log.md",
         "overview": "Forge_Overview.md",
         "checklist": "Forge_Checklist.md",
+        "inventory": "Forge_Inventory.md",
     },
     "atlas-apply": {
         "name": "Atlas Apply",
         "log": "Apply_Log.md",
         "overview": "Apply_Overview.md",
         "checklist": "Apply_Checklist.md",
+        "inventory": "Apply_Inventory.md",
     },
     "atlas-universalis": {
         "name": "Atlas Universalis",
         "log": "Universalis_Log.md",
         "overview": "Universalis_Overview.md",
         "checklist": "Universalis_Checklist.md",
+        "inventory": "Universalis_Inventory.md",
     },
     "electracast": {
         "name": "ElectraCast",
         "log": "Electracast_Log.md",
         "overview": "Electracast_Overview.md",
         "checklist": "Electracast_Checklist.md",
+        "inventory": "Electracast_Inventory.md",
     },
     "atlas-meridian": {
         "name": "Atlas Meridian",
         "log": "Meridian_Log.md",
         "overview": "Meridian_Overview.md",
         "checklist": "Meridian_Checklist.md",
+        "inventory": "Meridian_Inventory.md",
     },
 }
 
@@ -301,6 +306,23 @@ TOOLS = [
                 "mode": {"type": "string", "enum": ["append", "prepend", "replace"], "default": "append"}
             },
             "required": ["app_id", "section", "items"]
+        }
+    ),
+    Tool(
+        name="update_app_inventory_section",
+        description="Update a section in an app inventory file. Supports adding/replacing file entries with variable and method tables.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string",
+                    "enum": ["atlas-forge", "atlas-apply", "atlas-universalis", "electracast", "atlas-meridian"]
+                },
+                "section": {"type": "string", "description": "Section header text (without ##)"},
+                "content": {"type": "string", "description": "Raw markdown content to insert under the section"},
+                "mode": {"type": "string", "enum": ["append", "prepend", "replace"], "default": "replace"}
+            },
+            "required": ["app_id", "section", "content"]
         }
     ),
     Tool(
@@ -619,6 +641,52 @@ def impl_update_app_overview_section(arguments: dict) -> str:
 
     overview_path.write_text(_ensure_trailing_newline("\n".join(lines)), encoding="utf-8")
     return json.dumps({"path": str(overview_path), "section": section, "mode": mode}, indent=2)
+
+
+def impl_update_app_inventory_section(arguments: dict) -> str:
+    app_id = arguments.get("app_id")
+    app = APP_DOCS.get(app_id)
+    if not app:
+        return json.dumps({"error": f"Unknown app_id: {app_id}"})
+
+    section = str(arguments.get("section", "")).strip()
+    if not section:
+        return json.dumps({"error": "Section is required"})
+
+    content = str(arguments.get("content", "")).strip()
+    if not content:
+        return json.dumps({"error": "No content provided"})
+
+    mode = arguments.get("mode", "replace")
+    inventory_path = DOCS_DIR / app["inventory"]
+    lines = inventory_path.read_text(encoding="utf-8", errors="ignore").splitlines() if inventory_path.exists() else []
+
+    header_index = None
+    for idx, line in enumerate(lines):
+        if line.strip() == f"## {section}" or line.strip() == f"### {section}":
+            header_index = idx
+            break
+
+    content_lines = content.splitlines()
+    if header_index is None:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append(f"## {section}")
+        lines.extend(content_lines)
+    else:
+        end_index = header_index + 1
+        while end_index < len(lines) and not (lines[end_index].startswith("## ") or lines[end_index].startswith("### ")):
+            end_index += 1
+
+        if mode == "replace":
+            lines[header_index + 1:end_index] = content_lines
+        elif mode == "prepend":
+            lines[header_index + 1:header_index + 1] = content_lines
+        else:
+            lines[end_index:end_index] = content_lines
+
+    inventory_path.write_text(_ensure_trailing_newline("\n".join(lines)), encoding="utf-8")
+    return json.dumps({"path": str(inventory_path), "section": section, "mode": mode}, indent=2)
 
 
 def impl_get_dev_status() -> str:
@@ -1145,6 +1213,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             result = impl_update_app_checklist(arguments)
         elif name == "update_app_overview_section":
             result = impl_update_app_overview_section(arguments)
+        elif name == "update_app_inventory_section":
+            result = impl_update_app_inventory_section(arguments)
         elif name == "get_dev_status":
             result = impl_get_dev_status()
         elif name == "set_dev_status":

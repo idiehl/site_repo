@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all files in the Atlas Universalis project with descriptions of their purpose.
 
-**Last Updated:** 2026-02-11  
+**Last Updated:** 2026-02-17  
 **Project Repository:** `github.com/idiehl/site_repo`  
 **Production URL:** `atlasuniversalis.com`
 
@@ -41,7 +41,7 @@ Atlas Universalis is a multi-application platform consisting of:
 ## Directory Structure
 
 ```
-site_repo/
+atlasuniversalis/
 ├── alembic/                 # Database migrations
 ├── atlasops/                # Atlas Apply backend application
 ├── deploy/                  # Deployment configurations

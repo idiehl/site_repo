@@ -29,6 +29,7 @@ const appName = computed(() => APP_LABELS[appId.value] || 'Unknown App')
 const logPath = computed(() => `/dev/apps/${appId.value}/log`)
 const overviewPath = computed(() => `/dev/apps/${appId.value}/overview`)
 const checklistPath = computed(() => `/dev/apps/${appId.value}/checklist`)
+const inventoryPath = computed(() => `/dev/apps/${appId.value}/inventory`)
 
 async function fetchChecklist() {
   if (!accessToken.value) {
@@ -153,6 +154,12 @@ onMounted(fetchChecklist)
               class="px-3 py-1 text-sm rounded-md transition-colors bg-atlas-600 text-white"
             >
               Checklist
+            </router-link>
+            <router-link
+              :to="inventoryPath"
+              class="px-3 py-1 text-sm rounded-md transition-colors text-night-400 hover:text-white"
+            >
+              Inventory
             </router-link>
           </div>
           <div class="flex bg-night-800 rounded-lg p-1">

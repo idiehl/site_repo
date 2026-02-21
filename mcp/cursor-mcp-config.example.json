@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "atlasops-dashboard": {
-      "command": "/mnt/c/Users/ihigg/Git/github/site_repo/mcp/.venv/bin/python",
-      "args": ["/mnt/c/Users/ihigg/Git/github/site_repo/mcp/server.py"],
+      "command": "/mnt/d/www/atlasuniversalis/mcp/.venv/bin/python",
+      "args": ["/mnt/d/www/atlasuniversalis/mcp/server.py"],
       "env": {
         "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/atlasops",
         "REDIS_URL": "redis://localhost:6379/0",

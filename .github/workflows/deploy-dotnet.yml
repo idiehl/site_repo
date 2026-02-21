@@ -1,0 +1,142 @@
+name: Deploy .NET to DigitalOcean
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "*.sln"
+      - "*.props"
+      - "global.json"
+      - "deploy/**"
+
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore AtlasUniversalis.sln
+
+      - name: Build
+        run: dotnet build AtlasUniversalis.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test AtlasUniversalis.sln --configuration Release --no-build --verbosity normal
+
+      - name: Publish Atlas.Web
+        run: dotnet publish src/Atlas.Web/Atlas.Web.csproj -c Release -o publish/web --no-restore
+
+      - name: Publish Atlas.Apply
+        run: dotnet publish src/Atlas.Apply/Atlas.Apply.csproj -c Release -o publish/apply --no-restore
+
+      - name: Publish Atlas.Forge
+        run: dotnet publish src/Atlas.Forge/Atlas.Forge.csproj -c Release -o publish/forge --no-restore
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-publish
+          path: publish/
+          retention-days: 7
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment: production
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-publish
+          path: publish/
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            DEST=/opt/atlas
+            BACKUP="${DEST}/backups/$(date +%Y%m%d-%H%M%S)"
+
+            # Backup current installs
+            for app in web apply forge; do
+              if [ -d "${DEST}/${app}" ]; then
+                mkdir -p "${BACKUP}/${app}"
+                cp -a "${DEST}/${app}/." "${BACKUP}/${app}/"
+              fi
+            done
+
+            # Pull latest code (for deploy scripts and configs)
+            cd /var/www/atlasuniversalis.com
+            git pull origin master
+
+            # Build on server
+            dotnet publish src/Atlas.Web/Atlas.Web.csproj   -c Release -o /tmp/atlas-publish/web   --no-self-contained
+            dotnet publish src/Atlas.Apply/Atlas.Apply.csproj -c Release -o /tmp/atlas-publish/apply --no-self-contained
+            dotnet publish src/Atlas.Forge/Atlas.Forge.csproj -c Release -o /tmp/atlas-publish/forge --no-self-contained
+
+            # Stop services
+            sudo systemctl stop atlas-web   || true
+            sudo systemctl stop atlas-apply || true
+            sudo systemctl stop atlas-forge || true
+
+            # Deploy
+            rsync -a --delete /tmp/atlas-publish/web/   "${DEST}/web/"
+            rsync -a --delete /tmp/atlas-publish/apply/ "${DEST}/apply/"
+            rsync -a --delete /tmp/atlas-publish/forge/ "${DEST}/forge/"
+
+            # Fix ownership
+            sudo chown -R www-data:www-data "${DEST}/web" "${DEST}/apply" "${DEST}/forge"
+
+            # Start services
+            sudo systemctl start atlas-web
+            sudo systemctl start atlas-apply
+            sudo systemctl start atlas-forge
+
+            # Cleanup temp
+            rm -rf /tmp/atlas-publish
+
+  smoke-test:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for services to stabilise
+        run: sleep 15
+
+      - name: Smoke test — Atlas Web
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
+            "https://atlasuniversalis.com/healthz" || echo "000")
+          echo "Atlas Web /healthz → HTTP ${STATUS}"
+          [ "${STATUS}" = "200" ] || { echo "::warning::Atlas Web health check returned ${STATUS}"; }
+
+      - name: Smoke test — Atlas Apply
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
+            "https://apply.atlasuniversalis.com/healthz" || echo "000")
+          echo "Atlas Apply /healthz → HTTP ${STATUS}"
+          [ "${STATUS}" = "200" ] || { echo "::warning::Atlas Apply health check returned ${STATUS}"; }
+
+      - name: Smoke test — Atlas Forge
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
+            "https://forge.atlasuniversalis.com/healthz" || echo "000")
+          echo "Atlas Forge /healthz → HTTP ${STATUS}"
+          [ "${STATUS}" = "200" ] || { echo "::warning::Atlas Forge health check returned ${STATUS}"; }

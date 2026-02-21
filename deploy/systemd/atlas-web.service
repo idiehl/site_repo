@@ -1,0 +1,22 @@
+[Unit]
+Description=Atlas Web (Razor Pages + Blazor Server)
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/atlas/web
+ExecStart=/opt/atlas/web/Atlas.Web
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Restart=on-failure
+RestartSec=5
+WatchdogSec=30
+SyslogIdentifier=atlas-web
+User=www-data
+Group=www-data
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

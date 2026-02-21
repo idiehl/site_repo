@@ -1,0 +1,22 @@
+[Unit]
+Description=Atlas Forge (Blazor Server)
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/atlas/forge
+ExecStart=/opt/atlas/forge/Atlas.Forge
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5020
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Restart=on-failure
+RestartSec=5
+WatchdogSec=30
+SyslogIdentifier=atlas-forge
+User=www-data
+Group=www-data
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

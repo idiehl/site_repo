@@ -2619,3 +2619,162 @@ cd frontend-main && npm run build
 **Verification:** `frontend-main` production build succeeds and no lints are reported for updated component.  
 **Notes:** None  
 **Concepts:** @concept:frontend @concept:profile @concept:embed
+---
+
+## AU-C01-20260217-001 — Migrated local repos to D:\ dev drive, updated paths and deps
+
+**Type:** Ops  
+**Context:** Relocated Atlas Universalis and related repos from C:\Users\ihigg\Git\github to the D:\ dev drive, reorganized into D:\www\atlasuniversalis, D:\local, and D:\idiehl; updated hard-coded paths in the atlasuniversalis repo and rebuilt Python/npm dependencies.  
+**Change summary:**
+- Robocopied site_repo → D:\www\atlasuniversalis; Atlas_Meridian → D:\local\Atlas_Meridian; HYPERDESK → D:\local\HYPERDESK; github_portfolio_projects → D:\idiehl
+- Updated hard-coded paths in .cursor/mcp.json, MASTER.mdc, meridian-map-generator SKILL, mcp config example, and mcp README
+- Rebuilt .venv and mcp/.venv and reinstalled pip deps; ran npm install in frontend, frontend-main, atlasforge, electracast
+- Build artifacts (meridian obj/, atlasforge .astro/types.d.ts) intentionally not copied to avoid stale path embedding
+
+**Rationale / tradeoffs:** Not provided  
+**Files touched:**
+- `.cursor/mcp.json`
+- `.cursor/rules/MASTER.mdc`
+- `.cursor/skills/meridian-map-generator/SKILL.md`
+- `docs/master_log/PROJECT_OVERVIEW.md`
+- `mcp/cursor-mcp-config.example.json`
+- `mcp/README.md`
+- `atlasforge/package-lock.json`
+- `atlasforge/.astro/types.d.ts (removed)`
+- `meridian/Atlas.Meridian.App/obj/* (removed)`
+- `meridian/Atlas.Meridian.Core/obj/* (removed)`
+
+**Commands run:**
+```bash
+New-Item -ItemType Directory -Path "D:\www","D:\local","D:\idiehl"
+New-Item -ItemType Directory -Path "D:\www\atlasuniversalis"
+New-Item -ItemType Directory -Path "D:\local\Atlas_Meridian","D:\local\HYPERDESK"
+robocopy "C:\Users\ihigg\Git\github\site_repo" "D:\www\atlasuniversalis" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\Atlas_Apps\Atlas_Meridian" "D:\local\Atlas_Meridian" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\Atlas_Apps\HYPERDESK" "D:\local\HYPERDESK" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+robocopy "C:\Users\ihigg\Git\github\github_portfolio_projects" "D:\idiehl" /E /COPY:DAT /DCOPY:DAT /XD node_modules dist build __pycache__ .venv obj bin .pytest_cache .mypy_cache .ruff_cache .cache .parcel-cache .next .nuxt .svelte-kit .astro .vite .turbo
+python -m venv "D:\www\atlasuniversalis\.venv"
+D:\www\atlasuniversalis\.venv\Scripts\python.exe -m pip install -r D:\www\atlasuniversalis\requirements.txt
+python -m venv "D:\www\atlasuniversalis\mcp\.venv"
+D:\www\atlasuniversalis\mcp\.venv\Scripts\python.exe -m pip install -r D:\www\atlasuniversalis\mcp\requirements.txt
+npm install (frontend, frontend-main, atlasforge, electracast)
+git status -sb
+git remote -v
+D:\www\atlasuniversalis\mcp\.venv\Scripts\python.exe -c "import mcp, sqlalchemy, psycopg2"
+```
+
+**Verification:** git status -sb and git remote -v in D:\www\atlasuniversalis; MCP venv import check; pip/npm installs completed successfully  
+**Notes:** Build artifacts (meridian obj, atlasforge .astro) were intentionally not copied to avoid stale path embedding.  
+**Concepts:** None
+
+---
+
+## AU-C01-20260217-002 — Verify directory migration pipeline
+
+**Type:** Ops  
+**Context:** Project directory migrated from C:\Users\ihigg\Git\github\site_repo to D:\www\atlasuniversalis; needed to confirm CI/CD pipeline works from new location  
+**Change summary:** Ran 5-point migration verification: (1) git push from new directory, (2) GitHub Actions deploy triggered, (3) droplet received commit, (4) live site reflected change, (5) old directory confirmed stale. All tests passed.  
+**Rationale / tradeoffs:** End-to-end verification ensures no broken workflow references to old path  
+**Files touched:**
+- `frontend-main/index.html` (temporary marker added then removed)
+
+**Commands run:**
+```bash
+git add frontend-main/index.html && git commit && git push origin master
+ssh root@167.71.179.90 "cd /var/www/atlasuniversalis.com && git log -3 --oneline"
+```
+
+**Verification:** All 5 tests passed — push succeeded, Actions ran (success), droplet has commit 4f1160a, live site showed marker, old dir stuck at ad57fd7  
+**Notes:** Old directory C:\Users\ihigg\Git\github\site_repo can be safely archived or deleted  
+**Concepts:** @concept:deployment @concept:migration
+
+---
+
+## AU-C01-20260218-001 — Add Inventory page type to dev portal and create codebase inventories for all 5 projects
+
+**Type:** Feature  
+**Context:** User requested a new "Inventory" page type on the /dev portal, modeled after Meridian_Inventory PDF, plus comprehensive updates to Atlas Meridian Overview and Checklist from design documentation PDFs  
+**Change summary:** Added full-stack "Inventory" page type to the dev portal (backend API endpoint, frontend route, Vue view component, dashboard integration). Created codebase inventory markdown files for all 5 Atlas platform projects (Meridian, Forge, Apply, Universalis, ElectraCast). Updated Meridian Overview with comprehensive architecture/roadmap from design docs. Updated Meridian Checklist with 49-item phased roadmap. Updated Cursor rules and skills (MASTER.mdc, version-logging.mdc, workflow-tiering.mdc, version-logger SKILL.md, doc-ops SKILL.md) to automate inventory updates after every task.  
+**Rationale / tradeoffs:** Inventory pages provide a living codebase reference that stays current as the project evolves. Automating inventory updates in the version-logger workflow ensures they don't go stale.  
+**Files touched:**
+- `atlasops/api/v1/dev.py` — Added inventory to APP_DOCS, new `/apps/{app_id}/inventory` endpoint, updated apps listing
+- `frontend-main/src/router/index.js` — Added inventory route
+- `frontend-main/src/views/DevAppInventoryView.vue` — New view component (based on Overview template)
+- `frontend-main/src/views/DevDashboardView.vue` — Added Inventory button to app cards
+- `frontend-main/src/views/DevAppOverviewView.vue` — Inventory tab in nav (pre-existing)
+- `frontend-main/src/views/DevAppLogView.vue` — Inventory tab in nav (pre-existing)
+- `frontend-main/src/views/DevAppChecklistView.vue` — Inventory tab in nav (pre-existing)
+- `docs/master_log/Meridian_Inventory.md` — New: 847-line codebase inventory for Atlas Meridian
+- `docs/master_log/Forge_Inventory.md` — New: Atlas Forge codebase inventory
+- `docs/master_log/Apply_Inventory.md` — New: Atlas Apply/AtlasOps codebase inventory
+- `docs/master_log/Universalis_Inventory.md` — New: Atlas Universalis main site inventory
+- `docs/master_log/Electracast_Inventory.md` — New: ElectraCast codebase inventory
+- `docs/master_log/Meridian_Overview.md` — Rewritten with comprehensive architecture, capabilities, gaps, roadmap
+- `docs/master_log/Meridian_Checklist.md` — Rewritten with 49-item phased development roadmap
+- `.cursor/rules/MASTER.mdc` — Added inventory to doc tiers
+- `.cursor/rules/version-logging.mdc` — Added inventory to workflow and quick invocation
+- `.cursor/rules/workflow-tiering.mdc` — Added inventory to Standard/Full paths
+- `.cursor/skills/version-logger/SKILL.md` — Added Step 4b for inventory updates with format guide
+- `.cursor/skills/doc-ops/SKILL.md` — Added update_app_inventory MCP tool template
+
+**Commands run:**
+```bash
+# File creation and editing via agents
+```
+
+**Verification:** Grep confirmed all references correctly wired; inventory files contain per-file tables with types, methods, and variables  
+**Notes:** Deploy needed to make changes live on atlasuniversalis.com/dev. Source PDFs processed: Meridian_Inventory, Meridian_Outline, Meridian_Canvas, Meridian_Breakdown, Meridian_ContentEditor, Meridian_PresentationMode, Meridian_Script, Meridian_ScriptingTab, Meridian_Step-by-Step, MERIDIAN NOTES.  
+**Concepts:** @concept:dev-portal @concept:inventory @concept:atlas-meridian @concept:documentation
+
+---
+
+## AU-C01-20260221-001 — Phase 0: .NET 10 Solution Scaffold for Hybrid Rebuild
+
+**Type:** Feature
+**Context:** Beginning the full-stack migration from Python/FastAPI + Vue 3 + Astro to C#/.NET 10 / ASP.NET Core / Blazor Server / Razor Pages. Phase 0 establishes the solution skeleton, EF Core data layer, deployment infrastructure, and CI/CD pipeline without changing any production traffic.
+**Change summary:** Created `AtlasUniversalis.sln` at repo root with 17 projects (11 src, 5 test, 1 tool). Built all domain entities (11), shared contracts/DTOs (22), EF Core DbContext with entity configurations (12), repository interfaces (6), API endpoint stubs (9 modules, ~75 routes). Created Nginx blue/green upstream configs, systemd service units for 3 Kestrel hosts, GitHub Actions `deploy-dotnet.yml` workflow, deployment script with rollback support, and server setup runbook. All routes default to legacy upstream — zero traffic change.
+**Rationale / tradeoffs:** Three parallel agents (Solution Architect, Data/Domain Architect, DevOps Engineer) used for speed. .NET 10 preview chosen to match existing Meridian projects. NuGet packages use .NET 9 stable versions for compatibility. Entity schema derived from actual Python/SQLAlchemy models and Alembic migrations rather than the architecture spec alone — 8 discrepancies resolved in favor of real schema parity (3 analytics tables instead of 1, additional User fields for password reset/billing/usage tracking, correct ApplicationStatus enum values).
+**Files touched:**
+- `AtlasUniversalis.sln` — Solution file with 17 projects in src/tests/tools folders
+- `global.json` — .NET 10 SDK pin (10.0.100, rollForward latestMinor)
+- `Directory.Build.props` — Shared build properties (net10.0, nullable, warnings-as-errors)
+- `Directory.Packages.props` — Centralized NuGet versions (30+ packages)
+- `.editorconfig` — C# coding standards
+- `src/Atlas.Web/` — Razor Pages + Blazor Server host (Program.cs, Index.cshtml, appsettings.json)
+- `src/Atlas.Apply/` — Blazor Server host (:5010)
+- `src/Atlas.Forge/` — Blazor Server host (:5020)
+- `src/Atlas.Api/Endpoints/` — 9 endpoint stub classes (Auth, Job, Application, Profile, Billing, Admin, Dev, Meridian, Playground)
+- `src/Atlas.Core/Entities/` — 11 entity classes (User, UserProfile, JobPosting, CompanyDeepDive, Application, ApplicationEvent, GeneratedResume, GeneratedCoverLetter, SiteVisit, ApiUsage, SecurityEvent)
+- `src/Atlas.Core/Enums/ApplicationStatus.cs` — Status enum matching Python
+- `src/Atlas.Core/Interfaces/` — 6 repository/service interfaces
+- `src/Atlas.Contracts/` — 22 DTO files across Auth, Jobs, Applications, Profile, Billing, Meridian, Admin, Configuration
+- `src/Atlas.Infrastructure/Data/AtlasDbContext.cs` — EF Core context with 11 DbSets
+- `src/Atlas.Infrastructure/Data/Configurations/` — 11 entity type configurations (snake_case table/column mapping)
+- `src/Atlas.UIKit/` — Razor Class Library stub with placeholder CSS
+- `src/Atlas.Meridian.Core/` — Copied from meridian/ (existing document model)
+- `src/Atlas.Meridian.App/` — Copied from meridian/ (Avalonia desktop, updated project reference)
+- `src/Atlas.Meridian.Player/` — New RCL stub for SkiaSharp.Views.Blazor
+- `tests/` — 5 test projects (Core, Infrastructure, Api, Web, Meridian.Player)
+- `tools/Atlas.DbMigrator/` — One-time migration tool stub
+- `deploy/nginx/atlas-upstreams.conf` — Upstream definitions (legacy + 3 .NET)
+- `deploy/nginx/atlas-route-map.conf` — Blue/green map variables (all default to legacy)
+- `deploy/nginx/atlas-web.conf` — Main site server block with SSL, WebSocket, healthz
+- `deploy/nginx/atlas-apply.conf` — Apply server block
+- `deploy/nginx/atlas-forge.conf` — Forge server block
+- `deploy/systemd/atlas-web.service` — Kestrel :5000 unit
+- `deploy/systemd/atlas-apply.service` — Kestrel :5010 unit
+- `deploy/systemd/atlas-forge.service` — Kestrel :5020 unit
+- `deploy/deploy-dotnet.sh` — Deploy script with backup and rollback
+- `deploy/RUNBOOK.md` — Server setup and operations runbook
+- `.github/workflows/deploy-dotnet.yml` — .NET CI/CD pipeline (build, test, publish, deploy, smoke test)
+- `docs/architecture/Migration_Sequence.md` — Ordered route cutover plan per phase
+
+**Commands run:**
+```bash
+dotnet build AtlasUniversalis.sln  # 17 projects, 0 warnings, 0 errors
+dotnet test AtlasUniversalis.sln   # All test projects discovered (no tests yet)
+```
+
+**Verification:** Full solution builds with 0 warnings, 0 errors. All 17 projects compile. Test infrastructure works. Build time ~6s (incremental). Meridian projects successfully integrated from meridian/ subfolder into src/ with updated project references.
+**Notes:** No commits made. No production changes. Existing Python/Vue/Astro code untouched. Blocker resolutions recorded: B2=OpenAI .NET SDK, B3=IDistributedCache with Redis. Phase 1 (Design System) is next. Existing `meridian/` directory left in place (originals not deleted).
+**Concepts:** @concept:dotnet @concept:blazor @concept:deployment @concept:infrastructure @concept:api @concept:database

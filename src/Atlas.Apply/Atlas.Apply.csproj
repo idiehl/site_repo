@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atlas.Api\Atlas.Api.csproj" />
+    <ProjectReference Include="..\Atlas.UIKit\Atlas.UIKit.csproj" />
+    <ProjectReference Include="..\Atlas.Infrastructure\Atlas.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

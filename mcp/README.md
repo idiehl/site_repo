@@ -53,8 +53,8 @@ Add to your `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "atlasops-dashboard": {
-      "command": "/path/to/site_repo/mcp/.venv/bin/python",
-      "args": ["/path/to/site_repo/mcp/server.py"],
+      "command": "/path/to/atlasuniversalis/mcp/.venv/bin/python",
+      "args": ["/path/to/atlasuniversalis/mcp/server.py"],
       "env": {
         "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/atlasops"
       }
@@ -68,8 +68,8 @@ Add to your `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "atlasops-dashboard": {
-      "command": "C:\\Users\\ihigg\\Git\\github\\site_repo\\mcp\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\ihigg\\Git\\github\\site_repo\\mcp\\server.py"]
+      "command": "D:\\www\\atlasuniversalis\\mcp\\.venv\\Scripts\\python.exe",
+      "args": ["D:\\www\\atlasuniversalis\\mcp\\server.py"]
     }
   }
 }

@@ -1,0 +1,22 @@
+[Unit]
+Description=Atlas Apply (Blazor Server + API)
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/atlas/apply
+ExecStart=/opt/atlas/apply/Atlas.Apply
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5010
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Restart=on-failure
+RestartSec=5
+WatchdogSec=30
+SyslogIdentifier=atlas-apply
+User=www-data
+Group=www-data
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

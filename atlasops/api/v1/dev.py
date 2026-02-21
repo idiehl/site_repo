@@ -24,30 +24,35 @@ APP_DOCS = {
         "log": "Forge_Log.md",
         "overview": "Forge_Overview.md",
         "checklist": "Forge_Checklist.md",
+        "inventory": "Forge_Inventory.md",
     },
     "atlas-apply": {
         "name": "Atlas Apply",
         "log": "Apply_Log.md",
         "overview": "Apply_Overview.md",
         "checklist": "Apply_Checklist.md",
+        "inventory": "Apply_Inventory.md",
     },
     "atlas-universalis": {
         "name": "Atlas Universalis",
         "log": "Universalis_Log.md",
         "overview": "Universalis_Overview.md",
         "checklist": "Universalis_Checklist.md",
+        "inventory": "Universalis_Inventory.md",
     },
     "electracast": {
         "name": "ElectraCast",
         "log": "Electracast_Log.md",
         "overview": "Electracast_Overview.md",
         "checklist": "Electracast_Checklist.md",
+        "inventory": "Electracast_Inventory.md",
     },
     "atlas-meridian": {
         "name": "Atlas Meridian",
         "log": "Meridian_Log.md",
         "overview": "Meridian_Overview.md",
         "checklist": "Meridian_Checklist.md",
+        "inventory": "Meridian_Inventory.md",
     },
 }
 
@@ -210,6 +215,7 @@ async def list_apps(admin: AdminUser):
                 "log": f"/api/v1/dev/apps/{app_id}/log",
                 "overview": f"/api/v1/dev/apps/{app_id}/overview",
                 "checklist": f"/api/v1/dev/apps/{app_id}/checklist",
+                "inventory": f"/api/v1/dev/apps/{app_id}/inventory",
             }
         )
     return {"apps": apps}
@@ -265,6 +271,30 @@ async def get_app_checklist(app_id: str, admin: AdminUser):
         raise HTTPException(status_code=404, detail="Unknown application")
     try:
         return build_doc_response(app["checklist"], f"{app['name']} — Checklist")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/apps/{app_id}/inventory", response_model=DevDocResponse)
+async def get_app_inventory(app_id: str, admin: AdminUser):
+    """Get an application's codebase inventory document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        return build_doc_response(app["inventory"], f"{app['name']} — Inventory")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/apps/{app_id}/inventory", response_model=DevDocResponse)
+async def get_app_inventory(app_id: str, admin: AdminUser):
+    """Get an application's codebase inventory document."""
+    app = APP_DOCS.get(app_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Unknown application")
+    try:
+        return build_doc_response(app["inventory"], f"{app['name']} — Inventory")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

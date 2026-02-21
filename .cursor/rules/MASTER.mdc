@@ -1,82 +1,64 @@
 ---
-description: Master Cursor ruleset (sanitized for git)
+description: Atlas Universalis — single consolidated ruleset
 alwaysApply: true
 ---
 
-# Atlas Universalis — Optimized User Ruleset
+# Atlas Universalis
 
-## 0) Dev Landscape
-- If `C:\Users\ihigg\Git\github\site_repo` is missing **and** SSH to `root@167.71.179.90` fails, ignore all remaining rules. Create `internal/` at project root and maintain log/overview/checklist locally.
-- Primary repo: `C:\Users\ihigg\Git\github\site_repo`
-- Production host: DigitalOcean droplet (Ubuntu), SSH `root@167.71.179.90`
+## Environment
+
+- Repo: `D:\www\atlasuniversalis` — `github.com/idiehl/site-repo`
+- Server: DigitalOcean droplet `root@167.71.179.90`
+- Server path: `/var/www/atlasuniversalis.com`
 - Dev portal: `https://atlasuniversalis.com/dev`
-- Branding assets: `C:\Users\ihigg\Git\github\site_repo\internal\Logo_Icon`
-- Repo: `github.com/idiehl/site-repo`
 
-## 0.1) Logins (use as needed)
-- Never commit credentials or secrets in this repo.
-- Store credentials in a password manager and reference them here as placeholders only.
-- `https://atlasuniversalis.com/dev` — `<stored in password manager>`
-- `https://electracast.com/staging/4803/wp-login.php` — `<stored in password manager>`
-- `https://cms.megaphone.fm/users/sign_in` — `<stored in password manager>`
+## Apps
 
-## 1) Software & Tools
-- Windows PC + WSL + Ubuntu VM available
-- Docker running; MCP servers available
-- Cursor IDE primary; other IDEs permitted when it improves speed/quality
-- Use MCP/subagents/skills whenever they reduce manual overhead
+| App | Directory | Domain |
+|-----|-----------|--------|
+| Main Site | `frontend-main/` | `atlasuniversalis.com` |
+| Atlas Apply / AtlasOps | `frontend/` + `atlasops/` | `apply.atlasuniversalis.com` |
+| AtlasForge | `atlasforge/` | `forge.atlasuniversalis.com` |
+| ElectraCast | `electracast/` | `electracast.atlasuniversalis.com` |
+| Atlas Meridian | `meridian/` | Desktop (Avalonia, not deployed) |
+| MCP Server | `mcp/` | Local (Cursor) |
 
-## 2) Access
-- Network access allowed for search and web ops
-- Full local + droplet access permitted
+## Tech Stack
 
-## 3) MCP, Subagents, Skills
-- **Always prefer MCP tools** when available.
-- If a task suits a new MCP server or workflow, say:  
-  **“I think we should set up (n8n/MCP) for this.”**
-- Use subagents for parallelism (doc ops, deploy, testing)
-- Create skills when a repeatable pattern emerges
+- **Backend**: Python 3.11+, FastAPI, SQLAlchemy (async), PostgreSQL, Celery + Redis
+- **Frontend**: Vue 3 + Vite, Tailwind CSS, Pinia
+- **Deployment**: Nginx, GitHub Actions, Certbot SSL
 
-## 4) Documentation (MCP‑First + Tiered)
-**Primary mechanism:** Use **atlasops-dashboard MCP** tools for log/overview/checklist/status updates (no manual edits unless MCP is down).
+## Non-Negotiables
 
-**Always required (per task):**
-- Master Log entry (MCP)
-- App Log entry if task affects a specific app
+1. Never hardcode secrets — use environment variables
+2. Never break existing routes — `/` and `/pages/{slug}` must work
+3. Prefer async patterns throughout the stack
+4. Prefer MCP tools when available
 
-**Conditional only (if changed):**
-- Project Overview (architecture / file inventory / scope)
-- Checklist / To‑Do (task added/finished/removed)
-- STATUS (only when deploy starts/finishes or when blocked)
+## Documentation (Tiered)
 
-**Tiered doc policy:**
-- **Fast Path:** Master Log only
-- **Standard Path:** Master Log + App Log; checklist/overview if needed
-- **Full Path:** Master Log + App Log + checklist/overview + STATUS
+Use `/doc-ops` subagent or atlasops-dashboard MCP tools. Tier determines depth:
 
-**Batching allowed:** Overview/checklist can be batched per session/day as long as logs stay accurate.
+- **Fast** (minor edits): Master Log only
+- **Standard** (feature/bug): Master Log + App Log + Inventory if code changed
+- **Full** (infra/schema): All docs + STATUS updates
 
-**Fallback:** If MCP is unavailable, do manual edits and note MCP outage in Master Log.
+After deploys, `/post-deploy-docs` auto-updates documentation from the changeset.
 
-## 5) Task Completion & Deploy
-**Classification first:**
-- **Fast Path:** small UI/copy/local tweak → no deploy unless requested
-- **Standard Path:** typical feature/bug → deploy if public‑facing
-- **Full Path:** infra/backend/schema changes → always deploy + verify
+## Workflow
 
-**Deploy steps only when needed:**
-1) Check `/dev` status (must be READY)  
-2) Make code changes locally  
-3) Test relevant surfaces  
-4) MCP logs / status updates  
-5) Commit + push  
-6) Set STATUS → PENDING  
-7) Pull + deploy on droplet  
-8) Set STATUS → READY
+Use subagents (`.cursor/agents/`) for specialized tasks — Cursor auto-delegates based on descriptions. Key chains:
 
-## 6) Efficiency & Token Use
+1. Code changes → `/doc-ops` in parallel
+2. Production deploy → `/deploy` → `/post-deploy-docs` (with commit range)
+3. Verification → `/test-runner`
+4. Structured responses → `/teller`
+
+Launch subagents in parallel when tasks split into docs + deploy + tests.
+
+## Efficiency
+
 - Use the smallest acceptable workflow tier
-- Prefer MCP + subagents to avoid repeated manual steps
 - Avoid redundant dev portal checks during a single session
-
----
+- If a task suits a new MCP server or workflow, suggest it

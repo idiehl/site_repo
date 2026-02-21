@@ -57,6 +57,7 @@ const apps = [
     logPath: '/dev/apps/atlas-forge/log',
     overviewPath: '/dev/apps/atlas-forge/overview',
     checklistPath: '/dev/apps/atlas-forge/checklist',
+    inventoryPath: '/dev/apps/atlas-forge/inventory',
   },
   {
     id: 'atlas-apply',
@@ -65,6 +66,7 @@ const apps = [
     logPath: '/dev/apps/atlas-apply/log',
     overviewPath: '/dev/apps/atlas-apply/overview',
     checklistPath: '/dev/apps/atlas-apply/checklist',
+    inventoryPath: '/dev/apps/atlas-apply/inventory',
   },
   {
     id: 'atlas-universalis',
@@ -73,6 +75,7 @@ const apps = [
     logPath: '/dev/apps/atlas-universalis/log',
     overviewPath: '/dev/apps/atlas-universalis/overview',
     checklistPath: '/dev/apps/atlas-universalis/checklist',
+    inventoryPath: '/dev/apps/atlas-universalis/inventory',
   },
   {
     id: 'electracast',
@@ -81,14 +84,16 @@ const apps = [
     logPath: '/dev/apps/electracast/log',
     overviewPath: '/dev/apps/electracast/overview',
     checklistPath: '/dev/apps/electracast/checklist',
+    inventoryPath: '/dev/apps/electracast/inventory',
   },
   {
     id: 'atlas-meridian',
     title: 'Atlas Meridian',
-    description: 'Upcoming application in discovery and planning',
+    description: 'Dynamic visual interface and canvas operating system',
     logPath: '/dev/apps/atlas-meridian/log',
     overviewPath: '/dev/apps/atlas-meridian/overview',
     checklistPath: '/dev/apps/atlas-meridian/checklist',
+    inventoryPath: '/dev/apps/atlas-meridian/inventory',
   },
 ]
 
@@ -168,6 +173,12 @@ const platformPages = [
               class="px-3 py-1.5 text-sm rounded-lg bg-night-800 text-night-300 hover:text-white hover:bg-night-700 transition-colors"
             >
               Checklist
+            </router-link>
+            <router-link
+              :to="app.inventoryPath"
+              class="px-3 py-1.5 text-sm rounded-lg bg-night-800 text-night-300 hover:text-white hover:bg-night-700 transition-colors"
+            >
+              Inventory
             </router-link>
           </div>
         </div>

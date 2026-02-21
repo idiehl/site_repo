@@ -1,0 +1,12 @@
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\bin\Debug\net10.0\Atlas.Meridian.Core.deps.json
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\bin\Debug\net10.0\Atlas.Meridian.Core.dll
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\bin\Debug\net10.0\Atlas.Meridian.Core.pdb
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.AssemblyInfoInputs.cache
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.AssemblyInfo.cs
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.csproj.CoreCompileInputs.cache
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.sourcelink.json
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.dll
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\refint\Atlas.Meridian.Core.dll
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\Atlas.Meridian.Core.pdb
+D:\www\atlasuniversalis\src\Atlas.Meridian.Core\obj\Debug\net10.0\ref\Atlas.Meridian.Core.dll
