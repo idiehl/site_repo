@@ -319,7 +319,7 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 
 | File | Purpose |
 |------|---------|
-| `index.js` | Route definitions (currently just home) |
+| `index.js` | Route definitions for home, Meridian landing page, and full `/dev` portal views |
 
 #### Components: `frontend-main/src/components/`
 
@@ -338,6 +338,15 @@ Vue 3 SPA for the main Atlas Universalis landing page (served at `atlasuniversal
 | File | Purpose |
 |------|---------|
 | `HomeView.vue` | Homepage composition (assembles all sections) |
+| `MeridianView.vue` | Public Atlas Meridian landing page |
+| `DevLoginView.vue` | Dev portal authentication page |
+| `DevDashboardView.vue` | Dev portal app/document hub |
+| `DevLogView.vue` | Master log viewer |
+| `DevOverviewView.vue` | Project overview viewer |
+| `DevAppLogView.vue` | Per-app log viewer |
+| `DevAppOverviewView.vue` | Per-app overview viewer |
+| `DevAppChecklistView.vue` | Per-app checklist viewer and task creator |
+| `DevAppInventoryView.vue` | Per-app inventory viewer |
 
 #### Public Assets: `frontend-main/public/`
 
@@ -482,18 +491,23 @@ Nginx configurations and deployment utilities.
 | `Apply_Log.md` | Atlas Apply change log |
 | `Apply_Overview.md` | Atlas Apply project overview |
 | `Apply_Checklist.md` | Atlas Apply objectives checklist |
+| `Apply_Inventory.md` | Atlas Apply file/symbol inventory |
 | `Forge_Log.md` | Atlas Forge change log |
 | `Forge_Overview.md` | Atlas Forge project overview |
 | `Forge_Checklist.md` | Atlas Forge objectives checklist |
+| `Forge_Inventory.md` | Atlas Forge file/symbol inventory |
 | `Universalis_Log.md` | Atlas Universalis change log |
 | `Universalis_Overview.md` | Atlas Universalis project overview |
 | `Universalis_Checklist.md` | Atlas Universalis objectives checklist |
+| `Universalis_Inventory.md` | Atlas Universalis file/symbol inventory |
 | `Meridian_Log.md` | Atlas Meridian change log |
 | `Meridian_Overview.md` | Atlas Meridian project overview |
 | `Meridian_Checklist.md` | Atlas Meridian objectives checklist |
+| `Meridian_Inventory.md` | Atlas Meridian file/symbol inventory |
 | `Electracast_Log.md` | ElectraCast change log |
 | `Electracast_Overview.md` | ElectraCast project overview |
 | `Electracast_Checklist.md` | ElectraCast objectives checklist |
+| `Electracast_Inventory.md` | ElectraCast file/symbol inventory |
 | `dev_status.json` | Dev portal status indicator state |
 
 ---
@@ -509,6 +523,7 @@ Nginx configurations and deployment utilities.
 | `test_templates.py` | Template testing utility |
 | `build_master_log.ps1` | Windows script to build Master_Log.pdf |
 | `build_master_log.sh` | Linux/Mac script to build Master_Log.pdf |
+| `generate_inventory_docs.py` | Regenerate per-app inventory markdown pages from code scans |
 | `scrape_electracast_entries.py` | Scrape ElectraCast podcasts/networks into internal snapshots (supports `--skip-assets`) |
 | `normalize_electracast_dirs.py` | Normalize ElectraCast scrape folder names |
 | `export_electracast_podcasts_bundle.py` | Export scraped podcasts into tracked catalog JSON + cover images for the ElectraCast SPA |

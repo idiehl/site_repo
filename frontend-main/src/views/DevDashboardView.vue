@@ -155,7 +155,7 @@ const platformPages = [
             <h3 class="text-lg font-semibold text-white">{{ app.title }}</h3>
             <p class="text-night-400 mt-1">{{ app.description }}</p>
           </div>
-          <div class="mt-4 flex items-center gap-3">
+          <div class="mt-4 flex flex-wrap items-center gap-3">
             <router-link
               :to="app.logPath"
               class="px-3 py-1.5 text-sm rounded-lg bg-night-800 text-night-300 hover:text-white hover:bg-night-700 transition-colors"
