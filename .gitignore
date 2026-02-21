@@ -36,6 +36,10 @@ internal/Electracast_Codebase.zip
 # Internal scratch space
 /internal/
 
+# Local handoff artifacts
+/handoff.md
+/.cursor/commands/handoff.md
+
 # Logs
 *.log
 npm-debug.log*
