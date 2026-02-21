@@ -21,10 +21,15 @@ You will receive: `deploy_commit_before`, `deploy_commit_after`, `deploy_summary
    - `git log --oneline <before>..<after>`
    - Build lists: files_added, files_modified, files_deleted, commit_messages.
 
-2. **Classify tier**:
-   - Only docs/config/copy → **Fast** (Master Log only)
-   - Source code in 1-2 apps, no infra → **Standard** (+ App Logs + Inventory)
-   - Infra/backend/multi-app/breaking → **Full** (+ Overview + Checklist + Status)
+2. **Classify tier** (use the same matrix as `doc-ops`):
+   - **Full** if any condition is true:
+     - Infra/deploy/runtime files changed (`deploy/`, `.github/workflows/`, `requirements.txt`, `alembic/`).
+     - Auth/security/backend behavior changed (`atlasops/`, `src/Atlas.Api/`, `src/Atlas.Apply/`, `src/Atlas.Contracts/`).
+     - More than one app is affected.
+     - Deploy status is `partial` or `failed`.
+   - **Standard** if source code changed in one app and no Full condition is true.
+   - **Fast** for docs/content/config-only work with no source behavior changes.
+   - Policy reference: `internal/phase3_docops_tiering.md`.
 
 3. **Map paths to apps**:
    - `atlasforge/` → atlas-forge
@@ -54,6 +59,7 @@ You will receive: `deploy_commit_before`, `deploy_commit_after`, `deploy_summary
 ```
 Post-Deploy Docs Complete:
 - Tier: <Fast|Standard|Full>
+- Tier Reason: <why this tier was selected>
 - Commits: <short_before>..<short_after> (<count> commits)
 - Apps documented: <list>
 - Master Log: done

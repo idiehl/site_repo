@@ -35,6 +35,21 @@ Smoke Test Results:
 Overall: <all pass | N failures>
 ```
 
+## Phase 3 Auth Gate Output
+
+When the caller indicates a Phase 3 auth/OAuth batch, append:
+
+```yaml
+oauth_roundtrip_pass: pass|fail
+protected_route_enforcement_pass: pass|fail
+gate_notes: "<brief explanation>"
+```
+
+Evaluation rules:
+- `oauth_roundtrip_pass`: `pass` only when auth routes/callback screens load without crash or blank state and return expected UX state.
+- `protected_route_enforcement_pass`: `pass` only when protected pages show expected authenticated behavior (or expected redirect/unauthorized behavior when unauthenticated).
+- If evidence is incomplete, set the gate to `fail` and state what was missing.
+
 ## Rules
 
 - Only test URLs specified by the caller, or use the default list above.
