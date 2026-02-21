@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Atlas.Api.Authentication;
 using Atlas.Api.Authentication.OAuth;
 using Atlas.Api.Endpoints;
@@ -5,6 +6,11 @@ using Atlas.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+});
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

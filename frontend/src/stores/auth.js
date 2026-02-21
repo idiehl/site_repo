@@ -23,13 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const formData = new URLSearchParams()
-      formData.append('username', email)
-      formData.append('password', password)
-      
-      const response = await api.post('/api/v1/auth/login', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      })
+      const response = await api.post('/api/v2/auth/login', { email, password })
       
       accessToken.value = response.data.access_token
       refreshToken.value = response.data.refresh_token
@@ -52,7 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      await api.post('/api/v1/auth/register', { email, password })
+      await api.post('/api/v2/auth/register', { email, password })
       // Auto-login after registration
       return await login(email, password)
     } catch (err) {
@@ -67,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!accessToken.value) return
     
     try {
-      const response = await api.get('/api/v1/auth/me')
+      const response = await api.get('/api/v2/auth/me')
       user.value = response.data
     } catch (err) {
       // Token might be expired
@@ -86,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const response = await api.get('/api/v1/auth/linkedin/authorize')
+      const response = await api.get('/api/v2/auth/linkedin/authorize')
       // Redirect to LinkedIn authorization page
       window.location.href = response.data.url
     } catch (err) {
@@ -100,7 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const response = await api.get('/api/v1/auth/google/authorize')
+      const response = await api.get('/api/v2/auth/google/authorize')
       // Redirect to Google authorization page
       window.location.href = response.data.url
     } catch (err) {
