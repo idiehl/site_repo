@@ -1,0 +1,281 @@
+@page "/admin/analytics"
+@using System.Net
+@inject BrowserTokenStore TokenStore
+@inject ApplyAdminApiClient AdminApi
+@inject NavigationManager Navigation
+
+<PageTitle>Admin Analytics | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Analytics</div>
+            <nav class="dashboard-nav">
+                <a href="/admin">Overview</a>
+                <a class="active" href="/admin/analytics">Analytics</a>
+                <a href="/admin/security">Security</a>
+                <a href="/dashboard">User Dashboard</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (!_isAdmin)
+        {
+            <section class="jobs-card admin-danger">
+                <h2>Access Denied</h2>
+                <p class="auth-subtitle">You do not have admin privileges.</p>
+            </section>
+        }
+        else
+        {
+            <section class="jobs-card">
+                <div class="dashboard-actions">
+                    <label for="analytics-days">Period:</label>
+                    <select id="analytics-days" class="profile-input compact-select" value="@_days" @onchange="ChangePeriodAsync">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <button class="btn-primary compact" disabled="@_loading" @onclick="FetchAllAsync">Refresh</button>
+                </div>
+            </section>
+
+            @if (_loading)
+            {
+                <section class="jobs-card">
+                    <p class="auth-subtitle">Loading analytics...</p>
+                </section>
+            }
+            else if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <section class="jobs-card admin-danger">
+                    <p class="auth-error">✗ @_error</p>
+                </section>
+            }
+            else
+            {
+                <section class="jobs-card">
+                    <h2>Site Visits</h2>
+
+                    @if (_visits?.PopularPaths?.Count > 0)
+                    {
+                        <h3>Popular Paths</h3>
+                        <div class="admin-stack-list">
+                            @foreach (var path in _visits.PopularPaths)
+                            {
+                                <div class="admin-stack-item">
+                                    <code>@path.Path</code>
+                                    <strong>@path.Count</strong>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (_visits?.VisitsByDay?.Count > 0)
+                    {
+                        <h3>Visits by Day</h3>
+                        <div class="admin-stack-list">
+                            @foreach (var day in _visits.VisitsByDay)
+                            {
+                                <div class="admin-stack-item">
+                                    <span>@day.Date</span>
+                                    <strong>@day.Count</strong>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (_visits?.RecentVisits?.Count > 0)
+                    {
+                        <h3>Recent Visits</h3>
+                        <div class="admin-table-wrap">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Path</th>
+                                        <th>Method</th>
+                                        <th>IP</th>
+                                        <th>User</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var visit in _visits.RecentVisits.Take(20))
+                                    {
+                                        <tr>
+                                            <td><code>@visit.Path</code></td>
+                                            <td>@visit.Method</td>
+                                            <td>@(string.IsNullOrWhiteSpace(visit.IpAddress) ? "-" : visit.IpAddress)</td>
+                                            <td>@(string.IsNullOrWhiteSpace(visit.UserId) ? "Anonymous" : visit.UserId)</td>
+                                            <td>@visit.CreatedAt.ToLocalTime().ToString("g")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </section>
+
+                <section class="jobs-card">
+                    <h2>API Usage</h2>
+
+                    @if (_apiUsage?.EndpointStats?.Count > 0)
+                    {
+                        <h3>Endpoint Statistics</h3>
+                        <div class="admin-table-wrap">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Endpoint</th>
+                                        <th>Method</th>
+                                        <th class="right">Calls</th>
+                                        <th class="right">Avg (ms)</th>
+                                        <th class="right">Errors</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var stat in _apiUsage.EndpointStats)
+                                    {
+                                        <tr>
+                                            <td><code>@stat.Endpoint</code></td>
+                                            <td>@stat.Method</td>
+                                            <td class="right">@stat.Count</td>
+                                            <td class="right">@Math.Round(stat.AvgResponseTimeMs, 1)</td>
+                                            <td class="@($"right {(stat.ErrorCount > 0 ? "text-red" : string.Empty)}")">@stat.ErrorCount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    @if (_apiUsage?.UsageByDay?.Count > 0)
+                    {
+                        <h3>Usage by Day</h3>
+                        <div class="admin-stack-list">
+                            @foreach (var day in _apiUsage.UsageByDay)
+                            {
+                                <div class="admin-stack-item">
+                                    <span>@day.Date</span>
+                                    <span>@day.Count calls • @Math.Round(day.AvgResponseTimeMs, 1)ms avg</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+        }
+    </main>
+</div>
+
+@code {
+    private string? _accessToken;
+    private bool _isAdmin;
+    private bool _loading = true;
+    private string? _error;
+    private int _days = 7;
+    private AdminVisitAnalyticsDto? _visits;
+    private AdminApiUsageAnalyticsDto? _apiUsage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/admin/analytics", forceLoad: true);
+            return;
+        }
+
+        _isAdmin = AdminAccessEvaluator.TokenHasAdminAccess(_accessToken);
+        if (!_isAdmin)
+        {
+            _loading = false;
+            StateHasChanged();
+            return;
+        }
+
+        await FetchAllAsync();
+    }
+
+    private async Task ChangePeriodAsync(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var parsed) && parsed > 0)
+        {
+            _days = parsed;
+            await FetchAllAsync();
+        }
+    }
+
+    private async Task FetchAllAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _loading = true;
+        _error = null;
+        StateHasChanged();
+
+        var visitsTask = AdminApi.GetVisitAnalyticsAsync(_accessToken, _days, 100);
+        var usageTask = AdminApi.GetApiUsageAnalyticsAsync(_accessToken, _days, 100);
+        await Task.WhenAll(visitsTask, usageTask);
+
+        var visits = await visitsTask;
+        var usage = await usageTask;
+
+        _loading = false;
+
+        if (!visits.IsSuccess)
+        {
+            if (visits.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                await HandleAuthFailureAsync(visits.Error ?? "You are not authorized to access admin pages.");
+                return;
+            }
+
+            _error = visits.Error ?? "Failed to load visit analytics.";
+            StateHasChanged();
+            return;
+        }
+
+        if (!usage.IsSuccess)
+        {
+            if (usage.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                await HandleAuthFailureAsync(usage.Error ?? "You are not authorized to access admin pages.");
+                return;
+            }
+
+            _error = usage.Error ?? "Failed to load API analytics.";
+            StateHasChanged();
+            return;
+        }
+
+        _visits = visits.Value;
+        _apiUsage = usage.Value;
+        StateHasChanged();
+    }
+
+    private async Task LogoutAsync()
+    {
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await TokenStore.ClearTokensAsync();
+        _error = message;
+        _loading = false;
+        Navigation.NavigateTo("/login?redirect=/admin/analytics", forceLoad: true);
+    }
+}

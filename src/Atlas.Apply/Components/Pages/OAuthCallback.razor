@@ -1,0 +1,105 @@
+@page "/oauth/callback"
+@inject ApplyAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject Microsoft.JSInterop.IJSRuntime JS
+
+<PageTitle>OAuth Callback | Atlas Apply</PageTitle>
+
+<main class="auth-shell">
+    <section class="auth-card">
+        @if (_processing)
+        {
+            <div class="auth-processing">
+                <div class="auth-spinner" aria-hidden="true"></div>
+                <p class="auth-subtitle">Completing authentication...</p>
+            </div>
+        }
+        else
+        {
+            <h1>Authentication Failed</h1>
+            <p class="auth-error">@_error</p>
+            <button class="btn-primary" @onclick="BackToLoginAsync">Back to Login</button>
+        }
+    </section>
+</main>
+
+@code {
+    private bool _processing = true;
+    private string _error = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await ProcessCallbackAsync();
+    }
+
+    private async Task ProcessCallbackAsync()
+    {
+        try
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            if (query.TryGetValue("error", out var errorCode) && !string.IsNullOrWhiteSpace(errorCode))
+            {
+                _error = GetErrorMessage(errorCode.ToString());
+                _processing = false;
+                StateHasChanged();
+                return;
+            }
+
+            var tokens = await JS.InvokeAsync<OAuthHashTokens?>(
+                "atlasAuth.readOAuthTokensFromHash",
+                Array.Empty<object>());
+            if (tokens is null ||
+                string.IsNullOrWhiteSpace(tokens.AccessToken) ||
+                string.IsNullOrWhiteSpace(tokens.RefreshToken))
+            {
+                _error = "No tokens received from authentication provider";
+                _processing = false;
+                StateHasChanged();
+                return;
+            }
+
+            await AuthStateProvider.SignInAsync(tokens.AccessToken, tokens.RefreshToken);
+            await JS.InvokeAsync<object?>("atlasAuth.clearOAuthHash", Array.Empty<object>());
+            Navigation.NavigateTo("/dashboard", forceLoad: true);
+        }
+        catch
+        {
+            _error = "Failed to complete authentication";
+            _processing = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task BackToLoginAsync()
+    {
+        Navigation.NavigateTo("/login", forceLoad: true);
+        return Task.CompletedTask;
+    }
+
+    private static string GetErrorMessage(string errorCode)
+    {
+        return errorCode switch
+        {
+            "invalid_state" => "Invalid authentication state. Please try again.",
+            "oauth_not_configured" => "OAuth is not configured on this server.",
+            "token_exchange_failed" => "Failed to exchange authorization code.",
+            "no_access_token" => "No access token received.",
+            "userinfo_failed" => "Failed to retrieve user information.",
+            "missing_user_data" => "Missing required user data from provider.",
+            "network_error" => "Network error occurred. Please try again.",
+            _ => "An unknown error occurred.",
+        };
+    }
+
+    private sealed class OAuthHashTokens
+    {
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
+    }
+}

@@ -1,0 +1,342 @@
+@page "/applications"
+@using System.Net
+@inject BrowserTokenStore TokenStore
+@inject ApplyApplicationStateService ApplicationState
+@inject ApplyAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Applications | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Atlas Apply</div>
+            <nav class="dashboard-nav">
+                <a href="/dashboard">Dashboard</a>
+                <a class="active" href="/applications">Applications</a>
+                <a href="/profile">Profile</a>
+                <a href="/extension">Extension</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <section class="dashboard-stats">
+            <div class="stat-card">
+                <div class="label">Total Applications</div>
+                <div class="value">@TotalCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active</div>
+                <div class="value blue">@ActiveCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Interviews</div>
+                <div class="value yellow">@InterviewCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Offers</div>
+                <div class="value green">@OfferCount</div>
+            </div>
+        </section>
+
+        <section class="jobs-card">
+            <div class="filter-pills">
+                @foreach (var option in StatusOptions)
+                {
+                    <button
+                        type="button"
+                        class="@($"filter-pill {(_filterStatus == option.Value ? "active" : "")}")"
+                        @onclick="() => _filterStatus = option.Value">
+                        @option.Label
+                    </button>
+                }
+            </div>
+        </section>
+
+        @if (_loading)
+        {
+            <section class="jobs-card">
+                <p class="auth-subtitle">Loading applications...</p>
+            </section>
+        }
+        else if (FilteredApplications.Count == 0)
+        {
+            <section class="jobs-card">
+                <p class="auth-subtitle">@(_filterStatus == "all" ? "No applications yet." : "No applications with this status.")</p>
+                <div class="dashboard-actions">
+                    <button class="btn-primary compact" @onclick='() => Navigation.NavigateTo("/dashboard")'>Browse Jobs</button>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="jobs-card">
+                <div class="applications-list">
+                    @foreach (var app in FilteredApplications)
+                    {
+                        <article class="application-row">
+                            <div class="application-row-main">
+                                <span class="@($"status-pill {GetStatusClass(app.Status)}")">@GetStatusLabel(app.Status)</span>
+                                <p class="auth-subtitle">
+                                    Created @FormatDate(app.CreatedAt)
+                                    @if (app.AppliedAt.HasValue)
+                                    {
+                                        <span> • Applied @FormatDate(app.AppliedAt.Value)</span>
+                                    }
+                                </p>
+                                @if (!string.IsNullOrWhiteSpace(app.Notes))
+                                {
+                                    <p class="auth-subtitle">@app.Notes</p>
+                                }
+                            </div>
+                            <div class="application-row-actions">
+                                <select class="profile-input compact-select" value="@GetPendingStatus(app)" @onchange="(e) => SelectStatus(app.Id, e.Value?.ToString())">
+                                    @foreach (var option in MutableStatusOptions)
+                                    {
+                                        <option value="@option.Value">@option.Label</option>
+                                    }
+                                </select>
+                                <button
+                                    class="btn-secondary compact"
+                                    disabled="@(!CanUpdateStatus(app) || IsUpdating(app.Id))"
+                                    @onclick="() => SaveStatusAsync(app)">
+                                    @(IsUpdating(app.Id) ? "Updating..." : "Update")
+                                </button>
+                                <button class="btn-primary compact" @onclick="() => OpenJob(app.JobPostingId)">View Job</button>
+                            </div>
+                        </article>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <section class="jobs-card">
+                <p class="auth-error">✗ @_error</p>
+            </section>
+        }
+    </main>
+</div>
+
+@code {
+    private static readonly List<StatusOption> StatusOptions =
+    [
+        new("all", "All Applications"),
+        new("pending", "Pending"),
+        new("applied", "Applied"),
+        new("interview_scheduled", "Interview"),
+        new("offer_received", "Offers"),
+        new("rejected", "Rejected"),
+    ];
+
+    private static readonly List<StatusOption> MutableStatusOptions =
+    [
+        new("pending", "Pending"),
+        new("applied", "Applied"),
+        new("followup_scheduled", "Follow-up"),
+        new("interview_scheduled", "Interview"),
+        new("offer_received", "Offer"),
+        new("rejected", "Rejected"),
+        new("withdrawn", "Withdrawn"),
+        new("no_response_closed", "No Response"),
+    ];
+
+    private static readonly HashSet<string> ActiveStatuses =
+    [
+        "pending",
+        "applied",
+        "followup_scheduled",
+        "interview_scheduled",
+    ];
+
+    private string? _accessToken;
+    private bool _loading = true;
+    private string _filterStatus = "all";
+    private string? _error;
+    private readonly Dictionary<Guid, string> _selectedStatusById = new();
+    private readonly HashSet<Guid> _updatingIds = [];
+
+    private int TotalCount => ApplicationState.Applications.Count;
+    private int ActiveCount => ApplicationState.Applications.Count(a => ActiveStatuses.Contains(a.Status));
+    private int InterviewCount => ApplicationState.Applications.Count(a => string.Equals(a.Status, "interview_scheduled", StringComparison.OrdinalIgnoreCase));
+    private int OfferCount => ApplicationState.Applications.Count(a => string.Equals(a.Status, "offer_received", StringComparison.OrdinalIgnoreCase));
+
+    private List<ApplicationListItemDto> FilteredApplications => _filterStatus == "all"
+        ? ApplicationState.Applications.OrderByDescending(a => a.CreatedAt).ToList()
+        : ApplicationState.Applications.Where(a => string.Equals(a.Status, _filterStatus, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(a => a.CreatedAt)
+            .ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/applications", forceLoad: true);
+            return;
+        }
+
+        await LoadApplicationsAsync();
+    }
+
+    private async Task LoadApplicationsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _loading = true;
+        _error = null;
+        StateHasChanged();
+
+        var result = await ApplicationState.FetchApplicationsAsync(_accessToken);
+        _loading = false;
+
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "Session expired. Please sign in again.");
+                return;
+            }
+
+            _error = ApplicationState.Error ?? result.Error ?? "Failed to fetch applications.";
+            StateHasChanged();
+            return;
+        }
+
+        _selectedStatusById.Clear();
+        foreach (var app in ApplicationState.Applications)
+        {
+            _selectedStatusById[app.Id] = string.IsNullOrWhiteSpace(app.Status) ? "pending" : app.Status;
+        }
+
+        StateHasChanged();
+    }
+
+    private void SelectStatus(Guid appId, string? selected)
+    {
+        if (string.IsNullOrWhiteSpace(selected))
+        {
+            return;
+        }
+
+        _selectedStatusById[appId] = selected;
+    }
+
+    private string GetPendingStatus(ApplicationListItemDto app)
+    {
+        return _selectedStatusById.TryGetValue(app.Id, out var status) ? status : app.Status;
+    }
+
+    private bool CanUpdateStatus(ApplicationListItemDto app)
+    {
+        var selected = GetPendingStatus(app);
+        return !string.Equals(selected, app.Status, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool IsUpdating(Guid appId) => _updatingIds.Contains(appId);
+
+    private async Task SaveStatusAsync(ApplicationListItemDto app)
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        var status = GetPendingStatus(app);
+        if (string.Equals(status, app.Status, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        _updatingIds.Add(app.Id);
+        _error = null;
+        StateHasChanged();
+
+        var result = await ApplicationState.UpdateApplicationStatusAsync(_accessToken, app.Id, status);
+
+        _updatingIds.Remove(app.Id);
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "Session expired. Please sign in again.");
+                return;
+            }
+
+            _error = ApplicationState.Error ?? result.Error ?? "Failed to update status.";
+            StateHasChanged();
+            return;
+        }
+        _selectedStatusById[app.Id] = result.Value.Status;
+
+        StateHasChanged();
+    }
+
+    private void OpenJob(Guid jobPostingId)
+    {
+        Navigation.NavigateTo($"/jobs/{jobPostingId}");
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthStateProvider.SignOutAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await AuthStateProvider.SignOutAsync();
+        _error = message;
+        _loading = false;
+        Navigation.NavigateTo("/login?redirect=/applications", forceLoad: true);
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "pending" => "gray",
+            "applied" => "blue",
+            "followup_scheduled" => "yellow",
+            "interview_scheduled" => "yellow",
+            "offer_received" => "green",
+            "rejected" => "red",
+            "withdrawn" => "gray",
+            "no_response_closed" => "gray",
+            _ => "gray",
+        };
+    }
+
+    private static string GetStatusLabel(string status)
+    {
+        return status switch
+        {
+            "pending" => "Pending",
+            "applied" => "Applied",
+            "followup_scheduled" => "Follow-up",
+            "interview_scheduled" => "Interview",
+            "offer_received" => "Offer",
+            "rejected" => "Rejected",
+            "withdrawn" => "Withdrawn",
+            "no_response_closed" => "No Response",
+            _ => status,
+        };
+    }
+
+    private static string FormatDate(DateTime value) => value.ToLocalTime().ToString("MMM d, yyyy");
+
+    private sealed record StatusOption(string Value, string Label);
+}

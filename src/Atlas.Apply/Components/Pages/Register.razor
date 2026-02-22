@@ -1,0 +1,123 @@
+@page "/register"
+@inject ApplyAuthApiClient AuthApi
+@inject ApplyAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Sign Up | Atlas Apply</PageTitle>
+
+<main class="auth-shell">
+    <section class="auth-card">
+        <h1>Sign Up</h1>
+        <p class="auth-subtitle">Create your Atlas Apply account.</p>
+
+        <EditForm Model="_model" OnValidSubmit="HandleSubmitAsync" class="auth-form">
+            <DataAnnotationsValidator />
+
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="_model.Email" type="email" autocomplete="email" />
+            <ValidationMessage For="() => _model.Email" />
+
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="_model.Password" type="password" autocomplete="new-password" />
+            <ValidationMessage For="() => _model.Password" />
+
+            <label for="confirmPassword">Confirm Password</label>
+            <InputText id="confirmPassword" @bind-Value="_model.ConfirmPassword" type="password" autocomplete="new-password" />
+            <ValidationMessage For="() => _model.ConfirmPassword" />
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <p class="auth-error">@_error</p>
+            }
+
+            <button type="submit" class="btn-primary" disabled="@_isBusy">
+                @_submitLabel
+            </button>
+        </EditForm>
+
+        <div class="auth-divider">
+            <span>Or continue with</span>
+        </div>
+
+        <button type="button" class="btn-secondary" @onclick="LoginWithGoogleAsync" disabled="@_isBusy">
+            Continue with Google
+        </button>
+        <button type="button" class="btn-secondary" @onclick="LoginWithLinkedInAsync" disabled="@_isBusy">
+            Continue with LinkedIn
+        </button>
+
+        <p class="auth-switch">
+            Already have an account?
+            <a href="/login">Sign in</a>
+        </p>
+    </section>
+</main>
+
+@code {
+    private readonly RegisterModel _model = new();
+    private string? _error;
+    private bool _isBusy;
+    private string _submitLabel => _isBusy ? "Creating account..." : "Create Account";
+
+    private async Task HandleSubmitAsync()
+    {
+        _isBusy = true;
+        _error = null;
+
+        if (!string.Equals(_model.Password, _model.ConfirmPassword, StringComparison.Ordinal))
+        {
+            _error = "Passwords do not match";
+            _isBusy = false;
+            return;
+        }
+
+        var result = await AuthApi.RegisterThenLoginAsync(_model.Email, _model.Password);
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Registration failed";
+            _isBusy = false;
+            return;
+        }
+
+        await AuthStateProvider.SignInAsync(result.AccessToken!, result.RefreshToken!);
+        Navigation.NavigateTo("/dashboard", forceLoad: true);
+    }
+
+    private async Task LoginWithGoogleAsync()
+    {
+        await StartOAuthAsync(AuthApi.GetGoogleAuthorizeUrlAsync);
+    }
+
+    private async Task LoginWithLinkedInAsync()
+    {
+        await StartOAuthAsync(AuthApi.GetLinkedInAuthorizeUrlAsync);
+    }
+
+    private async Task StartOAuthAsync(Func<CancellationToken, Task<AuthorizeUrlResult>> authorizeCall)
+    {
+        _isBusy = true;
+        _error = null;
+
+        var result = await authorizeCall(CancellationToken.None);
+        if (!result.IsSuccess || string.IsNullOrWhiteSpace(result.Url))
+        {
+            _error = result.Error ?? "Failed to start OAuth flow";
+            _isBusy = false;
+            return;
+        }
+
+        Navigation.NavigateTo(result.Url, forceLoad: true);
+    }
+
+    private sealed class RegisterModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required, MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
+        public string Password { get; set; } = "";
+
+        [Required]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

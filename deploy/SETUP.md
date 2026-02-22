@@ -5,7 +5,7 @@ This document describes how to set up the server for the Atlas Universalis websi
 ## Architecture Overview
 
 - **atlasuniversalis.com** - Main portfolio/hub site (static Vue app)
-- **apply.atlasuniversalis.com** - Atlas Apply application (Vue + FastAPI)
+- **apply.atlasuniversalis.com** - Atlas Apply app (Blazor frontend + FastAPI API proxy during migration)
 - **forge.atlasuniversalis.com** - Atlas Forge UI playground (Astro + Vue + React)
 - **electracast.atlasuniversalis.com** - ElectraCast development mirror (static)
 

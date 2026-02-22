@@ -1,0 +1,109 @@
+@page "/extension"
+@inject BrowserTokenStore TokenStore
+@inject NavigationManager Navigation
+
+<PageTitle>Extension | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Atlas Apply</div>
+            <nav class="dashboard-nav">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/applications">Applications</a>
+                <a href="/profile">Profile</a>
+                <a class="active" href="/extension">Extension</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main extension-main">
+        <section class="jobs-card extension-hero">
+            <h1>Browser Extension</h1>
+            <p class="auth-subtitle">
+                Save job postings to Atlas Apply with one click. Works on LinkedIn, Indeed, Glassdoor, and more.
+            </p>
+        </section>
+
+        <section class="extension-feature-grid">
+            <article class="jobs-card">
+                <h3>One-Click Save</h3>
+                <p class="auth-subtitle">Use the extension icon or floating button to instantly save a posting.</p>
+            </article>
+            <article class="jobs-card">
+                <h3>Auto-Extract Details</h3>
+                <p class="auth-subtitle">Atlas extracts title, company, requirements, and key details automatically.</p>
+            </article>
+            <article class="jobs-card">
+                <h3>Bypass Blocks</h3>
+                <p class="auth-subtitle">Capture postings in your browser directly without scraping blocks.</p>
+            </article>
+        </section>
+
+        <section class="jobs-card">
+            <div class="jobs-card-header">
+                <div class="jobs-title-wrap">
+                    <h2>Installation</h2>
+                </div>
+            </div>
+
+            <div class="extension-steps">
+                <div class="extension-step">
+                    <span class="extension-step-index">1</span>
+                    <div>
+                        <strong>Download the extension package</strong>
+                        <div class="dashboard-actions">
+                            <a class="btn-primary compact" href="/atlas-apply-extension.zip" download="atlas-apply-extension.zip">Download for Chrome / Edge</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="extension-step">
+                    <span class="extension-step-index">2</span>
+                    <p>Extract the downloaded zip file to a folder you can keep.</p>
+                </div>
+
+                <div class="extension-step">
+                    <span class="extension-step-index">3</span>
+                    <div class="extension-codes">
+                        <code>chrome://extensions</code>
+                        <span>or</span>
+                        <code>edge://extensions</code>
+                    </div>
+                </div>
+
+                <div class="extension-step">
+                    <span class="extension-step-index">4</span>
+                    <p>Enable <strong>Developer mode</strong>, then click <strong>Load unpacked</strong>.</p>
+                </div>
+
+                <div class="extension-step">
+                    <span class="extension-step-index">5</span>
+                    <p>Select the extracted folder and pin Atlas Apply to your toolbar.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="jobs-card">
+            <h3>Supported Sites</h3>
+            <div class="extension-sites">
+                <span>LinkedIn</span>
+                <span>Indeed</span>
+                <span>Glassdoor</span>
+                <span>Lever</span>
+                <span>Greenhouse</span>
+                <span>Workday</span>
+                <span>+ Any job site</span>
+            </div>
+        </section>
+    </main>
+</div>
+
+@code {
+    private async Task LogoutAsync()
+    {
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+}

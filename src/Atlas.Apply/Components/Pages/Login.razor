@@ -1,0 +1,120 @@
+@page "/login"
+@inject ApplyAuthApiClient AuthApi
+@inject ApplyAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Sign In | Atlas Apply</PageTitle>
+
+<main class="auth-shell">
+    <section class="auth-card">
+        <h1>Sign In</h1>
+        <p class="auth-subtitle">The tools you need to build the future you want.</p>
+
+        <EditForm Model="_model" OnValidSubmit="HandleSubmitAsync" class="auth-form">
+            <DataAnnotationsValidator />
+
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="_model.Email" type="email" autocomplete="email" />
+            <ValidationMessage For="() => _model.Email" />
+
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="_model.Password" type="password" autocomplete="current-password" />
+            <ValidationMessage For="() => _model.Password" />
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <p class="auth-error">@_error</p>
+            }
+
+            <button type="submit" class="btn-primary" disabled="@_isBusy">
+                @_submitLabel
+            </button>
+        </EditForm>
+
+        <div class="auth-divider">
+            <span>Or continue with</span>
+        </div>
+
+        <button type="button" class="btn-secondary" @onclick="LoginWithGoogleAsync" disabled="@_isBusy">
+            Continue with Google
+        </button>
+        <button type="button" class="btn-secondary" @onclick="LoginWithLinkedInAsync" disabled="@_isBusy">
+            Continue with LinkedIn
+        </button>
+
+        <p class="auth-switch">
+            Don't have an account?
+            <a href="/register">Create one</a>
+        </p>
+    </section>
+</main>
+
+@code {
+    private readonly LoginModel _model = new();
+    private string? _error;
+    private bool _isBusy;
+    private string _submitLabel => _isBusy ? "Signing in..." : "Sign In";
+    private string _redirectPath = "/dashboard";
+
+    protected override void OnInitialized()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("redirect", out var redirectValue) && !string.IsNullOrWhiteSpace(redirectValue))
+        {
+            _redirectPath = redirectValue.ToString();
+        }
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        _isBusy = true;
+        _error = null;
+
+        var result = await AuthApi.LoginAsync(_model.Email, _model.Password);
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Login failed";
+            _isBusy = false;
+            return;
+        }
+
+        await AuthStateProvider.SignInAsync(result.AccessToken!, result.RefreshToken!);
+        Navigation.NavigateTo(_redirectPath, forceLoad: true);
+    }
+
+    private async Task LoginWithGoogleAsync()
+    {
+        await StartOAuthAsync(AuthApi.GetGoogleAuthorizeUrlAsync);
+    }
+
+    private async Task LoginWithLinkedInAsync()
+    {
+        await StartOAuthAsync(AuthApi.GetLinkedInAuthorizeUrlAsync);
+    }
+
+    private async Task StartOAuthAsync(Func<CancellationToken, Task<AuthorizeUrlResult>> authorizeCall)
+    {
+        _isBusy = true;
+        _error = null;
+
+        var result = await authorizeCall(CancellationToken.None);
+        if (!result.IsSuccess || string.IsNullOrWhiteSpace(result.Url))
+        {
+            _error = result.Error ?? "Failed to start OAuth flow";
+            _isBusy = false;
+            return;
+        }
+
+        Navigation.NavigateTo(result.Url, forceLoad: true);
+    }
+
+    private sealed class LoginModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        public string Password { get; set; } = "";
+    }
+}

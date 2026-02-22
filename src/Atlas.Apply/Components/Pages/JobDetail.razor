@@ -1,0 +1,511 @@
+@page "/jobs/{JobId:guid}"
+@using System.Net
+@using System.Text.Json
+@inject BrowserTokenStore TokenStore
+@inject ApplyJobStateService JobState
+@inject ApplyAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Job Details | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <button class="btn-secondary compact" @onclick="BackToDashboardAsync">Back</button>
+            <h1 class="job-detail-title">Job Details</h1>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (_isLoading)
+        {
+            <section class="auth-card">
+                <div class="auth-processing">
+                    <div class="auth-spinner"></div>
+                    <p class="auth-subtitle">Loading job...</p>
+                </div>
+            </section>
+        }
+        else if (_job is null)
+        {
+            <section class="auth-card">
+                <h2>Job not found</h2>
+                <p class="auth-subtitle">This job could not be loaded.</p>
+                <button class="btn-primary" @onclick="BackToDashboardAsync">Return to Dashboard</button>
+            </section>
+        }
+        else
+        {
+            <section class="jobs-card">
+                <div class="job-header-row">
+                    <div>
+                        <h2>@(_job.JobTitle ?? "Processing...")</h2>
+                        <p class="auth-subtitle">@(_job.CompanyName ?? "Company name pending")</p>
+                        <div class="job-meta">
+                            @if (!string.IsNullOrWhiteSpace(_job.Location))
+                            {
+                                <span>📍 @_job.Location</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_job.RemotePolicy))
+                            {
+                                <span>🏠 @_job.RemotePolicy</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_job.SalaryRange))
+                            {
+                                <span>💰 @_job.SalaryRange</span>
+                            }
+                        </div>
+                    </div>
+                    <span class="@GetStatusClass(_job.Status)">@FormatStatus(_job.Status)</span>
+                </div>
+
+                <div class="job-actions-row">
+                    <button class="btn-secondary compact" disabled="@_updatingStatus" @onclick="RefreshJobAsync">Refresh</button>
+                    <button class="btn-secondary compact" disabled="@_extractingRequirements" @onclick="ExtractRequirementsAsync">
+                        @(_extractingRequirements ? "Refreshing..." : "Refresh Requirements")
+                    </button>
+                    <button class="btn-secondary compact" disabled="@_retryingJob" @onclick="RetryJobAsync">
+                        @(_retryingJob ? "Retrying..." : "Retry Job")
+                    </button>
+                </div>
+
+                <div class="status-update-row">
+                    <label for="applicationStatus">Application Status</label>
+                    <select id="applicationStatus" value="@(_job.ApplicationStatus ?? "")" @onchange="UpdateApplicationStatusAsync" disabled="@_updatingStatus">
+                        @foreach (var option in _applicationStatuses)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                    @if (_updatingStatus)
+                    {
+                        <span class="polling-badge">Saving...</span>
+                    }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <p class="success-message">✓ @_message</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <p class="auth-error">✗ @_error</p>
+                }
+            </section>
+
+            <section class="jobs-card">
+                <h3>Description</h3>
+                @if (!string.IsNullOrWhiteSpace(_job.JobDescription))
+                {
+                    <p class="job-description">@_job.JobDescription</p>
+                }
+                else
+                {
+                    <p class="auth-subtitle">No description available yet.</p>
+                }
+            </section>
+
+            <section class="jobs-card">
+                <h3>Requirements</h3>
+                @if (HasRequirements)
+                {
+                    <div class="requirements-grid">
+                        @if (!string.IsNullOrWhiteSpace(GetRequirementString("experience_years")))
+                        {
+                            <div class="requirement-card">
+                                <p>Experience</p>
+                                <strong>@GetRequirementString("experience_years")</strong>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(GetRequirementString("education")))
+                        {
+                            <div class="requirement-card">
+                                <p>Education</p>
+                                <strong>@GetRequirementString("education")</strong>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(GetRequirementString("work_schedule")))
+                        {
+                            <div class="requirement-card">
+                                <p>Work Schedule</p>
+                                <strong>@GetRequirementString("work_schedule")</strong>
+                            </div>
+                        }
+                    </div>
+
+                    @if (GetRequirementList("hard_skills").Count > 0)
+                    {
+                        <div class="requirement-list">
+                            <h4>Technical Skills</h4>
+                            @foreach (var skill in GetRequirementList("hard_skills"))
+                            {
+                                <span class="status-pill blue">@skill</span>
+                            }
+                        </div>
+                    }
+                    @if (GetRequirementList("soft_skills").Count > 0)
+                    {
+                        <div class="requirement-list">
+                            <h4>Soft Skills</h4>
+                            @foreach (var skill in GetRequirementList("soft_skills"))
+                            {
+                                <span class="status-pill purple">@skill</span>
+                            }
+                        </div>
+                    }
+                    @if (GetRequirementList("certifications").Count > 0)
+                    {
+                        <div class="requirement-list">
+                            <h4>Certifications</h4>
+                            @foreach (var cert in GetRequirementList("certifications"))
+                            {
+                                <span class="status-pill green">@cert</span>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="auth-subtitle">No requirements extracted yet.</p>
+                }
+            </section>
+
+            @if (IsBlocked && !_showManualContent)
+            {
+                <section class="jobs-card warning">
+                    <h3>Could Not Load Job Content</h3>
+                    <p class="auth-subtitle">Paste job details manually to continue processing this posting.</p>
+                    <button class="btn-primary compact" @onclick="() => _showManualContent = true">Enter Details Manually</button>
+                </section>
+            }
+
+            @if (_showManualContent)
+            {
+                <section class="jobs-card">
+                    <h3>Manual Job Content</h3>
+                    <textarea class="manual-content-input" @bind="_manualContent" rows="8" placeholder="Paste job title, company details, and full description..."></textarea>
+                    <div class="dashboard-actions">
+                        <button class="btn-primary compact" disabled="@_savingManual || string.IsNullOrWhiteSpace(_manualContent)" @onclick="SaveManualContentAsync">
+                            @(_savingManual ? "Saving..." : "Save & Process")
+                        </button>
+                        <button class="btn-secondary compact" @onclick="() => _showManualContent = false">Cancel</button>
+                    </div>
+                </section>
+            }
+
+            <section class="jobs-card">
+                <h3>Source URL</h3>
+                <a href="@_job.Url" target="_blank" rel="noopener noreferrer">@_job.Url</a>
+            </section>
+        }
+    </main>
+</div>
+
+@code {
+    [Parameter]
+    public Guid JobId { get; set; }
+
+    private JobDetailDto? _job;
+    private string? _accessToken;
+    private bool _isLoading = true;
+    private bool _updatingStatus;
+    private bool _retryingJob;
+    private bool _extractingRequirements;
+    private bool _savingManual;
+    private string? _error;
+    private string? _message;
+    private bool _showManualContent;
+    private string _manualContent = "";
+
+    private readonly List<ApplicationStatusOption> _applicationStatuses =
+    [
+        new("", "📋 Not Applied"),
+        new("applied", "✅ Applied"),
+        new("interview_scheduled", "📅 Interview Scheduled"),
+        new("followup_sent", "📧 Follow-up Sent"),
+        new("second_interview", "🎯 Second Interview"),
+    ];
+
+    private bool HasRequirements =>
+        _job is not null &&
+        _job.Requirements.ValueKind == JsonValueKind.Object &&
+        _job.Requirements.EnumerateObject().Any();
+
+    private bool IsBlocked
+    {
+        get
+        {
+            if (_job is null)
+            {
+                return false;
+            }
+
+            var text = _job.RawText ?? _job.JobDescription ?? "";
+            var lowered = text.ToLowerInvariant();
+            return lowered.Contains("blocked") ||
+                   lowered.Contains("cloudflare") ||
+                   (string.IsNullOrWhiteSpace(_job.CompanyName) &&
+                    string.IsNullOrWhiteSpace(_job.JobTitle) &&
+                    IsStatus(_job.Status, "completed"));
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo($"/login?redirect=/jobs/{JobId}", forceLoad: true);
+            return;
+        }
+
+        await LoadJobAsync();
+    }
+
+    private async Task LoadJobAsync()
+    {
+        _isLoading = true;
+        _error = null;
+        _message = null;
+        StateHasChanged();
+
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        var result = await JobState.GetJobAsync(_accessToken, JobId);
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "Session expired. Please sign in again.");
+                return;
+            }
+
+            _error = result.Error ?? "Failed to load job details.";
+            _isLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        _job = result.Value;
+        _isLoading = false;
+        _error = null;
+        StateHasChanged();
+    }
+
+    private async Task RefreshJobAsync()
+    {
+        await LoadJobAsync();
+    }
+
+    private async Task UpdateApplicationStatusAsync(ChangeEventArgs args)
+    {
+        if (_job is null || string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        _updatingStatus = true;
+        _error = null;
+        _message = null;
+
+        var newStatus = args.Value?.ToString();
+        if (string.IsNullOrWhiteSpace(newStatus))
+        {
+            newStatus = null;
+        }
+
+        var result = await JobState.UpdateApplicationStatusAsync(
+            _accessToken,
+            _job.Id,
+            newStatus,
+            _job.InterviewDate?.ToString("O"),
+            _job.InterviewNotes);
+
+        _updatingStatus = false;
+        if (!result.IsSuccess || result.Value is null)
+        {
+            _error = result.Error ?? "Failed to update status.";
+            StateHasChanged();
+            return;
+        }
+
+        _job = result.Value;
+        _message = "Application status updated.";
+        StateHasChanged();
+    }
+
+    private async Task RetryJobAsync()
+    {
+        if (_job is null || string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        _retryingJob = true;
+        _error = null;
+        _message = null;
+
+        var result = await JobState.RetryJobAsync(_accessToken, _job.Id);
+        _retryingJob = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to retry job.";
+            StateHasChanged();
+            return;
+        }
+
+        _message = "Retry requested.";
+        await LoadJobAsync();
+    }
+
+    private async Task ExtractRequirementsAsync()
+    {
+        if (_job is null || string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        _extractingRequirements = true;
+        _error = null;
+        _message = null;
+
+        var result = await JobState.ExtractRequirementsAsync(_accessToken, _job.Id);
+        _extractingRequirements = false;
+
+        if (!result.IsSuccess || result.Value is null)
+        {
+            _error = result.Error ?? "Failed to extract requirements.";
+            StateHasChanged();
+            return;
+        }
+
+        _job = result.Value;
+        _message = "Requirements refreshed.";
+        StateHasChanged();
+    }
+
+    private async Task SaveManualContentAsync()
+    {
+        if (_job is null || string.IsNullOrWhiteSpace(_accessToken) || string.IsNullOrWhiteSpace(_manualContent))
+        {
+            return;
+        }
+
+        _savingManual = true;
+        _error = null;
+        _message = null;
+
+        var result = await JobState.SaveManualContentAsync(_accessToken, _job.Id, _manualContent);
+        _savingManual = false;
+
+        if (!result.IsSuccess || result.Value is null)
+        {
+            _error = result.Error ?? "Failed to save manual content.";
+            StateHasChanged();
+            return;
+        }
+
+        _job = result.Value;
+        _manualContent = "";
+        _showManualContent = false;
+        _message = "Manual content saved and processed.";
+        StateHasChanged();
+    }
+
+    private async Task BackToDashboardAsync()
+    {
+        await Task.Yield();
+        Navigation.NavigateTo("/dashboard", forceLoad: true);
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthStateProvider.SignOutAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await AuthStateProvider.SignOutAsync();
+        _error = message;
+        _isLoading = false;
+        Navigation.NavigateTo($"/login?redirect=/jobs/{JobId}", forceLoad: true);
+    }
+
+    private string? GetRequirementString(string propertyName)
+    {
+        if (!HasRequirements || _job is null)
+        {
+            return null;
+        }
+
+        if (_job.Requirements.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String)
+        {
+            return value.GetString();
+        }
+
+        return null;
+    }
+
+    private List<string> GetRequirementList(string propertyName)
+    {
+        var values = new List<string>();
+        if (!HasRequirements || _job is null)
+        {
+            return values;
+        }
+
+        if (!_job.Requirements.TryGetProperty(propertyName, out var array) || array.ValueKind != JsonValueKind.Array)
+        {
+            return values;
+        }
+
+        foreach (var item in array.EnumerateArray())
+        {
+            if (item.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(item.GetString()))
+            {
+                values.Add(item.GetString()!);
+            }
+        }
+
+        return values;
+    }
+
+    private static bool IsStatus(string? value, string expected) =>
+        string.Equals(value, expected, StringComparison.OrdinalIgnoreCase);
+
+    private static string FormatStatus(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return "Unknown";
+        }
+
+        return status.Replace("_", " ", StringComparison.Ordinal).Trim();
+    }
+
+    private static string GetStatusClass(string? status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "completed" => "status-pill green",
+            "pending" or "processing" => "status-pill yellow",
+            "needs_review" => "status-pill orange",
+            "failed" => "status-pill red",
+            _ => "status-pill gray",
+        };
+    }
+
+    private sealed record ApplicationStatusOption(string Value, string Label);
+}

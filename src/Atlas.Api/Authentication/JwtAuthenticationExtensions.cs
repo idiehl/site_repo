@@ -116,29 +116,31 @@ public static class JwtAuthenticationExtensions
 
     private static JwtSettings ResolveJwtSettings(IConfiguration configuration)
     {
-        var settings = configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
-
-        settings.SecretKey = FirstNonEmpty(
-            settings.SecretKey,
-            configuration["SECRET_KEY"],
-            "CHANGE-ME-IN-PRODUCTION");
-
-        settings.Algorithm = FirstNonEmpty(
-            settings.Algorithm,
-            configuration["ALGORITHM"],
-            "HS256");
-
-        settings.AccessTokenExpireMinutes = FirstPositiveInt(
-            settings.AccessTokenExpireMinutes,
-            configuration["ACCESS_TOKEN_EXPIRE_MINUTES"],
-            30);
-
-        settings.RefreshTokenExpireDays = FirstPositiveInt(
-            settings.RefreshTokenExpireDays,
-            configuration["REFRESH_TOKEN_EXPIRE_DAYS"],
-            7);
-
-        return settings;
+        return new JwtSettings
+        {
+            SecretKey = FirstNonEmpty(
+                configuration["JwtSettings:SecretKey"],
+                configuration["SECRET_KEY"],
+                "CHANGE-ME-IN-PRODUCTION"),
+            Algorithm = FirstNonEmpty(
+                configuration["JwtSettings:Algorithm"],
+                configuration["ALGORITHM"],
+                "HS256"),
+            AccessTokenExpireMinutes = FirstPositiveInt(
+                fallback: 30,
+                configuration["JwtSettings:AccessTokenExpireMinutes"],
+                configuration["ACCESS_TOKEN_EXPIRE_MINUTES"]),
+            RefreshTokenExpireDays = FirstPositiveInt(
+                fallback: 7,
+                configuration["JwtSettings:RefreshTokenExpireDays"],
+                configuration["REFRESH_TOKEN_EXPIRE_DAYS"]),
+            Issuer = FirstNonEmpty(
+                configuration["JwtSettings:Issuer"],
+                "atlasuniversalis.com"),
+            Audience = FirstNonEmpty(
+                configuration["JwtSettings:Audience"],
+                "atlasuniversalis.com"),
+        };
     }
 
     private static string FirstNonEmpty(params string?[] values)
@@ -154,16 +156,14 @@ public static class JwtAuthenticationExtensions
         return "";
     }
 
-    private static int FirstPositiveInt(int firstValue, string? candidate, int fallback)
+    private static int FirstPositiveInt(int fallback, params string?[] candidates)
     {
-        if (firstValue > 0)
+        foreach (var candidate in candidates)
         {
-            return firstValue;
-        }
-
-        if (int.TryParse(candidate, out var parsed) && parsed > 0)
-        {
-            return parsed;
+            if (int.TryParse(candidate, out var parsed) && parsed > 0)
+            {
+                return parsed;
+            }
         }
 
         return fallback;

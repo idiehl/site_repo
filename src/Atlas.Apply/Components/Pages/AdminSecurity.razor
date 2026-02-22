@@ -1,0 +1,271 @@
+@page "/admin/security"
+@using System.Net
+@inject BrowserTokenStore TokenStore
+@inject ApplyAdminApiClient AdminApi
+@inject NavigationManager Navigation
+
+<PageTitle>Admin Security | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Security Events</div>
+            <nav class="dashboard-nav">
+                <a href="/admin">Overview</a>
+                <a href="/admin/analytics">Analytics</a>
+                <a class="active" href="/admin/security">Security</a>
+                <a href="/dashboard">User Dashboard</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (!_isAdmin)
+        {
+            <section class="jobs-card admin-danger">
+                <h2>Access Denied</h2>
+                <p class="auth-subtitle">You do not have admin privileges.</p>
+            </section>
+        }
+        else
+        {
+            <section class="jobs-card">
+                <div class="dashboard-actions">
+                    <label for="security-resolved">Status:</label>
+                    <select id="security-resolved" class="profile-input compact-select" value="@_resolvedFilter" @onchange="ChangeResolvedFilterAsync">
+                        <option value="all">All</option>
+                        <option value="false">Unresolved</option>
+                        <option value="true">Resolved</option>
+                    </select>
+
+                    <label for="security-severity">Severity:</label>
+                    <select id="security-severity" class="profile-input compact-select" value="@_severityFilter" @onchange="ChangeSeverityFilterAsync">
+                        <option value="">All</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+
+                    <button class="btn-primary compact" disabled="@_loading" @onclick="LoadEventsAsync">Refresh</button>
+                </div>
+            </section>
+
+            @if (_loading)
+            {
+                <section class="jobs-card">
+                    <p class="auth-subtitle">Loading security events...</p>
+                </section>
+            }
+            else if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <section class="jobs-card admin-danger">
+                    <p class="auth-error">✗ @_error</p>
+                </section>
+            }
+            else if (_events.Count == 0)
+            {
+                <section class="jobs-card">
+                    <p class="auth-subtitle">No security events found.</p>
+                </section>
+            }
+            else
+            {
+                <section class="jobs-card">
+                    <h2>Security Events</h2>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Severity</th>
+                                    <th>IP Address</th>
+                                    <th>User</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in _events)
+                                {
+                                    <tr class="@((item.Severity == "critical" && !item.Resolved) ? "row-critical" : string.Empty)">
+                                        <td><code>@item.EventType</code></td>
+                                        <td class="@GetSeverityClass(item.Severity)">@item.Severity.ToUpperInvariant()</td>
+                                        <td>@(string.IsNullOrWhiteSpace(item.IpAddress) ? "-" : item.IpAddress)</td>
+                                        <td>@(string.IsNullOrWhiteSpace(item.UserId) ? "Anonymous" : item.UserId)</td>
+                                        <td>@item.CreatedAt.ToLocalTime().ToString("g")</td>
+                                        <td class="@(item.Resolved ? "text-green" : "text-yellow")">
+                                            @(item.Resolved ? "RESOLVED" : "UNRESOLVED")
+                                        </td>
+                                        <td>
+                                            @if (!item.Resolved)
+                                            {
+                                                <button
+                                                    class="btn-primary compact"
+                                                    disabled="@_resolvingEventIds.Contains(item.Id)"
+                                                    @onclick="() => ResolveEventAsync(item.Id)">
+                                                    @(_resolvingEventIds.Contains(item.Id) ? "Resolving..." : "Resolve")
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span>@(item.ResolvedAt?.ToLocalTime().ToString("d") ?? string.Empty)</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+        }
+    </main>
+</div>
+
+@code {
+    private string? _accessToken;
+    private bool _isAdmin;
+    private bool _loading = true;
+    private string? _error;
+    private string _resolvedFilter = "all";
+    private string _severityFilter = "";
+    private readonly List<AdminSecurityEventDto> _events = [];
+    private readonly HashSet<Guid> _resolvingEventIds = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/admin/security", forceLoad: true);
+            return;
+        }
+
+        _isAdmin = AdminAccessEvaluator.TokenHasAdminAccess(_accessToken);
+        if (!_isAdmin)
+        {
+            _loading = false;
+            StateHasChanged();
+            return;
+        }
+
+        await LoadEventsAsync();
+    }
+
+    private async Task ChangeResolvedFilterAsync(ChangeEventArgs args)
+    {
+        _resolvedFilter = args.Value?.ToString() ?? "all";
+        await LoadEventsAsync();
+    }
+
+    private async Task ChangeSeverityFilterAsync(ChangeEventArgs args)
+    {
+        _severityFilter = args.Value?.ToString() ?? "";
+        await LoadEventsAsync();
+    }
+
+    private async Task LoadEventsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _loading = true;
+        _error = null;
+        StateHasChanged();
+
+        bool? resolved = _resolvedFilter switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null,
+        };
+
+        var result = await AdminApi.GetSecurityEventsAsync(_accessToken, resolved, _severityFilter);
+
+        _loading = false;
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "You are not authorized to access admin pages.");
+                return;
+            }
+
+            _error = result.Error ?? "Failed to load security events.";
+            StateHasChanged();
+            return;
+        }
+
+        _events.Clear();
+        _events.AddRange(result.Value.Events);
+        StateHasChanged();
+    }
+
+    private async Task ResolveEventAsync(Guid eventId)
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _resolvingEventIds.Add(eventId);
+        _error = null;
+        StateHasChanged();
+
+        var result = await AdminApi.ResolveSecurityEventAsync(_accessToken, eventId);
+        _resolvingEventIds.Remove(eventId);
+
+        if (!result.IsSuccess)
+        {
+            if (result.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "You are not authorized to access admin pages.");
+                return;
+            }
+
+            _error = result.Error ?? "Failed to resolve event.";
+            StateHasChanged();
+            return;
+        }
+
+        await LoadEventsAsync();
+    }
+
+    private async Task LogoutAsync()
+    {
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await TokenStore.ClearTokensAsync();
+        _error = message;
+        _loading = false;
+        Navigation.NavigateTo("/login?redirect=/admin/security", forceLoad: true);
+    }
+
+    private static string GetSeverityClass(string severity)
+    {
+        return severity switch
+        {
+            "low" => "text-blue",
+            "medium" => "text-yellow",
+            "high" => "text-orange",
+            "critical" => "text-red",
+            _ => string.Empty,
+        };
+    }
+}

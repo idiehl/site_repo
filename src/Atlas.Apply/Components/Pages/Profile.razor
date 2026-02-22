@@ -1,0 +1,578 @@
+@page "/profile"
+@using System.Net
+@using System.Text.Json
+@inject BrowserTokenStore TokenStore
+@inject ApplyProfileApiClient ProfileApi
+@inject NavigationManager Navigation
+
+<PageTitle>Profile | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Atlas Apply</div>
+            <nav class="dashboard-nav">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/applications">Applications</a>
+                <a class="active" href="/profile">Profile</a>
+                <a href="/extension">Extension</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (_loading)
+        {
+            <section class="auth-card">
+                <div class="auth-processing">
+                    <div class="auth-spinner"></div>
+                    <p class="auth-subtitle">Loading profile...</p>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="jobs-card profile-header-card">
+                <div class="profile-header-main">
+                    <div class="profile-picture-wrap">
+                        @if (!string.IsNullOrWhiteSpace(_profile.ProfilePictureUrl))
+                        {
+                            <img src="@_profile.ProfilePictureUrl" alt="Profile picture" />
+                        }
+                        else
+                        {
+                            <div class="profile-avatar-fallback">👤</div>
+                        }
+                    </div>
+                    <div>
+                        <h2>@(string.IsNullOrWhiteSpace(_profile.FullName) ? "Your Name" : _profile.FullName)</h2>
+                        <p class="auth-subtitle">@(string.IsNullOrWhiteSpace(_profile.Headline) ? "Add your headline" : _profile.Headline)</p>
+                    </div>
+                </div>
+                <div class="profile-header-actions">
+                    <label class="btn-secondary compact file-label">
+                        @(_uploadingPicture ? "Uploading..." : "Upload Picture")
+                        <InputFile OnChange="HandlePictureFileSelectedAsync" accept=".jpg,.jpeg,.png,.gif,.webp" disabled="@_uploadingPicture" />
+                    </label>
+                    @if (!string.IsNullOrWhiteSpace(_profile.ProfilePictureUrl))
+                    {
+                        <button class="btn-secondary compact danger" disabled="@_uploadingPicture" @onclick="DeleteProfilePictureAsync">Remove</button>
+                    }
+                </div>
+                <div class="profile-completeness">
+                    <div class="profile-completeness-head">
+                        <span>Profile Strength</span>
+                        <strong>@_completeness.Score%</strong>
+                    </div>
+                    <div class="profile-completeness-track">
+                        <div class="@($"profile-completeness-fill {GetCompletenessClass(_completeness.Score)}")" style="@($"width: {_completeness.Score}%")"></div>
+                    </div>
+                    @if (_missingFieldLabels.Count > 0)
+                    {
+                        <p class="auth-subtitle">Tip: add @string.Join(", ", _missingFieldLabels.Take(3))@(_missingFieldLabels.Count > 3 ? $" and {_missingFieldLabels.Count - 3} more" : string.Empty) to improve your profile.</p>
+                    }
+                </div>
+            </section>
+
+            <section class="jobs-card">
+                <div class="jobs-card-header">
+                    <div class="jobs-title-wrap">
+                        <h2>Quick Import</h2>
+                    </div>
+                </div>
+                <p class="auth-subtitle">Upload your resume to automatically fill your profile.</p>
+                <div class="dashboard-actions">
+                    <label class="btn-secondary compact file-label">
+                        @(_resumeFileName ?? "Choose File")
+                        <InputFile OnChange="HandleResumeFileSelected" accept=".pdf,.txt" disabled="@_uploadingResume" />
+                    </label>
+                    <button class="btn-primary compact" disabled="@(_uploadingResume || _resumeFile is null)" @onclick="UploadResumeAsync">
+                        @(_uploadingResume ? "Parsing..." : "Parse Resume")
+                    </button>
+                </div>
+            </section>
+
+            <EditForm Model="_profile" OnValidSubmit="SaveProfileAsync">
+                <section class="jobs-card">
+                    <h2>Basic Information</h2>
+                    <div class="profile-form-grid">
+                        <div>
+                            <label>Full Name</label>
+                            <InputText class="profile-input" @bind-Value="_profile.FullName" />
+                        </div>
+                        <div>
+                            <label>Headline</label>
+                            <InputText class="profile-input" @bind-Value="_profile.Headline" />
+                        </div>
+                        <div>
+                            <label>Location</label>
+                            <InputText class="profile-input" @bind-Value="_profile.Location" />
+                        </div>
+                        <div>
+                            <label>Phone</label>
+                            <InputText class="profile-input" @bind-Value="_profile.Phone" />
+                        </div>
+                    </div>
+                    <div class="profile-summary-wrap">
+                        <label>Professional Summary</label>
+                        <InputTextArea class="profile-input profile-summary" @bind-Value="_profile.Summary" />
+                    </div>
+                </section>
+
+                <section class="jobs-card">
+                    <h2>Social Links</h2>
+                    <div class="profile-form-grid">
+                        <div>
+                            <label>LinkedIn</label>
+                            <InputText class="profile-input" @bind-Value="_profile.LinkedIn" />
+                        </div>
+                        <div>
+                            <label>GitHub</label>
+                            <InputText class="profile-input" @bind-Value="_profile.GitHub" />
+                        </div>
+                        <div>
+                            <label>Twitter/X</label>
+                            <InputText class="profile-input" @bind-Value="_profile.Twitter" />
+                        </div>
+                        <div>
+                            <label>Portfolio</label>
+                            <InputText class="profile-input" @bind-Value="_profile.Portfolio" />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="jobs-card">
+                    <h2>Skills</h2>
+                    <div class="dashboard-actions">
+                        <InputText class="profile-input" @bind-Value="_newSkill" placeholder="Add a skill" />
+                        <button type="button" class="btn-secondary compact" @onclick="AddSkill">Add</button>
+                    </div>
+                    <div class="profile-skills-wrap">
+                        @if (_profile.Skills.Count == 0)
+                        {
+                            <span class="auth-subtitle">No skills added yet.</span>
+                        }
+                        else
+                        {
+                            @foreach (var skill in _profile.Skills)
+                            {
+                                <span class="status-pill blue profile-skill-chip">
+                                    @skill
+                                    <button type="button" @onclick="() => RemoveSkill(skill)">×</button>
+                                </span>
+                            }
+                        }
+                    </div>
+                </section>
+
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <section class="jobs-card">
+                        <p class="auth-error">✗ @_error</p>
+                    </section>
+                }
+                @if (!string.IsNullOrWhiteSpace(_success))
+                {
+                    <section class="jobs-card">
+                        <p class="success-message">✓ @_success</p>
+                    </section>
+                }
+
+                <section class="jobs-card profile-save-row">
+                    <button type="submit" class="btn-primary compact" disabled="@_saving">
+                        @(_saving ? "Saving..." : "Save Profile")
+                    </button>
+                </section>
+            </EditForm>
+        }
+    </main>
+</div>
+
+@code {
+    private string? _accessToken;
+    private bool _loading = true;
+    private bool _saving;
+    private bool _uploadingResume;
+    private bool _uploadingPicture;
+    private string? _error;
+    private string? _success;
+    private string _newSkill = "";
+    private IBrowserFile? _resumeFile;
+    private string? _resumeFileName;
+    private ProfileFormModel _profile = new();
+    private ProfileCompletenessDto _completeness = new();
+    private readonly List<string> _missingFieldLabels = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/profile", forceLoad: true);
+            return;
+        }
+
+        await LoadAllAsync();
+    }
+
+    private async Task LoadAllAsync()
+    {
+        _loading = true;
+        _error = null;
+        _success = null;
+        StateHasChanged();
+
+        await LoadProfileAsync();
+        await LoadCompletenessAsync();
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadProfileAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        var result = await ProfileApi.GetProfileAsync(_accessToken);
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "Session expired. Please sign in again.");
+                return;
+            }
+
+            // Keep defaults when profile does not yet exist.
+            return;
+        }
+
+        _profile = ProfileFormModel.FromDto(result.Value);
+    }
+
+    private async Task LoadCompletenessAsync()
+    {
+        _missingFieldLabels.Clear();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        var result = await ProfileApi.GetCompletenessAsync(_accessToken);
+        if (!result.IsSuccess || result.Value is null)
+        {
+            return;
+        }
+
+        _completeness = result.Value;
+        foreach (var label in ExtractMissingFieldLabels(_completeness.MissingFields))
+        {
+            _missingFieldLabels.Add(label);
+        }
+    }
+
+    private async Task SaveProfileAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _saving = true;
+        _error = null;
+        _success = null;
+
+        var payload = new ProfileUpdatePayload
+        {
+            FullName = _profile.FullName,
+            Headline = _profile.Headline,
+            Summary = _profile.Summary,
+            Location = _profile.Location,
+            Phone = _profile.Phone,
+            SocialLinks = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["linkedin"] = _profile.LinkedIn,
+                ["github"] = _profile.GitHub,
+                ["twitter"] = _profile.Twitter,
+                ["portfolio"] = _profile.Portfolio,
+            },
+            Skills = [.. _profile.Skills],
+        };
+
+        var result = await ProfileApi.UpdateProfileAsync(_accessToken, payload);
+        _saving = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to save profile.";
+            StateHasChanged();
+            return;
+        }
+
+        _success = "Profile saved successfully!";
+        await LoadCompletenessAsync();
+        StateHasChanged();
+    }
+
+    private void HandleResumeFileSelected(InputFileChangeEventArgs args)
+    {
+        _resumeFile = args.File;
+        _resumeFileName = args.File.Name;
+        _error = null;
+    }
+
+    private async Task UploadResumeAsync()
+    {
+        if (_resumeFile is null || string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        _uploadingResume = true;
+        _error = null;
+        _success = null;
+
+        await using var stream = _resumeFile.OpenReadStream(10 * 1024 * 1024);
+        var result = await ProfileApi.UploadResumeAsync(
+            _accessToken,
+            stream,
+            _resumeFile.Name,
+            string.IsNullOrWhiteSpace(_resumeFile.ContentType) ? "application/octet-stream" : _resumeFile.ContentType);
+
+        _uploadingResume = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to parse resume.";
+            StateHasChanged();
+            return;
+        }
+
+        var parsedCount = 0;
+        if (result.Value is not null && result.Value.ParsedFields.ValueKind == JsonValueKind.Array)
+        {
+            parsedCount = result.Value.ParsedFields.GetArrayLength();
+        }
+
+        _success = parsedCount > 0
+            ? $"Resume parsed! Updated {parsedCount} fields."
+            : "Resume parsed successfully!";
+
+        _resumeFile = null;
+        _resumeFileName = null;
+        await LoadProfileAsync();
+        await LoadCompletenessAsync();
+        StateHasChanged();
+    }
+
+    private async Task HandlePictureFileSelectedAsync(InputFileChangeEventArgs args)
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        var file = args.File;
+        _uploadingPicture = true;
+        _error = null;
+        _success = null;
+
+        await using var stream = file.OpenReadStream(5 * 1024 * 1024);
+        var result = await ProfileApi.UploadPictureAsync(
+            _accessToken,
+            stream,
+            file.Name,
+            string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType);
+
+        _uploadingPicture = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to upload picture.";
+            StateHasChanged();
+            return;
+        }
+
+        _profile.ProfilePictureUrl = result.Value?.ProfilePictureUrl ?? _profile.ProfilePictureUrl;
+        _success = "Profile picture uploaded!";
+        await LoadCompletenessAsync();
+        StateHasChanged();
+    }
+
+    private async Task DeleteProfilePictureAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            return;
+        }
+
+        _uploadingPicture = true;
+        _error = null;
+        _success = null;
+
+        var result = await ProfileApi.DeletePictureAsync(_accessToken);
+        _uploadingPicture = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to delete picture.";
+            StateHasChanged();
+            return;
+        }
+
+        _profile.ProfilePictureUrl = "";
+        _success = "Profile picture removed.";
+        await LoadCompletenessAsync();
+        StateHasChanged();
+    }
+
+    private void AddSkill()
+    {
+        var value = _newSkill.Trim();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        if (_profile.Skills.Any(s => string.Equals(s, value, StringComparison.OrdinalIgnoreCase)))
+        {
+            _newSkill = "";
+            return;
+        }
+
+        _profile.Skills.Add(value);
+        _newSkill = "";
+    }
+
+    private void RemoveSkill(string skill)
+    {
+        _profile.Skills.RemoveAll(v => string.Equals(v, skill, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task LogoutAsync()
+    {
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await TokenStore.ClearTokensAsync();
+        _error = message;
+        _loading = false;
+        Navigation.NavigateTo("/login?redirect=/profile", forceLoad: true);
+    }
+
+    private static IEnumerable<string> ExtractMissingFieldLabels(JsonElement element)
+    {
+        if (element.ValueKind != JsonValueKind.Array)
+        {
+            yield break;
+        }
+
+        foreach (var item in element.EnumerateArray())
+        {
+            if (item.ValueKind == JsonValueKind.Object)
+            {
+                if (item.TryGetProperty("label", out var label) && label.ValueKind == JsonValueKind.String)
+                {
+                    var text = label.GetString();
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        yield return text;
+                    }
+                }
+            }
+            else if (item.ValueKind == JsonValueKind.String)
+            {
+                var text = item.GetString();
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    yield return text;
+                }
+            }
+        }
+    }
+
+    private static string GetCompletenessClass(int score)
+    {
+        return score switch
+        {
+            >= 80 => "strong",
+            >= 50 => "medium",
+            _ => "weak",
+        };
+    }
+
+    private sealed class ProfileFormModel
+    {
+        public string FullName { get; set; } = "";
+        public string Headline { get; set; } = "";
+        public string Summary { get; set; } = "";
+        public string ProfilePictureUrl { get; set; } = "";
+        public string Location { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string LinkedIn { get; set; } = "";
+        public string GitHub { get; set; } = "";
+        public string Twitter { get; set; } = "";
+        public string Portfolio { get; set; } = "";
+        public List<string> Skills { get; set; } = [];
+
+        public static ProfileFormModel FromDto(ProfileDto dto)
+        {
+            var model = new ProfileFormModel
+            {
+                FullName = dto.FullName ?? "",
+                Headline = dto.Headline ?? "",
+                Summary = dto.Summary ?? "",
+                ProfilePictureUrl = dto.ProfilePictureUrl ?? "",
+                Location = dto.Location ?? "",
+                Phone = dto.Phone ?? "",
+                Skills = ExtractSkillList(dto.Skills),
+            };
+
+            if (dto.SocialLinks.ValueKind == JsonValueKind.Object)
+            {
+                if (dto.SocialLinks.TryGetProperty("linkedin", out var linkedIn) && linkedIn.ValueKind == JsonValueKind.String)
+                    model.LinkedIn = linkedIn.GetString() ?? "";
+                if (dto.SocialLinks.TryGetProperty("github", out var github) && github.ValueKind == JsonValueKind.String)
+                    model.GitHub = github.GetString() ?? "";
+                if (dto.SocialLinks.TryGetProperty("twitter", out var twitter) && twitter.ValueKind == JsonValueKind.String)
+                    model.Twitter = twitter.GetString() ?? "";
+                if (dto.SocialLinks.TryGetProperty("portfolio", out var portfolio) && portfolio.ValueKind == JsonValueKind.String)
+                    model.Portfolio = portfolio.GetString() ?? "";
+            }
+
+            return model;
+        }
+
+        private static List<string> ExtractSkillList(JsonElement skills)
+        {
+            var values = new List<string>();
+            if (skills.ValueKind != JsonValueKind.Array)
+            {
+                return values;
+            }
+
+            foreach (var skill in skills.EnumerateArray())
+            {
+                if (skill.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(skill.GetString()))
+                {
+                    values.Add(skill.GetString()!);
+                }
+            }
+
+            return values;
+        }
+    }
+}

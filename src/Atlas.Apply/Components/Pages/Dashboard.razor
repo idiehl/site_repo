@@ -1,0 +1,429 @@
+@page "/dashboard"
+@implements IAsyncDisposable
+@inject BrowserTokenStore TokenStore
+@inject ApplyDashboardApiClient DashboardApi
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Atlas Apply</div>
+            <nav class="dashboard-nav">
+                <a class="active" href="/dashboard">Dashboard</a>
+                <a href="/applications">Applications</a>
+                <a href="/profile">Profile</a>
+                <a href="/extension">Extension</a>
+            </nav>
+            <div class="dashboard-user">
+                <span>@_userEmail</span>
+                <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (_isLoading)
+        {
+            <section class="auth-card">
+                <div class="auth-processing">
+                    <div class="auth-spinner"></div>
+                    <p class="auth-subtitle">Loading dashboard...</p>
+                </div>
+            </section>
+        }
+        else if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <section class="auth-card">
+                <h1>Dashboard Error</h1>
+                <p class="auth-error">@_error</p>
+                <div class="dashboard-actions">
+                    <button class="btn-primary" @onclick="RefreshAsync">Retry</button>
+                    <button class="btn-secondary" @onclick="LogoutAsync">Back to Login</button>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="dashboard-stats">
+                <article class="stat-card"><p>Saved Jobs</p><strong>@_jobs.Count</strong></article>
+                <article class="stat-card"><p>Processing</p><strong class="text-yellow">@PendingCount</strong></article>
+                <article class="stat-card"><p>Ready</p><strong class="text-green">@CompletedCount</strong></article>
+                <article class="stat-card"><p>Needs Review</p><strong class="text-orange">@NeedsReviewCount</strong></article>
+                <article class="stat-card">
+                    <p>Failed</p>
+                    <strong class="text-red">@FailedCount</strong>
+                    @if (FailedCount > 0)
+                    {
+                        <button class="tiny-action" disabled="@_retryingFailed" @onclick="RetryFailedAsync">
+                            @(_retryingFailed ? "Retrying..." : "Retry All")
+                        </button>
+                    }
+                </article>
+                <article class="stat-card"><p>Applications</p><strong class="text-blue">@_applicationsCount</strong></article>
+            </section>
+
+            <section class="jobs-card">
+                <div class="jobs-card-header">
+                    <div class="jobs-title-wrap">
+                        <h2>My Jobs</h2>
+                        @if (_isPolling)
+                        {
+                            <span class="polling-badge">Auto-refreshing</span>
+                        }
+                    </div>
+                    <div class="jobs-actions">
+                        <button class="btn-secondary compact" @onclick="RefreshAsync" disabled="@_isRefreshing">Refresh</button>
+                        <button class="btn-primary compact" @onclick="ToggleIngestPanel">
+                            @(_showIngestPanel ? "Hide Add Jobs" : "+ Add Jobs")
+                        </button>
+                    </div>
+                </div>
+
+                @if (_showIngestPanel)
+                {
+                    <div class="ingest-panel">
+                        <label for="jobUrls">Paste one or more job URLs (one per line):</label>
+                        <textarea id="jobUrls" @bind="_jobUrlsInput" rows="4" placeholder="https://linkedin.com/jobs/..."></textarea>
+                        @if (!string.IsNullOrWhiteSpace(_ingestError))
+                        {
+                            <p class="auth-error">@_ingestError</p>
+                        }
+                        <div class="dashboard-actions">
+                            <button class="btn-primary compact" disabled="@_isIngesting" @onclick="IngestJobsAsync">
+                                @(_isIngesting ? "Adding..." : "Add Jobs")
+                            </button>
+                        </div>
+                    </div>
+                }
+
+                @if (_jobs.Count == 0)
+                {
+                    <div class="empty-state">
+                        <p>No jobs yet.</p>
+                        <p class="auth-subtitle">Add job URLs to start your pipeline.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="jobs-table-wrap">
+                        <table class="jobs-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Position</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Added</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var job in _jobs)
+                                {
+                                    <tr>
+                                        <td>@(job.CompanyName ?? "Processing...")</td>
+                                        <td>@(job.JobTitle ?? "-")</td>
+                                        <td>@(job.Location ?? "-")</td>
+                                        <td><span class="@GetStatusClass(job.Status)">@FormatStatus(job.Status)</span></td>
+                                        <td>@FormatDate(job.CreatedAt)</td>
+                                        <td><a class="table-link" href="@($"/jobs/{job.Id}")">View</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        }
+    </main>
+</div>
+
+@code {
+    private readonly List<DashboardJobDto> _jobs = [];
+    private string? _accessToken;
+    private string _userEmail = "";
+    private string? _error;
+    private bool _isLoading = true;
+    private bool _isRefreshing;
+    private bool _isPolling;
+    private bool _showIngestPanel;
+    private bool _isIngesting;
+    private bool _retryingFailed;
+    private string _jobUrlsInput = "";
+    private string? _ingestError;
+    private int _applicationsCount;
+    private CancellationTokenSource? _pollingCts;
+
+    private int PendingCount => _jobs.Count(j => IsStatus(j.Status, "pending") || IsStatus(j.Status, "processing"));
+    private int CompletedCount => _jobs.Count(j => IsStatus(j.Status, "completed"));
+    private int NeedsReviewCount => _jobs.Count(j => IsStatus(j.Status, "needs_review"));
+    private int FailedCount => _jobs.Count(j => IsStatus(j.Status, "failed"));
+    private bool HasProcessingJobs => PendingCount > 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/dashboard", forceLoad: true);
+            return;
+        }
+
+        await LoadDashboardAsync();
+    }
+
+    private async Task LoadDashboardAsync()
+    {
+        _error = null;
+        _isLoading = true;
+        StateHasChanged();
+
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            _error = "No active session found.";
+            _isLoading = false;
+            return;
+        }
+
+        var userResult = await DashboardApi.GetCurrentUserAsync(_accessToken);
+        if (!userResult.IsSuccess || userResult.Value is null)
+        {
+            await HandleAuthFailureAsync(userResult.Error ?? "Could not validate credentials.");
+            return;
+        }
+
+        _userEmail = userResult.Value.Email;
+
+        var jobsResult = await DashboardApi.GetJobsAsync(_accessToken);
+        if (!jobsResult.IsSuccess || jobsResult.Value is null)
+        {
+            await HandleDashboardErrorAsync(jobsResult.Error ?? "Failed to load jobs.", jobsResult.StatusCode);
+            return;
+        }
+
+        _jobs.Clear();
+        _jobs.AddRange(jobsResult.Value);
+
+        var appsResult = await DashboardApi.GetApplicationsCountAsync(_accessToken);
+        _applicationsCount = appsResult.IsSuccess
+            ? appsResult.Value
+            : 0;
+
+        _isLoading = false;
+        _isRefreshing = false;
+
+        if (HasProcessingJobs)
+        {
+            StartPolling();
+        }
+        else
+        {
+            StopPolling();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task RefreshAsync()
+    {
+        _isRefreshing = true;
+        await LoadDashboardAsync();
+    }
+
+    private void ToggleIngestPanel()
+    {
+        _showIngestPanel = !_showIngestPanel;
+        _ingestError = null;
+    }
+
+    private async Task IngestJobsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        var urls = _jobUrlsInput
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(v => Uri.TryCreate(v, UriKind.Absolute, out _))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (urls.Count == 0)
+        {
+            _ingestError = "Add at least one valid URL.";
+            return;
+        }
+
+        _isIngesting = true;
+        _ingestError = null;
+
+        var result = await DashboardApi.IngestJobsAsync(_accessToken, urls);
+        _isIngesting = false;
+
+        if (!result.IsSuccess)
+        {
+            _ingestError = result.Error ?? "Failed to ingest jobs.";
+            return;
+        }
+
+        _jobUrlsInput = "";
+        _showIngestPanel = false;
+        await LoadDashboardAsync();
+    }
+
+    private async Task RetryFailedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _retryingFailed = true;
+        var result = await DashboardApi.RetryAllFailedAsync(_accessToken);
+        _retryingFailed = false;
+
+        if (!result.IsSuccess)
+        {
+            _error = result.Error ?? "Failed to retry jobs.";
+            StateHasChanged();
+            return;
+        }
+
+        await LoadDashboardAsync();
+    }
+
+    private void StartPolling()
+    {
+        if (_pollingCts is not null && !_pollingCts.IsCancellationRequested)
+        {
+            return;
+        }
+
+        _pollingCts = new CancellationTokenSource();
+        _isPolling = true;
+        _ = PollLoopAsync(_pollingCts.Token);
+    }
+
+    private void StopPolling()
+    {
+        _pollingCts?.Cancel();
+        _pollingCts?.Dispose();
+        _pollingCts = null;
+        _isPolling = false;
+    }
+
+    private async Task PollLoopAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+                if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(_accessToken))
+                {
+                    return;
+                }
+
+                var jobsResult = await DashboardApi.GetJobsAsync(_accessToken, cancellationToken);
+                if (!jobsResult.IsSuccess || jobsResult.Value is null)
+                {
+                    continue;
+                }
+
+                _jobs.Clear();
+                _jobs.AddRange(jobsResult.Value);
+
+                if (!HasProcessingJobs)
+                {
+                    StopPolling();
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // expected on dispose/stop
+        }
+    }
+
+    private async Task HandleDashboardErrorAsync(string message, System.Net.HttpStatusCode? statusCode)
+    {
+        if (statusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _error = message;
+        _isLoading = false;
+        _isRefreshing = false;
+        StopPolling();
+        StateHasChanged();
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await TokenStore.ClearTokensAsync();
+        _error = message;
+        _isLoading = false;
+        _isRefreshing = false;
+        StopPolling();
+        Navigation.NavigateTo("/login?redirect=/dashboard", forceLoad: true);
+    }
+
+    private async Task LogoutAsync()
+    {
+        StopPolling();
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private static string FormatDate(DateTime? value)
+    {
+        return value.HasValue
+            ? value.Value.ToLocalTime().ToString("MMM d, yyyy")
+            : "-";
+    }
+
+    private static bool IsStatus(string? value, string expected) =>
+        string.Equals(value, expected, StringComparison.OrdinalIgnoreCase);
+
+    private static string FormatStatus(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return "Unknown";
+        }
+
+        return status.Replace("_", " ", StringComparison.Ordinal).Trim();
+    }
+
+    private static string GetStatusClass(string? status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "completed" => "status-pill green",
+            "pending" or "processing" => "status-pill yellow",
+            "needs_review" => "status-pill orange",
+            "failed" => "status-pill red",
+            _ => "status-pill gray",
+        };
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        StopPolling();
+        return ValueTask.CompletedTask;
+    }
+}

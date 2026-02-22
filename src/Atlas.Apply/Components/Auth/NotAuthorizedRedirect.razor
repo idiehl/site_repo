@@ -1,0 +1,56 @@
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+@if (_checked && _isAuthenticated)
+{
+    <main class="auth-shell">
+        <section class="auth-card">
+            <h1>Access Denied</h1>
+            <p class="auth-error">You are signed in, but you do not have permission to view this page.</p>
+            <button class="btn-primary" @onclick="GoToDashboard">Go to Dashboard</button>
+        </section>
+    </main>
+}
+else
+{
+    <main class="auth-shell">
+        <section class="auth-card">
+            <div class="auth-processing">
+                <div class="auth-spinner"></div>
+                <p class="auth-subtitle">Redirecting...</p>
+            </div>
+        </section>
+    </main>
+}
+
+@code {
+    private bool _checked;
+    private bool _isAuthenticated;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        _isAuthenticated = state.User.Identity?.IsAuthenticated == true;
+        _checked = true;
+
+        if (!_isAuthenticated)
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var redirect = Uri.EscapeDataString(uri.PathAndQuery);
+            Navigation.NavigateTo($"/login?redirect={redirect}", forceLoad: true);
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+    private void GoToDashboard()
+    {
+        Navigation.NavigateTo("/dashboard", forceLoad: true);
+    }
+}

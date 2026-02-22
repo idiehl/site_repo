@@ -1,0 +1,184 @@
+@page "/admin"
+@using System.Net
+@inject BrowserTokenStore TokenStore
+@inject ApplyAdminApiClient AdminApi
+@inject NavigationManager Navigation
+
+<PageTitle>Admin Overview | Atlas Apply</PageTitle>
+
+<div class="dashboard-shell">
+    <header class="dashboard-header">
+        <div class="dashboard-header-inner">
+            <div class="dashboard-brand">Atlas Apply Admin</div>
+            <nav class="dashboard-nav">
+                <a class="active" href="/admin">Overview</a>
+                <a href="/admin/analytics">Analytics</a>
+                <a href="/admin/security">Security</a>
+                <a href="/dashboard">User Dashboard</a>
+            </nav>
+            <button class="btn-secondary compact" @onclick="LogoutAsync">Logout</button>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        @if (!_isAdmin)
+        {
+            <section class="jobs-card admin-danger">
+                <h2>Access Denied</h2>
+                <p class="auth-subtitle">You do not have admin privileges.</p>
+            </section>
+        }
+        else if (_loading)
+        {
+            <section class="jobs-card">
+                <p class="auth-subtitle">Loading statistics...</p>
+            </section>
+        }
+        else if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <section class="jobs-card admin-danger">
+                <p class="auth-error">✗ @_error</p>
+            </section>
+        }
+        else if (_stats is not null)
+        {
+            <section class="jobs-card">
+                <h2>Overview (Last @_stats.PeriodDays Days)</h2>
+                <div class="admin-overview-grid">
+                    <div class="stat-card">
+                        <div class="label">Total Users</div>
+                        <div class="value">@_stats.Users.Total</div>
+                        <div class="label">@_stats.Users.New new</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Job Postings</div>
+                        <div class="value green">@_stats.Jobs.Total</div>
+                        <div class="label">@_stats.Jobs.Recent recent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Applications</div>
+                        <div class="value blue">@_stats.Applications.Total</div>
+                        <div class="label">@_stats.Applications.Recent recent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Site Visits</div>
+                        <div class="value yellow">@_stats.Traffic.TotalVisits</div>
+                        <div class="label">@_stats.Traffic.UniqueVisitors unique</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="jobs-card">
+                <div class="admin-overview-grid">
+                    <div class="stat-card">
+                        <div class="label">API Calls</div>
+                        <div class="value">@_stats.Api.TotalCalls.ToString("N0")</div>
+                        <div class="label">Avg: @Math.Round(_stats.Api.AvgResponseTimeMs, 1)ms</div>
+                        <div class="label">Error Rate: @Math.Round(_stats.Api.ErrorRatePercent, 2)%</div>
+                    </div>
+                    <div class="@($"stat-card {(_stats.Security.CriticalEvents > 0 ? "admin-danger-soft" : string.Empty)}")">
+                        <div class="label">Security Events</div>
+                        <div class="@($"value {(_stats.Security.CriticalEvents > 0 ? "red" : "yellow")}")">@_stats.Security.UnresolvedEvents</div>
+                        @if (_stats.Security.CriticalEvents > 0)
+                        {
+                            <div class="label">@_stats.Security.CriticalEvents critical</div>
+                        }
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">System Health</div>
+                        <div class="value green">Healthy</div>
+                        <div class="label">Error rate: @Math.Round(_stats.Api.ErrorRatePercent, 2)%</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="jobs-card">
+                <h3>Quick Actions</h3>
+                <div class="dashboard-actions">
+                    <a class="btn-primary compact" href="/admin/analytics">View Analytics</a>
+                    <a class="btn-secondary compact" href="/admin/security">Security Events</a>
+                </div>
+            </section>
+        }
+    </main>
+</div>
+
+@code {
+    private string? _accessToken;
+    private bool _isAdmin;
+    private bool _loading = true;
+    private string? _error;
+    private AdminOverviewDto? _stats;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _accessToken = await TokenStore.GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            Navigation.NavigateTo("/login?redirect=/admin", forceLoad: true);
+            return;
+        }
+
+        _isAdmin = AdminAccessEvaluator.TokenHasAdminAccess(_accessToken);
+        if (!_isAdmin)
+        {
+            _loading = false;
+            StateHasChanged();
+            return;
+        }
+
+        await LoadOverviewAsync();
+    }
+
+    private async Task LoadOverviewAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_accessToken))
+        {
+            await HandleAuthFailureAsync("Session expired. Please sign in again.");
+            return;
+        }
+
+        _loading = true;
+        _error = null;
+        StateHasChanged();
+
+        var result = await AdminApi.GetOverviewAsync(_accessToken, 30);
+        _loading = false;
+
+        if (!result.IsSuccess || result.Value is null)
+        {
+            if (result.StatusCode == HttpStatusCode.Unauthorized || result.StatusCode == HttpStatusCode.Forbidden)
+            {
+                await HandleAuthFailureAsync(result.Error ?? "You are not authorized to access admin pages.");
+                return;
+            }
+
+            _error = result.Error ?? "Failed to load admin overview.";
+            StateHasChanged();
+            return;
+        }
+
+        _stats = result.Value;
+        StateHasChanged();
+    }
+
+    private async Task LogoutAsync()
+    {
+        await TokenStore.ClearTokensAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleAuthFailureAsync(string message)
+    {
+        await TokenStore.ClearTokensAsync();
+        _error = message;
+        _loading = false;
+        Navigation.NavigateTo("/login?redirect=/admin", forceLoad: true);
+    }
+
+}
