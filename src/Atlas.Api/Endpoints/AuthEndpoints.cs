@@ -1,21 +1,21 @@
-using System.Security.Cryptography;
-using System.Text;
+using System.Security.Claims;
 using System.Text.Json;
 using Atlas.Api.Authentication;
-using Atlas.Api.Authentication.OAuth;
+using Atlas.Api.OAuth;
 using Atlas.Contracts.Auth;
 using Atlas.Contracts.Configuration;
 using Atlas.Core.Entities;
 using Atlas.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Atlas.Api.Endpoints;
 
 public static class AuthEndpoints
 {
-    private const int FreeResumeGenerationLimit = 3;
-    private const int PaidResumeGenerationLimit = 50;
+    private const string LinkedInAuthUrl = "https://www.linkedin.com/oauth/v2/authorization";
+    private const string GoogleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
 
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
@@ -35,105 +35,95 @@ public static class AuthEndpoints
         return app;
     }
 
-    private static async Task<IResult> Register(
-        UserCreateRequest request,
-        AtlasDbContext db,
-        IJwtTokenFactory jwtTokenFactory,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> Register(UserCreateRequest request, AtlasDbContext db)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        var email = NormalizeEmail(request.Email);
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(request.Password))
         {
-            return Results.Json(
-                new { detail = "Email and password are required" },
-                statusCode: StatusCodes.Status400BadRequest);
+            return Results.Json(new { detail = "Email and password are required." }, statusCode: StatusCodes.Status400BadRequest);
         }
 
-        var existingUser = await db.Users
-            .AnyAsync(u => u.Email == request.Email, cancellationToken);
-
-        if (existingUser)
+        var exists = await db.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Email == email);
+        if (exists)
         {
-            return Results.Json(
-                new { detail = "Email already registered" },
-                statusCode: StatusCodes.Status400BadRequest);
+            return Results.Json(new { detail = "Email already registered" }, statusCode: StatusCodes.Status400BadRequest);
         }
 
         var now = DateTime.UtcNow;
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Email = request.Email,
+            Email = email,
             HashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            IsAdmin = false,
             SubscriptionTier = "free",
             SubscriptionStatus = "free",
-            ResumeGenerationsUsed = 0,
             CreatedAt = now,
             UpdatedAt = now,
         };
         db.Users.Add(user);
-        await db.SaveChangesAsync(cancellationToken);
-
-        var profile = new UserProfile
+        db.UserProfiles.Add(new UserProfile
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
-            CompletenessScore = 0,
             CreatedAt = now,
             UpdatedAt = now,
-        };
-        db.UserProfiles.Add(profile);
-        await db.SaveChangesAsync(cancellationToken);
+        });
+        await db.SaveChangesAsync();
 
         return Results.Json(
-            new UserResponse(user.Id, user.Email, user.CreatedAt, user.SubscriptionTier, user.IsAdmin),
+            new UserResponse(
+                user.Id,
+                user.Email,
+                user.CreatedAt,
+                user.SubscriptionTier,
+                user.IsAdmin),
             statusCode: StatusCodes.Status201Created);
     }
 
-    private static async Task<IResult> Login(
-        LoginRequest request,
-        AtlasDbContext db,
-        IJwtTokenFactory jwtTokenFactory,
-        CancellationToken cancellationToken)
+    private static async Task<IResult> Login(HttpContext context)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        var db = context.RequestServices.GetRequiredService<AtlasDbContext>();
+        var tokenFactory = context.RequestServices.GetRequiredService<IJwtTokenFactory>();
+        var login = await ReadLoginRequestAsync(context);
+        if (!login.IsValid)
         {
-            return Results.Json(
-                new { detail = "Incorrect email or password" },
-                statusCode: StatusCodes.Status401Unauthorized);
+            return Results.Json(new { detail = "Email and password are required." }, statusCode: StatusCodes.Status400BadRequest);
         }
 
+        var email = NormalizeEmail(login.Email);
         var user = await db.Users
-            .SingleOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Email == email, context.RequestAborted);
 
-        if (user is null
-            || string.IsNullOrWhiteSpace(user.HashedPassword)
-            || !BCrypt.Net.BCrypt.Verify(request.Password, user.HashedPassword))
+        if (user is null ||
+            string.IsNullOrWhiteSpace(user.HashedPassword) ||
+            !BCrypt.Net.BCrypt.Verify(login.Password, user.HashedPassword))
         {
-            return Results.Json(
-                new { detail = "Incorrect email or password" },
-                statusCode: StatusCodes.Status401Unauthorized);
+            return Results.Json(new { detail = "Incorrect email or password" }, statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        var tokens = jwtTokenFactory.CreateTokenPair(user.Id);
-        return Results.Ok(new
-        {
-            access_token = tokens.AccessToken,
-            refresh_token = tokens.RefreshToken,
-            token_type = tokens.TokenType,
-        });
+        var accessToken = await tokenFactory.CreateAccessTokenAsync(user.Id, context.RequestAborted);
+        var refreshToken = await tokenFactory.CreateRefreshTokenAsync(user.Id, context.RequestAborted);
+
+        return Results.Ok(new TokenResponse(accessToken, refreshToken, "bearer"));
     }
 
-    private static IResult GetCurrentUser(HttpContext context)
+    private static async Task<IResult> GetCurrentUser(HttpContext context)
     {
-        if (context.Items[AtlasApiHttpContextItems.CurrentUser] is not User user)
+        var db = context.RequestServices.GetRequiredService<AtlasDbContext>();
+        var user = await ResolveCurrentUserAsync(context, db);
+        if (user is null)
         {
-            return Results.Json(
-                new { detail = "Could not validate credentials" },
-                statusCode: StatusCodes.Status401Unauthorized);
+            return Results.Json(new { detail = "Could not validate credentials" }, statusCode: StatusCodes.Status401Unauthorized);
         }
 
-        var isPremium = CanAccessPremiumFeatures(user);
-        var limit = isPremium ? PaidResumeGenerationLimit : FreeResumeGenerationLimit;
+        var isPaid = string.Equals(user.SubscriptionTier, "paid", StringComparison.OrdinalIgnoreCase);
+        var isActive = string.Equals(user.SubscriptionStatus, "active", StringComparison.OrdinalIgnoreCase);
+        var canAccessPremium = isPaid && isActive;
+        var resumeGenerationLimit = isPaid ? 9999 : 3;
 
         return Results.Ok(new CurrentUserResponse(
             user.Id,
@@ -141,8 +131,8 @@ public static class AuthEndpoints
             user.CreatedAt,
             user.SubscriptionTier,
             user.IsAdmin,
-            limit,
-            isPremium));
+            resumeGenerationLimit,
+            canAccessPremium));
     }
 
     private static IResult Logout()
@@ -150,246 +140,302 @@ public static class AuthEndpoints
         return Results.Ok(new { message = "Successfully logged out" });
     }
 
-    private static async Task<IResult> RequestPasswordReset(
-        PasswordResetRequest request,
-        AtlasDbContext db,
-        IOptions<JwtSettings> jwtOptions,
-        CancellationToken cancellationToken)
+    private static IResult RequestPasswordReset(PasswordResetRequest request)
     {
-        var user = await db.Users
-            .SingleOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
-
-        if (user is not null)
-        {
-            var resetToken = GeneratePasswordResetToken();
-            user.PasswordResetTokenHash = HashResetToken(resetToken, jwtOptions.Value.SecretKey);
-            user.PasswordResetRequestedAt = DateTime.UtcNow;
-            user.PasswordResetExpiresAt = DateTime.UtcNow.AddHours(2);
-            await db.SaveChangesAsync(cancellationToken);
-        }
-
-        return Results.Ok(new
-        {
-            message = "If an account exists for that email, a reset link will be sent shortly.",
-        });
+        return Results.Ok();
     }
 
-    private static async Task<IResult> ConfirmPasswordReset(
-        PasswordResetConfirm request,
-        AtlasDbContext db,
-        IOptions<JwtSettings> jwtOptions,
-        CancellationToken cancellationToken)
+    private static IResult ConfirmPasswordReset(PasswordResetConfirm request)
     {
-        if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NewPassword))
-        {
-            return Results.Json(
-                new { detail = "Invalid or expired reset token" },
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-
-        var tokenHash = HashResetToken(request.Token, jwtOptions.Value.SecretKey);
-        var user = await db.Users
-            .SingleOrDefaultAsync(u => u.PasswordResetTokenHash == tokenHash, cancellationToken);
-
-        if (user is null
-            || user.PasswordResetExpiresAt is null
-            || user.PasswordResetExpiresAt < DateTime.UtcNow)
-        {
-            return Results.Json(
-                new { detail = "Invalid or expired reset token" },
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-
-        user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-        user.PasswordResetTokenHash = null;
-        user.PasswordResetRequestedAt = null;
-        user.PasswordResetExpiresAt = null;
-        user.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync(cancellationToken);
-
-        return Results.Ok(new { message = "Password updated successfully." });
+        return Results.Ok();
     }
 
-    // --- OAuth endpoints (already implemented in 63656e8) ---
+    private static string NormalizeEmail(string? email)
+    {
+        return string.IsNullOrWhiteSpace(email)
+            ? string.Empty
+            : email.Trim().ToLowerInvariant();
+    }
 
-    private static IResult LinkedInAuthorize(
+    private static async Task<(bool IsValid, string Email, string Password)> ReadLoginRequestAsync(HttpContext context)
+    {
+        if (context.Request.HasFormContentType)
+        {
+            var form = await context.Request.ReadFormAsync(context.RequestAborted);
+            var email = form["username"].FirstOrDefault() ?? form["email"].FirstOrDefault() ?? string.Empty;
+            var password = form["password"].FirstOrDefault() ?? string.Empty;
+            return (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(password), email, password);
+        }
+
+        var payload = await context.Request.ReadFromJsonAsync<LoginRequestBody>(cancellationToken: context.RequestAborted);
+        var jsonEmail = payload?.Email ?? payload?.Username ?? string.Empty;
+        var jsonPassword = payload?.Password ?? string.Empty;
+        return (!string.IsNullOrWhiteSpace(jsonEmail) && !string.IsNullOrWhiteSpace(jsonPassword), jsonEmail, jsonPassword);
+    }
+
+    private static async Task<User?> ResolveCurrentUserAsync(HttpContext context, AtlasDbContext db)
+    {
+        if (context.Items.TryGetValue(AtlasApiHttpContextItems.CurrentUser, out var item) && item is User cachedUser)
+        {
+            return cachedUser;
+        }
+
+        var userId = context.User.FindFirstValue("sub");
+        if (!Guid.TryParse(userId, out var parsed))
+        {
+            return null;
+        }
+
+        return await db.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id == parsed, context.RequestAborted);
+    }
+
+    private sealed record LoginRequestBody(string? Email, string? Username, string? Password);
+
+    private static async Task<IResult> LinkedInAuthorize(
+        IConfiguration configuration,
         IOAuthStateStore stateStore,
-        IOAuthConfigResolver configResolver)
+        CancellationToken cancellationToken)
     {
-        var config = configResolver.Resolve();
-        if (!config.IsLinkedInConfigured)
+        var oauth = GetOAuthSettings(configuration);
+        if (string.IsNullOrWhiteSpace(oauth.LinkedInClientId))
         {
             return Results.Json(
                 new { detail = "LinkedIn OAuth not configured" },
                 statusCode: StatusCodes.Status503ServiceUnavailable);
         }
 
-        var state = stateStore.CreateState();
-        var authUrl = OAuthUrlBuilder.BuildLinkedInAuthorizeUrl(
-            config.LinkedInClientId,
-            config.LinkedInRedirectUri,
-            state);
-
-        return Results.Ok(new
+        var state = await stateStore.CreateStateAsync(cancellationToken);
+        var query = new Dictionary<string, string>
         {
-            url = authUrl,
-            state,
-        });
+            ["response_type"] = "code",
+            ["client_id"] = oauth.LinkedInClientId,
+            ["redirect_uri"] = oauth.LinkedInRedirectUri,
+            ["state"] = state,
+            ["scope"] = "openid profile email",
+        };
+        var authUrl = $"{LinkedInAuthUrl}?{BuildQueryString(query)}";
+        return Results.Json(new { url = authUrl, state });
     }
 
-    private static Task<IResult> LinkedInCallback(
-        string code,
-        string state,
-        AtlasDbContext db,
+    private static async Task<IResult> GoogleAuthorize(
+        IConfiguration configuration,
         IOAuthStateStore stateStore,
-        IOAuthConfigResolver configResolver,
-        IOAuthProviderClient providerClient,
-        IJwtTokenFactory jwtTokenFactory,
         CancellationToken cancellationToken)
     {
-        return HandleOAuthCallbackAsync(
-            code,
-            state,
-            provider: "linkedin",
-            isProviderConfigured: config => config.IsLinkedInConfigured,
-            getUserInfo: (client, authCode, config, ct) =>
-                client.GetLinkedInUserInfoAsync(authCode, config, ct),
-            linkOnlyIfProviderUnset: false,
-            db,
-            stateStore,
-            configResolver,
-            providerClient,
-            jwtTokenFactory,
-            cancellationToken);
-    }
-
-    private static IResult GoogleAuthorize(
-        IOAuthStateStore stateStore,
-        IOAuthConfigResolver configResolver)
-    {
-        var config = configResolver.Resolve();
-        if (!config.IsGoogleConfigured)
+        var oauth = GetOAuthSettings(configuration);
+        if (string.IsNullOrWhiteSpace(oauth.GoogleClientId))
         {
             return Results.Json(
                 new { detail = "Google OAuth not configured" },
                 statusCode: StatusCodes.Status503ServiceUnavailable);
         }
 
-        var state = stateStore.CreateState();
-        var authUrl = OAuthUrlBuilder.BuildGoogleAuthorizeUrl(
-            config.GoogleClientId,
-            config.GoogleRedirectUri,
-            state);
-
-        return Results.Ok(new
+        var state = await stateStore.CreateStateAsync(cancellationToken);
+        var query = new Dictionary<string, string>
         {
-            url = authUrl,
-            state,
-        });
+            ["response_type"] = "code",
+            ["client_id"] = oauth.GoogleClientId,
+            ["redirect_uri"] = oauth.GoogleRedirectUri,
+            ["state"] = state,
+            ["scope"] = "openid email profile",
+            ["access_type"] = "offline",
+            ["prompt"] = "select_account",
+        };
+        var authUrl = $"{GoogleAuthUrl}?{BuildQueryString(query)}";
+        return Results.Json(new { url = authUrl, state });
     }
 
-    private static Task<IResult> GoogleCallback(
-        string code,
-        string state,
-        AtlasDbContext db,
+    private static async Task<IResult> LinkedInCallback(
+        HttpContext context,
+        string? code,
+        string? state,
         IOAuthStateStore stateStore,
-        IOAuthConfigResolver configResolver,
         IOAuthProviderClient providerClient,
-        IJwtTokenFactory jwtTokenFactory,
-        CancellationToken cancellationToken)
+        IJwtTokenFactory tokenFactory)
     {
-        return HandleOAuthCallbackAsync(
-            code,
-            state,
-            provider: "google",
-            isProviderConfigured: config => config.IsGoogleConfigured,
-            getUserInfo: (client, authCode, config, ct) =>
-                client.GetGoogleUserInfoAsync(authCode, config, ct),
-            linkOnlyIfProviderUnset: true,
-            db,
-            stateStore,
-            configResolver,
-            providerClient,
-            jwtTokenFactory,
-            cancellationToken);
-    }
-
-    // --- Shared helpers ---
-
-    private static async Task<IResult> HandleOAuthCallbackAsync(
-        string code,
-        string state,
-        string provider,
-        Func<OAuthResolvedConfig, bool> isProviderConfigured,
-        Func<IOAuthProviderClient, string, OAuthResolvedConfig, CancellationToken, Task<(OAuthUserInfo? UserInfo, string? ErrorCode)>> getUserInfo,
-        bool linkOnlyIfProviderUnset,
-        AtlasDbContext db,
-        IOAuthStateStore stateStore,
-        IOAuthConfigResolver configResolver,
-        IOAuthProviderClient providerClient,
-        IJwtTokenFactory jwtTokenFactory,
-        CancellationToken cancellationToken)
-    {
-        var config = configResolver.Resolve();
-        if (!stateStore.TryConsume(state))
+        var frontend = GetFrontendUrl(context.RequestServices);
+        if (string.IsNullOrEmpty(state) || !await stateStore.TryConsumeStateAsync(state, context.RequestAborted))
         {
-            return RedirectToLoginWithError(config.FrontendUrl, "invalid_state");
+            return Results.Redirect($"{frontend}/login?error=invalid_state");
         }
 
-        if (!isProviderConfigured(config))
+        var config = context.RequestServices.GetRequiredService<IConfiguration>();
+        var oauth = GetOAuthSettings(config);
+        if (string.IsNullOrWhiteSpace(oauth.LinkedInClientId) || string.IsNullOrWhiteSpace(oauth.LinkedInClientSecret))
         {
-            return RedirectToLoginWithError(config.FrontendUrl, "oauth_not_configured");
+            return Results.Redirect($"{frontend}/login?error=oauth_not_configured");
+        }
+
+        if (string.IsNullOrEmpty(code))
+        {
+            return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
         }
 
         try
         {
-            var (userInfo, errorCode) = await getUserInfo(providerClient, code, config, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(errorCode))
+            var userInfo = await providerClient.ExchangeCodeForUserAsync("linkedin", code, context.RequestAborted);
+            if (userInfo is null)
             {
-                return RedirectToLoginWithError(config.FrontendUrl, errorCode);
+                return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
             }
 
-            if (string.IsNullOrWhiteSpace(userInfo?.Sub) || string.IsNullOrWhiteSpace(userInfo?.Email))
+            if (string.IsNullOrEmpty(userInfo.ProviderId) || string.IsNullOrEmpty(userInfo.Email))
             {
-                return RedirectToLoginWithError(config.FrontendUrl, "missing_user_data");
+                return Results.Redirect($"{frontend}/login?error=missing_user_data");
             }
 
-            var user = await UpsertOAuthUserAsync(
+            var fullName = userInfo.Name ?? $"{userInfo.GivenName ?? ""} {userInfo.FamilyName ?? ""}".Trim();
+            var socialLinks = JsonDocument.Parse(JsonSerializer.Serialize(new Dictionary<string, string> { ["linkedin"] = $"https://linkedin.com/in/{userInfo.ProviderId}" }));
+
+            var db = context.RequestServices.GetRequiredService<AtlasDbContext>();
+            var user = await UpsertOAuthUser(
                 db,
-                provider,
-                userInfo,
-                linkOnlyIfProviderUnset,
-                cancellationToken);
+                provider: "linkedin",
+                providerId: userInfo.ProviderId,
+                email: userInfo.Email,
+                fullName,
+                userInfo.PictureUrl,
+                socialLinks);
 
-            var tokens = jwtTokenFactory.CreateTokenPair(user.Id);
-            return Results.Redirect(BuildCallbackRedirectUrl(config.FrontendUrl, tokens));
+            var accessToken = await tokenFactory.CreateAccessTokenAsync(user.Id, context.RequestAborted);
+            var refreshToken = await tokenFactory.CreateRefreshTokenAsync(user.Id, context.RequestAborted);
+            return Results.Redirect($"{frontend}/oauth/callback#access_token={Uri.EscapeDataString(accessToken)}&refresh_token={Uri.EscapeDataString(refreshToken)}&token_type=bearer");
         }
         catch (HttpRequestException)
         {
-            return RedirectToLoginWithError(config.FrontendUrl, "network_error");
+            return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
+        }
+        catch (InvalidOperationException)
+        {
+            return Results.Redirect($"{frontend}/login?error=userinfo_failed");
         }
     }
 
-    private static async Task<User> UpsertOAuthUserAsync(
+    private static async Task<IResult> GoogleCallback(
+        HttpContext context,
+        string? code,
+        string? state,
+        IOAuthStateStore stateStore,
+        IOAuthProviderClient providerClient,
+        IJwtTokenFactory tokenFactory)
+    {
+        var frontend = GetFrontendUrl(context.RequestServices);
+        if (string.IsNullOrEmpty(state) || !await stateStore.TryConsumeStateAsync(state, context.RequestAborted))
+        {
+            return Results.Redirect($"{frontend}/login?error=invalid_state");
+        }
+
+        var config = context.RequestServices.GetRequiredService<IConfiguration>();
+        var oauth = GetOAuthSettings(config);
+        if (string.IsNullOrWhiteSpace(oauth.GoogleClientId) || string.IsNullOrWhiteSpace(oauth.GoogleClientSecret))
+        {
+            return Results.Redirect($"{frontend}/login?error=oauth_not_configured");
+        }
+
+        if (string.IsNullOrEmpty(code))
+        {
+            return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
+        }
+
+        try
+        {
+            var userInfo = await providerClient.ExchangeCodeForUserAsync("google", code, context.RequestAborted);
+            if (userInfo is null)
+            {
+                return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
+            }
+
+            if (string.IsNullOrEmpty(userInfo.ProviderId) || string.IsNullOrEmpty(userInfo.Email))
+            {
+                return Results.Redirect($"{frontend}/login?error=missing_user_data");
+            }
+
+            var fullName = userInfo.Name ?? $"{userInfo.GivenName ?? ""} {userInfo.FamilyName ?? ""}".Trim();
+
+            var db = context.RequestServices.GetRequiredService<AtlasDbContext>();
+            var user = await UpsertOAuthUser(
+                db,
+                provider: "google",
+                providerId: userInfo.ProviderId,
+                email: userInfo.Email,
+                fullName,
+                userInfo.PictureUrl,
+                socialLinks: null);
+
+            var accessToken = await tokenFactory.CreateAccessTokenAsync(user.Id, context.RequestAborted);
+            var refreshToken = await tokenFactory.CreateRefreshTokenAsync(user.Id, context.RequestAborted);
+            return Results.Redirect($"{frontend}/oauth/callback#access_token={Uri.EscapeDataString(accessToken)}&refresh_token={Uri.EscapeDataString(refreshToken)}&token_type=bearer");
+        }
+        catch (HttpRequestException)
+        {
+            return Results.Redirect($"{frontend}/login?error=token_exchange_failed");
+        }
+        catch (InvalidOperationException)
+        {
+            return Results.Redirect($"{frontend}/login?error=userinfo_failed");
+        }
+    }
+
+    private static string BuildQueryString(Dictionary<string, string> query)
+    {
+        return string.Join("&", query.Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
+    }
+
+    private static OAuthSettings GetOAuthSettings(IConfiguration configuration)
+    {
+        var oauth = configuration.GetSection("OAuthSettings").Get<OAuthSettings>() ?? new OAuthSettings();
+        var app = configuration.GetSection("AppSettings").Get<AppSettings>();
+        if (!string.IsNullOrWhiteSpace(app?.FrontendUrl))
+        {
+            oauth.FrontendUrl = app.FrontendUrl;
+        }
+        return oauth;
+    }
+
+    private static string GetFrontendUrl(IServiceProvider services)
+    {
+        var config = services.GetRequiredService<IConfiguration>();
+        var oauth = GetOAuthSettings(config);
+        return string.IsNullOrWhiteSpace(oauth.FrontendUrl) ? "http://localhost:5010" : oauth.FrontendUrl.TrimEnd('/');
+    }
+
+    private static async Task<User> UpsertOAuthUser(
         AtlasDbContext db,
         string provider,
-        OAuthUserInfo userInfo,
-        bool linkOnlyIfProviderUnset,
-        CancellationToken cancellationToken)
+        string providerId,
+        string email,
+        string fullName,
+        string? profilePictureUrl,
+        JsonDocument? socialLinks)
     {
-        var providerId = userInfo.Sub!;
-        var email = userInfo.Email!;
-        var now = DateTime.UtcNow;
+        var user = await db.Users
+            .Include(u => u.Profile)
+            .FirstOrDefaultAsync(u => u.OauthProvider == provider && u.OauthProviderId == providerId);
 
-        var user = await db.Users.SingleOrDefaultAsync(
-            u => u.OauthProvider == provider && u.OauthProviderId == providerId,
-            cancellationToken);
+        var isNewUser = false;
 
         if (user is null)
         {
-            user = await db.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
+            var existingByEmail = await db.Users.Include(u => u.Profile).FirstOrDefaultAsync(u => u.Email == email);
+            if (existingByEmail is not null)
+            {
+                if (provider == "google" && !string.IsNullOrEmpty(existingByEmail.OauthProvider))
+                {
+                    user = existingByEmail;
+                }
+                else
+                {
+                    existingByEmail.OauthProvider = provider;
+                    existingByEmail.OauthProviderId = providerId;
+                    user = existingByEmail;
+                }
+            }
+
             if (user is null)
             {
+                isNewUser = true;
                 user = new User
                 {
                     Id = Guid.NewGuid(),
@@ -397,183 +443,72 @@ public static class AuthEndpoints
                     HashedPassword = null,
                     OauthProvider = provider,
                     OauthProviderId = providerId,
-                    SubscriptionTier = "free",
-                    SubscriptionStatus = "free",
-                    ResumeGenerationsUsed = 0,
-                    CreatedAt = now,
-                    UpdatedAt = now,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 };
                 db.Users.Add(user);
-            }
-            else
-            {
-                if (!linkOnlyIfProviderUnset || string.IsNullOrWhiteSpace(user.OauthProvider))
+                await db.SaveChangesAsync();
+
+                var profile = new UserProfile
                 {
-                    user.OauthProvider = provider;
-                    user.OauthProviderId = providerId;
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    FullName = fullName,
+                    ProfilePictureUrl = profilePictureUrl,
+                    SocialLinks = socialLinks,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
+                db.UserProfiles.Add(profile);
+            }
+
+            await db.SaveChangesAsync();
+        }
+
+        if (!isNewUser)
+        {
+            var profile = user.Profile ?? await db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            if (profile is not null)
+            {
+                if (string.IsNullOrEmpty(profile.FullName) && !string.IsNullOrEmpty(fullName))
+                    profile.FullName = fullName;
+
+                if (provider == "linkedin")
+                {
+                    if (!string.IsNullOrEmpty(profilePictureUrl) &&
+                        (string.IsNullOrEmpty(profile.ProfilePictureUrl) ||
+                         (profile.ProfilePictureUrl?.StartsWith("http", StringComparison.OrdinalIgnoreCase) ?? false)))
+                        profile.ProfilePictureUrl = profilePictureUrl;
+                    if (socialLinks is not null && providerId is not null)
+                        profile.SocialLinks = EnsureLinkedInSocialLink(profile.SocialLinks, providerId);
+                }
+                else if (provider == "google" && string.IsNullOrEmpty(profile.ProfilePictureUrl) && !string.IsNullOrEmpty(profilePictureUrl))
+                {
+                    profile.ProfilePictureUrl = profilePictureUrl;
                 }
 
-                user.UpdatedAt = now;
+                profile.UpdatedAt = DateTime.UtcNow;
+                await db.SaveChangesAsync();
             }
         }
-        else
-        {
-            user.UpdatedAt = now;
-        }
-
-        await db.SaveChangesAsync(cancellationToken);
-        await UpsertUserProfileAsync(db, user, provider, providerId, userInfo, now, cancellationToken);
 
         return user;
     }
 
-    private static async Task UpsertUserProfileAsync(
-        AtlasDbContext db,
-        User user,
-        string provider,
-        string providerId,
-        OAuthUserInfo userInfo,
-        DateTime now,
-        CancellationToken cancellationToken)
+    private static JsonDocument EnsureLinkedInSocialLink(JsonDocument? existing, string linkedinId)
     {
-        var profile = await db.UserProfiles
-            .SingleOrDefaultAsync(p => p.UserId == user.Id, cancellationToken);
-
-        var fullName = ResolveDisplayName(userInfo);
-
-        if (profile is null)
+        var dict = new Dictionary<string, string>();
+        if (existing is not null)
         {
-            profile = new UserProfile
+            foreach (var prop in existing.RootElement.EnumerateObject())
             {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                FullName = fullName,
-                ProfilePictureUrl = userInfo.Picture,
-                SocialLinks = BuildSocialLinksDocument(provider, providerId),
-                CompletenessScore = 0,
-                CreatedAt = now,
-                UpdatedAt = now,
-            };
-            db.UserProfiles.Add(profile);
-        }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(profile.FullName) && !string.IsNullOrWhiteSpace(fullName))
-            {
-                profile.FullName = fullName;
+                if (prop.Value.ValueKind == JsonValueKind.String)
+                    dict[prop.Name] = prop.Value.GetString() ?? "";
             }
-
-            if (!string.IsNullOrWhiteSpace(userInfo.Picture) && string.IsNullOrWhiteSpace(profile.ProfilePictureUrl))
-            {
-                profile.ProfilePictureUrl = userInfo.Picture;
-            }
-
-            profile.SocialLinks = MergeSocialLinks(profile.SocialLinks, provider, providerId);
-            profile.UpdatedAt = now;
         }
-
-        await db.SaveChangesAsync(cancellationToken);
+        if (!dict.ContainsKey("linkedin"))
+            dict["linkedin"] = $"https://linkedin.com/in/{linkedinId}";
+        return JsonDocument.Parse(JsonSerializer.Serialize(dict));
     }
 
-    private static bool CanAccessPremiumFeatures(User user)
-    {
-        if (user.IsAdmin)
-            return true;
-
-        return user.SubscriptionTier == "paid"
-               && user.SubscriptionStatus is "active" or "trialing" or "past_due";
-    }
-
-    private static string GeneratePasswordResetToken()
-    {
-        var bytes = new byte[32];
-        RandomNumberGenerator.Fill(bytes);
-        return Convert.ToBase64String(bytes)
-            .Replace("+", "-")
-            .Replace("/", "_")
-            .TrimEnd('=');
-    }
-
-    private static string HashResetToken(string token, string secretKey)
-    {
-        var salted = $"{token}{secretKey}";
-        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(salted));
-        return Convert.ToHexStringLower(hashBytes);
-    }
-
-    private static string ResolveDisplayName(OAuthUserInfo userInfo)
-    {
-        if (!string.IsNullOrWhiteSpace(userInfo.Name))
-        {
-            return userInfo.Name;
-        }
-
-        var composite = $"{userInfo.GivenName} {userInfo.FamilyName}".Trim();
-        return string.IsNullOrWhiteSpace(composite) ? "" : composite;
-    }
-
-    private static JsonDocument? BuildSocialLinksDocument(string provider, string providerId)
-    {
-        var profileUrl = BuildProviderProfileUrl(provider, providerId);
-        if (profileUrl is null)
-        {
-            return null;
-        }
-
-        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            [provider] = profileUrl,
-        };
-
-        return JsonDocument.Parse(JsonSerializer.Serialize(map));
-    }
-
-    private static JsonDocument? MergeSocialLinks(JsonDocument? existing, string provider, string providerId)
-    {
-        var profileUrl = BuildProviderProfileUrl(provider, providerId);
-        if (profileUrl is null)
-        {
-            return existing;
-        }
-
-        Dictionary<string, string> map;
-        if (existing is null)
-        {
-            map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-        else
-        {
-            map = JsonSerializer.Deserialize<Dictionary<string, string>>(existing.RootElement.GetRawText())
-                ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        if (!map.ContainsKey(provider))
-        {
-            map[provider] = profileUrl;
-        }
-
-        return JsonDocument.Parse(JsonSerializer.Serialize(map));
-    }
-
-    private static string? BuildProviderProfileUrl(string provider, string providerId)
-    {
-        return provider.Equals("linkedin", StringComparison.OrdinalIgnoreCase)
-            ? $"https://linkedin.com/in/{providerId}"
-            : null;
-    }
-
-    private static IResult RedirectToLoginWithError(string frontendUrl, string errorCode)
-    {
-        var baseUrl = frontendUrl.TrimEnd('/');
-        return Results.Redirect($"{baseUrl}/login?error={Uri.EscapeDataString(errorCode)}");
-    }
-
-    private static string BuildCallbackRedirectUrl(string frontendUrl, TokenResponse tokenResponse)
-    {
-        var baseUrl = frontendUrl.TrimEnd('/');
-        return $"{baseUrl}/oauth/callback" +
-               $"#access_token={Uri.EscapeDataString(tokenResponse.AccessToken)}" +
-               $"&refresh_token={Uri.EscapeDataString(tokenResponse.RefreshToken)}" +
-               $"&token_type={Uri.EscapeDataString(tokenResponse.TokenType)}";
-    }
 }

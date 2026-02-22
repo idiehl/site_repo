@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Atlas.Api.Authentication;
-using Atlas.Api.Authentication.OAuth;
 using Atlas.Api.Endpoints;
 using Atlas.Apply.Services.Admin;
 using Atlas.Apply.Services.Applications;
@@ -15,11 +13,6 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseStaticWebAssets();
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-});
-
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
@@ -31,7 +24,7 @@ builder.Services.AddDbContext<AtlasDbContext>(options =>
     options.UseNpgsql(defaultConnection));
 
 builder.Services.AddAtlasJwtAuthentication(builder.Configuration);
-builder.Services.AddOAuthCore();
+builder.Services.AddAtlasOAuthServices(builder.Configuration);
 builder.Services.AddScoped<BrowserTokenStore>();
 builder.Services.AddScoped<ApplyAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<ApplyAuthenticationStateProvider>());
