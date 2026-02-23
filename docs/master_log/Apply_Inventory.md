@@ -288,3 +288,63 @@ Routes: / (redirect), /login, /register, /dashboard, /jobs/:id, /profile, /appli
 | File | Lines | Description |
 |------|-------|-------------|
 | `src/assets/main.css` | 103 | Global styles, Tailwind directives, dark theme customization. |
+
+## Auth Endpoints
+| Endpoint | Method | Path | Status |
+|----------|--------|------|--------|
+| Register | POST | /api/v2/auth/register | Implemented |
+| Login | POST | /api/v2/auth/login | Implemented |
+| Get Current User | GET | /api/v2/auth/me | Implemented |
+| Logout | POST | /api/v2/auth/logout | Implemented |
+| Request Password Reset | POST | /api/v2/auth/password-reset/request | Implemented |
+| Confirm Password Reset | POST | /api/v2/auth/password-reset/confirm | Implemented |
+| LinkedIn Authorize | GET | /api/v2/auth/linkedin/authorize | Implemented |
+| LinkedIn Callback | GET | /api/v2/auth/linkedin/callback | Implemented |
+| Google Authorize | GET | /api/v2/auth/google/authorize | Implemented |
+| Google Callback | GET | /api/v2/auth/google/callback | Implemented |
+
+## Routing Configuration
+| Path Pattern | Backend | Port | Notes |
+|---|---|---|---|
+| /api/v2/* | .NET Kestrel (Atlas.Apply) | 5010 | Phase 3 cutover - live |
+| /api/* | Python/FastAPI (uvicorn) | 8000 | Legacy v1 - still active |
+| /healthz | .NET Kestrel | 5010 | Direct routing |
+| /health | Python/FastAPI | 8000 | Legacy health check |
+| / | Vue SPA (static files) | - | try_files fallback |
+
+## Phase 3 Migration Deltas (2026-02-22)
+### `src/Atlas.Apply` — Blazor Route Migration Surface
+
+| Attribute | Value |
+|-----------|-------|
+| Type | `.razor` / `.cs` |
+| Scope | login, register, oauth callback, dashboard, job detail, profile, applications, extension, admin |
+
+Blazor route migration completed for the primary Atlas Apply user and admin route set.
+
+### `src/Atlas.Apply` — Auth + State Layer
+
+| Attribute | Value |
+|-----------|-------|
+| Type | services/state/auth provider |
+| Scope | auth state provider, route gating updates, auth/admin/profile/applications/jobs state services |
+
+Auth state and route gating behavior updated to align with Blazor route ownership.
+
+### `deploy/nginx/atlas-route-map.conf`
+
+| Attribute | Value |
+|-----------|-------|
+| Type | `.conf` |
+| Scope | `map $request_uri $apply_frontend_backend` |
+| Change | `default` switched to `atlas_dotnet_apply` |
+
+Traffic selection for Apply frontend now defaults to the .NET Apply upstream in this migration batch.
+
+### `docs/architecture` — Phase 3 Governance Artifacts
+
+- `Identity_Migration_Decision.md`
+- `Phase3_Readiness_Report_2026-02-22.md`
+- `Phase3_Promotion_Gates_2026-02-22.md`
+
+Decision/readiness/promotion documentation recorded as part of migration promotion controls.

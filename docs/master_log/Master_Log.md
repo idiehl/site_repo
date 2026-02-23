@@ -2875,3 +2875,210 @@ dotnet build AtlasUniversalis.sln  # 17 projects, 0 warnings, 0 errors
 **Verification:** Full solution builds with 0 warnings, 0 errors across all 17 projects. All 10 routes confirmed via @page directives: / (landing), /meridian, /dev (login), /dev/dashboard, /dev/log, /dev/overview, /dev/apps/{appId}/log, /dev/apps/{appId}/overview, /dev/apps/{appId}/checklist, /dev/apps/{appId}/inventory. Plus /dev/logout bonus route. SEO meta tags present on landing and Meridian pages.
 **Notes:** No production deployment — code is local only. _Host.cshtml route changed to /blazor to avoid ambiguous match with Index.cshtml. DevAuthFilter uses simple cookie check (not JWT) for admin-only portal. Next phase: Phase 3 (Atlas Apply migration) or production deployment.
 **Concepts:** @concept:dotnet @concept:frontend @concept:auth @concept:master-log @concept:deployment
+---
+
+## AU-C01-20260221-004 — Phase 3 reconciliation + five-agent workflow bootstrap
+
+**Type:** Ops  
+**Context:** Phase 3 Integration and Hardening — reconciliation batch to sync local checkout with remote and establish five-agent workflow with gate-enforced promotion.  
+**Change summary:**
+- Reconciled D:\www\atlasuniversalis with origin/master (63656e8), eliminating behind-1 divergence and duplicate OAuth paths.
+- Added .cursor/agents/phase3-integrator.md — batch owner for P3-01..P3-18 with required handoff contract.
+- Updated deploy, ci-monitor, test-runner, doc-ops, post-deploy-docs agents with Phase 3 gate enforcement and deterministic tiering.
+
+**Rationale / tradeoffs:** Not provided  
+**Files touched:**
+- `.cursor/agents/phase3-integrator.md`
+- `.cursor/agents/deploy.md`
+- `.cursor/agents/ci-monitor.md`
+- `.cursor/agents/test-runner.md`
+- `.cursor/agents/doc-ops.md`
+- `.cursor/agents/post-deploy-docs.md`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** dotnet build succeeded (0 warnings, 0 errors). git status clean except agent defs. Push to origin/master succeeded.  
+**Notes:** None  
+**Concepts:** @concept:auth @concept:deployment @concept:master-log
+---
+
+## AU-C01-20260221-005 — Phase 3: Auth Endpoint Hardening
+
+**Type:** Feature  
+**Context:** Hardened six auth stub endpoints with real business logic matching Python v1 parity. Resolved duplicate OAuth paths.  
+**Change summary:**
+- Implemented Register/Login/GetCurrentUser/Logout/PasswordReset endpoints
+- Added bcrypt password hashing and SHA-256 reset token hashing for Python parity
+- Added BCrypt.Net-Next package reference and LoginRequest contract
+- Resolved duplicate OAuth implementation paths (canonical: Authentication/OAuth/*)
+
+**Rationale / tradeoffs:** Phase 3 requires full auth parity between Python v1 and .NET v2 for cutover  
+**Files touched:**
+- `src/Atlas.Api/Atlas.Api.csproj`
+- `src/Atlas.Api/Endpoints/AuthEndpoints.cs`
+- `src/Atlas.Contracts/Auth/LoginRequest.cs`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** dotnet build: 0 errors, 0 warnings. dotnet test: pass. Smoke tests: 4/4 auth routes pass.  
+**Notes:** None  
+**Concepts:** JWT parity bcrypt SHA-256 reset tokens OAuth reconciliation dual-stack auth
+---
+
+## AU-C01-20260221-006 — Phase 3: Frontend Auth Store Port + Nginx v2 Cutover
+
+**Type:** Feature  
+**Context:** Ported Pinia auth store from v1 to v2 API endpoints, performed Nginx cutover routing /api/v2/ to .NET, configured snake_case JSON serialization.  
+**Change summary:**
+- Ported auth store to /api/v2/auth/* endpoints
+- Changed login from form-urlencoded to JSON body
+- Nginx cutover: /api/v2/ -> .NET Kestrel at port 5010
+- Added snake_case JSON serialization policy
+- Vite dev proxy updated for dual-stack local dev
+
+**Rationale / tradeoffs:** Complete the Phase 3 auth cutover pipeline from backend through Nginx routing to frontend consumption  
+**Files touched:**
+- `frontend/src/stores/auth.js`
+- `frontend/vite.config.js`
+- `src/Atlas.Apply/Program.cs`
+- `/etc/nginx/sites-available/atlas-apply (server)`
+
+**Commands run:**
+```bash
+None
+```
+
+**Verification:** 8/8 post-cutover smoke tests pass. Both CI workflows green for f72bcf8. All v2 auth endpoints confirmed routing to .NET.  
+**Notes:** None  
+**Concepts:** Nginx cutover Pinia store migration snake_case serialization dual-stack routing v1/v2 API coexistence
+---
+
+## AU-C01-20260222-001 — Phase 3 Atlas Apply Migration Batch Docs Sync
+
+**Type:** Docs  
+**Context:** Phase 3 Atlas Apply migration batch completed route-level Blazor migration and supporting auth/service/deploy updates. Documentation needed a full-tier sync to capture infra-impact route map changes and readiness artifacts.  
+**Change summary:**
+- Recorded completion of Blazor route migration for login/register/oauth callback/dashboard/job detail/profile/applications/extension/admin in src/Atlas.Apply.
+- Captured auth state provider and route-gating updates plus new Apply services/state services for auth/admin/profile/applications/jobs.
+- Documented deploy map change in deploy/nginx/atlas-route-map.conf where apply_frontend_backend default switches to atlas_dotnet_apply.
+- Included architecture artifact scope for Identity_Migration_Decision.md, Phase3_Readiness_Report_2026-02-22.md, and Phase3_Promotion_Gates_2026-02-22.md.
+- Synced Atlas Apply app docs (log/overview/inventory/checklist) and refreshed dev status metadata for this batch.
+
+**Rationale / tradeoffs:** This migration batch affects both application behavior and deployment routing, so Full tier is required to keep operational records, app-level docs, and status signaling aligned before promotion.  
+**Files touched:**
+- `src/Atlas.Apply`
+- `deploy/nginx/atlas-route-map.conf`
+- `docs/architecture/Identity_Migration_Decision.md`
+- `docs/architecture/Phase3_Readiness_Report_2026-02-22.md`
+- `docs/architecture/Phase3_Promotion_Gates_2026-02-22.md`
+- `docs/master_log/Master_Log.md`
+- `docs/master_log/Apply_Log.md`
+- `docs/master_log/Apply_Overview.md`
+- `docs/master_log/Apply_Inventory.md`
+- `docs/master_log/Apply_Checklist.md`
+- `docs/master_log/dev_status.json`
+
+**Commands run:**
+```bash
+atlasops-dashboard.get_dev_status
+atlasops-dashboard.append_master_log_entry
+atlasops-dashboard.append_app_log_entry
+atlasops-dashboard.update_app_overview_section
+atlasops-dashboard.update_app_inventory_section
+atlasops-dashboard.update_app_checklist
+atlasops-dashboard.set_dev_status
+```
+
+**Verification:** Documentation sync calls completed through atlasops-dashboard MCP without tool errors. App log, overview, inventory, checklist, and status payloads were applied for atlas-apply.  
+**Notes:** During local validation, the three architecture files listed in scope were not discoverable at docs/architecture/* in this workspace snapshot and may require path/branch reconciliation.  
+**Concepts:** @concept:auth @concept:frontend @concept:deployment @concept:master-log
+---
+
+## AU-C01-20260222-002 — Phase3 gate execution evidence
+
+**Type:** Ops  
+**Context:** Executed immediate Phase 3 staging gate checks against apply.atlasuniversalis.com and GitHub Actions API to collect real evidence for remaining promotion blockers.  
+**Change summary:**
+- Verified protected-route redirects for unauthenticated users on /dashboard, /applications, /profile, /admin.
+- Validated OAuth gate remains blocked: login page reports Google/LinkedIn OAuth not configured.
+- Queried recent GitHub Actions runs via public API and captured successful master run URLs, while noting no batch-specific CI evidence for local unpushed changes.
+- Updated gate/readiness/runbook docs with concrete evidence and updated required next steps.
+
+**Rationale / tradeoffs:** Convert prior assumptions into live evidence and keep NO-GO decision traceable with actionable closure criteria.  
+**Files touched:**
+- `docs/architecture/Phase3_Promotion_Gates_2026-02-22.md`
+- `docs/architecture/Phase3_Readiness_Report_2026-02-22.md`
+- `docs/architecture/Phase3_Staging_Gate_Runbook.md`
+
+**Commands run:**
+```bash
+Browser checks on apply.atlasuniversalis.com routes and login OAuth buttons
+curl.exe https://api.github.com/repos/idiehl/site_repo/actions/runs?per_page=10
+```
+
+**Verification:** Live browser snapshots confirmed route redirects and OAuth misconfiguration; GitHub API response confirmed recent successful master workflow runs.  
+**Notes:** None  
+**Concepts:** None
+---
+
+## AU-C01-20260222-003 — JWT dual-stack parity fix
+
+**Type:** Fix  
+**Context:** Phase 3 gate execution found legacy tokens authorize v1 endpoints but fail v2 endpoints on live staging checks.  
+**Change summary:**
+- Added JWT settings precedence fix in Atlas.Api auth bootstrap so environment/config values are honored instead of default class initializers.
+- Verified build success for Atlas.Apply/Atlas.Api after fix.
+- Updated Phase 3 readiness, promotion gate, and runbook docs with concrete live evidence: v1 token success, v2 token 401, OAuth provider misconfiguration blocker.
+
+**Rationale / tradeoffs:** Unblock JWT coexistence gate by ensuring .NET token validation uses the same signing configuration path expected in production.  
+**Files touched:**
+- `src/Atlas.Api/Authentication/JwtAuthenticationExtensions.cs`
+- `docs/architecture/Phase3_Promotion_Gates_2026-02-22.md`
+- `docs/architecture/Phase3_Readiness_Report_2026-02-22.md`
+- `docs/architecture/Phase3_Staging_Gate_Runbook.md`
+
+**Commands run:**
+```bash
+curl POST /api/v1/auth/register
+curl POST /api/v1/auth/login
+curl GET /api/v1/auth/me,/api/v1/jobs,/api/v1/applications with bearer token
+curl GET /api/v2/auth/me,/api/v2/jobs with same bearer token
+dotnet build src/Atlas.Apply/Atlas.Apply.csproj
+```
+
+**Verification:** Legacy token returns 200 on v1 protected endpoints, 401 on v2 protected endpoints in live environment; local build succeeds after JWT config fix.  
+**Notes:** None  
+**Concepts:** None
+---
+
+## AU-C01-20260222-004 — Implement v2 auth core handlers
+
+**Type:** Feature  
+**Context:** Continued Phase 3 gate hardening to enable real .NET token issuance and dual-stack auth verification.  
+**Change summary:**
+- Implemented concrete /api/v2/auth/register, /api/v2/auth/login, /api/v2/auth/me behavior in Atlas.Api AuthEndpoints.
+- Added form+JSON login payload handling and BCrypt password verification for compatibility with existing clients.
+- Kept logout response explicit and retained existing OAuth endpoint behavior.
+- Updated readiness/gate/runbook docs to reflect that dual-stack remediation is now code-complete but deploy verification is still pending.
+
+**Rationale / tradeoffs:** Without non-stub v2 auth handlers, dual-stack JWT compatibility cannot be proven in staging because .NET-issued tokens are unavailable.  
+**Files touched:**
+- `src/Atlas.Api/Endpoints/AuthEndpoints.cs`
+- `docs/architecture/Phase3_Promotion_Gates_2026-02-22.md`
+- `docs/architecture/Phase3_Readiness_Report_2026-02-22.md`
+- `docs/architecture/Phase3_Staging_Gate_Runbook.md`
+
+**Commands run:**
+```bash
+dotnet build src/Atlas.Apply/Atlas.Apply.csproj
+```
+
+**Verification:** Build succeeded (0 warnings, 0 errors) after implementing v2 auth handlers.  
+**Notes:** None  
+**Concepts:** None

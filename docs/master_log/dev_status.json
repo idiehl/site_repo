@@ -1,6 +1,6 @@
 {
   "status": "READY",
-  "message": "Inventory table clipping fix deployed and verified on /dev",
-  "updated_at": "2026-02-19T02:28:38.454783+00:00",
-  "updated_by": "codex"
+  "message": "Phase 3 Atlas Apply migration batch documented: Blazor route migration, auth/state services, and apply_frontend_backend -> atlas_dotnet_apply. Promotion docs synced.",
+  "updated_at": "2026-02-22T16:13:31.877898+00:00",
+  "updated_by": "doc-ops"
 }
