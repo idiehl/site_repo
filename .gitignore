@@ -29,6 +29,7 @@ obj/
 
 # Runtime uploads
 atlasops/uploads/
+electracast/public/uploads/
 
 # Internal archives
 internal/Electracast_Codebase.zip
