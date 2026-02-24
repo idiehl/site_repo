@@ -65,6 +65,13 @@ public static class JwtAuthenticationExtensions
         {
             OnTokenValidated = async context =>
             {
+                var tokenType = context.Principal?.FindFirstValue("type");
+                if (string.Equals(tokenType, "refresh", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Fail("Refresh token cannot be used to access protected routes");
+                    return;
+                }
+
                 var userIdClaim = context.Principal?.FindFirstValue("sub");
                 if (!Guid.TryParse(userIdClaim, out var userId))
                 {

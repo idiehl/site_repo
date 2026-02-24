@@ -3082,3 +3082,93 @@ dotnet build src/Atlas.Apply/Atlas.Apply.csproj
 **Verification:** Build succeeded (0 warnings, 0 errors) after implementing v2 auth handlers.  
 **Notes:** None  
 **Concepts:** None
+
+---
+
+## AU-C01-20260224-001 — Phase 3 OAuth path consolidation and docs sync
+
+**Type:** Refactor  
+**Context:** Completed local reconciliation by removing duplicate OAuth implementation trees and retaining a single canonical runtime path to reduce merge/conflict risk in Phase 3.  
+**Change summary:**
+- Removed deprecated `src/Atlas.Api/Authentication/OAuth/` files and kept canonical OAuth runtime in `src/Atlas.Api/OAuth/`.
+- Synced docs with Phase 3 reconciliation context and added migration overview coverage.
+- Verified clean build/test after consolidation.
+
+**Rationale / tradeoffs:** Single-path ownership for OAuth reduces ambiguity and prevents accidental drift between sync/async implementations.  
+**Files touched:**
+- `src/Atlas.Api/Authentication/OAuth/*` (removed)
+- `docs/architecture/Migration_Overview.md`
+- `docs/master_log/Master_Log.md`
+- `docs/master_log/Apply_Log.md`
+- `docs/master_log/Apply_Overview.md`
+- `docs/master_log/Apply_Inventory.md`
+- `docs/master_log/Apply_Checklist.md`
+- `docs/master_log/dev_status.json`
+
+**Commands run:**
+```bash
+git rm -r src/Atlas.Api/Authentication/OAuth/
+dotnet build src/Atlas.Apply/Atlas.Apply.csproj
+dotnet test tests/Atlas.Api.Tests/
+git commit
+git push origin master
+```
+
+**Verification:** Build succeeded (0 warnings, 0 errors); tests passed; push completed.  
+**Notes:** Canonical OAuth path is `src/Atlas.Api/OAuth/`; `src/Atlas.Api/Authentication/OAuth/` is retired.  
+**Concepts:** @concept:auth @concept:api @concept:master-log
+
+---
+
+## AU-C01-20260224-002 — Runtime uploads hygiene for ElectraCast
+
+**Type:** Ops  
+**Context:** Server worktree was repeatedly reported dirty from runtime uploads under `electracast/public/uploads/`.  
+**Change summary:**
+- Added `electracast/public/uploads/` to `.gitignore` to keep runtime artifacts out of git status.
+
+**Rationale / tradeoffs:** Runtime-generated media should not appear as source-control drift in deployment worktrees.  
+**Files touched:**
+- `.gitignore`
+
+**Commands run:**
+```bash
+git add .gitignore
+git commit
+git push origin master
+```
+
+**Verification:** Commit pushed and repository stays clean in normal development flows.  
+**Notes:** Long-term option remains externalizing uploads to object storage.  
+**Concepts:** @concept:deployment @concept:master-log
+
+---
+
+## AU-C01-20260224-003 — Round 2 auth hardening and v2 client alignment
+
+**Type:** Fix  
+**Context:** Round 2 three-agent pipeline targeted auth safety, v1/v2 endpoint consistency, and readiness verification before next Phase 3 promotion steps.  
+**Change summary:**
+- Blocked refresh tokens from being accepted on protected JWT routes.
+- Hardened OAuth provider parsing to fail closed on malformed token/userinfo payloads.
+- Aligned Atlas Apply auth client calls to `/api/v2/auth/*` for login/register/authorize/me.
+- Added regression tests for refresh-token rejection and malformed OAuth provider JSON handling.
+
+**Rationale / tradeoffs:** Reduces auth misuse risk and improves parity between API versioning and client behavior while keeping migration scope minimal.  
+**Files touched:**
+- `src/Atlas.Api/Authentication/JwtAuthenticationExtensions.cs`
+- `src/Atlas.Api/OAuth/OAuthProviderClient.cs`
+- `src/Atlas.Apply/Services/Auth/ApplyAuthApiClient.cs`
+- `src/Atlas.Apply/Services/Dashboard/ApplyDashboardApiClient.cs`
+- `tests/Atlas.Api.Tests/Authentication/JwtAuthenticationExtensionsTests.cs`
+- `tests/Atlas.Api.Tests/OAuth/OAuthProviderClientTests.cs`
+
+**Commands run:**
+```bash
+dotnet test tests/Atlas.Api.Tests/Atlas.Api.Tests.csproj --nologo
+dotnet build src/Atlas.Apply/Atlas.Apply.csproj --nologo
+```
+
+**Verification:** Tests passed (7/7) and build succeeded (0 warnings, 0 errors).  
+**Notes:** OAuth end-to-end with live provider credentials remains a gate blocker for production validation.  
+**Concepts:** @concept:auth @concept:api @concept:deployment @concept:master-log

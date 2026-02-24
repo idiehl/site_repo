@@ -27,3 +27,9 @@ This log tracks changes specific to Atlas Apply (AtlasOps).
 - New Apply services/state services documented for auth/admin/profile/applications/jobs.
 - Deploy route map update documented: deploy/nginx/atlas-route-map.conf apply_frontend_backend default switched to atlas_dotnet_apply.
 - Architecture governance docs scoped for this batch: Identity_Migration_Decision.md, Phase3_Readiness_Report_2026-02-22.md, Phase3_Promotion_Gates_2026-02-22.md.
+
+## 2026-02-24
+- Canonical OAuth implementation path is now `src/Atlas.Api/OAuth/`; deprecated `src/Atlas.Api/Authentication/OAuth/` was removed in reconciliation.
+- Atlas Apply auth client calls were aligned to `/api/v2/auth/*` for login, register, Google/LinkedIn authorize, and current-user fetch.
+- Added auth hardening in API: refresh tokens are rejected for protected-route access and malformed OAuth provider payloads now fail closed.
+- Added regression tests for refresh-token rejection and invalid OAuth provider JSON handling (7/7 tests passing).

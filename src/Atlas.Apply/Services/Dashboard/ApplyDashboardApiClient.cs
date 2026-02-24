@@ -16,7 +16,7 @@ public sealed class ApplyDashboardApiClient
 
     public async Task<ApiResult<DashboardUserDto>> GetCurrentUserAsync(string accessToken, CancellationToken cancellationToken = default)
     {
-        using var request = CreateRequest(HttpMethod.Get, "/api/v1/auth/me", accessToken);
+        using var request = CreateRequest(HttpMethod.Get, "/api/v2/auth/me", accessToken);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {

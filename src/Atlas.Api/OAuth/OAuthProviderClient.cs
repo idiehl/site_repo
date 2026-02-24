@@ -53,8 +53,11 @@ public sealed class OAuthProviderClient : IOAuthProviderClient
         if (!tokenResponse.IsSuccessStatusCode)
             return null;
 
-        var tokenJson = await tokenResponse.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
-        var accessToken = tokenJson.TryGetProperty("access_token", out var at) ? at.GetString() : null;
+        var tokenJson = await TryReadJsonObjectAsync(tokenResponse.Content, ct);
+        if (tokenJson is null)
+            return null;
+
+        var accessToken = tokenJson.Value.TryGetProperty("access_token", out var at) ? at.GetString() : null;
         if (string.IsNullOrEmpty(accessToken))
             return null;
 
@@ -64,8 +67,11 @@ public sealed class OAuthProviderClient : IOAuthProviderClient
         if (!userinfoResponse.IsSuccessStatusCode)
             return null;
 
-        var userinfo = await userinfoResponse.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
-        return MapUserInfo(userinfo);
+        var userinfo = await TryReadJsonObjectAsync(userinfoResponse.Content, ct);
+        if (userinfo is null)
+            return null;
+
+        return MapUserInfo(userinfo.Value);
     }
 
     private async Task<OAuthUserInfo?> ExchangeGoogleAsync(string code, CancellationToken ct)
@@ -90,8 +96,11 @@ public sealed class OAuthProviderClient : IOAuthProviderClient
         if (!tokenResponse.IsSuccessStatusCode)
             return null;
 
-        var tokenJson = await tokenResponse.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
-        var accessToken = tokenJson.TryGetProperty("access_token", out var at) ? at.GetString() : null;
+        var tokenJson = await TryReadJsonObjectAsync(tokenResponse.Content, ct);
+        if (tokenJson is null)
+            return null;
+
+        var accessToken = tokenJson.Value.TryGetProperty("access_token", out var at) ? at.GetString() : null;
         if (string.IsNullOrEmpty(accessToken))
             return null;
 
@@ -101,8 +110,11 @@ public sealed class OAuthProviderClient : IOAuthProviderClient
         if (!userinfoResponse.IsSuccessStatusCode)
             return null;
 
-        var userinfo = await userinfoResponse.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
-        return MapUserInfo(userinfo);
+        var userinfo = await TryReadJsonObjectAsync(userinfoResponse.Content, ct);
+        if (userinfo is null)
+            return null;
+
+        return MapUserInfo(userinfo.Value);
     }
 
     private static OAuthUserInfo? MapUserInfo(JsonElement userinfo)
@@ -118,5 +130,22 @@ public sealed class OAuthProviderClient : IOAuthProviderClient
         var picture = userinfo.TryGetProperty("picture", out var pictureProp) ? pictureProp.GetString() : null;
 
         return new OAuthUserInfo(providerId, email, name, givenName, familyName, picture);
+    }
+
+    private static async Task<JsonElement?> TryReadJsonObjectAsync(HttpContent content, CancellationToken ct)
+    {
+        try
+        {
+            var json = await content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
+            return json.ValueKind == JsonValueKind.Object ? json : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+        catch (NotSupportedException)
+        {
+            return null;
+        }
     }
 }

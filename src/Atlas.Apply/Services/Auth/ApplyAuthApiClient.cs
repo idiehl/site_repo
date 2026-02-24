@@ -20,7 +20,7 @@ public sealed class ApplyAuthApiClient
             new KeyValuePair<string, string>("password", password),
         ]);
 
-        using var response = await _httpClient.PostAsync("/api/v1/auth/login", content, cancellationToken);
+        using var response = await _httpClient.PostAsync("/api/v2/auth/login", content, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             var error = await ReadErrorAsync(response, "Login failed", cancellationToken);
@@ -39,7 +39,7 @@ public sealed class ApplyAuthApiClient
     public async Task<AuthCallResult> RegisterThenLoginAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         using var response = await _httpClient.PostAsJsonAsync(
-            "/api/v1/auth/register",
+            "/api/v2/auth/register",
             new RegisterRequest(email, password),
             cancellationToken);
 
@@ -54,12 +54,12 @@ public sealed class ApplyAuthApiClient
 
     public async Task<AuthorizeUrlResult> GetGoogleAuthorizeUrlAsync(CancellationToken cancellationToken = default)
     {
-        return await GetAuthorizeUrlAsync("/api/v1/auth/google/authorize", "Failed to initiate Google login", cancellationToken);
+        return await GetAuthorizeUrlAsync("/api/v2/auth/google/authorize", "Failed to initiate Google login", cancellationToken);
     }
 
     public async Task<AuthorizeUrlResult> GetLinkedInAuthorizeUrlAsync(CancellationToken cancellationToken = default)
     {
-        return await GetAuthorizeUrlAsync("/api/v1/auth/linkedin/authorize", "Failed to initiate LinkedIn login", cancellationToken);
+        return await GetAuthorizeUrlAsync("/api/v2/auth/linkedin/authorize", "Failed to initiate LinkedIn login", cancellationToken);
     }
 
     private async Task<AuthorizeUrlResult> GetAuthorizeUrlAsync(string endpoint, string fallbackError, CancellationToken cancellationToken)
