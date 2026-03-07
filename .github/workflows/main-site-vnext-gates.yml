@@ -1,0 +1,82 @@
+name: Main Site Placeholder Gates
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "src/Atlas.Web/**"
+      - "tests/Atlas.Web.Tests/**"
+      - ".github/workflows/main-site-vnext-gates.yml"
+  pull_request:
+    paths:
+      - "src/Atlas.Web/**"
+      - "tests/Atlas.Web.Tests/**"
+      - ".github/workflows/main-site-vnext-gates.yml"
+  workflow_dispatch:
+
+jobs:
+  placeholder-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore "tests/Atlas.Web.Tests/Atlas.Web.Tests.csproj"
+
+      - name: Build
+        run: dotnet build "tests/Atlas.Web.Tests/Atlas.Web.Tests.csproj" --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test "tests/Atlas.Web.Tests/Atlas.Web.Tests.csproj" --configuration Release --no-build --verbosity normal
+
+      - name: Run local smoke gates and generate readiness packet
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          dotnet run --project "src/Atlas.Web/Atlas.Web.csproj" --configuration Release --no-build --urls "http://127.0.0.1:5099" > artifacts/placeholder-host.log 2>&1 &
+          APP_PID=$!
+          cleanup() {
+            kill "${APP_PID}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for _ in {1..20}; do
+            if curl -sS -o /dev/null "http://127.0.0.1:5099/healthz"; then
+              break
+            fi
+            sleep 1
+          done
+
+          HOME_STATUS="$(curl -sS -o /dev/null -w "%{http_code}" "http://127.0.0.1:5099/")"
+          HEALTH_STATUS="$(curl -sS -o /dev/null -w "%{http_code}" "http://127.0.0.1:5099/healthz")"
+          {
+            echo "# Main Site Placeholder Readiness"
+            echo
+            echo "| Route | Expected | Actual | Result |"
+            echo "|---|---:|---:|---|"
+            if [ "${HOME_STATUS}" = "200" ]; then HOME_RESULT="PASS"; else HOME_RESULT="FAIL"; fi
+            if [ "${HEALTH_STATUS}" = "200" ]; then HEALTH_RESULT="PASS"; else HEALTH_RESULT="FAIL"; fi
+            echo "| \`/\` | 200 | ${HOME_STATUS} | ${HOME_RESULT} |"
+            echo "| \`/healthz\` | 200 | ${HEALTH_STATUS} | ${HEALTH_RESULT} |"
+            echo
+            if [ "${HOME_RESULT}" = "PASS" ] && [ "${HEALTH_RESULT}" = "PASS" ]; then
+              echo "Overall: PASS"
+            else
+              echo "Overall: FAIL"
+              exit 1
+            fi
+          } > artifacts/main-site-placeholder-readiness.md
+
+      - name: Upload readiness packet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-site-placeholder-readiness
+          path: artifacts/main-site-placeholder-readiness.md
+          retention-days: 14

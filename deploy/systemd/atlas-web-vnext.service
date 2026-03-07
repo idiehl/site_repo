@@ -1,0 +1,21 @@
+[Unit]
+Description=Atlas Web VNext (Main Site Reboot Host)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/atlas/web-vnext
+ExecStart=/opt/atlas/web-vnext/Atlas.Web.VNext
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5003
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Restart=on-failure
+RestartSec=5
+SyslogIdentifier=atlas-web-vnext
+User=www-data
+Group=www-data
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

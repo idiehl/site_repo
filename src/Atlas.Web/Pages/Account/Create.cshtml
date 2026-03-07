@@ -1,0 +1,41 @@
+@page
+@model Atlas.Web.Pages.Account.CreateModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<section class="section">
+    <div class="section-header">
+        <span class="section-number">Account</span>
+        <h1 class="section-title">Create Your Atlas Account</h1>
+        <p class="section-lede">
+            This page is the initial handoff target from landing CTAs. Full auth implementation is scheduled in Phase 1.
+        </p>
+    </div>
+
+    <form method="post" class="feature-grid">
+        <label>
+            Email
+            <input type="email" name="email" autocomplete="email" required />
+        </label>
+
+        <label>
+            Password
+            <input type="password" name="password" autocomplete="new-password" required />
+        </label>
+
+        <label>
+            Display Name
+            <input type="text" name="displayName" autocomplete="nickname" />
+        </label>
+
+        <div>
+            <button type="submit" class="button">Create Account</button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Intent))
+    {
+        <p class="hero-stat">Intent captured: <strong>@Model.Intent</strong></p>
+    }
+</section>

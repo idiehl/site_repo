@@ -1,54 +1,38 @@
-name: Deploy to DigitalOcean
+name: Main Site CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
+    paths:
+      - "src/Atlas.Web/**"
+      - "tests/Atlas.Web.Tests/**"
+      - "AtlasUniversalis.sln"
+      - ".github/workflows/deploy.yml"
+  pull_request:
+    paths:
+      - "src/Atlas.Web/**"
+      - "tests/Atlas.Web.Tests/**"
+      - "AtlasUniversalis.sln"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.10
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
         with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /var/www/atlasuniversalis.com
-            
-            # Pull latest code
-            git pull origin master
-            
-            # Install Python dependencies
-            .venv/bin/pip install -r requirements.txt
-            
-            # Run database migrations
-            .venv/bin/alembic upgrade head
-            
-            # Build main portfolio site (atlasuniversalis.com)
-            cd frontend-main
-            npm ci
-            npm run build
-            cd ..
-            
-            # Build Atlas Apply app (apply.atlasuniversalis.com)
-            cd frontend
-            npm ci
-            npm run build
-            cd ..
+          dotnet-version: "10.0.x"
 
-            # Build ElectraCast site (electracast.atlasuniversalis.com)
-            cd electracast
-            npm ci
-            npm run build
-            cd ..
-            
-            # Restart services
-            sudo systemctl restart atlasuniversalis
-            
-            # Restart Celery worker (if configured)
-            sudo systemctl restart celery-worker || true
+      - name: Restore
+        run: dotnet restore AtlasUniversalis.sln
+
+      - name: Build
+        run: dotnet build AtlasUniversalis.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test AtlasUniversalis.sln --configuration Release --no-build --verbosity normal

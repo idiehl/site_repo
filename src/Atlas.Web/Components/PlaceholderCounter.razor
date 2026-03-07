@@ -1,0 +1,16 @@
+<section class="card">
+    <h2>Fresh Start Counter</h2>
+    <p>This tiny Blazor block confirms interactive server components are wired.</p>
+    <button class="button" @onclick="Increment">
+        Clicked @clickCount time(s)
+    </button>
+</section>
+
+@code {
+    private int clickCount;
+
+    private void Increment()
+    {
+        clickCount++;
+    }
+}
