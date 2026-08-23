@@ -10,6 +10,7 @@ RELEASE_ROOT="${ATLAS_RELEASE_ROOT:-/opt/atlas/releases/web}"
 STATE_ROOT="${ATLAS_RELEASE_STATE_ROOT:-/var/lib/atlas-releases/web}"
 MIRROR_PATH="${ATLAS_RELEASE_MIRROR:-/opt/atlas/repository.git}"
 BUILD_USER="${ATLAS_BUILD_USER:-atlas}"
+BUILD_HOME="${ATLAS_BUILD_HOME:-/opt/atlas/build-home}"
 RUN_USER="${ATLAS_RUN_USER:-www-data}"
 RUN_GROUP="${ATLAS_RUN_GROUP:-www-data}"
 PORT_MIN="${ATLAS_CANDIDATE_PORT_MIN:-5100}"
@@ -52,6 +53,8 @@ validate_repository_url() {
 ensure_layout() {
     install -d -m 0755 -o "${BUILD_USER}" -g "${BUILD_USER}" "$(dirname -- "${MIRROR_PATH}")"
     install -d -m 0755 -o "${BUILD_USER}" -g "${BUILD_USER}" "${RELEASE_ROOT}"
+    install -d -m 0755 -o "${BUILD_USER}" -g "${BUILD_USER}" \
+        "${BUILD_HOME}" "${BUILD_HOME}/.nuget" "${BUILD_HOME}/.nuget/packages"
     install -d -m 0750 -o root -g root "${STATE_ROOT}" "${STATE_ROOT}/receipts" "${STATE_ROOT}/routing"
     install -d -m 0755 -o root -g root "$(dirname -- "${ACTIVE_INCLUDE}")"
 }
@@ -69,11 +72,15 @@ fetch_exact_commit() {
         as_build_user git --git-dir="${MIRROR_PATH}" fetch --prune origin \
             '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*'
     fi
-    local resolved
+    local resolved containing_refs
     resolved="$(as_build_user git --git-dir="${MIRROR_PATH}" rev-parse "${requested}^{commit}")" \
         || fail "The exact commit is not present on an advertised remote ref."
     [ "${resolved,,}" = "${requested,,}" ] \
         || fail "The requested commit did not resolve to the exact supplied identity."
+    containing_refs="$(as_build_user git --git-dir="${MIRROR_PATH}" for-each-ref \
+        --format='%(refname)' --contains "${resolved}" refs/heads refs/tags)"
+    [ -n "${containing_refs}" ] \
+        || fail "The exact commit is not reachable from an advertised remote branch or tag."
     printf '%s\n' "${resolved,,}"
 }
 
@@ -175,7 +182,11 @@ prepare_release() {
         _ "${MIRROR_PATH}" "${commit}" "${release_dir}/source"
     [ -f "${release_dir}/source/${PROJECT_PATH}" ] || fail "Commit lacks ${PROJECT_PATH}."
     log "Publishing as unprivileged identity ${BUILD_USER}."
-    as_build_user env DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 \
+    as_build_user env \
+        HOME="${BUILD_HOME}" \
+        DOTNET_CLI_HOME="${BUILD_HOME}" \
+        NUGET_PACKAGES="${BUILD_HOME}/.nuget/packages" \
+        DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 \
         dotnet publish "${release_dir}/source/${PROJECT_PATH}" \
         -c Release -o "${release_dir}/publish" --no-self-contained --nologo
 
@@ -220,9 +231,12 @@ restore_route() {
 }
 
 public_health_check() {
-    curl --fail --silent --show-error --max-time 10 \
+    local expected_commit="${1:-}" response
+    response="$(curl --fail --silent --show-error --max-time 10 \
         --resolve atlasuniversalis.com:443:127.0.0.1 \
-        https://atlasuniversalis.com/healthz >/dev/null
+        https://atlasuniversalis.com/healthz)" || return 1
+    [ -z "${expected_commit}" ] \
+        || grep -Fq "\"release\":\"${expected_commit}\"" <<<"${response}"
 }
 
 install_routing() {
@@ -262,6 +276,7 @@ activate_release() {
     require_root
     for command in nginx curl sha256sum; do require_command "${command}"; done
     local commit="${1:-}" release_dir port unit old_route old_release new_route
+    local old_active old_previous old_previous_routing receipt receipt_temporary activated_at
     validate_commit "${commit}"
     commit="${commit,,}"
     release_dir="$(release_dir_for "${commit}")"
@@ -275,38 +290,101 @@ activate_release() {
         || fail "Candidate health failed; public traffic is unchanged."
     old_route="$(readlink -f "${ACTIVE_INCLUDE}")"
     [ -f "${old_route}" ] || fail "The active route is not an exact release file."
-    old_release="$(readlink -f "${STATE_ROOT}/active" 2>/dev/null || printf 'bootstrap-5000')"
+    old_active="$(readlink -f "${STATE_ROOT}/active" 2>/dev/null || true)"
+    old_previous="$(readlink -f "${STATE_ROOT}/previous" 2>/dev/null || true)"
+    old_previous_routing="$(readlink -f "${STATE_ROOT}/previous-routing" 2>/dev/null || true)"
+    old_release="${old_active:-bootstrap-5000}"
     new_route="${release_dir}/nginx-servers.conf"
-    atomic_symlink "${old_route}" "${STATE_ROOT}/previous-routing"
-    atomic_symlink "${new_route}" "${ACTIVE_INCLUDE}"
-    if ! nginx -t >/dev/null 2>&1 || ! systemctl reload nginx; then
-        restore_route "${old_route}" || true
-        fail "Activation failed; the previous route was restored."
-    fi
-    if ! public_health_check; then
-        restore_route "${old_route}" || true
-        fail "Public health failed; the previous route was restored."
-    fi
-    if [ -e "${STATE_ROOT}/active" ]; then
-        atomic_symlink "$(readlink -f "${STATE_ROOT}/active")" "${STATE_ROOT}/previous"
-    fi
-    atomic_symlink "${release_dir}" "${STATE_ROOT}/active"
-    systemctl enable "${unit}" >/dev/null
-    if [ -L "${STATE_ROOT}/previous" ] && [ -f "$(readlink -f "${STATE_ROOT}/previous")/unit" ]; then
-        systemctl disable "$(cat "$(readlink -f "${STATE_ROOT}/previous")/unit")" >/dev/null || true
-    fi
-    local receipt="${STATE_ROOT}/receipts/$(date --utc +%Y%m%dT%H%M%SZ)-${commit}.json"
-    cat >"${receipt}" <<JSON
+    activated_at="$(date --utc +%Y-%m-%dT%H:%M:%SZ)"
+    receipt="${STATE_ROOT}/receipts/$(date --utc +%Y%m%dT%H%M%SZ)-${commit}.json"
+    receipt_temporary="${receipt}.tmp.$$"
+    cat >"${receipt_temporary}" <<JSON
 {
   "schemaVersion": 1,
   "sourceCommit": "${commit}",
-  "activatedAtUtc": "$(date --utc +%Y-%m-%dT%H:%M:%SZ)",
+  "activatedAtUtc": "${activated_at}",
   "previousRelease": "${old_release}",
   "candidateLoopbackUrl": "http://127.0.0.1:${port}",
   "artifactManifestSha256": "$(sha256sum "${release_dir}/artifacts.sha256" | awk '{ print $1 }')"
 }
 JSON
-    chmod 0440 "${receipt}"
+    chmod 0440 "${receipt_temporary}"
+    if ! systemctl enable "${unit}" >/dev/null; then
+        rm -f -- "${receipt_temporary}"
+        fail "Candidate could not be enabled; public traffic is unchanged."
+    fi
+    if ! atomic_symlink "${old_route}" "${STATE_ROOT}/previous-routing"; then
+        systemctl disable "${unit}" >/dev/null || true
+        rm -f -- "${receipt_temporary}"
+        fail "The rollback route could not be recorded; public traffic is unchanged."
+    fi
+    if ! atomic_symlink "${new_route}" "${ACTIVE_INCLUDE}"; then
+        systemctl disable "${unit}" >/dev/null || true
+        if [ -n "${old_previous_routing}" ]; then
+            atomic_symlink "${old_previous_routing}" "${STATE_ROOT}/previous-routing" || true
+        else
+            rm -f -- "${STATE_ROOT}/previous-routing"
+        fi
+        rm -f -- "${receipt_temporary}"
+        fail "The candidate route could not be staged; public traffic is unchanged."
+    fi
+    if ! nginx -t >/dev/null 2>&1 || ! systemctl reload nginx; then
+        restore_route "${old_route}" || true
+        systemctl disable "${unit}" >/dev/null || true
+        if [ -n "${old_previous_routing}" ]; then
+            atomic_symlink "${old_previous_routing}" "${STATE_ROOT}/previous-routing" || true
+        else
+            rm -f -- "${STATE_ROOT}/previous-routing"
+        fi
+        rm -f -- "${receipt_temporary}"
+        fail "Activation failed; the previous route was restored."
+    fi
+    if ! public_health_check "${commit}"; then
+        restore_route "${old_route}" || true
+        systemctl disable "${unit}" >/dev/null || true
+        if [ -n "${old_previous_routing}" ]; then
+            atomic_symlink "${old_previous_routing}" "${STATE_ROOT}/previous-routing" || true
+        else
+            rm -f -- "${STATE_ROOT}/previous-routing"
+        fi
+        rm -f -- "${receipt_temporary}"
+        fail "Public health failed; the previous route was restored."
+    fi
+
+    local state_failed=0
+    if [ -n "${old_active}" ] && ! atomic_symlink "${old_active}" "${STATE_ROOT}/previous"; then
+        state_failed=1
+    fi
+    if ! atomic_symlink "${release_dir}" "${STATE_ROOT}/active"; then
+        state_failed=1
+    fi
+    if ! mv -f -- "${receipt_temporary}" "${receipt}"; then
+        state_failed=1
+    fi
+    if [ "${state_failed}" -ne 0 ]; then
+        restore_route "${old_route}" || true
+        systemctl disable "${unit}" >/dev/null || true
+        if [ -n "${old_active}" ]; then
+            atomic_symlink "${old_active}" "${STATE_ROOT}/active" || true
+        else
+            rm -f -- "${STATE_ROOT}/active"
+        fi
+        if [ -n "${old_previous}" ]; then
+            atomic_symlink "${old_previous}" "${STATE_ROOT}/previous" || true
+        else
+            rm -f -- "${STATE_ROOT}/previous"
+        fi
+        if [ -n "${old_previous_routing}" ]; then
+            atomic_symlink "${old_previous_routing}" "${STATE_ROOT}/previous-routing" || true
+        else
+            rm -f -- "${STATE_ROOT}/previous-routing"
+        fi
+        rm -f -- "${receipt}" "${receipt_temporary}"
+        fail "Activation bookkeeping failed; the previous route and state were restored."
+    fi
+    if [ -L "${STATE_ROOT}/previous" ] && [ -f "$(readlink -f "${STATE_ROOT}/previous")/unit" ]; then
+        systemctl disable "$(cat "$(readlink -f "${STATE_ROOT}/previous")/unit")" >/dev/null || true
+    fi
     log "Public traffic now targets exact healthy commit ${commit}."
 }
 
