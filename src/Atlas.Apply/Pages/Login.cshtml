@@ -1,0 +1,63 @@
+@page
+@model Atlas.Apply.Pages.LoginModel
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+<section class="apply-page">
+    <p class="apply-kicker">Account</p>
+    <h1 class="apply-title">Sign in or create your Atlas Apply account.</h1>
+    <p class="apply-lede">Use one account to manage your dashboard, profile, saved roles, and tailored application materials.</p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="apply-alert" role="alert">@Model.ErrorMessage</div>
+    }
+
+    <div class="apply-split-grid">
+        <article class="apply-panel">
+            <h2 class="panel-title">Sign in</h2>
+            <form method="post" asp-page-handler="Login">
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                <div class="mb-3">
+                    <label class="form-label" asp-for="LoginInput.Email"></label>
+                    <input class="form-control" asp-for="LoginInput.Email" autocomplete="username" />
+                    <span class="field-validation-error" asp-validation-for="LoginInput.Email"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" asp-for="LoginInput.Password"></label>
+                    <input class="form-control" asp-for="LoginInput.Password" type="password" autocomplete="current-password" />
+                    <span class="field-validation-error" asp-validation-for="LoginInput.Password"></span>
+                </div>
+                <button class="btn btn-primary" type="submit">Sign in</button>
+            </form>
+        </article>
+
+        <article class="apply-panel">
+            <h2 class="panel-title">Create your account</h2>
+            <form method="post" asp-page-handler="Register" autocomplete="off">
+                <div class="mb-3">
+                    <label class="form-label" asp-for="RegisterInput.DisplayName"></label>
+                    <input class="form-control" asp-for="RegisterInput.DisplayName" autocomplete="off" />
+                    <span class="field-validation-error" asp-validation-for="RegisterInput.DisplayName"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" asp-for="RegisterInput.Email"></label>
+                    <input class="form-control" asp-for="RegisterInput.Email" autocomplete="off" />
+                    <span class="field-validation-error" asp-validation-for="RegisterInput.Email"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" asp-for="RegisterInput.Password"></label>
+                    <input class="form-control" asp-for="RegisterInput.Password" type="password" autocomplete="new-password" />
+                    <span class="field-validation-error" asp-validation-for="RegisterInput.Password"></span>
+                </div>
+                <button class="btn btn-outline-primary" type="submit">Create account</button>
+            </form>
+        </article>
+    </div>
+</section>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

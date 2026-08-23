@@ -1,5 +1,5 @@
 ---
-description: Atlas Universalis — single consolidated ruleset
+description: Atlas Universalis development and immutable release guidance
 alwaysApply: true
 ---
 
@@ -7,7 +7,26 @@ alwaysApply: true
 
 ## Environment
 
-- Repo: `D:\www\atlasuniversalis` — `github.com/idiehl/site-repo`
+- Recovery repo: `I:\dev\AtlasUniversalis` — `github.com/idiehl/site_repo`
 - Server: DigitalOcean droplet `root@167.71.179.90`
 - Server path: `/var/www/atlasuniversalis.com`
 - Dev portal: `https://atlasuniversalis.com/dev`
+
+## Project Structure
+
+Treat every active directory/repository as a distinct project. Every project should consist of 3 stages: Planning, Development, and Deployment. During the planning stage, establish a thorough understanding of the concept and scope of the application. Ask as many clarifying questions as needed. Once a complete picture of the project has been established create a markdown file named the same as the project's directory. Place the project.md file in a subdirectory called "internal". The project.md file should contain a complete overview of the project at a conceptual level and should avoid overly technical jargon. Before transitioning into the Development stage, organize the project into a development timeline. The timeline should define the order in which the development stage will occur. Development should be organized into a set of sub-stages. Each sub-stage should be accompanied by a brief description of the key objectives and tasks that will be executed. Once the timeline has been established, create an estimate of how many work cycles the project will require in total, and how many work cycles each sub-stage in the development stage will require. This will define our target launch date and we will work throughout the project according to this timeline. If any change to the project occurs that alters the projected duration, notify me and update the project.md documentation.
+
+## Drift
+
+During the development stage, it's critical that each work cycle contributes something valuable to the project and progresses the development timeline in a direct, demonstrable way. If, during the course of the development process, you feel as though you're experiencing "drift" (becoming "lost" or "distracted" by a peripheral or unimportant task), communicate this immediately. Whenever actual development progress differs from the projected timeline, ensure that you aren't experiencing drift. If at any time during the development stage, your task or current work cycle becomes unclear or you require more clarification in order to stay on schedule, pause the development stage. We can return to the Planning stage at any time during the development process in order to reestablish the timeline, flush out a concept, or reconsider any feature of the target application.
+
+## Deploying
+
+Never synchronize files into or build from the production checkout. Development,
+publication, candidate preparation, and production activation are separate gates.
+
+- Publish only an attributable, exact reviewed Git commit.
+- Prepare it with `deploy/atlas-release.sh prepare <exact-commit>`.
+- Inspect the loopback candidate through the owner-only linked-host tunnel.
+- Activate only after explicit review with `deploy/atlas-release.sh activate <exact-commit>`.
+- A failed candidate or health check must leave production traffic untouched.

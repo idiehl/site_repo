@@ -1,0 +1,207 @@
+@page
+@model Atlas.Apply.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="apply-page">
+    <p class="apply-kicker">Dashboard</p>
+    <h1 class="apply-title">Application dashboard</h1>
+    <p class="apply-lede">Track saved roles and active applications in one place. Open any role to review the position, research the company, tailor your resume, practice for interviews, and capture notes.</p>
+
+    <div class="workspace-toolbar">
+        <button type="button" class="btn btn-primary workspace-add-btn" id="open-create-dialog" title="Add role">
+            <span class="workspace-add-btn__icon" aria-hidden="true">+</span>
+            <span class="visually-hidden">Add role</span>
+        </button>
+        <a class="btn btn-outline-primary btn-sm" asp-page="/Profile">Edit profile</a>
+        <a class="btn btn-outline-secondary btn-sm" href="@Url.Content("~/atlas-apply-extension.zip")" download>Download browser extension</a>
+    </div>
+
+    <article class="apply-panel mb-4">
+        <div class="workspace-list-head" aria-hidden="true">
+            <span>Job Title</span>
+            <span>Company</span>
+            <span>Status</span>
+            <span>Prep Status</span>
+        </div>
+
+        @if (Model.Jobs.Count == 0)
+        {
+            <p class="text-muted mb-0">No roles yet. Use the plus button to add one, or install the browser extension to save a posting directly from the web.</p>
+        }
+        else
+        {
+            <div class="workspace-list" role="list">
+                @foreach (var row in Model.Jobs)
+                {
+                    <a class="workspace-list-row" role="listitem" asp-page="/Jobs/Index" asp-route-applicationId="@row.ApplicationId">
+                        <span class="workspace-cell">
+                            <span class="workspace-cell__label">Job Title</span>
+                            <span class="workspace-cell__value workspace-job-title">@row.RoleTitle</span>
+                            <span class="workspace-cell__meta">@row.UpdatedUtc.ToLocalTime().ToString("g")</span>
+                        </span>
+                        <span class="workspace-cell">
+                            <span class="workspace-cell__label">Company</span>
+                            <span class="workspace-cell__value">@row.Company</span>
+                        </span>
+                        <span class="workspace-cell">
+                            <span class="workspace-cell__label">Status</span>
+                            <span class="workspace-chip workspace-chip--status">@row.Status</span>
+                        </span>
+                        <span class="workspace-cell">
+                            <span class="workspace-cell__label">Prep Status</span>
+                            <span class="workspace-chip @(row.IsReady ? "workspace-chip--ready" : "workspace-chip--review")">@row.ReadyStatus</span>
+                        </span>
+                    </a>
+                }
+            </div>
+        }
+    </article>
+</section>
+
+<dialog id="create-job-dialog" class="apply-dialog">
+    <div class="apply-dialog__inner apply-panel">
+        <div class="apply-dialog__head">
+            <h2 class="panel-title mb-0">New role</h2>
+            <button type="button" class="btn btn-sm btn-outline-secondary apply-dialog__close" data-close-dialog="create-job-dialog" aria-label="Close">Close</button>
+        </div>
+        <p class="small text-muted mb-3">Add a role to your dashboard and start building out its details, resume, and application notes.</p>
+        <div class="row g-2">
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-source">Source</label>
+                <select id="opp-source" class="form-control">
+                    <option value="Manual">Manual</option>
+                    <option value="Url">URL paste</option>
+                    <option value="Extension">Extension</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-company">Company</label>
+                <input id="opp-company" class="form-control" placeholder="Optional if URL provided" />
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-role">Role title</label>
+                <input id="opp-role" class="form-control" placeholder="Optional" />
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-url">Job posting URL</label>
+                <input id="opp-url" class="form-control" placeholder="Optional" />
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-location">Location</label>
+                <input id="opp-location" class="form-control" placeholder="Optional" />
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-description">Description</label>
+                <textarea id="opp-description" class="form-control" rows="3" placeholder="Paste the job description"></textarea>
+            </div>
+            <div class="col-12">
+                <label class="form-label small mb-0" for="opp-options">Resume preferences</label>
+                <input id="opp-options" class="form-control" placeholder="Optional advanced settings in JSON" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small mb-0" for="opp-status">Status</label>
+                <select id="opp-status" class="form-control">
+                    @foreach (var status in Model.StatusOptions)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small mb-0" for="opp-priority">Priority</label>
+                <select id="opp-priority" class="form-control">
+                    <option value="Normal">Normal</option>
+                    <option value="Low">Low</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex gap-2 align-items-center flex-wrap pt-2">
+                <button class="btn btn-primary" type="button" id="create-job-submit">Add role</button>
+                <button class="btn btn-outline-secondary" type="button" data-close-dialog="create-job-dialog">Cancel</button>
+                <small id="opp-result" class="text-muted"></small>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+@section Scripts
+{
+    <script>
+        (() => {
+            const createDialog = document.getElementById("create-job-dialog");
+            const openCreate = document.getElementById("open-create-dialog");
+            const createSubmit = document.getElementById("create-job-submit");
+            const oppResult = document.getElementById("opp-result");
+
+            document.querySelectorAll("[data-close-dialog]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-close-dialog");
+                    const dlg = document.getElementById(id);
+                    dlg?.close();
+                });
+            });
+
+            openCreate?.addEventListener("click", () => {
+                oppResult.textContent = "";
+                createDialog?.showModal();
+            });
+
+            createSubmit?.addEventListener("click", async () => {
+                oppResult.textContent = "Saving...";
+
+                const optionsRaw = document.getElementById("opp-options").value?.trim() || "";
+                let optionsJson = null;
+                if (optionsRaw) {
+                    try {
+                        JSON.parse(optionsRaw);
+                        optionsJson = optionsRaw;
+                    } catch {
+                        oppResult.textContent = "Options JSON is invalid.";
+                        return;
+                    }
+                }
+
+                const payload = {
+                    sourceType: document.getElementById("opp-source").value || "Manual",
+                    company: document.getElementById("opp-company").value || null,
+                    roleTitle: document.getElementById("opp-role").value || null,
+                    location: document.getElementById("opp-location").value || null,
+                    compensationText: null,
+                    postingUrl: document.getElementById("opp-url").value || null,
+                    descriptionRaw: document.getElementById("opp-description").value || null,
+                    metadataJson: "{}",
+                    createBoardEntry: true,
+                    applicationStatus: document.getElementById("opp-status").value || "Saved",
+                    applicationPriority: document.getElementById("opp-priority").value || "Normal",
+                    applicationOptionsJson: optionsJson
+                };
+
+                const response = await fetch("/api/v2/opportunities", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                        oppResult.textContent = data.error || "Unable to add role.";
+                    return;
+                }
+
+                const data = await response.json().catch(() => ({}));
+                oppResult.textContent = "Role added.";
+                createDialog?.close();
+
+                if (data.applicationId) {
+                    window.location.href = `/Jobs/${data.applicationId}`;
+                    return;
+                }
+
+                setTimeout(() => window.location.reload(), 300);
+            });
+        })();
+    </script>
+}

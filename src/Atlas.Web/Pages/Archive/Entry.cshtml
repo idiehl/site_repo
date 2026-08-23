@@ -1,0 +1,13 @@
+@page "/Archive/{slug}"
+@model Atlas.Web.Pages.Archive.EntryModel
+@{
+    ViewData["Title"] = Model.Manifest!.Title;
+    ViewData["Description"] = Model.Manifest.Description;
+}
+
+<section class="archive-entry">
+    <nav class="archive-entry__breadcrumb" aria-label="Breadcrumb">
+        <a href="/Archive">Archive</a><span aria-hidden="true">/</span><span>@Model.Manifest.Title</span>
+    </nav>
+    <component type="Model.ComponentType" render-mode="ServerPrerendered" />
+</section>

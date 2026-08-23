@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Atlas Apply</title>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Montserrat:wght@300;400;500;600&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/atlas.tokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Atlas.Apply.styles.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+        var isDashboard = string.Equals(currentPage, "/Dashboard", StringComparison.OrdinalIgnoreCase);
+        var isProfile = string.Equals(currentPage, "/Profile", StringComparison.OrdinalIgnoreCase);
+        var isJobDetail = currentPage.StartsWith("/Jobs/", StringComparison.OrdinalIgnoreCase);
+    }
+    <header class="site-header" id="site-header">
+        <div class="site-header-inner">
+            <a class="brand" asp-area="" asp-page="/Index">Atlas Apply</a>
+            <nav class="header-nav" aria-label="Apply navigation">
+                <a class="nav-link" href="https://atlasuniversalis.com">Home</a>
+                <a class="nav-link @((isDashboard || isJobDetail) ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/Dashboard">Dashboard</a>
+                <a class="nav-link @(isProfile ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/Profile">Profile</a>
+                <a class="nav-link" asp-area="" asp-page="/Logout">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main role="main" class="main-shell">
+        <div class="apply-container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="apply-container">
+            &copy; 2026 Atlas Apply
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const header = document.getElementById("site-header");
+            if (!header) return;
+            const onScroll = () => header.classList.toggle("site-header--scrolled", window.scrollY > 40);
+            onScroll();
+            window.addEventListener("scroll", onScroll, { passive: true });
+        })();
+    </script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

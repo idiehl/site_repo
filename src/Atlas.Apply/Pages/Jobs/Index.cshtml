@@ -1,0 +1,548 @@
+@page "{applicationId:guid}"
+@model Atlas.Apply.Pages.Jobs.IndexModel
+@{
+    var job = Model.Job!;
+    ViewData["Title"] = $"{job.RoleTitle} - {job.Company}";
+    var interviewQuestions = job.InterviewQuestions.Count == 0
+        ? string.Empty
+        : string.Join("\n\n", job.InterviewQuestions.Select((q, i) => $"{i + 1}. {q}"));
+    var report = job.CompanyReport;
+    var summary = job.JobSummary;
+}
+
+<section class="apply-page job-detail-page">
+    <a class="job-back-link" asp-page="/Dashboard">Back to dashboard</a>
+
+    <div class="job-hero">
+        <div>
+            <p class="apply-kicker">Job</p>
+            <h1 class="apply-title">@job.RoleTitle</h1>
+            <p class="job-company">@job.Company</p>
+            <div class="job-hero-meta">
+                <span>@job.SourceType</span>
+                @if (!string.IsNullOrWhiteSpace(job.Location))
+                {
+                    <span>@job.Location</span>
+                }
+                <span>Updated @job.UpdatedUtc.ToLocalTime().ToString("g")</span>
+                @if (!string.IsNullOrWhiteSpace(job.PostingUrl))
+                {
+                    <a href="@job.PostingUrl" target="_blank" rel="noopener noreferrer">View posting</a>
+                }
+            </div>
+        </div>
+        <div class="job-hero-chips">
+            <span class="workspace-chip workspace-chip--status" id="job-status-chip">@job.Status</span>
+            <span class="workspace-chip @(job.IsReady ? "workspace-chip--ready" : "workspace-chip--review")">@job.ReadyStatus</span>
+        </div>
+    </div>
+
+    @if (!job.HasProfileData)
+    {
+        <div class="apply-alert">
+            Complete your <a asp-page="/Profile">profile</a> to generate stronger, more personalized materials for this role.
+        </div>
+    }
+
+    <div class="job-detail-flow">
+        <article class="apply-panel job-detail-span">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Role Summary</h2>
+                <div class="job-inline-actions">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="refresh-job-summary">Refresh role summary</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="open-note-dialog">Add note</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="delete-job">Delete role</button>
+                </div>
+            </div>
+            <div class="job-summary-sections">
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Role Overview</h3>
+                    <p class="job-copy" id="job-summary-overview">
+                        @(string.IsNullOrWhiteSpace(summary.PlainLanguageOverview) ? job.Description : summary.PlainLanguageOverview)
+                    </p>
+                </section>
+
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Job Expectations</h3>
+                    <ul class="job-bullet-list" id="job-summary-expectations">
+                        @if (summary.JobExpectations.Count == 0)
+                        {
+                            <li>Expectations have not been generated yet.</li>
+                        }
+                        else
+                        {
+                            @foreach (var item in summary.JobExpectations)
+                            {
+                                <li>@item</li>
+                            }
+                        }
+                    </ul>
+                </section>
+
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Job Rating</h3>
+                    <div class="job-summary-inline">
+                        <strong id="job-summary-rating-label">@(string.IsNullOrWhiteSpace(summary.JobRatingLabel) ? "Not available yet" : summary.JobRatingLabel)</strong>
+                        <p class="job-company-description mb-0" id="job-summary-rating-summary">@(string.IsNullOrWhiteSpace(summary.JobRatingSummary) ? "No job rating summary is available yet." : summary.JobRatingSummary)</p>
+                    </div>
+                </section>
+
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Key Skills</h3>
+                    <ul class="job-bullet-list" id="job-summary-skills">
+                        @if (summary.KeySkills.Count == 0)
+                        {
+                            <li>Key skills have not been generated yet.</li>
+                        }
+                        else
+                        {
+                            @foreach (var item in summary.KeySkills)
+                            {
+                                <li>@item</li>
+                            }
+                        }
+                    </ul>
+                </section>
+
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Work Hours</h3>
+                    <p class="job-copy" id="job-summary-hours">@(string.IsNullOrWhiteSpace(summary.WorkHours) ? "Work hour expectations have not been generated yet." : summary.WorkHours)</p>
+                </section>
+
+                <section class="job-summary-section">
+                    <h3 class="job-subtitle">Workplace Environment</h3>
+                    <p class="job-copy" id="job-summary-environment">@(string.IsNullOrWhiteSpace(summary.WorkplaceEnvironment) ? "Workplace environment guidance has not been generated yet." : summary.WorkplaceEnvironment)</p>
+                </section>
+            </div>
+            <small id="job-summary-result" class="text-muted d-block mt-2"></small>
+        </article>
+
+        <article class="apply-panel job-detail-span">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Company Report</h2>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="refresh-company-report">Refresh company report</button>
+            </div>
+
+            <div class="job-company-intel">
+                <div class="job-company-summary">
+                    <p class="job-copy" id="company-report-summary">@(string.IsNullOrWhiteSpace(report.Summary) ? "No company report is available yet." : report.Summary)</p>
+                    @if (!string.IsNullOrWhiteSpace(report.Description))
+                    {
+                        <p class="job-company-description" id="company-report-description">@report.Description</p>
+                    }
+                </div>
+
+                <dl class="job-facts">
+                    <div>
+                        <dt>Company</dt>
+                        <dd id="company-report-name">@(string.IsNullOrWhiteSpace(report.Name) ? job.Company : report.Name)</dd>
+                    </div>
+                    <div>
+                        <dt>Founded</dt>
+                        <dd id="company-report-founded">@(report.FoundedYear?.ToString() ?? "Not available")</dd>
+                    </div>
+                    <div>
+                        <dt>Employees</dt>
+                        <dd id="company-report-employees">@report.EmployeeCountDisplay</dd>
+                    </div>
+                    <div>
+                        <dt>Revenue</dt>
+                        <dd id="company-report-revenue">@(string.IsNullOrWhiteSpace(report.RevenueDisplay) ? "Not available" : report.RevenueDisplay)</dd>
+                    </div>
+                    <div>
+                        <dt>Official website</dt>
+                        <dd id="company-report-website">
+                            @if (!string.IsNullOrWhiteSpace(report.OfficialWebsiteUrl))
+                            {
+                                <a href="@report.OfficialWebsiteUrl" target="_blank" rel="noopener noreferrer">@report.OfficialWebsiteUrl</a>
+                            }
+                            else
+                            {
+                                <span>Not available</span>
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Company page</dt>
+                        <dd id="company-report-page">
+                            @if (!string.IsNullOrWhiteSpace(report.CompanyPageUrl))
+                            {
+                                <a href="@report.CompanyPageUrl" target="_blank" rel="noopener noreferrer">@report.CompanyPageUrl</a>
+                            }
+                            else
+                            {
+                                <span>Not available</span>
+                            }
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Domain</dt>
+                        <dd id="company-report-domain">@(string.IsNullOrWhiteSpace(report.Domain) ? "Not available" : report.Domain)</dd>
+                    </div>
+                    <div>
+                        <dt>Industry</dt>
+                        <dd id="company-report-industry">@(string.IsNullOrWhiteSpace(report.Industry) ? "Not available" : report.Industry)</dd>
+                    </div>
+                    <div>
+                        <dt>Exchange / ticker</dt>
+                        <dd id="company-report-market">
+                            @if (!string.IsNullOrWhiteSpace(report.Ticker))
+                            {
+                                @(string.IsNullOrWhiteSpace(report.Exchange) ? report.Ticker : $"{report.Exchange} / {report.Ticker}")
+                            }
+                            else
+                            {
+                                <span>Not available</span>
+                            }
+                        </dd>
+                    </div>
+                </dl>
+
+                <div class="job-market-chart" id="company-market-chart-wrap">
+                    @if (!string.IsNullOrWhiteSpace(report.MarketChartUrl))
+                    {
+                        <img id="company-market-chart" src="@report.MarketChartUrl" alt="Recent market chart for @job.Company" />
+                    }
+                </div>
+
+                <div class="job-company-news">
+                    <div class="panel-head-row">
+                        <h3 class="job-subtitle mb-0">Recent Company Updates</h3>
+                        <small id="company-report-result" class="text-muted"></small>
+                    </div>
+                    <ul class="job-news-list" id="company-news-list">
+                        @if (report.RecentNews.Count == 0)
+                        {
+                            <li class="text-muted">No recent company news was found yet.</li>
+                        }
+                        else
+                        {
+                            @foreach (var item in report.RecentNews)
+                            {
+                                <li>
+                                    <a href="@item.Url" target="_blank" rel="noopener noreferrer">@item.Title</a>
+                                    @if (item.PublishedUtc is not null)
+                                    {
+                                        <small class="text-muted">@item.PublishedUtc.Value.ToLocalTime().ToString("g")</small>
+                                    }
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </article>
+
+        <article class="apply-panel job-detail-span">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Resume for This Role</h2>
+                <div class="job-inline-actions">
+                    <select id="resume-template" class="form-control form-control-sm job-inline-select">
+                        <option value="Classic">Classic</option>
+                        <option value="Modern">Modern</option>
+                        <option value="Executive">Executive</option>
+                    </select>
+                    <select id="resume-quality" class="form-control form-control-sm job-inline-select">
+                        <option value="Standard">Standard</option>
+                        <option value="Targeted">Targeted</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="generate-resume">Generate resume PDF</button>
+                </div>
+            </div>
+            <p class="small text-muted mb-2">Generate a resume tailored to this role using your profile, the role details, and the company research above.</p>
+            <label class="form-label small mb-1" for="resume-focus">What should this resume emphasize?</label>
+            <input id="resume-focus" class="form-control mb-3" placeholder="leadership, cloud delivery, systems design" />
+            <textarea id="resume-output" class="form-control job-artifact" rows="16" readonly placeholder="Your resume draft will appear here.">@job.ResumeDraft</textarea>
+            <div class="job-action-row">
+                <a id="resume-download" class="btn btn-primary btn-sm @(string.IsNullOrWhiteSpace(job.ResumeDraft) ? "disabled" : string.Empty)" href="/api/v2/automation/resume-pdf/@job.OpportunityId" @(string.IsNullOrWhiteSpace(job.ResumeDraft) ? "aria-disabled=\"true\"" : string.Empty)>Download resume PDF</a>
+                <small id="resume-result" class="text-muted"></small>
+            </div>
+        </article>
+
+        <article class="apply-panel job-detail-span">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Interview Prep</h2>
+                <div class="job-inline-actions">
+                    <select id="question-type" class="form-control form-control-sm job-inline-select">
+                        <option value="mixed">Mixed</option>
+                        <option value="behavioral">Behavioral</option>
+                        <option value="technical">Technical</option>
+                        <option value="system-design">System Design</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="generate-questions">Generate questions</button>
+                </div>
+            </div>
+            <textarea id="questions-output" class="form-control job-artifact" rows="14" readonly placeholder="Interview questions will appear here.">@interviewQuestions</textarea>
+            <small id="questions-result" class="text-muted d-block mt-2"></small>
+        </article>
+
+        <article class="apply-panel job-detail-span">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Follow-Up Draft</h2>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="generate-follow-up">Generate draft</button>
+            </div>
+            <input id="follow-up-subject" class="form-control mb-2" readonly placeholder="Subject line" value="@job.FollowUpEmailSubject" />
+            <textarea id="follow-up-output" class="form-control job-artifact" rows="14" readonly placeholder="Follow-up email draft will appear here.">@job.FollowUpEmailBody</textarea>
+            <small id="follow-up-result" class="text-muted d-block mt-2"></small>
+        </article>
+
+        <article class="apply-panel job-detail-span">
+            <h2 class="panel-title">Recent Activity</h2>
+            @if (job.History.Count == 0)
+            {
+                <p class="text-muted mb-0">No activity has been recorded for this role yet.</p>
+            }
+            else
+            {
+                <ul class="job-history-list">
+                    @foreach (var item in job.History)
+                    {
+                        <li class="job-history-item">
+                            <div>
+                                <strong>@item.Label</strong>
+                                @if (!string.IsNullOrWhiteSpace(item.Detail))
+                                {
+                                    <p class="job-history-detail">@item.Detail</p>
+                                }
+                            </div>
+                            <small class="text-muted">@item.CreatedUtc.ToLocalTime().ToString("g")</small>
+                        </li>
+                    }
+                </ul>
+            }
+        </article>
+    </div>
+</section>
+
+<dialog id="note-dialog" class="apply-dialog">
+    <div class="apply-dialog__inner apply-panel">
+        <div class="apply-dialog__head">
+            <h2 class="panel-title mb-0">Add Note</h2>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-close-dialog="note-dialog">Close</button>
+        </div>
+        <label class="form-label small mb-1" for="existing-notes">Current notes</label>
+        <textarea id="existing-notes" class="form-control job-artifact job-artifact--compact" rows="8" readonly placeholder="No notes yet.">@job.Notes</textarea>
+        <label class="form-label small mb-1 mt-3" for="job-note-input">New note</label>
+        <textarea id="job-note-input" class="form-control job-artifact--compact" rows="5" placeholder="Add a new note for this role"></textarea>
+        <div class="job-action-row">
+            <button type="button" class="btn btn-primary btn-sm" id="save-job-note">Save note</button>
+            <small id="job-note-result" class="text-muted"></small>
+        </div>
+    </div>
+</dialog>
+
+@section Scripts
+{
+    <script>
+        (() => {
+            const applicationId = "@job.ApplicationId";
+            const opportunityId = "@job.OpportunityId";
+            const noteDialog = document.getElementById("note-dialog");
+            const notesBox = document.getElementById("existing-notes");
+            const noteInput = document.getElementById("job-note-input");
+            const noteResult = document.getElementById("job-note-result");
+            const jobSummaryResult = document.getElementById("job-summary-result");
+            const resumeOutput = document.getElementById("resume-output");
+            const resumeResult = document.getElementById("resume-result");
+            const resumeDownload = document.getElementById("resume-download");
+            const questionsOutput = document.getElementById("questions-output");
+            const questionsResult = document.getElementById("questions-result");
+            const followUpSubject = document.getElementById("follow-up-subject");
+            const followUpOutput = document.getElementById("follow-up-output");
+            const followUpResult = document.getElementById("follow-up-result");
+            const companyReportResult = document.getElementById("company-report-result");
+
+            const setMessage = (element, message, isError = false) => {
+                if (!element) return;
+                element.textContent = message || "";
+                element.classList.toggle("board-action-result--error", !!isError);
+                element.classList.toggle("board-action-result--success", !isError && !!message);
+            };
+
+            document.querySelectorAll("[data-close-dialog]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const dialogId = btn.getAttribute("data-close-dialog");
+                    document.getElementById(dialogId)?.close();
+                });
+            });
+
+            document.getElementById("open-note-dialog")?.addEventListener("click", () => {
+                noteDialog?.showModal();
+            });
+
+            const renderList = (elementId, items, emptyText) => {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                el.innerHTML = "";
+                if (!items || items.length === 0) {
+                    const li = document.createElement("li");
+                    li.textContent = emptyText;
+                    el.appendChild(li);
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const li = document.createElement("li");
+                    li.textContent = item;
+                    el.appendChild(li);
+                });
+            };
+
+            document.getElementById("save-job-note")?.addEventListener("click", async () => {
+                const note = (noteInput.value || "").trim();
+                if (!note) {
+                    setMessage(noteResult, "Note cannot be empty.", true);
+                    return;
+                }
+
+                const response = await fetch(`/api/v2/applications/${applicationId}/note`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ note })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    setMessage(noteResult, data.error || "Unable to save note.", true);
+                    return;
+                }
+
+                notesBox.value = notesBox.value ? `${notesBox.value}\n${note}` : note;
+                noteInput.value = "";
+                    setMessage(noteResult, "Note saved.");
+            });
+
+            document.getElementById("refresh-job-summary")?.addEventListener("click", async () => {
+                setMessage(jobSummaryResult, "Refreshing...");
+                const response = await fetch("/api/v2/automation/job-summary", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ opportunityId })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    setMessage(jobSummaryResult, data.error || "Unable to refresh the role summary.", true);
+                    return;
+                }
+
+                const data = await response.json();
+                const summary = data.summary || {};
+                document.getElementById("job-summary-overview").textContent = summary.plainLanguageOverview || "No overview available yet.";
+                document.getElementById("job-summary-rating-label").textContent = summary.jobRatingLabel || "Not available yet";
+                document.getElementById("job-summary-rating-summary").textContent = summary.jobRatingSummary || "No job rating summary is available yet.";
+                document.getElementById("job-summary-hours").textContent = summary.workHours || "Work hour expectations have not been generated yet.";
+                document.getElementById("job-summary-environment").textContent = summary.workplaceEnvironment || "Workplace environment guidance has not been generated yet.";
+                renderList("job-summary-expectations", summary.jobExpectations, "Expectations have not been generated yet.");
+                renderList("job-summary-skills", summary.keySkills, "Key skills have not been generated yet.");
+                setMessage(jobSummaryResult, "Role summary updated.");
+            });
+
+            document.getElementById("refresh-company-report")?.addEventListener("click", async () => {
+                setMessage(companyReportResult, "Refreshing...");
+                const response = await fetch("/api/v2/automation/company-report", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ opportunityId })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    setMessage(companyReportResult, data.error || "Unable to refresh the company report.", true);
+                    return;
+                }
+
+                window.location.reload();
+            });
+
+            document.getElementById("generate-resume")?.addEventListener("click", async () => {
+                setMessage(resumeResult, "Generating...");
+                const response = await fetch("/api/v2/automation/resume-pdf", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        opportunityId,
+                        template: document.getElementById("resume-template").value || "Classic",
+                        quality: document.getElementById("resume-quality").value || "Standard",
+                        focusAreasCsv: document.getElementById("resume-focus").value || null
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    setMessage(resumeResult, data.error || "Unable to generate the resume draft.", true);
+                    return;
+                }
+
+                const data = await response.json();
+                resumeOutput.value = data.draft || "";
+                if (resumeDownload && data.downloadUrl) {
+                    resumeDownload.href = data.downloadUrl;
+                    resumeDownload.classList.remove("disabled");
+                    resumeDownload.removeAttribute("aria-disabled");
+                }
+                setMessage(resumeResult, data.usedProfile ? "Your resume PDF is ready." : "Your resume PDF is ready. Add more profile details for a stronger result.");
+            });
+
+            document.getElementById("generate-questions")?.addEventListener("click", async () => {
+                setMessage(questionsResult, "Generating...");
+                const response = await fetch("/api/v2/automation/interview-questions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        opportunityId,
+                        questionType: document.getElementById("question-type").value || "mixed",
+                        saveToMetadata: true
+                    })
+                });
+
+                if (!response.ok) {
+                    setMessage(questionsResult, "Unable to generate interview questions.", true);
+                    return;
+                }
+
+                const data = await response.json();
+                questionsOutput.value = (data.questions || []).map((q, i) => `${i + 1}. ${q}`).join("\n\n");
+                setMessage(questionsResult, "Interview questions updated.");
+            });
+
+            document.getElementById("generate-follow-up")?.addEventListener("click", async () => {
+                setMessage(followUpResult, "Generating...");
+                const response = await fetch("/api/v2/automation/follow-up-email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ opportunityId })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    setMessage(followUpResult, data.error || "Unable to generate the follow-up draft.", true);
+                    return;
+                }
+
+                const data = await response.json();
+                followUpSubject.value = data.subject || "";
+                followUpOutput.value = data.body || "";
+                setMessage(followUpResult, "Follow-up email draft ready.");
+            });
+
+            document.getElementById("delete-job")?.addEventListener("click", async () => {
+                if (!window.confirm("Delete this job? This cannot be undone.")) {
+                    return;
+                }
+
+                const response = await fetch(`/api/v2/applications/${applicationId}`, {
+                    method: "DELETE"
+                });
+
+                if (!response.ok) {
+                    setMessage(noteResult, "Unable to delete this role.", true);
+                    return;
+                }
+
+                window.location.href = "/Dashboard";
+            });
+        })();
+    </script>
+}

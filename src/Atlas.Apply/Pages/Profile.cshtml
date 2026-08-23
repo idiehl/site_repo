@@ -1,0 +1,1682 @@
+@page "{userId:guid?}"
+@model Atlas.Apply.Pages.ProfileModel
+@using System.Text.Json
+@using Atlas.Apply.Features.Profile
+@{
+    ViewData["Title"] = string.IsNullOrWhiteSpace(Model.Profile.DisplayName) ? "Profile" : Model.Profile.DisplayName;
+    var profileJson = JsonSerializer.Serialize(Model.Profile, ProfileDocument.JsonOptions);
+    var displayName = string.IsNullOrWhiteSpace(Model.Profile.DisplayName) ? "Your Name" : Model.Profile.DisplayName;
+    var headline = string.IsNullOrWhiteSpace(Model.Profile.Headline) ? "Add a clear headline for the roles you want." : Model.Profile.Headline;
+    var summary = string.IsNullOrWhiteSpace(Model.Profile.Summary)
+        ? "Use this page as the polished source of truth for your experience, skills, and application materials."
+        : Model.Profile.Summary;
+    var currentRoleCompany = string.Join(" at ", new[] { Model.Profile.CurrentRoleTitle, Model.Profile.CurrentCompany }.Where(x => !string.IsNullOrWhiteSpace(x)));
+}
+
+<section class="apply-page profile-page @(Model.IsVisitorView ? "profile-page--visitor" : string.Empty)">
+    <div id="profile-warning" class="apply-alert d-none"></div>
+
+    <article class="apply-panel bio-module">
+        <div class="bio-module__toolbar">
+            <p class="apply-kicker">Profile</p>
+            @if (Model.CanEditProfile)
+            {
+                <div class="bio-module__toolbar-actions">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="bio-edit-toggle">Edit</button>
+                    <small id="profile-message" class="text-muted"></small>
+                </div>
+            }
+        </div>
+
+        <div class="bio-module__shell">
+            <div class="bio-module__left">
+                <button type="button" class="bio-module__image-button" id="profile-image-trigger" @(Model.CanEditProfile ? null : "disabled")>
+                    <div class="profile-image-frame profile-image-frame--hero">
+                        <img id="profile-image-preview" alt="Profile image preview" class="profile-image-preview @(Model.Profile.HasProfileImage ? string.Empty : "d-none")" src="@(Model.Profile.ProfileImageUrl ?? string.Empty)" />
+                        <div id="profile-image-placeholder" class="profile-image-placeholder @(Model.Profile.HasProfileImage ? "d-none" : string.Empty)">No image</div>
+                        @if (Model.CanEditProfile)
+                        {
+                            <div class="profile-image-overlay d-none" id="profile-image-overlay" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" class="profile-image-overlay__icon" focusable="false" aria-hidden="true">
+                                    <path d="M12 16.5a1 1 0 0 1-1-1V8.92l-2.8 2.79a1 1 0 1 1-1.4-1.42l4.5-4.5a1 1 0 0 1 1.4 0l4.5 4.5a1 1 0 1 1-1.4 1.42L13 8.92v6.58a1 1 0 0 1-1 1Z" fill="currentColor"/>
+                                    <path d="M6.5 18a1 1 0 0 1 0-2h11a1 1 0 1 1 0 2h-11Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                        }
+                    </div>
+                </button>
+                @if (Model.CanEditProfile)
+                {
+                    <input id="image-upload" type="file" accept=".png,.jpg,.jpeg,.gif,.webp" hidden />
+                }
+
+                <div class="bio-module__contacts">
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.PhoneNumber) ? "d-none" : string.Empty)" id="contact-phone">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="bio-contact-item__icon-svg" focusable="false">
+                                <path d="M7.8 4.5c.4-.4 1-.5 1.5-.3l2.3 1c.6.2.9.9.8 1.5l-.4 2c0 .4 0 .8.3 1.1l2.8 2.8c.3.3.7.4 1.1.3l2-.4c.6-.1 1.2.2 1.5.8l1 2.3c.2.5.1 1.1-.3 1.5l-1.3 1.3c-.7.7-1.7 1-2.7.8-2.6-.5-5-1.8-7.2-4S5.9 10 5.4 7.4c-.2-1 .1-2 .8-2.7L7.8 4.5Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <span class="bio-contact-item__value" id="contact-phone-value">@Model.Profile.PhoneNumber</span>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.Email) ? "d-none" : string.Empty)" id="contact-email">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="bio-contact-item__icon-svg" focusable="false">
+                                <path d="M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-11Zm1.8.1 6.2 4.8 6.2-4.8H5.8Zm12.7 1.8-5.9 4.6a1 1 0 0 1-1.2 0L5.5 8.4v9.1h13V8.4Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-email-value" href="mailto:@Model.Profile.Email">@Model.Profile.Email</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.LinkedInUrl) ? "d-none" : string.Empty)" id="contact-linkedin">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" class="bio-contact-item__icon-svg bio-contact-item__icon-svg--social" focusable="false">
+                                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146ZM4.943 13.5V6.169H2.542V13.5h2.401ZM3.743 5.167c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.343-1.248-.821 0-1.358.54-1.358 1.248 0 .694.521 1.248 1.327 1.248h.016ZM13.5 13.5V9.198c0-2.304-1.228-3.375-2.863-3.375-1.321 0-1.913.73-2.244 1.243V6.169H6.001c.03.595 0 7.331 0 7.331h2.392V9.405c0-.22.016-.44.081-.598.177-.44.58-.896 1.256-.896.886 0 1.241.676 1.241 1.668V13.5H13.5Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-linkedin-value" href="@Model.Profile.LinkedInUrl" target="_blank" rel="noopener noreferrer">@Model.Profile.LinkedInUrl</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.XUrl) ? "d-none" : string.Empty)" id="contact-x">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" class="bio-contact-item__icon-svg bio-contact-item__icon-svg--social" focusable="false">
+                                <path d="M12.6.75h2.11l-4.61 5.27 5.4 8.23h-4.4l-3.45-4.5-3.94 4.5H1.6l4.93-5.64L1.25.75h4.51l3.12 4.12L12.6.75Zm-.74 12.5h1.17L5.12 1.93H3.86l8 11.32Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-x-value" href="@Model.Profile.XUrl" target="_blank" rel="noopener noreferrer">@Model.Profile.XUrl</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.InstagramUrl) ? "d-none" : string.Empty)" id="contact-instagram">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="bio-contact-item__icon-svg bio-contact-item__icon-svg--social" focusable="false">
+                                <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-instagram-value" href="@Model.Profile.InstagramUrl" target="_blank" rel="noopener noreferrer">@Model.Profile.InstagramUrl</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.GithubUrl) ? "d-none" : string.Empty)" id="contact-github">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" class="bio-contact-item__icon-svg bio-contact-item__icon-svg--social" focusable="false">
+                                <path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.64 7.64 0 0 1 8 4.68c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 8 0Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-github-value" href="@Model.Profile.GithubUrl" target="_blank" rel="noopener noreferrer">@Model.Profile.GithubUrl</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.PortfolioUrl) ? "d-none" : string.Empty)" id="contact-portfolio">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="bio-contact-item__icon-svg" focusable="false">
+                                <path d="M12 4 3 10.4v1.6h1.5V20h6v-5h3V20h6v-7.99H21v-1.6L12 4Zm5.5 14h-2.5v-5h-7v5H6.5v-6.3L12 7.7l5.5 4Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-portfolio-value" href="@Model.Profile.PortfolioUrl" target="_blank" rel="noopener noreferrer">@Model.Profile.PortfolioUrl</a>
+                    </div>
+                    <div class="bio-contact-item @(string.IsNullOrWhiteSpace(Model.Profile.ImportedResumeDownloadUrl) ? "d-none" : string.Empty)" id="contact-resume">
+                        <span class="bio-contact-item__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="bio-contact-item__icon-svg" focusable="false">
+                                <path d="M7 3.5h7.5L20 9v11.5A1.5 1.5 0 0 1 18.5 22h-11A1.5 1.5 0 0 1 6 20.5v-15A2 2 0 0 1 7 3.5Zm6.5 1.8V9h3.7l-3.7-3.7Zm-5.5.2v15h10V10.5h-4A1.5 1.5 0 0 1 12.5 9v-4h-4.5Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <a class="bio-contact-item__value" id="contact-resume-value" href="@Model.Profile.ImportedResumeDownloadUrl" target="_blank" rel="noopener noreferrer">@(!string.IsNullOrWhiteSpace(Model.Profile.ImportedResumeFileName) ? Model.Profile.ImportedResumeFileName : "Resume.pdf")</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bio-module__right">
+                <div id="bio-display">
+                    <h1 class="bio-module__name" id="profile-display-name-preview">@displayName</h1>
+                    <div class="bio-module__meta">
+                        <span id="profile-location-preview" class="@(string.IsNullOrWhiteSpace(Model.Profile.Location) ? "d-none" : string.Empty)">@Model.Profile.Location</span>
+                        <span id="profile-role-company-preview" class="@(string.IsNullOrWhiteSpace(currentRoleCompany) ? "d-none" : string.Empty)">@currentRoleCompany</span>
+                    </div>
+                    <p class="bio-module__headline" id="profile-headline-preview">@headline</p>
+                    <p class="bio-module__summary" id="profile-summary-preview">@summary</p>
+                </div>
+
+                @if (Model.CanEditProfile)
+                {
+                    <div class="bio-module__editor d-none" id="bio-editor">
+                        <div class="bio-module__editor-grid">
+                            <div>
+                                <label class="form-label" for="display-name">Name</label>
+                                <input class="form-control" id="display-name" value="@Model.Profile.DisplayName" />
+                            </div>
+                            <div>
+                                <label class="form-label" for="location">Location</label>
+                                <input class="form-control" id="location" value="@Model.Profile.Location" placeholder="Austin, TX" />
+                            </div>
+                            <div>
+                                <label class="form-label" for="current-role-title">Current Position</label>
+                                <input class="form-control" id="current-role-title" value="@Model.Profile.CurrentRoleTitle" placeholder="Staff Engineer" />
+                            </div>
+                            <div>
+                                <label class="form-label" for="current-company">Current Company</label>
+                                <input class="form-control" id="current-company" value="@Model.Profile.CurrentCompany" placeholder="Atlas Universalis" />
+                            </div>
+                            <div class="bio-module__editor-wide">
+                                <label class="form-label" for="headline">Professional Headline</label>
+                                <input class="form-control" id="headline" value="@Model.Profile.Headline" placeholder="AI Trainer | Data Analyst | Python, SQL, Analytics" />
+                            </div>
+                            <div class="bio-module__editor-wide">
+                                <label class="form-label" for="summary">Summary</label>
+                                <textarea class="form-control profile-textarea" id="summary" rows="5" placeholder="Write the summary that should anchor tailored resumes and application materials.">@Model.Profile.Summary</textarea>
+                            </div>
+                            <div>
+                                <label class="form-label" for="phone-number">Phone</label>
+                                <input class="form-control" id="phone-number" value="@Model.Profile.PhoneNumber" />
+                            </div>
+                            <div>
+                                <label class="form-label" for="email">Email</label>
+                                <input class="form-control" id="email" value="@Model.Profile.Email" />
+                            </div>
+                            <div>
+                                <label class="form-label" for="linkedin-url">LinkedIn</label>
+                                <input class="form-control" id="linkedin-url" value="@Model.Profile.LinkedInUrl" placeholder="https://linkedin.com/in/..." />
+                            </div>
+                            <div>
+                                <label class="form-label" for="x-url">X</label>
+                                <input class="form-control" id="x-url" value="@Model.Profile.XUrl" placeholder="https://x.com/..." />
+                            </div>
+                            <div>
+                                <label class="form-label" for="instagram-url">Instagram</label>
+                                <input class="form-control" id="instagram-url" value="@Model.Profile.InstagramUrl" placeholder="https://instagram.com/..." />
+                            </div>
+                            <div>
+                                <label class="form-label" for="github-url">GitHub</label>
+                                <input class="form-control" id="github-url" value="@Model.Profile.GithubUrl" placeholder="https://github.com/..." />
+                            </div>
+                            <div class="bio-module__editor-wide">
+                                <label class="form-label" for="portfolio-url">Personal Website</label>
+                                <input class="form-control" id="portfolio-url" value="@Model.Profile.PortfolioUrl" placeholder="https://your-site.com" />
+                            </div>
+                        </div>
+
+                        <div class="resume-preview-card bio-module__resume-tools">
+                            <a id="resume-preview-link" class="resume-preview-card__thumb @(string.IsNullOrWhiteSpace(Model.Profile.ImportedResumeDownloadUrl) ? "disabled" : string.Empty)" href="@Model.Profile.ImportedResumeDownloadUrl" target="_blank" rel="noopener noreferrer">
+                                <img id="resume-preview-image" class="resume-preview-card__image @(string.IsNullOrWhiteSpace(Model.Profile.ImportedResumePreviewUrl) ? "d-none" : string.Empty)" src="@Model.Profile.ImportedResumePreviewUrl" alt="Imported resume preview" />
+                                <div id="resume-preview-placeholder" class="resume-preview-card__placeholder @(string.IsNullOrWhiteSpace(Model.Profile.ImportedResumePreviewUrl) ? string.Empty : "d-none")">
+                                    Upload a PDF resume to generate a preview image here.
+                                </div>
+                            </a>
+                            <div class="resume-preview-card__meta">
+                                <small class="text-muted" id="resume-import-name">@(!string.IsNullOrWhiteSpace(Model.Profile.ImportedResumeFileName) ? Model.Profile.ImportedResumeFileName : "No resume imported yet")</small>
+                                <p class="job-copy mb-2" id="resume-import-processor">@Model.Profile.ImportedResumeSummary</p>
+                                <small class="text-muted" id="resume-import-date">
+                                    @(Model.Profile.ImportedResumeUtc.HasValue ? $"Imported {Model.Profile.ImportedResumeUtc.Value.ToLocalTime():g}" : string.Empty)
+                                </small>
+                                <div class="profile-inline-actions">
+                                    <label class="btn btn-outline-primary btn-sm mb-0" for="resume-upload">Upload Document</label>
+                                    <input id="resume-upload" type="file" accept=".docx,.txt,.pdf,.json" hidden />
+                                    <a id="resume-open-original" class="btn btn-outline-secondary btn-sm @(string.IsNullOrWhiteSpace(Model.Profile.ImportedResumeDownloadUrl) ? "disabled" : string.Empty)" href="@Model.Profile.ImportedResumeDownloadUrl" target="_blank" rel="noopener noreferrer">Open original</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-section-attachment" id="bio-section-doc">
+                            <div class="panel-head-row">
+                                <h3 class="job-subtitle mb-0">Supporting document</h3>
+                                <small class="text-muted">Optional file attached to the Profile section (separate from resume import below).</small>
+                            </div>
+                            <div class="profile-inline-actions profile-inline-actions--wrap">
+                                <small class="text-muted mb-0" id="section-doc-bio-name">No supporting document</small>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <label class="btn btn-outline-primary btn-sm mb-0" for="section-doc-bio-upload">Upload Document</label>
+                                    <input id="section-doc-bio-upload" type="file" accept=".docx,.txt,.pdf,.json" hidden />
+                                    <a id="section-doc-bio-open" class="btn btn-outline-secondary btn-sm d-none" href="#" target="_blank" rel="noopener noreferrer">Open</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-import-panel">
+                            <div class="panel-head-row">
+                                <h3 class="job-subtitle mb-0">LinkedIn Import</h3>
+                                <small class="text-muted">Public URL or pasted profile text</small>
+                            </div>
+                            <div class="profile-form-grid">
+                                <div class="profile-form-grid__wide">
+                                    <label class="form-label" for="linkedin-import-url">LinkedIn profile URL</label>
+                                    <input class="form-control" id="linkedin-import-url" placeholder="https://www.linkedin.com/in/your-profile" value="@Model.Profile.LinkedInUrl" />
+                                </div>
+                                <div class="profile-form-grid__wide">
+                                    <label class="form-label" for="linkedin-import-text">Pasted LinkedIn profile text</label>
+                                    <textarea class="form-control profile-textarea profile-textarea--compact" id="linkedin-import-text" rows="4" placeholder="If LinkedIn blocks the URL fetch, paste the visible profile text here instead."></textarea>
+                                </div>
+                            </div>
+                            <div class="profile-inline-actions">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="import-linkedin">Import LinkedIn profile</button>
+                                <small id="linkedin-import-result" class="text-muted"></small>
+                            </div>
+                        </div>
+
+                        <div class="bio-module__editor-actions">
+                            <button type="button" class="btn btn-primary" id="bio-save">Save bio</button>
+                            <button type="button" class="btn btn-outline-secondary" id="bio-cancel">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" id="bio-clear">Clear</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </article>
+
+    <article class="apply-panel experience-module">
+        <div class="bio-module__toolbar">
+            <p class="apply-kicker">Experience</p>
+            @if (Model.CanEditProfile)
+            {
+                <div class="bio-module__toolbar-actions">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="experience-edit-toggle">Edit</button>
+                    <small id="experience-message" class="text-muted"></small>
+                </div>
+            }
+        </div>
+
+        <div class="experience-module__shell">
+            <div id="experience-display" class="experience-module__display">
+                <div id="experience-list" class="profile-list-host experience-module__list">
+                    @if (Model.Profile.Experience.Count == 0)
+                    {
+                        <div class="experience-module__empty">
+                            <p class="text-muted mb-0">No experience added yet. Add your recent roles, 3-5 highlights per role, and the skills used in each position.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Profile.Experience)
+                        {
+                            var experienceDates = string.Join(" - ", new[] { item.StartDate, item.IsCurrent ? "Present" : item.EndDate }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                            <article class="public-resume__entry experience-module__entry">
+                                <div class="public-resume__entry-head">
+                                    <div>
+                                        @if (item.IsCurrent)
+                                        {
+                                            <p class="experience-module__entry-label">Current role</p>
+                                        }
+                                        <h3>@(item.RoleTitle ?? "Role")</h3>
+                                        @if (!string.IsNullOrWhiteSpace(item.Company))
+                                        {
+                                            <p class="public-resume__entry-subtitle">@item.Company</p>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(item.Summary))
+                                        {
+                                            <p class="experience-module__summary">@item.Summary</p>
+                                        }
+                                    </div>
+                                    <div class="public-resume__entry-meta">
+                                        @if (!string.IsNullOrWhiteSpace(experienceDates))
+                                        {
+                                            <span>@experienceDates</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(item.Location))
+                                        {
+                                            <span>@item.Location</span>
+                                        }
+                                    </div>
+                                </div>
+                                @if (item.Skills?.Count > 0)
+                                {
+                                    <div class="public-resume__skills experience-module__skills">
+                                        @foreach (var skill in item.Skills)
+                                        {
+                                            <span class="public-resume__skill public-resume__skill--muted">@skill</span>
+                                        }
+                                    </div>
+                                }
+                                @if (item.Highlights?.Count > 0)
+                                {
+                                    <ul class="experience-module__highlights">
+                                        @foreach (var highlight in item.Highlights)
+                                        {
+                                            <li>@highlight</li>
+                                        }
+                                    </ul>
+                                }
+                            </article>
+                        }
+                    }
+                </div>
+            </div>
+
+            @if (Model.CanEditProfile)
+            {
+                <div class="bio-module__editor d-none" id="experience-editor">
+                    <div class="experience-module__editor-head">
+                        <div>
+                            <h3 class="job-subtitle mb-0">Role history</h3>
+                            <p class="job-copy mb-0">List roles from most recent to least recent. Use up to 5 lines to describe the role, and up to 5 bullet highlights; Atlas will infer role skills when you leave that field blank.</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="experience-add">Add role</button>
+                    </div>
+
+                    <div class="profile-section-attachment" id="experience-section-doc">
+                        <div class="panel-head-row">
+                            <h3 class="job-subtitle mb-0">Supporting document</h3>
+                            <small class="text-muted">Optional file attached to the Experience section (e.g. portfolio samples or references).</small>
+                        </div>
+                        <div class="profile-inline-actions profile-inline-actions--wrap">
+                            <small class="text-muted mb-0" id="section-doc-experience-name">No supporting document</small>
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <label class="btn btn-outline-primary btn-sm mb-0" for="section-doc-experience-upload">Upload Document</label>
+                                <input id="section-doc-experience-upload" type="file" accept=".docx,.txt,.pdf,.json" hidden />
+                                <a id="section-doc-experience-open" class="btn btn-outline-secondary btn-sm d-none" href="#" target="_blank" rel="noopener noreferrer">Open</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="experience-editor-list" class="profile-list-host"></div>
+
+                    <div class="bio-module__editor-actions">
+                        <button type="button" class="btn btn-primary" id="experience-save">Save experience</button>
+                        <button type="button" class="btn btn-outline-secondary" id="experience-cancel">Cancel</button>
+                        <button type="button" class="btn btn-outline-secondary" id="experience-clear">Clear</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </article>
+
+    <div class="profile-grid">
+        <article class="apply-panel">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Skills</h2>
+            </div>
+            <div id="skills-list" class="skills-list-host"></div>
+        </article>
+
+        <article class="apply-panel">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Education</h2>
+            </div>
+            <div id="education-list" class="profile-list-host"></div>
+        </article>
+
+        <article class="apply-panel">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Projects</h2>
+            </div>
+            <div id="projects-list" class="profile-list-host"></div>
+        </article>
+
+        <article class="apply-panel profile-grid__main">
+            <div class="panel-head-row">
+                <h2 class="panel-title mb-0">Certifications</h2>
+            </div>
+            <div id="certifications-list" class="profile-list-host"></div>
+        </article>
+    </div>
+</section>
+
+<template id="skill-template">
+    <span class="public-resume__skill"></span>
+</template>
+
+<template id="experience-display-template">
+    <article class="public-resume__entry experience-module__entry">
+        <div class="public-resume__entry-head">
+            <div>
+                <p class="experience-module__entry-label d-none" data-status></p>
+                <h3 data-role-title></h3>
+                <p class="public-resume__entry-subtitle" data-company></p>
+            </div>
+            <div class="public-resume__entry-meta">
+                <span data-dates></span>
+                <span data-location></span>
+            </div>
+        </div>
+        <p class="experience-module__summary d-none" data-summary></p>
+        <div class="public-resume__skills experience-module__skills d-none" data-skills></div>
+        <ul class="experience-module__highlights" data-highlights></ul>
+    </article>
+</template>
+
+<template id="experience-editor-template">
+    <article class="profile-entry">
+        <div class="profile-entry__toolbar">
+            <strong data-entry-title>Role</strong>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-remove>Remove</button>
+        </div>
+        <div class="profile-entry__grid">
+            <div>
+                <label class="form-label">Role title</label>
+                <input class="form-control" data-field="roleTitle" placeholder="Senior Product Designer" />
+            </div>
+            <div>
+                <label class="form-label">Company</label>
+                <input class="form-control" data-field="company" placeholder="Atlas Universalis" />
+            </div>
+            <div>
+                <label class="form-label">Location</label>
+                <input class="form-control" data-field="location" placeholder="Remote" />
+            </div>
+            <div class="profile-entry__checkbox-wrap">
+                <label class="profile-checkbox">
+                    <input type="checkbox" data-field="isCurrent" />
+                    <span>Current role</span>
+                </label>
+            </div>
+            <div>
+                <label class="form-label">Start date</label>
+                <input class="form-control" data-field="startDate" placeholder="Jan 2023" />
+            </div>
+            <div>
+                <label class="form-label">End date</label>
+                <input class="form-control" data-field="endDate" data-end-date placeholder="Dec 2025" />
+            </div>
+            <div class="profile-entry__wide">
+                <label class="form-label">Role description</label>
+                <textarea class="form-control profile-textarea profile-textarea--compact" data-field="summary" rows="5" placeholder="Optional role context, scope, or team fit — up to 5 lines. Add bullets below for concrete wins."></textarea>
+            </div>
+            <div class="profile-entry__wide">
+                <label class="form-label">Highlights (up to 5)</label>
+                <textarea class="form-control profile-textarea profile-textarea--compact" data-field="highlights" rows="5" placeholder="Up to 5 bullet points, one per line. Focus on scope, outcomes, and measurable impact."></textarea>
+            </div>
+            <div class="profile-entry__wide">
+                <label class="form-label">Skills used</label>
+                <input class="form-control" data-field="skills" placeholder="Optional. Comma-separated. Atlas will infer role skills if you leave this blank." />
+            </div>
+        </div>
+    </article>
+</template>
+
+<template id="education-display-template">
+    <article class="public-resume__entry">
+        <div class="public-resume__entry-head">
+            <div>
+                <h3 data-school></h3>
+                <p class="public-resume__entry-subtitle" data-degree></p>
+            </div>
+            <div class="public-resume__entry-meta">
+                <span data-dates></span>
+                <span data-location></span>
+            </div>
+        </div>
+        <p data-summary></p>
+    </article>
+</template>
+
+<template id="project-display-template">
+    <article class="public-resume__entry">
+        <div class="public-resume__entry-head">
+            <div>
+                <h3 data-name></h3>
+                <p class="public-resume__entry-subtitle" data-role></p>
+            </div>
+            <div class="public-resume__entry-meta">
+                <span data-dates></span>
+                <a data-link target="_blank" rel="noopener noreferrer">View project</a>
+            </div>
+        </div>
+        <p data-summary></p>
+        <div class="public-resume__skills" data-technologies></div>
+        <ul data-highlights></ul>
+    </article>
+</template>
+
+<template id="certification-display-template">
+    <article class="public-resume__entry">
+        <div class="public-resume__entry-head">
+            <div>
+                <h3 data-name></h3>
+                <p class="public-resume__entry-subtitle" data-issuer></p>
+            </div>
+            <div class="public-resume__entry-meta">
+                <span data-issued></span>
+                <a data-link target="_blank" rel="noopener noreferrer">Verify</a>
+            </div>
+        </div>
+        <p data-summary></p>
+    </article>
+</template>
+
+@section Scripts
+{
+    <script>
+        (() => {
+            const initialProfile = @Html.Raw(profileJson);
+            const state = structuredClone(initialProfile);
+            const canEdit = @Model.CanEditProfile.ToString().ToLowerInvariant();
+
+            const messageEl = document.getElementById("profile-message");
+            const warningEl = document.getElementById("profile-warning");
+            const bioEditToggle = document.getElementById("bio-edit-toggle");
+            const bioDisplay = document.getElementById("bio-display");
+            const bioEditor = document.getElementById("bio-editor");
+            const imagePreview = document.getElementById("profile-image-preview");
+            const imagePlaceholder = document.getElementById("profile-image-placeholder");
+            const imageOverlay = document.getElementById("profile-image-overlay");
+            const profileImageTrigger = document.getElementById("profile-image-trigger");
+            const imageUpload = document.getElementById("image-upload");
+            const displayNamePreview = document.getElementById("profile-display-name-preview");
+            const headlinePreview = document.getElementById("profile-headline-preview");
+            const summaryPreview = document.getElementById("profile-summary-preview");
+            const locationPreview = document.getElementById("profile-location-preview");
+            const currentRoleCompanyPreview = document.getElementById("profile-role-company-preview");
+            const phoneContact = document.getElementById("contact-phone");
+            const emailContact = document.getElementById("contact-email");
+            const linkedInContact = document.getElementById("contact-linkedin");
+            const xContact = document.getElementById("contact-x");
+            const instagramContact = document.getElementById("contact-instagram");
+            const githubContact = document.getElementById("contact-github");
+            const portfolioContact = document.getElementById("contact-portfolio");
+            const resumeContact = document.getElementById("contact-resume");
+            const phoneContactValue = document.getElementById("contact-phone-value");
+            const emailContactValue = document.getElementById("contact-email-value");
+            const linkedInContactValue = document.getElementById("contact-linkedin-value");
+            const xContactValue = document.getElementById("contact-x-value");
+            const instagramContactValue = document.getElementById("contact-instagram-value");
+            const githubContactValue = document.getElementById("contact-github-value");
+            const portfolioContactValue = document.getElementById("contact-portfolio-value");
+            const resumeContactValue = document.getElementById("contact-resume-value");
+            const resumeImportName = document.getElementById("resume-import-name");
+            const resumeImportProcessor = document.getElementById("resume-import-processor");
+            const resumeImportDate = document.getElementById("resume-import-date");
+            const resumePreviewImage = document.getElementById("resume-preview-image");
+            const resumePreviewPlaceholder = document.getElementById("resume-preview-placeholder");
+            const resumePreviewLink = document.getElementById("resume-preview-link");
+            const resumeOpenOriginal = document.getElementById("resume-open-original");
+            const resumeUpload = document.getElementById("resume-upload");
+            const linkedinImportResult = document.getElementById("linkedin-import-result");
+            const experienceEditToggle = document.getElementById("experience-edit-toggle");
+            const experienceDisplay = document.getElementById("experience-display");
+            const experienceEditor = document.getElementById("experience-editor");
+            const experienceMessageEl = document.getElementById("experience-message");
+            const experienceEditorList = document.getElementById("experience-editor-list");
+            const experienceAddButton = document.getElementById("experience-add");
+            const experienceSaveButton = document.getElementById("experience-save");
+            const experienceCancelButton = document.getElementById("experience-cancel");
+            const experienceClearButton = document.getElementById("experience-clear");
+            const bioClearButton = document.getElementById("bio-clear");
+            const sectionDocBioName = document.getElementById("section-doc-bio-name");
+            const sectionDocBioUpload = document.getElementById("section-doc-bio-upload");
+            const sectionDocBioOpen = document.getElementById("section-doc-bio-open");
+            const sectionDocExperienceName = document.getElementById("section-doc-experience-name");
+            const sectionDocExperienceUpload = document.getElementById("section-doc-experience-upload");
+            const sectionDocExperienceOpen = document.getElementById("section-doc-experience-open");
+            let experienceDraft = [];
+
+            const setInlineMessage = (element, message, isError = false) => {
+                if (!element) return;
+                element.textContent = message || "";
+                element.classList.toggle("board-action-result--error", !!isError);
+                element.classList.toggle("board-action-result--success", !isError && !!message);
+            };
+
+            const setMessage = (message, isError = false) => setInlineMessage(messageEl, message, isError);
+
+            const setFieldValue = (id, value = "") => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value;
+                }
+            };
+
+            const getTrimmedValue = (id) => {
+                const element = document.getElementById(id);
+                if (!element) return null;
+                const trimmed = element.value.trim();
+                return trimmed || null;
+            };
+
+            const fetchWithTimeout = async (url, options, timeoutMs = 120000) => {
+                const controller = new AbortController();
+                const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    return await fetch(url, { ...options, signal: controller.signal });
+                } finally {
+                    window.clearTimeout(timeoutId);
+                }
+            };
+
+            const setWarning = (items) => {
+                const warnings = Array.isArray(items) ? items.filter(Boolean) : [];
+                if (warnings.length === 0) {
+                    warningEl.textContent = "";
+                    warningEl.classList.add("d-none");
+                    return;
+                }
+
+                warningEl.innerHTML = warnings.join(" ");
+                warningEl.classList.remove("d-none");
+            };
+
+            const updateImageUI = () => {
+                if (state.hasProfileImage && state.profileImageUrl) {
+                    imagePreview.src = state.profileImageUrl;
+                    imagePreview.classList.remove("d-none");
+                    imagePlaceholder.classList.add("d-none");
+                } else {
+                    imagePreview.classList.add("d-none");
+                    imagePreview.removeAttribute("src");
+                    imagePlaceholder.classList.remove("d-none");
+                }
+            };
+
+            const trimExperienceSummary = (value) => {
+                if (!value) return null;
+                const lines = value.replace(/\r\n/g, "\n").split("\n");
+                const firstFive = lines.slice(0, 5).map((line) => line.replace(/\s+/g, " ").trim());
+                const text = firstFive.join("\n").trim();
+                return text || null;
+            };
+
+            const updateSectionDocumentUI = () => {
+                if (!sectionDocBioName || !sectionDocExperienceName) return;
+                const bio = state.sectionDocumentBio;
+                const exp = state.sectionDocumentExperience;
+                const hasBio = bio?.hasDocument && bio?.fileName;
+                const hasExp = exp?.hasDocument && exp?.fileName;
+                sectionDocBioName.textContent = hasBio ? bio.fileName : "No supporting document";
+                sectionDocExperienceName.textContent = hasExp ? exp.fileName : "No supporting document";
+                if (sectionDocBioOpen) {
+                    sectionDocBioOpen.classList.toggle("d-none", !hasBio);
+                    if (hasBio && bio.downloadUrl) {
+                        sectionDocBioOpen.href = bio.downloadUrl;
+                    } else {
+                        sectionDocBioOpen.removeAttribute("href");
+                    }
+                }
+                if (sectionDocExperienceOpen) {
+                    sectionDocExperienceOpen.classList.toggle("d-none", !hasExp);
+                    if (hasExp && exp.downloadUrl) {
+                        sectionDocExperienceOpen.href = exp.downloadUrl;
+                    } else {
+                        sectionDocExperienceOpen.removeAttribute("href");
+                    }
+                }
+            };
+
+            const updateResumeUI = () => {
+                if (!resumeImportName) return;
+                resumeImportName.textContent = state.importedResumeFileName || "No resume imported yet";
+                resumeImportProcessor.textContent = state.importedResumeSummary || "";
+                resumeImportDate.textContent = state.importedResumeUtc
+                    ? `Imported ${new Date(state.importedResumeUtc).toLocaleString()}`
+                    : "";
+
+                if (state.importedResumePreviewUrl) {
+                    resumePreviewImage.src = state.importedResumePreviewUrl;
+                    resumePreviewImage.classList.remove("d-none");
+                    resumePreviewPlaceholder.classList.add("d-none");
+                } else {
+                    resumePreviewImage.classList.add("d-none");
+                    resumePreviewImage.removeAttribute("src");
+                    resumePreviewPlaceholder.classList.remove("d-none");
+                }
+
+                const hasResume = !!state.importedResumeDownloadUrl;
+                [resumePreviewLink, resumeOpenOriginal, resumeContactValue].forEach((el) => {
+                    if (!el) return;
+                    if (hasResume) {
+                        el.href = state.importedResumeDownloadUrl;
+                        el.classList.remove("disabled");
+                    } else {
+                        el.removeAttribute("href");
+                        el.classList.add("disabled");
+                    }
+                });
+                resumeContact.classList.toggle("d-none", !hasResume);
+            };
+
+            const createLocalId = () => {
+                const id = window.crypto?.randomUUID?.();
+                return id ? id.replace(/-/g, "") : `exp${Date.now()}${Math.random().toString(16).slice(2, 8)}`;
+            };
+
+            const cloneExperienceEntry = (item = {}) => ({
+                id: item.id || createLocalId(),
+                roleTitle: item.roleTitle || "",
+                company: item.company || "",
+                location: item.location || "",
+                startDate: item.startDate || "",
+                endDate: item.endDate || "",
+                isCurrent: !!item.isCurrent,
+                summary: item.summary || "",
+                highlights: Array.isArray(item.highlights) ? [...item.highlights] : [],
+                skills: Array.isArray(item.skills) ? [...item.skills] : []
+            });
+
+            const normalizeLines = (value) => (value || "")
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            const normalizeSkillValues = (value) => (value || "")
+                .split(/[,\n;|]/)
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            const experienceMonthRank = {
+                jan: 1,
+                feb: 2,
+                mar: 3,
+                apr: 4,
+                may: 5,
+                jun: 6,
+                jul: 7,
+                aug: 8,
+                sep: 9,
+                sept: 9,
+                oct: 10,
+                nov: 11,
+                dec: 12
+            };
+
+            const getExperienceDateRank = (value) => {
+                if (!value) return 0;
+                const lowered = value.toLowerCase();
+                if (lowered.includes("present") || lowered.includes("current")) {
+                    return Number.MAX_SAFE_INTEGER;
+                }
+
+                const yearMatch = lowered.match(/\b(19|20)\d{2}\b/);
+                if (!yearMatch) {
+                    return 0;
+                }
+
+                const monthMatch = lowered.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/);
+                const year = Number(yearMatch[0]);
+                const month = monthMatch ? (experienceMonthRank[monthMatch[1]] || 12) : 12;
+                return (year * 12) + month;
+            };
+
+            const getExperienceSortRank = (item) => {
+                if (item?.isCurrent) {
+                    return Number.MAX_SAFE_INTEGER;
+                }
+
+                return Math.max(
+                    getExperienceDateRank(item?.endDate),
+                    getExperienceDateRank(item?.startDate)
+                );
+            };
+
+            const sortExperienceEntries = (items) => [...(items || [])]
+                .map((item, index) => ({ item, index }))
+                .sort((left, right) => {
+                    const currentDiff = Number(right.item?.isCurrent) - Number(left.item?.isCurrent);
+                    if (currentDiff !== 0) {
+                        return currentDiff;
+                    }
+
+                    const rankDiff = getExperienceSortRank(right.item) - getExperienceSortRank(left.item);
+                    if (rankDiff !== 0) {
+                        return rankDiff;
+                    }
+
+                    return left.index - right.index;
+                })
+                .map(({ item }) => item);
+
+            const buildStatePayload = () => ({
+                email: state.email || null,
+                displayName: state.displayName || null,
+                headline: state.headline || null,
+                summary: state.summary || null,
+                location: state.location || null,
+                phoneNumber: state.phoneNumber || null,
+                linkedInUrl: state.linkedInUrl || null,
+                xUrl: state.xUrl || null,
+                instagramUrl: state.instagramUrl || null,
+                githubUrl: state.githubUrl || null,
+                portfolioUrl: state.portfolioUrl || null,
+                currentRoleTitle: state.preferences?.currentRoleTitle ?? null,
+                currentCompany: state.preferences?.currentCompany ?? null,
+                skills: Array.isArray(state.skills) ? [...state.skills] : [],
+                experience: structuredClone(state.experience || []),
+                education: structuredClone(state.education || []),
+                projects: structuredClone(state.projects || []),
+                certifications: structuredClone(state.certifications || []),
+                preferences: {
+                    currentRoleTitle: state.preferences?.currentRoleTitle ?? null,
+                    currentCompany: state.preferences?.currentCompany ?? null,
+                    targetRoles: state.preferences?.targetRoles || null,
+                    targetIndustries: state.preferences?.targetIndustries || null,
+                    workModes: state.preferences?.workModes || null,
+                    preferredLocations: state.preferences?.preferredLocations || null,
+                    xUrl: state.preferences?.xUrl ?? state.xUrl ?? null,
+                    instagramUrl: state.preferences?.instagramUrl ?? state.instagramUrl ?? null,
+                    notes: state.preferences?.notes || null
+                }
+            });
+
+            const buildPayload = (overrides = {}) => {
+                const payload = buildStatePayload();
+                return {
+                    ...payload,
+                    ...overrides,
+                    preferences: {
+                        ...payload.preferences,
+                        ...(overrides.preferences || {})
+                    }
+                };
+            };
+
+            const buildBioPayload = () => {
+                const currentRoleTitle = getTrimmedValue("current-role-title");
+                const currentCompany = getTrimmedValue("current-company");
+                const xUrl = getTrimmedValue("x-url");
+                const instagramUrl = getTrimmedValue("instagram-url");
+
+                return buildPayload({
+                    email: getTrimmedValue("email"),
+                    displayName: getTrimmedValue("display-name"),
+                    headline: getTrimmedValue("headline"),
+                    summary: getTrimmedValue("summary"),
+                    location: getTrimmedValue("location"),
+                    phoneNumber: getTrimmedValue("phone-number"),
+                    linkedInUrl: getTrimmedValue("linkedin-url"),
+                    xUrl,
+                    instagramUrl,
+                    githubUrl: getTrimmedValue("github-url"),
+                    portfolioUrl: getTrimmedValue("portfolio-url"),
+                    currentRoleTitle,
+                    currentCompany,
+                    preferences: {
+                        currentRoleTitle,
+                        currentCompany,
+                        targetRoles: getTrimmedValue("target-roles"),
+                        targetIndustries: getTrimmedValue("target-industries"),
+                        workModes: getTrimmedValue("work-modes"),
+                        preferredLocations: getTrimmedValue("preferred-locations"),
+                        xUrl,
+                        instagramUrl,
+                        notes: getTrimmedValue("preference-notes")
+                    }
+                });
+            };
+
+            const sanitizeExperience = (items) => items
+                .map((item) => {
+                    const highlightsRaw = Array.isArray(item.highlights)
+                        ? item.highlights.map((highlight) => highlight.trim()).filter(Boolean)
+                        : [];
+                    const highlights = highlightsRaw
+                        .filter((h, i, arr) => arr.findIndex((x) => x.toLowerCase() === h.toLowerCase()) === i)
+                        .slice(0, 5);
+                    const skills = Array.isArray(item.skills)
+                        ? item.skills.map((skill) => skill.trim()).filter(Boolean)
+                        : [];
+
+                    const normalized = {
+                        id: item.id || createLocalId(),
+                        roleTitle: item.roleTitle?.trim() || null,
+                        company: item.company?.trim() || null,
+                        location: item.location?.trim() || null,
+                        startDate: item.startDate?.trim() || null,
+                        endDate: item.isCurrent ? null : (item.endDate?.trim() || null),
+                        isCurrent: !!item.isCurrent,
+                        summary: trimExperienceSummary(item.summary),
+                        highlights,
+                        skills
+                    };
+
+                    const hasContent = normalized.roleTitle
+                        || normalized.company
+                        || normalized.location
+                        || normalized.startDate
+                        || normalized.endDate
+                        || normalized.summary
+                        || normalized.highlights.length
+                        || normalized.skills.length;
+
+                    return hasContent ? normalized : null;
+                })
+                .filter(Boolean);
+
+            const fillBasics = () => {
+                if (!canEdit) return;
+                setFieldValue("display-name", state.displayName || "");
+                setFieldValue("headline", state.headline || "");
+                setFieldValue("summary", state.summary || "");
+                setFieldValue("location", state.location || "");
+                setFieldValue("phone-number", state.phoneNumber || "");
+                setFieldValue("email", state.email || "");
+                setFieldValue("linkedin-url", state.linkedInUrl || "");
+                setFieldValue("x-url", state.xUrl || "");
+                setFieldValue("instagram-url", state.instagramUrl || "");
+                setFieldValue("github-url", state.githubUrl || "");
+                setFieldValue("portfolio-url", state.portfolioUrl || "");
+                setFieldValue("current-role-title", state.currentRoleTitle || "");
+                setFieldValue("current-company", state.currentCompany || "");
+                setFieldValue("target-roles", state.preferences?.targetRoles || "");
+                setFieldValue("target-industries", state.preferences?.targetIndustries || "");
+                setFieldValue("work-modes", state.preferences?.workModes || "");
+                setFieldValue("preferred-locations", state.preferences?.preferredLocations || "");
+                setFieldValue("preference-notes", state.preferences?.notes || "");
+                setFieldValue("linkedin-import-url", state.linkedInUrl || "");
+            };
+
+            const updateBioPreview = () => {
+                const displayName = canEdit ? (document.getElementById("display-name").value.trim() || "Your Name") : (state.displayName || "Your Name");
+                const headline = canEdit ? (document.getElementById("headline").value.trim() || "Add a clear headline for the roles you want.") : (state.headline || "Add a clear headline for the roles you want.");
+                const summary = canEdit ? (document.getElementById("summary").value.trim() || "Use this page as the polished source of truth for your experience, skills, and application materials.") : (state.summary || "Use this page as the polished source of truth for your experience, skills, and application materials.");
+                const location = canEdit ? document.getElementById("location").value.trim() : (state.location || "");
+                const phone = canEdit ? document.getElementById("phone-number").value.trim() : (state.phoneNumber || "");
+                const email = canEdit ? document.getElementById("email").value.trim() : (state.email || "");
+                const linkedIn = canEdit ? document.getElementById("linkedin-url").value.trim() : (state.linkedInUrl || "");
+                const xUrl = canEdit ? document.getElementById("x-url").value.trim() : (state.xUrl || "");
+                const instagram = canEdit ? document.getElementById("instagram-url").value.trim() : (state.instagramUrl || "");
+                const github = canEdit ? document.getElementById("github-url").value.trim() : (state.githubUrl || "");
+                const portfolio = canEdit ? document.getElementById("portfolio-url").value.trim() : (state.portfolioUrl || "");
+                const currentRoleTitle = canEdit ? document.getElementById("current-role-title").value.trim() : (state.currentRoleTitle || "");
+                const currentCompany = canEdit ? document.getElementById("current-company").value.trim() : (state.currentCompany || "");
+                const currentRoleCompany = [currentRoleTitle, currentCompany].filter(Boolean).join(" at ");
+
+                displayNamePreview.textContent = displayName;
+                headlinePreview.textContent = headline;
+                summaryPreview.textContent = summary;
+
+                locationPreview.textContent = location;
+                locationPreview.classList.toggle("d-none", !location);
+
+                currentRoleCompanyPreview.textContent = currentRoleCompany;
+                currentRoleCompanyPreview.classList.toggle("d-none", !currentRoleCompany);
+
+                phoneContactValue.textContent = phone;
+                phoneContact.classList.toggle("d-none", !phone);
+
+                emailContactValue.textContent = email;
+                emailContactValue.href = email ? `mailto:${email}` : "#";
+                emailContact.classList.toggle("d-none", !email);
+
+                linkedInContactValue.href = linkedIn || "#";
+                linkedInContactValue.textContent = linkedIn;
+                linkedInContact.classList.toggle("d-none", !linkedIn);
+
+                xContactValue.href = xUrl || "#";
+                xContactValue.textContent = xUrl;
+                xContact.classList.toggle("d-none", !xUrl);
+
+                instagramContactValue.href = instagram || "#";
+                instagramContactValue.textContent = instagram;
+                instagramContact.classList.toggle("d-none", !instagram);
+
+                githubContactValue.href = github || "#";
+                githubContactValue.textContent = github;
+                githubContact.classList.toggle("d-none", !github);
+
+                portfolioContactValue.href = portfolio || "#";
+                portfolioContactValue.textContent = portfolio;
+                portfolioContact.classList.toggle("d-none", !portfolio);
+            };
+
+            const createSkillChip = (skill) => {
+                const fragment = document.getElementById("skill-template").content.cloneNode(true);
+                fragment.querySelector(".public-resume__skill").textContent = skill;
+                return fragment;
+            };
+
+            const renderSkills = () => {
+                const host = document.getElementById("skills-list");
+                host.innerHTML = "";
+                const skills = state.skills || [];
+                if (skills.length === 0) {
+                    host.innerHTML = '<p class="text-muted mb-0">No skills added yet.</p>';
+                    return;
+                }
+
+                skills.forEach((skill) => host.appendChild(createSkillChip(skill)));
+            };
+
+            const renderExperience = () => {
+                const host = document.getElementById("experience-list");
+                if (!host) return;
+                host.innerHTML = "";
+                const items = sortExperienceEntries(state.experience || []);
+                if (items.length === 0) {
+                    host.innerHTML = '<div class="experience-module__empty"><p class="text-muted mb-0">No experience added yet. Add your recent roles, 3-5 highlights per role, and the skills used in each position.</p></div>';
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const fragment = document.getElementById("experience-display-template").content.cloneNode(true);
+                    const status = fragment.querySelector("[data-status]");
+                    status.textContent = item.isCurrent ? "Current role" : "";
+                    status.classList.toggle("d-none", !item.isCurrent);
+                    fragment.querySelector("[data-role-title]").textContent = item.roleTitle || "Role";
+                    const company = fragment.querySelector("[data-company]");
+                    company.textContent = item.company || "";
+                    company.classList.toggle("d-none", !item.company);
+                    const dates = fragment.querySelector("[data-dates]");
+                    dates.textContent = [item.startDate, item.isCurrent ? "Present" : item.endDate].filter(Boolean).join(" - ");
+                    dates.classList.toggle("d-none", !dates.textContent);
+                    const location = fragment.querySelector("[data-location]");
+                    location.textContent = item.location || "";
+                    location.classList.toggle("d-none", !item.location);
+
+                    const summary = fragment.querySelector("[data-summary]");
+                    if (summary) {
+                        summary.textContent = item.summary || "";
+                        summary.classList.toggle("d-none", !item.summary);
+                    }
+
+                    const skills = fragment.querySelector("[data-skills]");
+                    skills.innerHTML = "";
+                    (item.skills || []).forEach((skill) => {
+                        const span = document.createElement("span");
+                        span.className = "public-resume__skill public-resume__skill--muted";
+                        span.textContent = skill;
+                        skills.appendChild(span);
+                    });
+                    skills.classList.toggle("d-none", !skills.children.length);
+
+                    const ul = fragment.querySelector("[data-highlights]");
+                    ul.innerHTML = "";
+                    (item.highlights || []).forEach((highlight) => {
+                        const li = document.createElement("li");
+                        li.textContent = highlight;
+                        ul.appendChild(li);
+                    });
+                    ul.classList.toggle("d-none", !ul.children.length);
+
+                    host.appendChild(fragment);
+                });
+            };
+
+            const getExperienceEntryTitle = (item, index) => {
+                const roleTitle = item.roleTitle?.trim();
+                const company = item.company?.trim();
+                if (roleTitle && company) {
+                    return `${roleTitle} at ${company}`;
+                }
+
+                return roleTitle || company || `Role ${index + 1}`;
+            };
+
+            const updateExperienceEndDateState = (input, item) => {
+                if (!input) return;
+                input.disabled = !!item.isCurrent;
+                input.placeholder = item.isCurrent ? "Present" : "Dec 2025";
+                if (item.isCurrent) {
+                    input.value = "";
+                }
+            };
+
+            const renderExperienceEditor = () => {
+                if (!canEdit || !experienceEditorList) return;
+                experienceEditorList.innerHTML = "";
+
+                if (experienceDraft.length === 0) {
+                    experienceEditorList.innerHTML = '<div class="experience-module__empty experience-module__empty--editor"><p class="text-muted mb-0">No roles added yet. Start with your current or most relevant role.</p></div>';
+                    return;
+                }
+
+                experienceDraft.forEach((item, index) => {
+                    const fragment = document.getElementById("experience-editor-template").content.cloneNode(true);
+                    const card = fragment.querySelector(".profile-entry");
+                    const title = card.querySelector("[data-entry-title]");
+                    const roleTitleInput = card.querySelector('[data-field="roleTitle"]');
+                    const companyInput = card.querySelector('[data-field="company"]');
+                    const locationInput = card.querySelector('[data-field="location"]');
+                    const startDateInput = card.querySelector('[data-field="startDate"]');
+                    const endDateInput = card.querySelector('[data-end-date]');
+                    const currentRoleInput = card.querySelector('[data-field="isCurrent"]');
+                    const summaryInput = card.querySelector('[data-field="summary"]');
+                    const highlightsInput = card.querySelector('[data-field="highlights"]');
+                    const skillsInput = card.querySelector('[data-field="skills"]');
+                    const removeButton = card.querySelector("[data-remove]");
+
+                    title.textContent = getExperienceEntryTitle(item, index);
+                    roleTitleInput.value = item.roleTitle || "";
+                    companyInput.value = item.company || "";
+                    locationInput.value = item.location || "";
+                    startDateInput.value = item.startDate || "";
+                    endDateInput.value = item.endDate || "";
+                    currentRoleInput.checked = !!item.isCurrent;
+                    summaryInput.value = item.summary || "";
+                    highlightsInput.value = (item.highlights || []).join("\n");
+                    skillsInput.value = (item.skills || []).join(", ");
+                    updateExperienceEndDateState(endDateInput, item);
+
+                    roleTitleInput.addEventListener("input", (event) => {
+                        experienceDraft[index].roleTitle = event.target.value;
+                        title.textContent = getExperienceEntryTitle(experienceDraft[index], index);
+                    });
+
+                    companyInput.addEventListener("input", (event) => {
+                        experienceDraft[index].company = event.target.value;
+                        title.textContent = getExperienceEntryTitle(experienceDraft[index], index);
+                    });
+
+                    locationInput.addEventListener("input", (event) => {
+                        experienceDraft[index].location = event.target.value;
+                    });
+
+                    startDateInput.addEventListener("input", (event) => {
+                        experienceDraft[index].startDate = event.target.value;
+                    });
+
+                    endDateInput.addEventListener("input", (event) => {
+                        experienceDraft[index].endDate = event.target.value;
+                    });
+
+                    currentRoleInput.addEventListener("change", (event) => {
+                        const checked = event.target.checked;
+                        experienceDraft = sortExperienceEntries(experienceDraft.map((entry, entryIndex) => {
+                            if (entryIndex === index) {
+                                return {
+                                    ...entry,
+                                    isCurrent: checked,
+                                    endDate: checked ? "" : entry.endDate
+                                };
+                            }
+
+                            return checked ? { ...entry, isCurrent: false } : entry;
+                        }));
+
+                        renderExperienceEditor();
+                    });
+
+                    summaryInput.addEventListener("input", (event) => {
+                        const raw = event.target.value.replace(/\r\n/g, "\n");
+                        const parts = raw.split("\n");
+                        if (parts.length > 5) {
+                            event.target.value = parts.slice(0, 5).join("\n");
+                        }
+                        experienceDraft[index].summary = event.target.value;
+                    });
+
+                    highlightsInput.addEventListener("input", (event) => {
+                        let lines = normalizeLines(event.target.value);
+                        if (lines.length > 5) {
+                            lines = lines.slice(0, 5);
+                            event.target.value = lines.join("\n");
+                        }
+                        experienceDraft[index].highlights = lines;
+                    });
+
+                    skillsInput.addEventListener("input", (event) => {
+                        experienceDraft[index].skills = normalizeSkillValues(event.target.value);
+                    });
+
+                    removeButton.addEventListener("click", () => {
+                        experienceDraft = experienceDraft.filter((_, entryIndex) => entryIndex !== index);
+                        renderExperienceEditor();
+                    });
+
+                    experienceEditorList.appendChild(fragment);
+                });
+            };
+
+            const resetExperienceDraft = () => {
+                experienceDraft = sortExperienceEntries((state.experience || []).map(cloneExperienceEntry));
+                renderExperienceEditor();
+            };
+
+            const renderEducation = () => {
+                const host = document.getElementById("education-list");
+                host.innerHTML = "";
+                const items = state.education || [];
+                if (items.length === 0) {
+                    host.innerHTML = '<p class="text-muted mb-0">No education added yet.</p>';
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const fragment = document.getElementById("education-display-template").content.cloneNode(true);
+                    fragment.querySelector("[data-school]").textContent = item.school || "Education";
+                    fragment.querySelector("[data-degree]").textContent = [item.degree, item.fieldOfStudy].filter(Boolean).join(", ");
+                    fragment.querySelector("[data-dates]").textContent = [item.startDate, item.endDate].filter(Boolean).join(" - ");
+                    fragment.querySelector("[data-location]").textContent = item.location || "";
+
+                    const summary = fragment.querySelector("[data-summary]");
+                    summary.textContent = item.summary || "";
+                    summary.classList.toggle("d-none", !item.summary);
+
+                    host.appendChild(fragment);
+                });
+            };
+
+            const renderProjects = () => {
+                const host = document.getElementById("projects-list");
+                host.innerHTML = "";
+                const items = state.projects || [];
+                if (items.length === 0) {
+                    host.innerHTML = '<p class="text-muted mb-0">No projects added yet.</p>';
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const fragment = document.getElementById("project-display-template").content.cloneNode(true);
+                    fragment.querySelector("[data-name]").textContent = item.name || "Project";
+                    fragment.querySelector("[data-role]").textContent = item.role || "";
+                    fragment.querySelector("[data-dates]").textContent = [item.startDate, item.endDate].filter(Boolean).join(" - ");
+
+                    const summary = fragment.querySelector("[data-summary]");
+                    summary.textContent = item.summary || "";
+                    summary.classList.toggle("d-none", !item.summary);
+
+                    const link = fragment.querySelector("[data-link]");
+                    if (item.url) {
+                        link.href = item.url;
+                    } else {
+                        link.classList.add("d-none");
+                    }
+
+                    const techWrap = fragment.querySelector("[data-technologies]");
+                    techWrap.innerHTML = "";
+                    (item.technologies || []).forEach((tech) => {
+                        const span = document.createElement("span");
+                        span.className = "public-resume__skill public-resume__skill--muted";
+                        span.textContent = tech;
+                        techWrap.appendChild(span);
+                    });
+                    techWrap.classList.toggle("d-none", !techWrap.children.length);
+
+                    const ul = fragment.querySelector("[data-highlights]");
+                    ul.innerHTML = "";
+                    (item.highlights || []).forEach((highlight) => {
+                        const li = document.createElement("li");
+                        li.textContent = highlight;
+                        ul.appendChild(li);
+                    });
+                    ul.classList.toggle("d-none", !ul.children.length);
+
+                    host.appendChild(fragment);
+                });
+            };
+
+            const renderCertifications = () => {
+                const host = document.getElementById("certifications-list");
+                host.innerHTML = "";
+                const items = state.certifications || [];
+                if (items.length === 0) {
+                    host.innerHTML = '<p class="text-muted mb-0">No certifications added yet.</p>';
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const fragment = document.getElementById("certification-display-template").content.cloneNode(true);
+                    fragment.querySelector("[data-name]").textContent = item.name || "Certification";
+                    fragment.querySelector("[data-issuer]").textContent = item.issuer || "";
+                    fragment.querySelector("[data-issued]").textContent = item.issueDate ? `Issued ${item.issueDate}` : "";
+
+                    const summary = fragment.querySelector("[data-summary]");
+                    summary.textContent = item.summary || "";
+                    summary.classList.toggle("d-none", !item.summary);
+
+                    const link = fragment.querySelector("[data-link]");
+                    if (item.credentialUrl) {
+                        link.href = item.credentialUrl;
+                    } else {
+                        link.classList.add("d-none");
+                    }
+
+                    host.appendChild(fragment);
+                });
+            };
+
+            const applyProfileState = (profile) => {
+                Object.assign(state, profile);
+                state.experience = sortExperienceEntries(Array.isArray(state.experience) ? state.experience : []);
+                fillBasics();
+                updateImageUI();
+                updateResumeUI();
+                updateSectionDocumentUI();
+                updateBioPreview();
+                renderSkills();
+                renderExperience();
+                renderEducation();
+                renderProjects();
+                renderCertifications();
+                if (canEdit) {
+                    resetExperienceDraft();
+                }
+            };
+
+            const setBioEditing = (editing) => {
+                if (!canEdit || !bioEditor || !bioDisplay || !bioEditToggle) return;
+                bioEditor.classList.toggle("d-none", !editing);
+                bioDisplay.classList.toggle("d-none", editing);
+                bioEditToggle.textContent = editing ? "Close" : "Edit";
+                if (imageOverlay) {
+                    imageOverlay.classList.toggle("d-none", !editing);
+                }
+            };
+
+            const setExperienceEditing = (editing) => {
+                if (!canEdit || !experienceEditor || !experienceDisplay || !experienceEditToggle) return;
+                experienceEditor.classList.toggle("d-none", !editing);
+                experienceDisplay.classList.toggle("d-none", editing);
+                experienceEditToggle.textContent = editing ? "Close" : "Edit";
+            };
+
+            if (canEdit && bioEditToggle) {
+                bioEditToggle.addEventListener("click", () => {
+                    const editing = bioEditor.classList.contains("d-none");
+                    if (editing) {
+                        setExperienceEditing(false);
+                    }
+                    setBioEditing(editing);
+                });
+
+                ["display-name", "headline", "summary", "location", "phone-number", "email", "linkedin-url", "x-url", "instagram-url", "github-url", "portfolio-url", "current-role-title", "current-company"]
+                    .forEach((id) => document.getElementById(id).addEventListener("input", updateBioPreview));
+
+                profileImageTrigger.addEventListener("click", () => {
+                    if (!bioEditor.classList.contains("d-none")) {
+                        imageUpload.click();
+                    }
+                });
+
+                document.getElementById("bio-save").addEventListener("click", async () => {
+                    setMessage("Saving...");
+                    setWarning([]);
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile", {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(buildBioPayload())
+                        }, 60000);
+
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            setMessage(data.error || "Unable to save profile.", true);
+                            return;
+                        }
+
+                        const profile = await response.json();
+                        applyProfileState(profile);
+                        setBioEditing(false);
+                        setMessage("Bio updated.");
+                    } catch (error) {
+                        const message = error?.name === "AbortError"
+                            ? "Saving took too long. Please try again."
+                            : "Unable to save profile right now.";
+                        setMessage(message, true);
+                    }
+                });
+
+                document.getElementById("bio-cancel").addEventListener("click", () => {
+                    fillBasics();
+                    updateBioPreview();
+                    setBioEditing(false);
+                    setMessage("");
+                });
+
+                const patchSectionDocumentsFromProfile = (profile) => {
+                    if (!profile) {
+                        return;
+                    }
+                    state.sectionDocumentBio = profile.sectionDocumentBio;
+                    state.sectionDocumentExperience = profile.sectionDocumentExperience;
+                    updateSectionDocumentUI();
+                };
+
+                const clearBioEditorFields = () => {
+                    [
+                        "display-name", "headline", "summary", "location", "phone-number", "email", "linkedin-url", "x-url", "instagram-url", "github-url", "portfolio-url", "current-role-title", "current-company", "linkedin-import-url", "linkedin-import-text"
+                    ].forEach((id) => setFieldValue(id, ""));
+                    state.displayName = "";
+                    state.headline = "";
+                    state.summary = "";
+                    state.location = "";
+                    state.phoneNumber = "";
+                    state.email = "";
+                    state.linkedInUrl = "";
+                    state.xUrl = "";
+                    state.instagramUrl = "";
+                    state.githubUrl = "";
+                    state.portfolioUrl = "";
+                    state.currentRoleTitle = "";
+                    state.currentCompany = "";
+                    state.preferences = state.preferences || {};
+                    state.preferences.currentRoleTitle = "";
+                    state.preferences.currentCompany = "";
+                    state.preferences.xUrl = "";
+                    state.preferences.instagramUrl = "";
+                    updateBioPreview();
+                };
+
+                bioClearButton?.addEventListener("click", async () => {
+                    clearBioEditorFields();
+                    setMessage("");
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile/section-documents/bio", { method: "DELETE" }, 60000);
+                        if (response.ok) {
+                            const profile = await response.json();
+                            patchSectionDocumentsFromProfile(profile);
+                        }
+                    } catch {
+                        // Section document delete is optional if none existed
+                    }
+                });
+
+                if (experienceEditToggle) {
+                    experienceEditToggle.addEventListener("click", () => {
+                        const editing = experienceEditor.classList.contains("d-none");
+                        if (editing) {
+                            setBioEditing(false);
+                        }
+                        setExperienceEditing(editing);
+                    });
+                }
+
+                experienceAddButton?.addEventListener("click", () => {
+                    experienceDraft = [cloneExperienceEntry(), ...experienceDraft];
+                    renderExperienceEditor();
+                    experienceEditorList?.querySelector('[data-field="roleTitle"]')?.focus();
+                });
+
+                experienceSaveButton?.addEventListener("click", async () => {
+                    setInlineMessage(experienceMessageEl, "Saving...");
+                    setWarning([]);
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile", {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(buildPayload({
+                                experience: sanitizeExperience(sortExperienceEntries(experienceDraft))
+                            }))
+                        }, 60000);
+
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            setInlineMessage(experienceMessageEl, data.error || "Unable to save experience.", true);
+                            return;
+                        }
+
+                        const profile = await response.json();
+                        applyProfileState(profile);
+                        setExperienceEditing(false);
+                        setInlineMessage(experienceMessageEl, "Experience updated.");
+                    } catch (error) {
+                        const message = error?.name === "AbortError"
+                            ? "Saving took too long. Please try again."
+                            : "Unable to save experience right now.";
+                        setInlineMessage(experienceMessageEl, message, true);
+                    }
+                });
+
+                experienceCancelButton?.addEventListener("click", () => {
+                    resetExperienceDraft();
+                    setExperienceEditing(false);
+                    setInlineMessage(experienceMessageEl, "");
+                });
+
+                experienceClearButton?.addEventListener("click", async () => {
+                    experienceDraft = [];
+                    renderExperienceEditor();
+                    setInlineMessage(experienceMessageEl, "");
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile/section-documents/experience", { method: "DELETE" }, 60000);
+                        if (response.ok) {
+                            const profile = await response.json();
+                            patchSectionDocumentsFromProfile(profile);
+                        }
+                    } catch {
+                        // Optional cleanup when no file existed
+                    }
+                });
+
+                const postSectionDocument = async (section, file) => {
+                    const body = new FormData();
+                    body.append("file", file);
+                    const response = await fetchWithTimeout(`/api/v2/profile/section-documents/${section}`, { method: "POST", body }, 120000);
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.error || "Document upload failed.");
+                    }
+                    return response.json();
+                };
+
+                sectionDocBioUpload?.addEventListener("change", async (event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (!file) {
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        setMessage("Document must be 5 MB or smaller.", true);
+                        return;
+                    }
+                    setMessage("Uploading...");
+                    setWarning([]);
+                    try {
+                        const data = await postSectionDocument("bio", file);
+                        if (data?.profile) {
+                            patchSectionDocumentsFromProfile(data.profile);
+                        }
+                        setWarning(data.warnings || []);
+                        setMessage(data.warnings?.length ? "Supporting document uploaded (see note above)." : "Supporting document uploaded.");
+                    } catch (error) {
+                        setMessage(error?.message || "Upload failed.", true);
+                    }
+                });
+
+                sectionDocExperienceUpload?.addEventListener("change", async (event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (!file) {
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        setInlineMessage(experienceMessageEl, "Document must be 5 MB or smaller.", true);
+                        return;
+                    }
+                    setInlineMessage(experienceMessageEl, "Uploading...");
+                    setWarning([]);
+                    try {
+                        const data = await postSectionDocument("experience", file);
+                        if (data?.profile) {
+                            patchSectionDocumentsFromProfile(data.profile);
+                        }
+                        setWarning(data.warnings || []);
+                        setInlineMessage(experienceMessageEl, data.warnings?.length ? "Uploaded (see global notice)." : "Supporting document uploaded.");
+                    } catch (error) {
+                        setInlineMessage(experienceMessageEl, error?.message || "Upload failed.", true);
+                    }
+                });
+
+                resumeUpload.addEventListener("change", async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        setMessage("Resume files must be 5 MB or smaller.", true);
+                        event.target.value = "";
+                        return;
+                    }
+
+                    setMessage("Importing resume...");
+                    setWarning([]);
+                    const body = new FormData();
+                    body.append("file", file);
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile/import-resume", {
+                            method: "POST",
+                            body
+                        }, 180000);
+
+                        event.target.value = "";
+
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            setMessage(data.error || "Resume import failed.", true);
+                            return;
+                        }
+
+                        const data = await response.json();
+                        applyProfileState(data.profile);
+                        setWarning(data.warnings || []);
+                        setMessage("Resume imported. Review the bio details and save any changes.");
+                    } catch (error) {
+                        event.target.value = "";
+                        const message = error?.name === "AbortError"
+                            ? "Resume import took too long. Try a smaller PDF or DOCX file."
+                            : "Resume import failed before the server returned a response.";
+                        setMessage(message, true);
+                    }
+                });
+
+                document.getElementById("import-linkedin").addEventListener("click", async () => {
+                    setInlineMessage(linkedinImportResult, "Importing...");
+                    setWarning([]);
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile/import-linkedin", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                linkedInUrl: document.getElementById("linkedin-import-url").value || null,
+                                profileText: document.getElementById("linkedin-import-text").value || null
+                            })
+                        }, 120000);
+
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            setInlineMessage(linkedinImportResult, data.error || "LinkedIn import failed.", true);
+                            return;
+                        }
+
+                        const data = await response.json();
+                        applyProfileState(data.profile);
+                        setWarning(data.warnings || []);
+                        document.getElementById("linkedin-import-text").value = "";
+                        setInlineMessage(linkedinImportResult, "LinkedIn profile imported.");
+                    } catch (error) {
+                        const message = error?.name === "AbortError"
+                            ? "LinkedIn import took too long. Try pasting the visible profile text instead."
+                            : "LinkedIn import failed before the server returned a response.";
+                        setInlineMessage(linkedinImportResult, message, true);
+                    }
+                });
+
+                imageUpload.addEventListener("change", async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    setMessage("Uploading image...");
+                    const body = new FormData();
+                    body.append("file", file);
+                    try {
+                        const response = await fetchWithTimeout("/api/v2/profile/image", {
+                            method: "POST",
+                            body
+                        }, 120000);
+
+                        event.target.value = "";
+
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            setMessage(data.error || "Image upload failed.", true);
+                            return;
+                        }
+
+                        const profile = await response.json();
+                        applyProfileState(profile);
+                        setMessage("Profile image updated.");
+                    } catch (error) {
+                        event.target.value = "";
+                        const message = error?.name === "AbortError"
+                            ? "Image upload took too long. Please try again."
+                            : "Image upload failed before the server returned a response.";
+                        setMessage(message, true);
+                    }
+                });
+
+            } else {
+                profileImageTrigger.setAttribute("disabled", "disabled");
+            }
+
+            applyProfileState(state);
+            setBioEditing(false);
+            setExperienceEditing(false);
+        })();
+    </script>
+}

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Atlas Apply Connector",
+  "version": "0.2.0",
+  "description": "Capture job postings into Atlas Apply.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*",
+    "https://apply.atlasuniversalis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+# Legacy Atlas stack (Python FastAPI + main site Vue)
+# Serves main site and API on port 8000 when route map uses atlas_legacy.
+# Requires: legacy code at LEGACY_ROOT, venv, .env, and built frontend-main.
+
+[Unit]
+Description=Atlas Legacy (FastAPI + main site on :8000)
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/atlasuniversalis.com/legacy
+ExecStart=/var/www/atlasuniversalis.com/legacy/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+SyslogIdentifier=atlas-legacy
+User=www-data
+Group=www-data
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

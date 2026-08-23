@@ -9,6 +9,8 @@ ExecStart=/opt/atlas/apply/Atlas.Apply
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://127.0.0.1:5010
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=ApplyDbProvider=Sqlite
+Environment=ConnectionStrings__ApplyDb=DataSource=/var/lib/atlas-apply/atlas-apply.db
 Restart=on-failure
 RestartSec=5
 SyslogIdentifier=atlas-apply

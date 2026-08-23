@@ -1,0 +1,33 @@
+@page "/Archive"
+@model Atlas.Web.Pages.Archive.IndexModel
+@{
+    ViewData["Title"] = "Archive";
+    ViewData["Description"] = "Portable pages created in Hypershell Visual Page Studio.";
+}
+
+<section class="archive-index">
+    <header class="archive-index__header">
+        <p class="archive-kicker">Atlas Universalis</p>
+        <h1>Archive</h1>
+        <p>Responsive, portable Blazor pages created in Visual Page Studio and published as exact, reviewable source revisions.</p>
+    </header>
+
+    @if (Model.Pages.Count == 0)
+    {
+        <p class="archive-empty">No public Archive pages have been activated.</p>
+    }
+    else
+    {
+        <div class="archive-grid">
+            @foreach (var archivePage in Model.Pages)
+            {
+                <article class="archive-card">
+                    <p class="archive-card__classification">@string.Join(" · ", archivePage.Classifications)</p>
+                    <h2><a href="@archivePage.Route">@archivePage.Title</a></h2>
+                    <p>@archivePage.Description</p>
+                    <a class="archive-card__link" href="@archivePage.Route">Open page <span aria-hidden="true">→</span></a>
+                </article>
+            }
+        </div>
+    }
+</section>

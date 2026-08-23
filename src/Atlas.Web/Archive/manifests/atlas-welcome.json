@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "slug": "atlas-welcome",
+  "route": "/Archive/atlas-welcome",
+  "title": "Welcome to the Archive",
+  "description": "The first portable Razor component hosted through Atlas Archive.",
+  "visibility": "Public",
+  "sourceProjectId": "59bde02d-861e-4b18-9fb1-5992d661ac68",
+  "sourcePageId": "e9fa687e-3bbc-4295-a45e-5833966a3108",
+  "sourceRevision": "0a106e7ee87913482a68904a280520af8fdb5d58c0583c51c2234923ca17c7bc",
+  "componentType": "Atlas.Archive.Samples.Pages.Welcome",
+  "assemblyName": "Atlas.Archive.Sample",
+  "classifications": [ "built-in" ],
+  "artifacts": []
+}

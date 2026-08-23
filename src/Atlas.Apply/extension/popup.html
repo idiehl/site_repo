@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Atlas Apply</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 12px; width: 300px; background: #0f162a; color: #e9eef9; }
+      h1 { font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 8px; color: #dbe7ff; }
+      label { display: block; margin: 8px 0 4px; font-size: 12px; color: #b7c4e0; }
+      input, select { width: 100%; box-sizing: border-box; padding: 8px; border-radius: 6px; border: 1px solid #3b4b72; background: #121d36; color: #f3f6ff; }
+      button { width: 100%; margin-top: 10px; padding: 10px; border: 0; border-radius: 8px; background: #1f5ef5; color: #fff; cursor: pointer; }
+      button:disabled { opacity: 0.65; cursor: wait; }
+      .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+      .button-row button { margin-top: 0; }
+      #reset-defaults { background: #243253; }
+      #status { margin-top: 10px; font-size: 12px; color: #d8e4ff; white-space: pre-wrap; }
+      #status.status-error { color: #ffb8b8; }
+      #status.status-success { color: #b9efcf; }
+    </style>
+  </head>
+  <body>
+    <h1>Atlas Apply Capture</h1>
+    <label for="status-select">Initial status</label>
+    <select id="status-select">
+      <option value="Queued">Queued</option>
+      <option value="Saved">Saved</option>
+      <option value="Applied">Applied</option>
+      <option value="Interview">Interview</option>
+      <option value="Offer">Offer</option>
+      <option value="Closed">Closed</option>
+    </select>
+
+    <label for="priority-select">Priority</label>
+    <select id="priority-select">
+      <option value="Normal">Normal</option>
+      <option value="Low">Low</option>
+      <option value="High">High</option>
+      <option value="Critical">Critical</option>
+    </select>
+
+    <label for="resume-variant">Resume variant</label>
+    <input id="resume-variant" placeholder="General" value="General" />
+
+    <label for="cover-tone">Cover letter tone</label>
+    <input id="cover-tone" placeholder="Direct" value="Direct" />
+
+    <label for="focus-areas">Focus areas (comma-separated)</label>
+    <input id="focus-areas" placeholder="delivery,collaboration,problem-solving" value="delivery,collaboration,problem-solving" />
+
+    <div class="button-row">
+      <button id="capture">Capture current job page</button>
+      <button id="reset-defaults" type="button">Reset defaults</button>
+    </div>
+    <div id="status"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>

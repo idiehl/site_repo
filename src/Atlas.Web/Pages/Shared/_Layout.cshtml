@@ -3,40 +3,66 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@(ViewData["Description"] ?? "Atlas Universalis")" />
     <title>@ViewData["Title"] - Atlas Universalis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Montserrat:wght@300;400;500;600&display=swap" />
+    <link rel="icon" type="image/png" href="~/img/logo-clean.png" asp-append-version="true" />
+    <link rel="shortcut icon" type="image/png" href="~/img/logo-clean.png" asp-append-version="true" />
+    <link rel="apple-touch-icon" href="~/img/logo-clean.png" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/atlas.tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Atlas.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <a class="brand" asp-area="" asp-page="/Index">Atlas Universalis</a>
+    @{
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+        var isHome = string.Equals(currentPage, "/Index", StringComparison.OrdinalIgnoreCase);
+        var isServices = string.Equals(currentPage, "/Services", StringComparison.OrdinalIgnoreCase);
+        var isBio = string.Equals(currentPage, "/Bio", StringComparison.OrdinalIgnoreCase);
+        var isProjectLab = string.Equals(currentPage, "/ProjectLab", StringComparison.OrdinalIgnoreCase);
+        var isArchive = currentPage.StartsWith("/Archive", StringComparison.OrdinalIgnoreCase);
+    }
+    <header class="site-header" id="site-header">
+        <div class="site-header-inner">
+            <a class="brand" asp-area="" asp-page="/Index">
+                <svg class="brand-logo-mark" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.9" />
+                    <ellipse cx="12" cy="12" rx="5.45" ry="7.6" fill="none" stroke="currentColor" stroke-width="1.05" opacity="0.86" />
+                    <ellipse cx="12" cy="12" rx="7.6" ry="3.2" fill="none" stroke="currentColor" stroke-width="1.05" opacity="0.86" />
+                    <path d="M8.15 17.8 12 6.5l3.85 11.3M9.65 13.2h4.7" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="brand-text">Atlas Universalis</span>
+            </a>
             <nav class="header-nav" aria-label="Primary">
-                <a class="nav-link" asp-area="" asp-page="/Account/Create">Create Account</a>
-                <a class="nav-link" asp-area="" asp-page="/Explore">Explore</a>
-                <a class="health-link" href="/healthz">Health</a>
+                <a class="nav-link @(isHome ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/Index">Home</a>
+                <a class="nav-link" href="/#principles">Principles</a>
+                <a class="nav-link @(isServices ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/Services">Services</a>
+                <a class="nav-link @(isBio ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/Bio">Bio</a>
+                <a class="nav-link @(isProjectLab ? "nav-link--active" : string.Empty)" asp-area="" asp-page="/ProjectLab">Project Lab</a>
+                <a class="nav-link @(isArchive ? "nav-link--active" : string.Empty)" href="/Archive">Archive</a>
             </nav>
         </div>
     </header>
 
-    <div class="container">
-        <main role="main" class="main">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="site-footer">
-        <div class="container">
-            &copy; @DateTime.UtcNow.Year Atlas Universalis
-        </div>
-    </footer>
+    <main role="main" class="main">
+        @RenderBody()
+    </main>
 
     <script src="_framework/blazor.server.js"></script>
-
+    <script>
+        (function() {
+            var header = document.getElementById('site-header');
+            if (header) {
+                var onScroll = function() {
+                    header.classList.toggle('site-header--scrolled', window.scrollY > 60);
+                };
+                onScroll();
+                window.addEventListener('scroll', onScroll, { passive: true });
+            }
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

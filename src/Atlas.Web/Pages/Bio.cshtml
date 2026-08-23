@@ -1,0 +1,104 @@
+@page
+@{
+    ViewData["Title"] = "Bio";
+}
+
+<section class="bio-page" aria-label="Founder bio">
+    <div class="landing-container">
+        <div class="bio-shell">
+            <p class="bio-kicker">Founder Bio</p>
+            <h1 class="bio-title">Building software where precision, creativity, and execution intersect.</h1>
+            <p class="bio-lede">
+                I started Atlas Universalis with a simple conviction: meaningful software is never mass-produced.
+                It is discovered through deep understanding of a specific challenge, then built with discipline.
+            </p>
+
+            <div class="bio-intro-card">
+                <img
+                    class="bio-photo"
+                    src="~/img/profile-bio.png"
+                    alt="Jacob Diehl portrait"
+                    loading="lazy" />
+                <div class="bio-intro-copy">
+                    <h2>Jacob Diehl</h2>
+                    <p>
+                        My path into software started with psychology, visual art, and communication studies, then expanded into full-stack engineering and product development.
+                        That cross-disciplinary background shapes how I solve problems: analytical where it matters, creative where it helps, and practical from day one.
+                    </p>
+                    <p>
+                        I build systems for creators, analysts, and technical teams with an emphasis on clarity, maintainability, and real-world use.
+                        My core stack spans C#/.NET, Python, Vue, React, TypeScript, SQL, and modern deployment workflows.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bio-history-full">
+                <article class="bio-card">
+                    <h2>Work history</h2>
+                    <ul class="bio-timeline">
+                        <li>
+                            <strong>Network Manager - ElectraCast Media</strong>
+                            <span>2025 - Present</span>
+                            <p>Directed platform rebuild initiatives across the ElectraCast web stack, translating product goals into execution plans across frontend architecture, deployment reliability, and production routing.</p>
+                            <p>Owned cross-functional delivery for account workflows, API integrations, and operational tooling, balancing user experience goals with stable release practices and service uptime requirements.</p>
+                        </li>
+                        <li>
+                            <strong>AI Trainer - Handshake AI</strong>
+                            <span>Nov 2025 - Present</span>
+                            <p>Evaluate and rank LLM outputs for quality, correctness, safety, and instruction-following across multimodal workflows and complex prompt scenarios.</p>
+                            <p>Provide structured feedback that improves model reliability and edge-case behavior, sharpening analytical judgment that maps directly to software quality, testing, and review discipline.</p>
+                        </li>
+                        <li>
+                            <strong>Electrician C - Pierce Manufacturing</strong>
+                            <span>2022 - 2024</span>
+                            <p>Diagnosed and resolved electrical system failures in a high-precision production environment with strict quality and safety requirements.</p>
+                            <p>Built a repeatable troubleshooting mindset centered on root-cause analysis, disciplined verification, and clean handoff documentation - the same core practices required for debugging and maintaining complex software systems.</p>
+                        </li>
+                        <li>
+                            <strong>Key Account Manager - Fibrocon</strong>
+                            <span>Nov 2019 - Jul 2022</span>
+                            <p>Managed high-stakes client requirements and transformed business needs into practical implementation plans across design, production, and delivery teams.</p>
+                            <p>Produced clear technical communication artifacts that reduced ambiguity, improved execution consistency, and strengthened stakeholder alignment - a foundation for effective software product delivery.</p>
+                        </li>
+                    </ul>
+                </article>
+            </div>
+
+            <section class="bio-history-full bio-connect-section" aria-label="Contact and social links">
+                <article class="bio-card">
+                    <h2>Connect</h2>
+                    <ul class="connect-links">
+                        <li>
+                            <a href="mailto:idiehl@protonmail.com">
+                                <svg class="connect-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="3.3" y="5.5" width="17.4" height="13" rx="2.1" fill="none" stroke="currentColor" stroke-width="1.5" />
+                                    <path d="M4.6 7.4 12 13.1l7.4-5.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>idiehl@protonmail.com</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://linkedin.com/in/jdiehl-usf" target="_blank" rel="noreferrer">
+                                <svg class="connect-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="3.7" y="3.7" width="16.6" height="16.6" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.5" />
+                                    <circle cx="8" cy="9" r="1.1" fill="currentColor" />
+                                    <path d="M8 11.5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path d="M12 16.5v-2.9c0-1 .8-1.8 1.8-1.8h.5c1 0 1.8.8 1.8 1.8v2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>linkedin.com/in/jdiehl-usf</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/idiehl" target="_blank" rel="noreferrer">
+                                <svg class="connect-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 3.8a8.4 8.4 0 0 0-2.7 16.3c.4.1.6-.2.6-.5v-2c-2.4.5-2.9-1-2.9-1-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.6 1 1.6 1 .9 1.5 2.4 1 3 .8.1-.6.4-1 .7-1.2-1.9-.2-3.9-1-3.9-4.3 0-1 .4-1.9 1-2.6-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.1 9.1 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.6 1 2.6 0 3.3-2 4.1-3.9 4.3.4.3.8 1 .8 2v3c0 .3.2.6.6.5A8.4 8.4 0 0 0 12 3.8Z" fill="currentColor" />
+                                </svg>
+                                <span>github.com/idiehl</span>
+                            </a>
+                        </li>
+                    </ul>
+                </article>
+            </section>
+        </div>
+    </div>
+</section>

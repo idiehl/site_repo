@@ -1,0 +1,31 @@
+.archive-sample {
+    max-width: 58rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 5rem);
+    border: 1px solid rgba(201, 164, 86, 0.28);
+    border-radius: 1rem;
+    background: linear-gradient(145deg, rgba(15, 24, 41, 0.94), rgba(11, 18, 38, 0.98));
+}
+
+.archive-sample__kicker {
+    color: rgba(201, 164, 86, 0.95);
+    font-family: monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.archive-sample h1 {
+    color: #edf3ff;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.08;
+}
+
+.archive-sample p {
+    color: rgba(184, 198, 221, 0.82);
+    line-height: 1.75;
+}
+
+.archive-sample a {
+    color: #f0c982;
+}
