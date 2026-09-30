@@ -1,0 +1,117 @@
+@page
+@{
+    ViewData["Title"] = "Project Lab";
+}
+
+<section class="bio-page" aria-label="Project and repository lab">
+    <div class="landing-container">
+        <div class="bio-shell">
+            <section class="repo-lab">
+                <div class="repo-lab-header">
+                    <p class="bio-kicker">Project Lab</p>
+                    <h1 class="bio-title">Explore live apps, codebases, and build paths.</h1>
+                    <p>
+                        A GitHub-style workspace for exploring live apps, source code, and build commands.
+                        This page combines projects from public GitHub and local legacy codebases.
+                    </p>
+                    <a href="https://github.com/idiehl" target="_blank" rel="noreferrer">View full GitHub profile</a>
+                </div>
+
+                <div class="repo-grid">
+                    <article class="repo-card">
+                        <div class="repo-card-head">
+                            <h3>Atlas Forge</h3>
+                            <span>Local + hosted</span>
+                        </div>
+                        <p>UI Design Laboratory using Astro with Vue and React component ecosystems.</p>
+                        <ul>
+                            <li>Source: local legacy directory + project history in site_repo</li>
+                            <li>Live: <a href="https://forge.atlasuniversalis.com" target="_blank" rel="noreferrer">forge.atlasuniversalis.com</a></li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">View code</a>
+                        </div>
+                        <pre><code>cd atlasforge
+npm install
+npm run dev</code></pre>
+                    </article>
+
+                    <article class="repo-card">
+                        <div class="repo-card-head">
+                            <h3>Atlas Meridian</h3>
+                            <span>Local desktop app</span>
+                        </div>
+                        <p>Desktop visual workspace for mapping systems and ideas with nodes, frames, and rich content.</p>
+                        <ul>
+                            <li>Source: local legacy meridian solution (Atlas.Meridian.sln)</li>
+                            <li>Stack: .NET 10 + Avalonia</li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">View code base</a>
+                        </div>
+                        <pre><code>cd meridian
+dotnet restore Atlas.Meridian.sln
+dotnet run --project src/Atlas.Universalis.App</code></pre>
+                    </article>
+
+                    <article class="repo-card">
+                        <div class="repo-card-head">
+                            <h3>Atlas Apply</h3>
+                            <span>Live production app</span>
+                        </div>
+                        <p>AI-powered job application platform with tracking, profile tooling, and workflow automation.</p>
+                        <ul>
+                            <li>Source: <a href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">github.com/idiehl/site_repo</a></li>
+                            <li>Live: <a href="https://apply.atlasuniversalis.com" target="_blank" rel="noreferrer">apply.atlasuniversalis.com</a></li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">View code</a>
+                            <a class="btn btn-primary" href="https://apply.atlasuniversalis.com" target="_blank" rel="noreferrer">Launch app</a>
+                        </div>
+                        <pre><code>pip install -r requirements.txt
+cd frontend
+npm install
+npm run dev</code></pre>
+                    </article>
+
+                    <article class="repo-card">
+                        <div class="repo-card-head">
+                            <h3>Enterprise and infrastructure work</h3>
+                            <span>Platform scope</span>
+                        </div>
+                        <p>
+                            Multi-application delivery across main site, app subdomains, deployment automation, CI/CD,
+                            and production operations.
+                        </p>
+                        <ul>
+                            <li>Includes architecture, deployment scripts, and production runbooks</li>
+                            <li>Primary source: <a href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">site_repo</a></li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/site_repo" target="_blank" rel="noreferrer">Explore repository</a>
+                        </div>
+                    </article>
+
+                    <article class="repo-card">
+                        <div class="repo-card-head">
+                            <h3>Additional GitHub projects</h3>
+                            <span>Public repos</span>
+                        </div>
+                        <p>Selected public repositories from GitHub for direct code access.</p>
+                        <ul>
+                            <li><a href="https://github.com/idiehl/Atlas_Battlegrounds" target="_blank" rel="noreferrer">Atlas_Battlegrounds</a></li>
+                            <li><a href="https://github.com/idiehl/HYPERDESK" target="_blank" rel="noreferrer">HYPERDESK</a></li>
+                            <li><a href="https://github.com/idiehl/stockview" target="_blank" rel="noreferrer">stockview</a></li>
+                            <li><a href="https://github.com/idiehl/Cs_Type_Browser" target="_blank" rel="noreferrer">Cs_Type_Browser</a></li>
+                            <li><a href="https://github.com/idiehl/tiny_api" target="_blank" rel="noreferrer">tiny_api</a></li>
+                            <li><a href="https://github.com/idiehl/wpf_samples" target="_blank" rel="noreferrer">wpf_samples</a></li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl?tab=repositories" target="_blank" rel="noreferrer">Browse all repos</a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>

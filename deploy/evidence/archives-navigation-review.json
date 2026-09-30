@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "status": "ATLAS_ARCHIVES_NAVIGATION_REVIEW_OK",
+  "baseCommit": "6febc0c4293d7865306b29bc90dd3605ee21f177",
+  "liveSourceFileCount": 90,
+  "unchangedSourceFiles": 88,
+  "intendedSourceChanges": [
+    "Pages/Shared/_Layout.cshtml: Add Archives navigation link to /Archives",
+    "Program.cs: report ATLAS_RELEASE_COMMIT in health response"
+  ],
+  "copiedNoEnvironmentOrCredentials": true,
+  "build": "dotnet publish Atlas.Web net10.0 Release: passed",
+  "publicHtmlChecks": [
+    {
+      "route": "/",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/Services",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/Bio",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/ProjectLab",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/launch-scope",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/Explore",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/Account/Create",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    },
+    {
+      "route": "/Privacy",
+      "liveStatus": 200,
+      "candidateStatus": 200,
+      "identicalExceptArchivesLink": true,
+      "archivesLinkCount": 1
+    }
+  ],
+  "normalizedRenderingFields": [
+    "new Archives link",
+    "Blazor prerender descriptors and state",
+    "antiforgery token",
+    "generated scoped CSS identifiers and asset fingerprint",
+    "inter-tag whitespace"
+  ],
+  "scopedCssSemanticsIdentical": true,
+  "nginxOnlyChanges": [
+    "three main-site proxy_pass upstreams",
+    "atomic upstream include",
+    "Archives route include"
+  ],
+  "nginxAllOtherDirectivesPreserved": true,
+  "receiverRoutingMustBeInstalledFirst": true,
+  "liveTrafficChanged": false
+}

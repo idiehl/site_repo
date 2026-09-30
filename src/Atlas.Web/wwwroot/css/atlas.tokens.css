@@ -18,7 +18,7 @@
   --atlas-color-overlay-strong: rgba(7, 13, 26, 0.78);
 
   /* Typography intent */
-  --atlas-font-sans: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --atlas-font-sans: "Montserrat", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --atlas-font-mono: "JetBrains Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
   --atlas-font-display: "Playfair Display", Georgia, serif;
 

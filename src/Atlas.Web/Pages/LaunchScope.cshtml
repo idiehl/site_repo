@@ -1,0 +1,183 @@
+@page "/launch-scope"
+@model Atlas.Web.Pages.LaunchScopeModel
+@{
+    ViewData["Title"] = "Launch Scope Builder";
+}
+
+<section class="tool-page">
+    <div class="landing-container">
+        <div class="tool-hero">
+            <p class="tool-kicker">Tomorrow MVP Tool</p>
+            <h1 class="tool-title">Launch Scope Builder</h1>
+            <p class="tool-lede">
+                Turn a raw tool idea into the smallest public version you can ship on this C# site by tomorrow.
+                Define the audience, the core input, the expected output, and the delivery mode, then get a cut list and success criteria.
+            </p>
+        </div>
+
+        <div class="tool-grid">
+            <section class="tool-card">
+                <div class="tool-card-header">
+                    <h2>Define the tool</h2>
+                    <p>Focus on one outcome, one result screen, and one clear next action.</p>
+                </div>
+
+                <form method="post" class="tool-form">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                    <div class="tool-field">
+                        <label asp-for="Input.ToolName"></label>
+                        <input asp-for="Input.ToolName" class="tool-input" placeholder="Market Opportunity Mapper" />
+                        <span asp-validation-for="Input.ToolName" class="field-error"></span>
+                    </div>
+
+                    <div class="tool-field">
+                        <label asp-for="Input.PrimaryAudience"></label>
+                        <input asp-for="Input.PrimaryAudience" class="tool-input" placeholder="Founders validating a new product idea" />
+                        <span asp-validation-for="Input.PrimaryAudience" class="field-error"></span>
+                    </div>
+
+                    <div class="tool-field">
+                        <label asp-for="Input.ProblemToSolve"></label>
+                        <textarea asp-for="Input.ProblemToSolve" class="tool-textarea" rows="3" placeholder="Help them decide what to build first without turning the first release into a full platform."></textarea>
+                        <span asp-validation-for="Input.ProblemToSolve" class="field-error"></span>
+                    </div>
+
+                    <div class="tool-form-grid">
+                        <div class="tool-field">
+                            <label asp-for="Input.PrimaryInput"></label>
+                            <input asp-for="Input.PrimaryInput" class="tool-input" placeholder="Concept description, target audience, and time limit" />
+                            <span asp-validation-for="Input.PrimaryInput" class="field-error"></span>
+                        </div>
+
+                        <div class="tool-field">
+                            <label asp-for="Input.ExpectedOutput"></label>
+                            <input asp-for="Input.ExpectedOutput" class="tool-input" placeholder="A ranked MVP scope with next-step guidance" />
+                            <span asp-validation-for="Input.ExpectedOutput" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="tool-form-grid">
+                        <div class="tool-field">
+                            <label asp-for="Input.ExperienceMode"></label>
+                            <select asp-for="Input.ExperienceMode" class="tool-select">
+                                <option value="public-no-signin">Public with no sign-in</option>
+                                <option value="public-lead-capture">Public with optional lead capture</option>
+                                <option value="signed-in">Signed-in experience</option>
+                                <option value="saved-data">Saved account data</option>
+                            </select>
+                            <span class="helper-text">Choose the minimum experience you really need for tomorrow.</span>
+                            <span asp-validation-for="Input.ExperienceMode" class="field-error"></span>
+                        </div>
+
+                        <div class="tool-field">
+                            <label asp-for="Input.TrustSignal"></label>
+                            <input asp-for="Input.TrustSignal" class="tool-input" placeholder="Sample output, expert framing, or a next-step CTA" />
+                            <span class="helper-text">Optional. Keep it to one trust-building element.</span>
+                            <span asp-validation-for="Input.TrustSignal" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="tool-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">Build tomorrow scope</button>
+                        <a href="/" class="btn btn-secondary btn-lg">Back to landing</a>
+                    </div>
+                </form>
+            </section>
+
+            <section class="tool-card tool-result-card">
+                @if (Model.Recommendation is null)
+                {
+                    <div class="tool-card-header">
+                        <h2>What you will get</h2>
+                        <p>A clear answer on whether the idea is tomorrow-ready and what to cut if it is not.</p>
+                    </div>
+
+                    <div class="tool-preview">
+                        <article class="preview-block">
+                            <h3>Tomorrow MVP scope</h3>
+                            <p>The smallest public version that proves value in one page load.</p>
+                        </article>
+                        <article class="preview-block">
+                            <h3>Cut from tomorrow</h3>
+                            <p>The features that slow down launch: auth, persistence, integrations, and secondary workflows.</p>
+                        </article>
+                        <article class="preview-block">
+                            <h3>Success criteria</h3>
+                            <p>Specific checks for inputs, output, clarity, and next-step conversion.</p>
+                        </article>
+                    </div>
+                }
+                else
+                {
+                    <div class="result-badge result-badge--@Model.Recommendation.RiskTone">
+                        @Model.Recommendation.Verdict
+                    </div>
+                    <p class="result-note">@Model.Recommendation.DeliveryNote</p>
+
+                    <div class="tool-meta-grid">
+                        <div class="tool-meta-card">
+                            <span>Risk</span>
+                            <strong>@Model.Recommendation.RiskLabel</strong>
+                        </div>
+                        <div class="tool-meta-card">
+                            <span>Experience mode</span>
+                            <strong>@Model.Recommendation.ExperienceModeLabel</strong>
+                        </div>
+                    </div>
+
+                    <div class="result-section">
+                        <h3>Inputs and output</h3>
+                        <ul class="tool-list">
+                            @foreach (var item in Model.Recommendation.InputSummary)
+                            {
+                                <li>@item</li>
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="tool-columns">
+                        <article class="result-section">
+                            <h3>Tomorrow MVP scope</h3>
+                            <ul class="tool-list">
+                                @foreach (var item in Model.Recommendation.ScopeItems)
+                                {
+                                    <li>@item</li>
+                                }
+                            </ul>
+                        </article>
+
+                        <article class="result-section">
+                            <h3>Cut from tomorrow</h3>
+                            <ul class="tool-list">
+                                @foreach (var item in Model.Recommendation.CutItems)
+                                {
+                                    <li>@item</li>
+                                }
+                            </ul>
+                        </article>
+
+                        <article class="result-section">
+                            <h3>Success criteria</h3>
+                            <ul class="tool-list">
+                                @foreach (var item in Model.Recommendation.SuccessCriteria)
+                                {
+                                    <li>@item</li>
+                                }
+                            </ul>
+                        </article>
+                    </div>
+
+                    <div class="result-next-step">
+                        <h3>Recommended next step</h3>
+                        <p>@Model.Recommendation.NextStep</p>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -4,121 +4,58 @@
     ViewData["Title"] = "Atlas Universalis";
 }
 
-<section class="hero">
-    <div class="hero-grid">
-        <div class="hero-copy">
-            <p class="eyebrow">Atlas Universalis</p>
-            <h1>Navigate the Digital Frontier With Confidence</h1>
-            <p class="lede">
-                Atlas Universalis is rebuilding as a modern C# platform where each application module starts from
-                a shared identity foundation, consistent design language, and operationally safe deployment model.
-            </p>
-            <p class="hero-stat">Phase 1 focus: landing experience and account/profile foundation.</p>
-        </div>
-        <div class="hero-actions">
-            <a class="button" asp-page="/Account/Create">Create Account</a>
-            <a class="button button-secondary" asp-page="/Explore">Explore Atlas</a>
-            <a class="button button-secondary" asp-page="/Account/Create" asp-route-intent="early-access">Join Early Access</a>
+<section class="landing-hero" id="hero" aria-label="Atlas Universalis hero">
+    <div class="landing-hero-bg" aria-hidden="true">
+        <div class="landing-hero-stars stars-layer-a"></div>
+        <div class="landing-hero-stars stars-layer-b"></div>
+        <div class="landing-hero-stars stars-layer-c"></div>
+        <div class="landing-hero-map-lines"></div>
+        <div class="landing-hero-vline"></div>
+        <div class="landing-hero-glow"></div>
+        <div class="landing-hero-atlas-wrap">
+            <img src="~/img/au-icon-atlas-globe-2048.png" class="landing-hero-atlas" alt="" />
         </div>
     </div>
-</section>
 
-<section class="section" id="pillars">
-    <div class="section-header">
-        <span class="section-number">01</span>
-        <h2 class="section-title">Core Value Pillars</h2>
-        <p class="section-lede">A strategic platform direction designed for reliability, clarity, and extensibility.</p>
-    </div>
-    <div class="pillars-grid">
-        <article class="pillar-card">
-            <h3>Identity First</h3>
-            <p>Account and profile capabilities ship first so every future application can share a trusted user core.</p>
-        </article>
-        <article class="pillar-card">
-            <h3>Operationally Safe</h3>
-            <p>Health checks, route-map cutover, and rollback controls remain intact during phased migration.</p>
-        </article>
-        <article class="pillar-card">
-            <h3>Design Consistency</h3>
-            <p>The atlas_brand system drives token-based styling for a premium, cohesive visual experience.</p>
-        </article>
-    </div>
-</section>
-
-<section class="section" id="platform">
-    <div class="section-header">
-        <span class="section-number">02</span>
-        <h2 class="section-title">Platform Overview</h2>
-        <p class="section-lede">How landing actions transition into authenticated application usage.</p>
-    </div>
-    <div class="platform-flow">
-        <div class="flow-steps">
-            <div class="flow-step">
-                <span>Step 01</span>
-                <p>Visitor arrives on landing page and selects a clear CTA.</p>
-            </div>
-            <div class="flow-step">
-                <span>Step 02</span>
-                <p>User completes account creation and secure sign-in.</p>
-            </div>
-            <div class="flow-step">
-                <span>Step 03</span>
-                <p>Profile setup captures identity and preference baseline.</p>
-            </div>
-            <div class="flow-step">
-                <span>Step 04</span>
-                <p>User enters Atlas modules with shared identity context.</p>
-            </div>
+    <div class="landing-hero-content">
+        <h1 class="landing-hero-wordmark">
+            <span>Atlas</span>
+            <span>Universalis</span>
+        </h1>
+        <div class="landing-hero-divider" aria-hidden="true">
+            <span></span>
+            <span class="star-glyph">✦</span>
+            <span></span>
         </div>
+        <p class="landing-hero-kicker">Custom Software Strategy & Delivery</p>
+        <p class="landing-hero-subtitle">We build custom solutions around the unique challenges our clients face - no templates, no pre-packaged products, no least-common-denominator compromises.</p>
+    </div>
+
+    <div class="landing-hero-scroll" aria-hidden="true">
+        <span>Explore</span>
     </div>
 </section>
 
-<section class="section" id="features">
-    <div class="section-header">
-        <span class="section-number">03</span>
-        <h2 class="section-title">Near-Term Feature Preview</h2>
-        <p class="section-lede">The first roadmap sequence after landing release.</p>
-    </div>
-    <div class="feature-grid">
-        <article class="feature-card">
-            <h3>Auth and Profiles</h3>
-            <p>Registration, sign-in, and profile setup establish the platform identity layer.</p>
-        </article>
-        <article class="feature-card">
-            <h3>Atlas Explorer</h3>
-            <p>Interactive exploration experience delivered next with profile-aware personalization paths.</p>
-        </article>
-        <article class="feature-card">
-            <h3>Knowledge and Community</h3>
-            <p>Editorial and community capabilities follow after identity and explorer foundations stabilize.</p>
-        </article>
-    </div>
-</section>
-
-<section class="section" id="trust">
-    <div class="section-header">
-        <span class="section-number">04</span>
-        <h2 class="section-title">Trust and Reliability</h2>
-        <p class="section-lede">The rebuild prioritizes resilient operations from day one.</p>
-    </div>
-    <div class="trust-grid">
-        <article class="trust-card">
-            <h3>Operational Controls</h3>
-            <p>Nginx route-map cutover and rollback remains available during migration.</p>
-        </article>
-        <article class="trust-card">
-            <h3>Health Visibility</h3>
-            <p>The health endpoint remains continuously available for direct and proxy-level smoke checks.</p>
-        </article>
-    </div>
-</section>
-
-<section class="conversion-band" aria-label="Primary conversion">
-    <div>
-        <p>Ready to chart your route with Atlas Universalis?</p>
-    </div>
-    <div class="conversion-actions">
-        <a class="button" asp-page="/Account/Create">Create Account</a>
-        <a class="button button-secondary" asp-page="/Explore">Explore Atlas</a>
+<section class="landing-principles" id="principles" aria-label="Core principles">
+    <div class="landing-container">
+        <div class="principles-intro">
+            <p class="principles-kicker">Core Values</p>
+            <h2 class="principles-title">Many challenges. One solution mindset.</h2>
+            <p class="principles-lede">Our process is rooted in research, insight, analysis, and close observation of the problem itself - then building the right solution for that exact context.</p>
+        </div>
+        <div class="principles-grid">
+            <article class="principle-card">
+                <h3>Challenge reveals exceptionalism</h3>
+                <p>We treat hard problems as opportunities to demonstrate uncommon precision, judgment, and craft.</p>
+            </article>
+            <article class="principle-card">
+                <h3>Custom over commodity</h3>
+                <p>No one-size-fits-all model. Every system is shaped by your constraints, objectives, and environment.</p>
+            </article>
+            <article class="principle-card">
+                <h3>Solutions built on evidence</h3>
+                <p>Our work is guided by research and observation first, then translated into clear, practical implementation.</p>
+            </article>
+        </div>
     </div>
 </section>

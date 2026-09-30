@@ -24,7 +24,11 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 app.MapBlazorHub();
-app.MapGet("/healthz", () => Results.Ok(new { status = "healthy", app = "atlas-web-placeholder" }));
+app.MapGet("/healthz", () => Results.Ok(new
+{
+    status = "healthy", app = "atlas-web-placeholder",
+    release = Environment.GetEnvironmentVariable("ATLAS_RELEASE_COMMIT") ?? "local"
+}));
 
 app.Run();
 

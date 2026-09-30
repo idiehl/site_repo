@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 1,
+  "source": "/var/www/atlasuniversalis.com/src/Atlas.Web",
+  "capturedAtUtc": "2026-09-30T21:21:53.0649833Z",
+  "baseCommit": "6febc0c4293d7865306b29bc90dd3605ee21f177",
+  "sourceStableAcrossCopy": true,
+  "copiedScope": [
+    "Pages",
+    "Components",
+    "wwwroot",
+    "Program.cs",
+    "Atlas.Web.csproj"
+  ],
+  "excludedScope": [
+    "configuration",
+    "environment files",
+    "credentials",
+    "bin",
+    "obj"
+  ],
+  "files": [
+    {
+      "path": "Components/PlaceholderCounter.razor",
+      "sha256": "462314a4c7fb0d28a4d9feee728310c81083d481eac11f88da3a0e4209137ffb",
+      "length": 353
+    },
+    {
+      "path": "Pages/Account/Create.cshtml",
+      "sha256": "6d04788a0aa1a675ef2b2b8942fcf99bae90ed635dc28aa298cec64888f5b889",
+      "length": 1180
+    },
+    {
+      "path": "Pages/Account/Create.cshtml.cs",
+      "sha256": "4462bae1de04c38b80156b5667dfc4bcefe692ec5c7feab4d6f712efec0b7213",
+      "length": 489
+    },
+    {
+      "path": "Pages/Bio.cshtml",
+      "sha256": "a17183353b03e55208bea01983348bf9ae3be426fd8c04d6e61dbe49cb0c21c2",
+      "length": 7382
+    },
+    {
+      "path": "Pages/Error.cshtml",
+      "sha256": "6d42ce8f51555c7c4a67ae83c909f1b4ad0d440781d3f4e814735afed9311581",
+      "length": 856
+    },
+    {
+      "path": "Pages/Error.cshtml.cs",
+      "sha256": "c598f837cb21017258801450694c383a915641da07456e86792ece37894cfd48",
+      "length": 502
+    },
+    {
+      "path": "Pages/Explore.cshtml",
+      "sha256": "bb92200b247aab3123f9b667698fff1944c46651f42fcf5c973fb1ec03574430",
+      "length": 1036
+    },
+    {
+      "path": "Pages/Explore.cshtml.cs",
+      "sha256": "020280ca44dab2f6edde8324be28f83ec12bbcff8d765d1cbf91e67494038e34",
+      "length": 157
+    },
+    {
+      "path": "Pages/Index.cshtml",
+      "sha256": "c0f072d6563a909360047218acbd5c3f52452e6466841c4fa76b99a3db2cf116",
+      "length": 2766
+    },
+    {
+      "path": "Pages/Index.cshtml.cs",
+      "sha256": "68fae7dc8f274d7135a9b3a533552116c207d3cd1eb11b1fec24e424452af462",
+      "length": 181
+    },
+    {
+      "path": "Pages/LaunchScope.cshtml",
+      "sha256": "a755a142827f44534cb4871010f20b673a1088c1942f86d37ada43f627e45afc",
+      "length": 9320
+    },
+    {
+      "path": "Pages/LaunchScope.cshtml.cs",
+      "sha256": "aab11c2d8be8272a00ba241f8f4c932218edb80adc8c82737e72d5ee7f71d3b1",
+      "length": 7697
+    },
+    {
+      "path": "Pages/Privacy.cshtml",
+      "sha256": "c1e9d8d43865d3b68cedbf714fda9c0ff9393a18c7de943c3cd065343e1b4511",
+      "length": 164
+    },
+    {
+      "path": "Pages/Privacy.cshtml.cs",
+      "sha256": "db8138d5d706335b730dee444cb20355fda0cf31763bf70085cff66c1e71d1ac",
+      "length": 186
+    },
+    {
+      "path": "Pages/ProjectLab.cshtml",
+      "sha256": "137388f95a1f317f3e13a2dacb9a5e94f2eda2aaf65fe167c202290b1f0afe6f",
+      "length": 6753
+    },
+    {
+      "path": "Pages/Services.cshtml",
+      "sha256": "9a3359fcc0f5952f0e20109195f73cb2ad2b9f3e3ba22712dfe48f419f7561b1",
+      "length": 3746
+    },
+    {
+      "path": "Pages/Shared/_Layout.cshtml",
+      "sha256": "9c0d67a0bffb1a127d917a0eaebf8204f18ce0b316f317899eeaf6b1252f46d9",
+      "length": 3785
+    },
+    {
+      "path": "Pages/Shared/_Layout.cshtml.css",
+      "sha256": "6a0ad45ce7ea1fed708db43eaa8cb16cba7d9a42a0cd546a9eeb3ded676af9ad",
+      "length": 105
+    },
+    {
+      "path": "Pages/Shared/_ValidationScriptsPartial.cshtml",
+      "sha256": "48fed6ed616ba43ee237ff7c36ff2cd11b68db5cd00fa08c177e27aef2fe599e",
+      "length": 179
+    },
+    {
+      "path": "Pages/_ViewImports.cshtml",
+      "sha256": "2f48715309c62feb67b6fd439c3bede2891f6cdf14974c1355e9d92eab9219a1",
+      "length": 100
+    },
+    {
+      "path": "Pages/_ViewStart.cshtml",
+      "sha256": "f6dceb9e6258ad80525250b5faf8454ab7688b0f5d58a253529149f42d4ec50c",
+      "length": 32
+    },
+    {
+      "path": "wwwroot/css/atlas.tokens.css",
+      "sha256": "35d42897161e5459c39f92528d508aa4955b176656b4c2018fcf575e6a0c668f",
+      "length": 1017
+    },
+    {
+      "path": "wwwroot/css/site.css",
+      "sha256": "a263a163b539705b0d7eba99dbd2a98ba26a505c0b0944e667ed583d2f144ceb",
+      "length": 27907
+    },
+    {
+      "path": "wwwroot/favicon.ico",
+      "sha256": "26dc5ff4bfb9213291735808465e156d4a4691135f3815e3613761243e1f69c3",
+      "length": 5430
+    },
+    {
+      "path": "wwwroot/img/au-icon-atlas-globe-2048.png",
+      "sha256": "439adcb57df423bf63710f9ef13833154a1b497fc03213ed6f7531896c6d4906",
+      "length": 3417765
+    },
+    {
+      "path": "wwwroot/img/logo-clean.png",
+      "sha256": "4986aa7d68ee4055808e2c9637c2458be712f7a350314e6b9d6b6dc332fe731d",
+      "length": 23653635
+    },
+    {
+      "path": "wwwroot/img/profile-bio.png",
+      "sha256": "3cf48d7b9398b5399291826364eb3cc6ddd0607066cf390a6866d6d3a36d682a",
+      "length": 288995
+    },
+    {
+      "path": "wwwroot/js/site.js",
+      "sha256": "cbf36077c5b6d54a6e094844a866d428312a16735f4e301f6f6e068492465323",
+      "length": 227
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/LICENSE",
+      "sha256": "5b30317c9c35bb6f05101c501de866cc6852ab9b655dcf5941733f6644c3ebd0",
+      "length": 1131
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css",
+      "sha256": "632e7f841a919a6536309d532b03f6697a133baf8e8f3acb98922c0b65b2e07f",
+      "length": 70329
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css.map",
+      "sha256": "c404fe9f6e4513986f3a38f67c6e1874ec2bd5b97822500904d83a3db84b4f61",
+      "length": 203221
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css",
+      "sha256": "e670c73068b27d91e5dd45de3ee84b0d047d9dc3df051d4725e64b5f224d576e",
+      "length": 51795
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.min.css.map",
+      "sha256": "9202fec7056633c20eb35e659e81edf5d691d8b44c8811bf7188143dc290398e",
+      "length": 115986
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.css",
+      "sha256": "099c6817cce368b97256472f5420e573c09e411d70d5132bbe0631df472cf243",
+      "length": 70403
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.css.map",
+      "sha256": "fec890500f325fcdf48fe70be1a98a1d8df206d9f79fccf7120f95675e5ff749",
+      "length": 203225
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css",
+      "sha256": "bccc5372f902e0bcbb2e2013dc6f32132f44a53afb1607b849ccd6a74effa779",
+      "length": 51870
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-grid.rtl.min.css.map",
+      "sha256": "ec674e970ed4ff083269e52d166c4fcf9fcca6176f5523ed54e3a54e7f5cdf74",
+      "length": 116063
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css",
+      "sha256": "968f5823cd8e174defa2376ef97391dfe0d1acb229321a7364d9876cce420cc0",
+      "length": 12065
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.css.map",
+      "sha256": "45727f4198817c75e83ed5d1d84802f9b168da97b71ad6d93bbdb646d88b1b34",
+      "length": 129371
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css",
+      "sha256": "97cbede68a33bfde7c78c77d4c5b0f016825f4924af5829f6d54acf2672143ce",
+      "length": 10126
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.min.css.map",
+      "sha256": "d1ea954fada4a912c987da13a8b7881f852742c92a56389bf219767d7c65e258",
+      "length": 51369
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.css",
+      "sha256": "57ca6c9c7a094bf30f9425d6c1cfc9ded1ada7d7378061519aab08420a67f868",
+      "length": 12058
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.css.map",
+      "sha256": "3a8415c21ec0ae9edb5682b66624f1d92fff2ab9cfad23f33d9f770aa08c85ef",
+      "length": 129386
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css",
+      "sha256": "ffc8e1f217043052b24ba8285aa9cdbbbb7713364f0867506603bab02908f2d2",
+      "length": 10198
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-reboot.rtl.min.css.map",
+      "sha256": "f75d33c3eacc75c8342ece3c013a7ae6f127f2b7791ef3f138a9b6c77fc20482",
+      "length": 63943
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.css",
+      "sha256": "d81b9b80d50f950485ff4c0b15c45743f623ce4f6fb146c301e2b640cfa1fb2a",
+      "length": 107823
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.css.map",
+      "sha256": "35f8eb73852bf45bf6a0112cc10588c819cd0cff7dabe2e12fecfde79dced1c6",
+      "length": 267535
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.min.css",
+      "sha256": "2b213dc5b28ef42b98c741d7a482a0b1622f5e401f213b62435ef68f6eb0991b",
+      "length": 85352
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.min.css.map",
+      "sha256": "ac70e68a9e09673b9a18e71243541242b21b1b411bdd98daf7086a485d736085",
+      "length": 180381
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.css",
+      "sha256": "1fac2405b4b08ee6b6bde2684e1268e2ecb5eb58e9f833a2653968525719eaa4",
+      "length": 107691
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.css.map",
+      "sha256": "a74055ab955efdda2104875f6eb66ca1036ed36252b0a875834c1bca242251a5",
+      "length": 267476
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css",
+      "sha256": "18052e9ba163c10f07ad719aa054671d3a9040ba658d719abd3ee6057f04f6a5",
+      "length": 85281
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.min.css.map",
+      "sha256": "a3c5cadf699c63f15f70e4350f61c9bd5b99d184d74944590cb5c22b47e741e0",
+      "length": 180217
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.css",
+      "sha256": "18a105d7cb38e01e5ed0ca255c092992a2e211b39594a7fa57262bfc6fc4ea9c",
+      "length": 281046
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.css.map",
+      "sha256": "2b3355477a7b51919b6bde1d9c2b6573a8d78cae6ead23e267f78d9ca4e60e4c",
+      "length": 679755
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css",
+      "sha256": "3c8f27e6009ccfd710a905e6dcf12d0ee3c6f2ac7da05b0572d3e0d12e736fc8",
+      "length": 232803
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css.map",
+      "sha256": "f12338536350a422c64d02d6e43ff1dea493c3156ad823fe19761cdd5d56c05b",
+      "length": 589892
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.css",
+      "sha256": "8f91385c88f5a7590d9c38b4c75b5e5fd457a21d7f14d94fbc230bf589918764",
+      "length": 280259
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.css.map",
+      "sha256": "ddb61652289560c65fbf6c2ae499d722c1e540a8122acfd57118af823819d61a",
+      "length": 679615
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.min.css",
+      "sha256": "879944ecd9bc4a4788a411c763137df6ca4fdd5b8614a97935982ca1c8a5ef39",
+      "length": 232911
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/css/bootstrap.rtl.min.css.map",
+      "sha256": "ad3cd79677a971bfef80502207e53b3834007ce9492df337818e8853b78800d9",
+      "length": 589087
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js",
+      "sha256": "9a4a11a15db88d5fab08f59c1c34796b03f1f15bb3cc928dd226e1c59f7f59a3",
+      "length": 207819
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js.map",
+      "sha256": "5aae1a596d6b41d27eea8020cb525073d2018c72fd4f730a7d74c136a3afd367",
+      "length": 444579
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js",
+      "sha256": "0833b2e9c3a26c258476c46266e6877fc75218625162e0460be9a3a098a61c6c",
+      "length": 80721
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js.map",
+      "sha256": "5e3e0763164143baaa1ca0706b6100ba0452f911d6ce9713b48e3dbe07b35125",
+      "length": 332090
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js",
+      "sha256": "7b189764d243c2e7177ee8dedc26d73dbb92ebe12bcb7cfdb0ffa9826be1f270",
+      "length": 135829
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js.map",
+      "sha256": "10f44b829a9691a84bc449fa0948dd33be91218230d71747c136de1ecb2e8ffe",
+      "length": 305438
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js",
+      "sha256": "4197454f564d765cb8ae681406d5e65c54bd054d454dafac3deea1efde2c1514",
+      "length": 73935
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js.map",
+      "sha256": "4ec6eff33e9594d815113f31bf3ff22e8fefe622474c08f62788648633f5ac73",
+      "length": 222455
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.js",
+      "sha256": "f945bcd36c2055f9e36926ddc321cb954ec056995bd164e83a5bcdd429f321a7",
+      "length": 145401
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.js.map",
+      "sha256": "f56afb1f17bc802243a081e1e713f6f65757bc2de43761a489f423f5cf2f631e",
+      "length": 306606
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js",
+      "sha256": "de040986d9a3ed89d5d5f9ad6d5727015e9e238c2cd13af8f1b55909386d0864",
+      "length": 60635
+    },
+    {
+      "path": "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js.map",
+      "sha256": "648d357bf9ece3bdc62af0021b831c82025dc6f15f148c38c6ca704221bc61ee",
+      "length": 220561
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation-unobtrusive/LICENSE.txt",
+      "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+      "length": 1116
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
+      "sha256": "c0941a2745f29c11367eae827b15d78712aeedfb2d56641ced5d8c1cd4e8f964",
+      "length": 19385
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js",
+      "sha256": "6096bb5bc12241d429924f778861238e72d25164694496d27f37d4461d64c73e",
+      "length": 5824
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation/LICENSE.md",
+      "sha256": "f398878cab338b869638bdac1aeae76bf3ac11b2b89da6e0b68bc1a645733440",
+      "length": 1095
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation/dist/additional-methods.js",
+      "sha256": "46d2b9ff1697dc7d4640dc39817ee54c41ad0d772a943f23feb82cd1b10f03a7",
+      "length": 51529
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation/dist/additional-methods.min.js",
+      "sha256": "32d100f35f5996ce9db4bb794b906910c3a189f3f2cfb81fcdf82d36d63be651",
+      "length": 22122
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation/dist/jquery.validate.js",
+      "sha256": "9112fcdb7ef6babe58ad54e3156a7d9ae6a8f72794f00a0b889c526f97a49878",
+      "length": 52536
+    },
+    {
+      "path": "wwwroot/lib/jquery-validation/dist/jquery.validate.min.js",
+      "sha256": "ba66d3685c4fdf516fe8ed62b692d2ff7fafe5f3805832ce533966bce19a295e",
+      "length": 25308
+    },
+    {
+      "path": "wwwroot/lib/jquery/LICENSE.txt",
+      "sha256": "911d138518f2d3bfa1ab8a74f277dd92337ea48f781a3dab2b99721346ee2135",
+      "length": 1097
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.js",
+      "sha256": "78a85aca2f0b110c29e0d2b137e09f0a1fb7a8e554b499f740d6744dc8962cfe",
+      "length": 285314
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.min.js",
+      "sha256": "fc9a93dd241f6b045cbff0481cf4e1901becd0e12fb45166a8f17f95823f0b1a",
+      "length": 87533
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.min.map",
+      "sha256": "cf74d51c62d299189989130ebb423b30453532fdc8988d8e2b71b1b9165a80b8",
+      "length": 134755
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.slim.js",
+      "sha256": "520bef37cbc19203b496e3d2525dacf13225392611a061405f88e50889bd01d7",
+      "length": 232015
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.slim.min.js",
+      "sha256": "9261efb3407e3a9096e4654750d8eff6b3a663422f48845c7fbcc65034c340cf",
+      "length": 70264
+    },
+    {
+      "path": "wwwroot/lib/jquery/dist/jquery.slim.min.map",
+      "sha256": "f45626720b71f2a668d4e3cf88fb7f049feccf4108f1244d518b052d90c412de",
+      "length": 107143
+    },
+    {
+      "path": "Program.cs",
+      "sha256": "4398d7cbd127b6a12dc3e79423b7c242d793262f5cfde7e92686b82ca1fee3e9",
+      "length": 764
+    },
+    {
+      "path": "Atlas.Web.csproj",
+      "sha256": "7c8dbff9196245188b63132959ebb1348c904f95d6b8e627e08ef2314bf6bcec",
+      "length": 211
+    }
+  ]
+}
