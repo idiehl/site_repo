@@ -7,9 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Montserrat:wght@300;400;500;600&display=swap" />
-    <link rel="icon" type="image/png" href="~/img/logo-clean.png" asp-append-version="true" />
-    <link rel="shortcut icon" type="image/png" href="~/img/logo-clean.png" asp-append-version="true" />
-    <link rel="apple-touch-icon" href="~/img/logo-clean.png" asp-append-version="true" />
+    <meta name="theme-color" content="#070d1a" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+    <link rel="icon" type="image/png" sizes="32x32" href="~/brand/favicon-32.png" asp-append-version="true" />
+    <link rel="icon" type="image/png" sizes="16x16" href="~/brand/favicon-16.png" asp-append-version="true" />
+    <link rel="apple-touch-icon" sizes="180x180" href="~/brand/apple-touch-icon.png" asp-append-version="true" />
+    <link rel="manifest" href="~/site.webmanifest" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/atlas.tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Atlas.Web.styles.css" asp-append-version="true" />
@@ -25,12 +28,7 @@
     <header class="site-header" id="site-header">
         <div class="site-header-inner">
             <a class="brand" asp-area="" asp-page="/Index">
-                <svg class="brand-logo-mark" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="7.6" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.9" />
-                    <ellipse cx="12" cy="12" rx="5.45" ry="7.6" fill="none" stroke="currentColor" stroke-width="1.05" opacity="0.86" />
-                    <ellipse cx="12" cy="12" rx="7.6" ry="3.2" fill="none" stroke="currentColor" stroke-width="1.05" opacity="0.86" />
-                    <path d="M8.15 17.8 12 6.5l3.85 11.3M9.65 13.2h4.7" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
+                <img class="brand-logo-mark" src="~/brand/atlas-emblem-96.png" asp-append-version="true" width="32" height="32" alt="" />
                 <span class="brand-text">Atlas Universalis</span>
             </a>
             <nav class="header-nav" aria-label="Primary">

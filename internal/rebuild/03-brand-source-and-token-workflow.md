@@ -2,6 +2,15 @@
 
 ## Canonical Design Source
 
+The approved Atlas logo is the restored antique gold Atlas-and-globe emblem in
+`src/Atlas.Web/wwwroot/brand/atlas-emblem.png` (transparent PNG, 1254 × 1254).
+It replaces both the circular A mark and the earlier parchment-backed artwork.
+Use this same image for website branding, hero artwork, tabs and saved shortcuts;
+do not redraw it from the historical Figma references below.
+Run `tools/Export-AtlasBrand.ps1` on Windows to package the checked-in PNG and ICO
+sizes without changing the master artwork. Older public image paths are retained
+as copies of the new emblem for cached pages and shortcuts.
+
 The canonical aesthetic baseline for the rebuild is:
 
 - `internal/UI/Figma/Atlas_Pages/atlas_brand`
