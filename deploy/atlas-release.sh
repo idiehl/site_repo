@@ -231,12 +231,21 @@ restore_route() {
 }
 
 public_health_check() {
-    local expected_commit="${1:-}" response
-    response="$(curl --fail --silent --show-error --max-time 10 \
-        --resolve atlasuniversalis.com:443:127.0.0.1 \
-        https://atlasuniversalis.com/healthz)" || return 1
-    [ -z "${expected_commit}" ] \
-        || grep -Fq "\"release\":\"${expected_commit}\"" <<<"${response}"
+    local expected_commit="${1:-}" response attempt
+    # nginx reload returns before new workers necessarily serve requests. Allow
+    # ten bounded requests and nine one-second waits (at most ~29 seconds).
+    for ((attempt=1; attempt<=10; attempt++)); do
+        if response="$(curl --fail --silent --show-error --max-time 2 \
+            --resolve atlasuniversalis.com:443:127.0.0.1 \
+            https://atlasuniversalis.com/healthz)"; then
+            if [ -z "${expected_commit}" ] \
+                || grep -Fq "\"release\":\"${expected_commit}\"" <<<"${response}"; then
+                return 0
+            fi
+        fi
+        [ "${attempt}" -eq 10 ] || sleep 1
+    done
+    return 1
 }
 
 install_routing() {
