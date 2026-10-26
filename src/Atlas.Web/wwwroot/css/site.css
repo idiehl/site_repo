@@ -790,6 +790,7 @@ a:hover {
 }
 
 .repo-card {
+  scroll-margin-top: 6rem;
   border: 1px solid rgba(138, 159, 193, 0.24);
   border-radius: 0.9rem;
   background: linear-gradient(160deg, rgba(13, 23, 45, 0.74), rgba(10, 18, 34, 0.82));
