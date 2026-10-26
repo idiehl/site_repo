@@ -18,6 +18,35 @@
                 </div>
 
                 <div class="repo-grid">
+                    <article class="repo-card" id="pulseforge" style="scroll-margin-top: 6rem;">
+                        <div class="repo-card-head">
+                            <h3>PulseForge</h3>
+                            <span>Windows desktop alpha</span>
+                        </div>
+                        <p>
+                            A stereo output workstation for headphones and speakers, built as a companion to PulseGen.
+                            Shape each channel independently and inspect sound with live waveform, spectrum, and phase displays.
+                        </p>
+                        <ul>
+                            <li>Twelve parametric EQ nodes per channel, high/low-pass filters, resonance damping, and stereo controls.</li>
+                            <li>Guarded output boost with a linked limiter, portable output modes, and device-setting recall.</li>
+                            <li>Stack: .NET 10, Avalonia, C++20 DSP, and WASAPI &middot; Windows 11 x64</li>
+                        </ul>
+                        <div class="repo-actions">
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/PulseForge" target="_blank" rel="noreferrer">View code</a>
+                            <a class="btn btn-secondary" href="https://github.com/idiehl/PulseForge/blob/main/docs/ALPHA-ACCEPTANCE.md" target="_blank" rel="noreferrer">Alpha acceptance status</a>
+                        </div>
+                        <p>
+                            System-wide processing requires the developer test driver and a deliberately configured Windows test environment.
+                            A production-signed installer is not available; see the acceptance status for verified behavior and remaining hardware checks.
+                        </p>
+                        <pre><code>git clone https://github.com/idiehl/PulseForge.git
+cd PulseForge
+./scripts/bootstrap.ps1
+./scripts/build.ps1 -Configuration Release
+./scripts/verify.ps1 -Configuration Release -NoBuild</code></pre>
+                    </article>
+
                     <article class="repo-card">
                         <div class="repo-card-head">
                             <h3>Atlas Forge</h3>
